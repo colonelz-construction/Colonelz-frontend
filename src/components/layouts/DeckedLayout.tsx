@@ -38,6 +38,7 @@ const DeckedLayout = () => {
     return (
         <div className="app-layout-simple flex flex-auto flex-col min-h-screen">
             <div className="flex flex-auto min-w-0">
+            <RoleProvider>
                 <div className="flex flex-col flex-auto min-h-screen min-w-0 relative w-full">
                     <Header
                         container
@@ -46,10 +47,10 @@ const DeckedLayout = () => {
                         headerEnd={<HeaderActionsEnd />}
                     />
                     <SecondaryHeader contained />
-                    <RoleProvider>
+                   
                     <View pageContainerType="contained" />
-                    </RoleProvider>
                 </div>
+                    </RoleProvider>
             </div>
         </div>
     )

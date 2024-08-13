@@ -4,9 +4,12 @@ import { FaHome, FaRegBuilding, FaRegFolderOpen } from 'react-icons/fa'
 import { IoMdArchive } from "react-icons/io";
 import { MdOutlineMiscellaneousServices } from 'react-icons/md'
 import { useNavigate } from 'react-router-dom'
+import { useRoleContext } from '../../Roles/RolesContext';
+import { AuthorityCheck } from '@/components/shared';
 
 const Template = () => {
   const navigate=useNavigate()
+  const {roleData} = useRoleContext()
   const role = localStorage.getItem('role')
   return (
     <div className='grid xl:grid-cols-4 sm:grid-cols-3 gap-4 cursor-pointer'>
@@ -33,11 +36,16 @@ const Template = () => {
           <div className=' text-lg ' ><FaRegFolderOpen/></div>
        <p> Company Policies</p>
         </div></Card>
-        {role !== 'Jr. Executive HR & Marketing' && (
+        <AuthorityCheck
+                       userAuthority={[`${localStorage.getItem('role')}`]}
+                       authority={roleData?.data?.archive?.read??[]}
+                       >
+        
       <Card onClick={()=>navigate('/app/crm/fileManager/archive')}>  <div className='flex gap-4'>
           <div className=' text-lg ' ><IoMdArchive /></div>
        <p> Archive</p>
-        </div></Card>)}
+        </div></Card>
+        </AuthorityCheck>
       
       </div>
   )

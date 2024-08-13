@@ -5,7 +5,7 @@ import { Button, Dialog, Notification, Pagination, Select, Skeleton, toast } fro
 import type { MouseEvent } from 'react';
 import YourFormComponent from './ProjectForm';
 import { FaFolder } from 'react-icons/fa';
-import { ConfirmDialog, StickyFooter } from '@/components/shared';
+import { AuthorityCheck, ConfirmDialog, StickyFooter } from '@/components/shared';
 import { HiTrash } from 'react-icons/hi';
 import { apiDeleteFileManagerFolders } from '@/services/CrmService';
 import { useMemo} from 'react'
@@ -29,6 +29,8 @@ import NoData from '@/views/pages/NoData';
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton';
 import { AiOutlineDelete } from 'react-icons/ai';
 import { MdOutlineDelete } from 'react-icons/md';
+import { useRoleContext } from '@/views/crm/Roles/RolesContext';
+import formateDate from '@/store/dateformate';
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -66,10 +68,10 @@ function DebouncedInput({
     return (
         <div className="flex justify-end">
             <div className="flex items-center mb-4">
-                <span className="mr-2">Search:</span>
                 <Input
                     {...props}
                     value={value}
+                    size='sm'
                     onChange={(e) => setValue(e.target.value)}
                 />
             </div>
@@ -78,14 +80,20 @@ function DebouncedInput({
 }
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    
-    const itemRank = rankItem(row.getValue(columnId), value)
+  let itemValue:any = row.getValue(columnId);
 
-    addMeta({
-        itemRank,
-    })
-    return itemRank.passed
-}
+  
+  if (columnId === 'updated_date') {
+      itemValue = formateDate(itemValue);
+  }
+
+  const itemRank = rankItem(itemValue, value);
+  addMeta({
+      itemRank,
+  });
+
+  return itemRank.passed;
+};
 
 
 
@@ -98,6 +106,7 @@ const Index = () => {
   const projectId = queryParams.get('project_id');
   const projectName = queryParams.get('project_name');
   const role=localStorage.getItem('role')
+  const {roleData} = useRoleContext()
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const [dialogIsOpen, setIsOpen] = useState(false);
@@ -179,13 +188,6 @@ const deleteFolders = async (folder_name:string) => {
   
 }
 
-function formatDate(dateString:string) {
-  const date = new Date(dateString);
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
-}
 
 
 const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -218,7 +220,7 @@ const columns = useMemo<ColumnDef<FolderItem>[]>(
         { header: 'Modified', accessorKey: 'updated_date', cell: ({row}) => {
             const date=row.original.updated_date
             return(
-                <div>{formatDate(date)}</div>
+                <div>{formateDate(date)}</div>
             )
         }
         },
@@ -228,9 +230,14 @@ const columns = useMemo<ColumnDef<FolderItem>[]>(
             id: 'actions',
             cell: ({row}) => {
                 return(
+                  <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.lead?.read??[]}
+                    >
                     <div className=' ml-3 cursor-pointer' onClick={()=>openDialog2(row.original.folder_name)}>
                   <MdOutlineDelete className=' text-xl text-center hover:text-red-500'/>
                   </div>
+                  </AuthorityCheck>
                 )
             }
         },
@@ -258,17 +265,16 @@ const onSelectChange = (value = 0) => {
 
 
 const filteredProjectData = useMemo(() => {
-  if (role === 'Executive Assistant') {
+ 
+  if (!roleData?.data?.quotation?.read?.includes(`${role}`)) {
     return projectData.filter(item => 
-      item.folder_name.toLowerCase() === 'procurement' || 
-      item.folder_name.toLowerCase() === 'quotation'
-    );
-  }
-  else if (role === '3D Visualizer' || role==="Project Architect" || role==="Jr. Interior Designer" || role==="Site Supervisor") {
-    return projectData.filter(item => 
-      item.folder_name.toLowerCase() !== 'contract' && 
       item.folder_name.toLowerCase() !== 'quotation' && 
       item.folder_name.toLowerCase() !== 'procurement data'
+    );
+  }
+  else if (!roleData?.data?.contract?.read?.includes(`${role}`)) {
+    return projectData.filter(item => 
+      item.folder_name.toLowerCase() !== 'contract'
     );
   }
   return projectData;
@@ -304,9 +310,14 @@ const table = useReactTable({
       <div>
           <div className=" mb-5 flex justify-between">
               <h3 className=" capitalize">Project-{projectName}</h3>
+              <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.file?.create??[]}
+                    >
               <Button variant="solid" size="sm" onClick={() => openDialog()}>
                   Upload
               </Button>
+              </AuthorityCheck>
           </div> 
             <>
     <div className=' flex justify-between'>
@@ -327,7 +338,7 @@ const table = useReactTable({
             <DebouncedInput
                 value={globalFilter ?? ''}
                 className="p-2 font-lg shadow border border-block"
-                placeholder="Search all columns..."
+                placeholder="Search..."
                 onChange={(value) => setGlobalFilter(String(value))}
             />
             </div>

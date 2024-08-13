@@ -28,6 +28,7 @@ import { AuthorityCheck, ConfirmDialog } from '@/components/shared'
 import EditTask from './EditTask'
 import NoData from '@/views/pages/NoData'
 import { useRoleContext } from '../../Roles/RolesContext'
+import formateDate from '@/store/dateformate'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -64,18 +65,68 @@ const pageSizeOption = [
     { value: 40, label: '40 / page' },
     { value: 50, label: '50 / page' },
 ]
+function DebouncedInput({
+    value: initialValue,
+    onChange,
+    debounce = 500,
+    ...props
+}: DebouncedInputProps) {
+    const [value, setValue] = useState(initialValue)
+    
 
+    useEffect(() => {
+        setValue(initialValue)
+    }, [initialValue])
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            onChange(value)
+        }, debounce)
+
+        return () => clearTimeout(timeout)
+    }, [value])
+   
+    
+    
+
+    return (
+        <div className="flex justify-between md:flex-col lg:flex-row">
+            <h3></h3>
+            <div className="flex items-center mb-4 gap-3">
+                <Input
+                size='sm'
+                    {...props}
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                />
+               
+            </div>
+        </div>
+    )
+}
 
 
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+    let itemValue:any = row.getValue(columnId);
+
     
-    const itemRank = rankItem(row.getValue(columnId), value)
+    if (columnId === 'estimated_task_start_date') {
+        itemValue = formateDate(itemValue);
+    }
+    if (columnId === 'estimated_task_end_date') {
+        itemValue = formateDate(itemValue);
+    }
+   
+    
+
+    const itemRank = rankItem(itemValue, value);
     addMeta({
         itemRank,
-    })
-    return itemRank.passed
-}
+    });
+
+    return itemRank.passed;
+};
 const statusColors: { [key: string]: string } = {
     'Follow Up': 'bg-green-200 text-green-700',
     'Interested': 'bg-blue-200 text-blue-700',
@@ -92,6 +143,9 @@ const Filtering = () => {
     const [taskData,setTaskData]=useState<any>(null)
     const [loading,setLoading]=useState(true)
     const [userData,setUserData]=useState<any>(null)
+
+    const role=localStorage.getItem('role')
+    const {roleData}=useRoleContext()
 
     useEffect(() => {
         const TaskData=async()=>{
@@ -111,53 +165,7 @@ const Filtering = () => {
     },[projectId])
 
 
-    function DebouncedInput({
-        value: initialValue,
-        onChange,
-        debounce = 500,
-        ...props
-    }: DebouncedInputProps) {
-        const [value, setValue] = useState(initialValue)
-        const role=localStorage.getItem('role')
-        const {roleData}=useRoleContext()
-    
-        useEffect(() => {
-            setValue(initialValue)
-        }, [initialValue])
-    
-        useEffect(() => {
-            const timeout = setTimeout(() => {
-                onChange(value)
-            }, debounce)
-    
-            return () => clearTimeout(timeout)
-        }, [value])
-        const location=useLocation()
-        const queryParams = new URLSearchParams(location.search);
-        const projectId=queryParams.get('project_id') || '';
-        console.log(userData);
-        
-    
-        return (
-            <div className="flex justify-between md:flex-col lg:flex-row">
-                <h3></h3>
-                <div className="flex items-center mb-4 gap-3">
-                    <Input
-                    size='sm'
-                        {...props}
-                        value={value}
-                        onChange={(e) => setValue(e.target.value)}
-                    />
-                    <AuthorityCheck
-                    userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.task?.create??[]}
-                    >
-                    <AddTask project={projectId} userData={userData}/>
-                    </AuthorityCheck>
-                </div>
-            </div>
-        )
-    }
+   
 
 
 
@@ -324,12 +332,20 @@ const Filtering = () => {
     }
     return (
         <>
+        <div className='flex gap-3 justify-end'>
             <DebouncedInput
                 value={globalFilter ?? ''}
                 className="p-2 font-lg shadow border border-block"
                 placeholder="Search..."
                 onChange={(value) => setGlobalFilter(String(value))}
             />
+             <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.task?.create??[]}
+                    >
+                    <AddTask project={projectId} userData={userData}/>
+                    </AuthorityCheck>
+                    </div>
             {!loading ? taskData.length===0?(<NoData/>):(
                 <Table>
                 <THead>

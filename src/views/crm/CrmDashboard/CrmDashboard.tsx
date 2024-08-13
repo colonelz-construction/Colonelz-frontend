@@ -2,6 +2,8 @@ import Project from "./components/Projects";
 import Statistic from "./components/Statistic";
 import Leads from "./components/Leads";
 import { ProjectProvider, useProjectContext } from "../Customers/store/ProjectContext";
+import { useRoleContext } from "../Roles/RolesContext";
+import { AuthorityCheck } from "@/components/shared";
 
 interface Data{
     Execution_Phase:string,
@@ -33,13 +35,24 @@ const CrmDashboard = () => {
         },
     ]
     const role=localStorage.getItem('role');
+    const {roleData} = useRoleContext();
     return (
         <div className="flex flex-col gap-4 h-full">
                     <Statistic data={data} />
                 <div className="grid grid-cols-1 xl:grid-cols-7 gap-4">
                 </div>
+                <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.project?.read??[]}
+                    >
                 <Project />
-                {(role === 'ADMIN' || role === 'Senior Architect' || role==='Project Architect') && <Leads />}
+                </AuthorityCheck>
+                <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.lead?.read??[]}
+                    >
+               <Leads />
+               </AuthorityCheck>
                 
           
         </div>

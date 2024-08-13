@@ -12,7 +12,7 @@ import type { MomData } from './data';
 import type { ColumnDef, Row, ColumnSort, FilterFn } from '@tanstack/react-table';
 import type { InputHTMLAttributes, ReactElement } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, DatePicker, Input } from '@/components/ui';
+import { Button, DatePicker, Input, Pagination, Select } from '@/components/ui';
 import { useMomContext } from '../../store/MomContext';
 import type { ColumnFiltersState } from '@tanstack/react-table';
 import { rankItem } from '@tanstack/match-sorter-utils';
@@ -20,6 +20,7 @@ import Sorter from '@/components/ui/Table/Sorter';
 import { MdDownload } from 'react-icons/md';
 import { useRoleContext } from '@/views/crm/Roles/RolesContext';
 import { AuthorityCheck } from '@/components/shared';
+import formateDate from '@/store/dateformate';
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number;
@@ -61,19 +62,12 @@ function DebouncedInput({
     );
 }
 
-const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-based in JavaScript
-    const year = date.getUTCFullYear();
-  
-    return `${day}-${month}-${year}`;
-};
+
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     let itemValue: any = row.getValue(columnId);
     if (columnId === 'meetingdate') {
-        itemValue = formatDate(itemValue);
+        itemValue = formateDate(itemValue);
     } else if (columnId === 'client_name') {
         itemValue = row.original.attendees.client_name;
     }
@@ -101,6 +95,10 @@ type MOM = {
 };
 
 const { Tr, Th, Td, THead, TBody } = Table;
+type Option={
+    value:number;
+    label:string;
+  }
 
 function ReactTable({
     renderRowSubComponent,
@@ -155,7 +153,7 @@ function ReactTable({
                 cell: (props) => {
                     const row = props.row.original;
                     const date = new Date(row.meetingdate);
-                    const formattedDate = formatDate(row.meetingdate);
+                    const formattedDate = formateDate(row.meetingdate);
 
                     return <div>{formattedDate}</div>;
                 },
@@ -175,6 +173,21 @@ function ReactTable({
     const projectId = new URLSearchParams(location.search).get('project_id');
 
     const [sorting, setSorting] = useState<ColumnSort[]>([]);
+    const pageSizeOption = [
+        { value: 10, label: '10 / page' },
+        { value: 20, label: '20 / page' },
+        { value: 30, label: '30 / page' },
+        { value: 40, label: '40 / page' },
+        { value: 50, label: '50 / page' },
+    ]
+    
+    const onPaginationChange = (page: number) => {
+      table.setPageIndex(page - 1)
+    }
+    
+    const onSelectChange = (value = 0) => {
+      table.setPageSize(Number(value))
+    }
     
 
     const table = useReactTable({
@@ -304,6 +317,27 @@ function ReactTable({
                             ))}
                         </TBody>
                     </Table>
+                    <div className="flex items-center justify-between mt-4">
+                <Pagination
+                    pageSize={table.getState().pagination.pageSize}
+                    currentPage={table.getState().pagination.pageIndex + 1}
+                    total={leadData?leadData.length:0}
+                    onChange={onPaginationChange}
+                />
+                <div style={{ minWidth: 130 }}>
+                    <Select<Option>
+                        size="sm"
+                        isSearchable={false}
+                        value={pageSizeOption.filter(
+                            (option) =>
+                                option.value ===
+                                table.getState().pagination.pageSize
+                        )}
+                        options={pageSizeOption}
+                        onChange={(option) => onSelectChange(option?.value)}
+                    />
+                </div>
+            </div>
                 </>
             ) : (
                 <div style={{ textAlign: 'center' }}>No Mom Data</div>
@@ -340,7 +374,7 @@ const renderSubComponent = ({ row }: { row: Row<MomData> }) => {
           <div class="section-title">Meeting Details</div>
           <div class="section-content">
             <p><strong>Location:</strong> ${rowData.location}</p>
-            <p><strong>Date:</strong> ${formatDate(rowData.meetingdate)}</p>
+            <p><strong>Date:</strong> ${formateDate(rowData.meetingdate)}</p>
           </div>
         </div>
         <div class="section">
@@ -398,7 +432,7 @@ const handlePrint = () => {
                               </div>
                               <div className="flex gap-1 items-center">
                                   <p className="text-gray-500 dark:text-gray-400 font-semibold text-lg">Date: </p>
-                                  <p className="text-base">{formatDate(rowData.meetingdate)}</p>
+                                  <p className="text-base">{formateDate(rowData.meetingdate)}</p>
                               </div>
                           </div>
                           <div>

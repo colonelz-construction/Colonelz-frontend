@@ -25,6 +25,7 @@ import { useData } from '../FileManagerContext/FIleContext'
 import { Loading } from '@/components/shared'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import NoData from '@/views/pages/NoData'
+import formateDate from '@/store/dateformate'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -72,13 +73,20 @@ function DebouncedInput({
 }
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-  
-    const itemRank = rankItem(row.getValue(columnId), value)
+    let itemValue:any = row.getValue(columnId);
+
+    
+    if (columnId === 'lead_date') {
+        itemValue = formateDate(itemValue);
+    }
+
+    const itemRank = rankItem(itemValue, value);
     addMeta({
         itemRank,
-    })
-    return itemRank.passed
-}
+    });
+
+    return itemRank.passed;
+};
 type Option = {
     value: number
     label: string

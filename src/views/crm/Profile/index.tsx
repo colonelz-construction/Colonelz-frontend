@@ -20,7 +20,12 @@ const Index = () => {
     <TabList>
         <TabNav value="tab1">Profile</TabNav>
         <TabNav value="tab2">Password</TabNav>
-        {userRole === 'ADMIN' && <TabNav value="tab3">Users</TabNav>}
+        <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.user?.read??[]}
+                    >
+         <TabNav value="tab3">Users</TabNav>
+         </AuthorityCheck>
         <AuthorityCheck
                     userAuthority={[`${localStorage.getItem('role')}`]}
                     authority={roleData?.data?.role?.read??[]}

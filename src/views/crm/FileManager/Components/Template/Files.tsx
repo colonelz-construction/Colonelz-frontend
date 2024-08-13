@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Checkbox, Dialog, FormItem, Input, Notification, Select, Upload, toast } from '@/components/ui';
-import { ConfirmDialog, RichTextEditor, StickyFooter } from '@/components/shared';
+import { Button, Checkbox, Dialog, FormItem, Input, Notification, Pagination, Select, Upload, toast } from '@/components/ui';
+import { AuthorityCheck, ConfirmDialog, RichTextEditor, StickyFooter } from '@/components/shared';
 import CreatableSelect from 'react-select/creatable';
 import { CiFileOn, CiImageOn } from 'react-icons/ci';
 import { getTemplateData } from '../data';
@@ -29,6 +29,8 @@ import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
 import { AiOutlineDelete, AiOutlineFolder } from 'react-icons/ai'
+import { useRoleContext } from '@/views/crm/Roles/RolesContext';
+import formateDate from '@/store/dateformate';
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -37,7 +39,10 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
 }
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
-
+type Option={
+  value:number;
+  label:string;
+}
 function DebouncedInput({
     value: initialValue,
     onChange,
@@ -63,6 +68,7 @@ function DebouncedInput({
               <span className="mr-2"></span>
               <Input
                   {...props}
+                  size='sm'
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
               />
@@ -71,12 +77,20 @@ function DebouncedInput({
   )
   }
   const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    const itemRank = rankItem(row.getValue(columnId), value)
+    let itemValue:any = row.getValue(columnId);
+
+    
+    if (columnId === 'date') {
+        itemValue = formateDate(itemValue);
+    }
+
+    const itemRank = rankItem(itemValue, value);
     addMeta({
         itemRank,
-    })
-    return itemRank.passed
-}
+    });
+
+    return itemRank.passed;
+};
 
 const Index = () => {
   const [leadData, setLeadData] = useState<FileItem[]>([]);
@@ -93,6 +107,7 @@ const Index = () => {
   const subfolder = queryParams.get('subfolder');
   const folderId = queryParams.get('folder_id');
   const [shareLoading, setShareLoading] = useState(false);
+  const { roleData } = useRoleContext();
   
   const navigate=useNavigate()
 
@@ -343,19 +358,28 @@ const onDialogClose3 = () => {
   }
 
 
-  function formatDate(dateString:string) {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  }
+
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState('')
+  const pageSizeOption = [
+    { value: 10, label: '10 / page' },
+    { value: 20, label: '20 / page' },
+    { value: 30, label: '30 / page' },
+    { value: 40, label: '40 / page' },
+    { value: 50, label: '50 / page' },
+]
+
+const onPaginationChange = (page: number) => {
+  table.setPageIndex(page - 1)
+}
+
+const onSelectChange = (value = 0) => {
+  table.setPageSize(Number(value))
+}
 
   const columns = useMemo<ColumnDef<FileItem>[]>(
       () => [
-          { header: 'Name', accessorKey: 'folder_name', cell: ({row}) =>
+          { header: 'Name', accessorKey: 'fileName', cell: ({row}) =>
             <div className="flex items-center gap-2">
           {getFileIcon(row.original.fileName)}
             <a className="font-medium cursor-pointer" href={row.original.fileUrl} target='_blank'>
@@ -374,7 +398,7 @@ const onDialogClose3 = () => {
           },
           { header: 'modified', accessorKey: 'date',
             cell:({row})=>{
-                return formatDate(row.original.date)
+                return formateDate(row.original.date)
             }
            },
            {
@@ -382,11 +406,18 @@ const onDialogClose3 = () => {
             accessorKey:'action',
             id:'actions',
             cell:({row})=>{
-                return (  <div className=' flex justify-center gap-3'> 
+                return ( 
+                  <div className=' flex justify-center gap-3'> 
+                     <AuthorityCheck
+                       userAuthority={[`${localStorage.getItem('role')}`]}
+                       authority={roleData?.data?.file?.delete??[]}
+                       >
   
                   <AiOutlineDelete className='text-xl cursor-pointer hover:text-red-500' onClick={()=>openDialog3(row.original.fileId)} />
+                    </AuthorityCheck>
                     <HiShare className='text-xl cursor-pointer'  onClick={() => openDialog(row.original.fileId)}/>  
-                    </div>)
+                    </div>
+                    )
             }
            }
       ],
@@ -424,14 +455,20 @@ const onDialogClose3 = () => {
     <div>
         <div className='flex justify-between'>
       <h3 className='mb-5'>Company Data</h3>
+      <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.file?.create??[]}
+                    >
       <Button className='' size='sm' variant='solid' onClick={()=>openDialog2()}>
         Upload Files
       </Button>
+      </AuthorityCheck>
       </div>
       {leadData && leadData.length > 0 ? (
         
         <div className="h-screen w-full">
         <div className="flex-1 p-4">
+          <div className='flex justify-between'>
         <div className="flex items-center mb-4">
     <nav className="flex">
       <ol className="flex items-center space-x-2">
@@ -466,9 +503,15 @@ const onDialogClose3 = () => {
         <li className="text-gray-500">{subfolder}</li>
       </ol>
     </nav>
-  </div>
+    </div>
   
-         
+  <DebouncedInput
+                value={globalFilter ?? ''}
+                className="p-2 font-lg shadow border border-block"
+                placeholder="Search..."
+                onChange={(value) => setGlobalFilter(String(value))}
+            />
+            </div>
           <>
           
           <Table>
@@ -529,6 +572,27 @@ const onDialogClose3 = () => {
                   })}
               </TBody>
           </Table>
+          <div className="flex items-center justify-between mt-4">
+                <Pagination
+                    pageSize={table.getState().pagination.pageSize}
+                    currentPage={table.getState().pagination.pageIndex + 1}
+                    total={leadData.length}
+                    onChange={onPaginationChange}
+                />
+                <div style={{ minWidth: 130 }}>
+                    <Select<Option>
+                        size="sm"
+                        isSearchable={false}
+                        value={pageSizeOption.filter(
+                            (option) =>
+                                option.value ===
+                                table.getState().pagination.pageSize
+                        )}
+                        options={pageSizeOption}
+                        onChange={(option) => onSelectChange(option?.value)}
+                    />
+                </div>
+            </div>
       </>
         </div>
       </div>

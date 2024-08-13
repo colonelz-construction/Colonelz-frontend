@@ -26,9 +26,46 @@ const Timeline = () => {
     }, [])
    console.log(taskData);
    
-  const event=taskData?.map((task:any)=>({start:formatDate(task.estimated_task_start_date),end:formatDate(task.estimated_task_end_date),title:task.task_name,
-    eventColor:['A',"D"].includes(task.task_name[0])?'blue':'red'})
-)
+   const colorMap: { [key: string]: string } = {
+    A: 'red',
+    B: 'orange',
+    C: 'amber',
+    D: 'yellow',
+    E: 'lime',
+    F: 'green',
+    G: 'emerald',
+    H: 'teal',
+    I: 'cyan',
+    J: 'sky',
+    K: 'blue',
+    L: 'indigo',
+    M: 'purple',
+    N: 'fuchsia',
+    O: 'pink',
+    P: 'rose',
+    Q: 'red',
+    R: 'orange',
+    S: 'amber',
+    T: 'yellow',
+    U: 'lime',
+    V: 'green',
+    W: 'emerald',
+    X: 'teal',
+    Y: 'cyan',
+    Z: 'sky'
+};
+
+const getColorForTask = (taskName: string): string => {
+    const firstLetter = taskName[0].toUpperCase();
+    return colorMap[firstLetter] || 'gray'; // Default color if the letter is not in the map
+};
+
+const event = taskData?.map((task: any) => ({
+    start: formatDate(task.estimated_task_start_date),
+    end: formatDate(task.estimated_task_end_date),
+    title: task.task_name,
+    eventColor: getColorForTask(task.task_name)
+}));
 console.log(event);
 
    return( <div><CalendarView

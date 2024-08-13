@@ -55,6 +55,18 @@ export async function apiGetRoleWiseDetails() {
 
 
 
+export async function apiCreateRole(Data: any) {
+    const response = await fetch(`${apiPrefix}admin/create/role`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(Data)
+    });
+    const responseData = await response.json();
+    return responseData;
+}
 export async function apiEditRoles(Data: any,id:string |null) {
     const response = await fetch(`${apiPrefix}admin/update/role?id=${id}`, {
         method: 'PUT',
@@ -66,6 +78,18 @@ export async function apiEditRoles(Data: any,id:string |null) {
     });
 
     return response;}
+export async function apiDeleteRole(id:string |null) {
+    const response = await fetch(`${apiPrefix}admin/delete/role?id=${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        
+    });
+    const responseData = await response.json();
+
+    return responseData;}
 export async function addProfilePhoto(Data: any) {
     const response = await fetch(`${apiPrefix}users/profileurl`, {
         method: 'POST',

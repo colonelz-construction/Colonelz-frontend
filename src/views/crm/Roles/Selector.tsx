@@ -1,25 +1,37 @@
 import React from 'react';
-import { HiPlusCircle, HiEye, HiPencilAlt, HiTrash } from 'react-icons/hi';
+import { HiPlusCircle, HiEye, HiPencilAlt, HiTrash, HiCheck } from 'react-icons/hi';
 import classNames from 'classnames';
 import { Segment } from '@/components/ui';
 
-type Permission = 'create' | 'read' | 'update' | 'delete';
+type Permission = 'create' | 'read' | 'update' | 'delete' | 'restore';
 
 type SelectorProps = {
     field: any;
     form: any;
 };
 
-const permissions: Permission[] = ['create', 'read', 'update', 'delete'];
+const permissionsMap: { [key: string]: Permission[] } = {
+    default: ['create', 'read', 'update', 'delete'],
+    archive: ['read', 'restore'],
+    addMember: ['create'],
+    lead: ['create', 'read', 'update'],
+    project: ['create', 'read', 'update'],
+    mom: ['create', 'read'],
+    contract: ['create', 'read'],
+    quotation: ['create', 'read'],
+    user: ['create', 'read', 'delete']
+};
 
 const icons = {
     create: <HiPlusCircle className="text-xl" />,
     read: <HiEye className="text-xl" />,
     update: <HiPencilAlt className="text-xl" />,
-    delete: <HiTrash className="text-xl" />
+    delete: <HiTrash className="text-xl" />,
+    restore: <HiPlusCircle className="text-xl" /> // Assuming restore uses the same icon as create
 };
 
 const Selector = ({ field, form }: SelectorProps) => {
+    const permissions = permissionsMap[field.name] || permissionsMap.default;
 
     const handleChange = (permission: Permission) => {
         const newValue = field.value.includes(permission)
@@ -43,12 +55,14 @@ const Selector = ({ field, form }: SelectorProps) => {
                             ? perm === 'create' ? 'bg-green-200 text-green-700' :
                               perm === 'read' ? 'bg-blue-200 text-blue-700' :
                               perm === 'update' ? 'bg-yellow-200 text-yellow-700' :
+                              perm === 'restore' ? 'bg-green-200 text-green-700' :
                               'bg-red-200 text-red-700'
                             : 'bg-gray-100 text-gray-700'
                     )}
                 >
                     {icons[perm]}
-                    {perm}
+                    <span className="ml-2">{perm}</span>
+                    {field.value.includes(perm) && <HiCheck className="ml-2 text-green-700" />}
                 </Segment.Item>
             ))}
         </Segment>

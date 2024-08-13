@@ -52,7 +52,8 @@ const Leads = ({ data = [], className }: any) => {
         'Follow Up': 'bg-green-200 text-green-700',
         'Interested': 'bg-blue-200 text-blue-700',
         'No Response': 'bg-red-200 text-red-700',
-        'Not Interested': 'bg-red-200 text-red-700',
+        'Not Contacted': 'bg-red-200 text-red-700',
+        'Inactive': 'bg-yellow-200 text-yellow-700',
     };
 
 

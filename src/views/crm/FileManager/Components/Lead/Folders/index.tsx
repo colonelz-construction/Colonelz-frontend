@@ -2,7 +2,7 @@ import React, {  useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FileItem } from '../data';
 import { Button, Dialog, FormItem, Input, Notification, Pagination, Select, Upload, toast } from '@/components/ui';
-import { ConfirmDialog, RichTextEditor, StickyFooter } from '@/components/shared';
+import { AuthorityCheck, ConfirmDialog, RichTextEditor, StickyFooter } from '@/components/shared';
 import CreatableSelect from 'react-select/creatable';
 import { CiFileOn, CiImageOn } from 'react-icons/ci';
 import { apiDeleteFileManagerFiles, apiGetCrmFileManagerCreateLeadFolder, apiGetCrmFileManagerLeads, apiGetCrmFileManagerShareContractFile, apiGetCrmFileManagerShareFiles } from '@/services/CrmService';
@@ -31,6 +31,8 @@ import { FaFile } from 'react-icons/fa';
 import NoData from '@/views/pages/NoData';
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton';
 import { MdDeleteOutline } from 'react-icons/md';
+import { useRoleContext } from '@/views/crm/Roles/RolesContext';
+import formateDate from '@/store/dateformate';
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -63,7 +65,6 @@ function DebouncedInput({
     return (
         <div className="flex justify-end">
             <div className="flex items-center mb-4">
-                <span className="mr-2">Search:</span>
                 <Input
                     {...props}
                     value={value}
@@ -75,15 +76,20 @@ function DebouncedInput({
 }
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  let itemValue:any = row.getValue(columnId);
+
   
-    const itemRank = rankItem(row.getValue(columnId), value)
+  if (columnId === 'date') {
+      itemValue = formateDate(itemValue);
+  }
 
-    addMeta({
-        itemRank,
-    })
+  const itemRank = rankItem(itemValue, value);
+  addMeta({
+      itemRank,
+  });
 
-    return itemRank.passed
-}
+  return itemRank.passed;
+};
 
 interface User {
   username: string;
@@ -107,6 +113,8 @@ const Index = () => {
   const leadId = queryParams.get('lead_id');
   const leadName = queryParams.get('lead_name');
   const folderName = queryParams.get('folder_name');
+
+  const {roleData} = useRoleContext();
    const [users, setUsers] = useState<User[]>([]);
   useEffect(() => {
     const fetchDataAndLog = async () => {
@@ -345,13 +353,7 @@ console.log(leadData);
   };
 
 
-function formatDate(dateString:string) {
-  const date = new Date(dateString);
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
-}
+
 
 function formatFileSize(fileSizeInKB: string | undefined): string {
   if (!fileSizeInKB) {
@@ -402,12 +404,17 @@ const columns = useMemo<ColumnDef<FileItem>[]>(
 
 
         { header: 'Created', accessorKey: 'date',cell:({row})=>{
-          return <div>{formatDate(row.original.date)}</div>
+          return <div>{formateDate(row.original.date)}</div>
         } },
         { header: 'Actions', accessorKey: 'actions',
         cell:({row})=>{
           return <div className='flex items-center gap-2'>
+             <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.file?.delete??[]}
+                    >
               <MdDeleteOutline className='text-xl cursor-pointer hover:text-red-500' onClick={()=>openDialog3(row.original.fileId)} />
+              </AuthorityCheck>
                   <HiShare className='text-xl cursor-pointer'  onClick={() => openDialog(row.original.fileId)}/> 
           </div>
         }
@@ -451,9 +458,14 @@ const onSelectChange = (value = 0) => {
     <div>
        <div className='flex justify-between'>
       <h3 className='mb-5'>Lead-{leadName}</h3>
+      <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.file?.create??[]}
+                    >
       <Button className='' size='sm' variant='solid' onClick={()=>openDialog2()}>
         Upload Files
       </Button>
+      </AuthorityCheck>
       </div>
 
       <div className="w-full">
@@ -492,7 +504,7 @@ const onSelectChange = (value = 0) => {
         <DebouncedInput
                 value={globalFilter ?? ''}
                 className="p-2 font-lg shadow border border-block"
-                placeholder="Search all columns..."
+                placeholder="Search..."
                 onChange={(value) => setGlobalFilter(String(value))}
             />
             </div>

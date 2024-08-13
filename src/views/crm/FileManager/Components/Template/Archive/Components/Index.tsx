@@ -27,8 +27,10 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { Button, Input, Notification, Skeleton, Tooltip, toast } from '@/components/ui'
 import { LiaTrashRestoreSolid } from "react-icons/lia";
 import { AiOutlineFile, AiOutlineFolder } from 'react-icons/ai'
-import { ConfirmDialog, StickyFooter } from '@/components/shared'
+import { AuthorityCheck, ConfirmDialog, StickyFooter } from '@/components/shared'
 import NoData from '@/views/pages/NoData'
+import { useRoleContext } from '@/views/crm/Roles/RolesContext'
+import formateDate from '@/store/dateformate'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -64,6 +66,7 @@ function DebouncedInput({
             <div className="flex items-center mb-4">
                 <Input
                     {...props}
+                    size='sm'
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                 />
@@ -73,12 +76,20 @@ function DebouncedInput({
 }
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    const itemRank = rankItem(row.getValue(columnId), value)
+    let itemValue:any = row.getValue(columnId);
+
+    
+    if (columnId === 'created_at') {
+        itemValue = formateDate(itemValue);
+    }
+
+    const itemRank = rankItem(itemValue, value);
     addMeta({
         itemRank,
-    })
-    return itemRank.passed
-}
+    });
+
+    return itemRank.passed;
+};
 
 type Person = {
     firstName: string
@@ -127,19 +138,7 @@ const pageSizeOption = [
 const PaginationTable = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
-
-
-    const formatDate = (dateString: string | undefined) => {
-        if (!dateString) return ''
-        const date = new Date(dateString)
-        const day = String(date.getDate()).padStart(2, '0')
-        const month = String(date.getMonth() + 1).padStart(2, '0') // Months are 0-based in JavaScript
-        const year = date.getFullYear()
-      
-        return `${day}-${month}-${year}`
-      }
-
-
+    const { roleData } = useRoleContext()
       const [deleteData,setDeleteData]=useState<ArchiveData>()
       const [restoreData,setRestoreData]=useState<Restore>()
       const [dialogIsOpen2, setIsOpen2] = useState(false)
@@ -264,7 +263,7 @@ const PaginationTable = () => {
                         <div>
                         {
                             fileName 
-                            ? <a href={file.fileUrl} target="_blank" rel="noopener noreferrer" className=' cursor-pointer text-md flex items-center gap-2'>{<AiOutlineFile/>}{ fileName.length > 20 ? `${fileName.slice(0,20)}...` : fileName}</a>
+                            ? <a href={file.fileUrl} target="_blank" rel="noopener noreferrer" className=' cursor-pointer text-md flex items-center gap-2'>{<AiOutlineFile/>}{fileName}</a>
                             : <div className='  flex items-center gap-2' >{<AiOutlineFolder/>}{folderName || subfolderName}</div>
                         }
                     </div>
@@ -285,6 +284,7 @@ const PaginationTable = () => {
             },
             {
                 header: 'Type',
+                accessorKey: 'type',
                 cell: ({row}) => {
                     const file = row.original.files && row.original.files[0];
                     const fileName = file && file.fileName;
@@ -299,7 +299,7 @@ const PaginationTable = () => {
                 cell: ({row}) => {
                     const date=row.original.created_at
                     return(
-                        <div>{formatDate(date)}</div>
+                        <div>{formateDate(date)}</div>
                     )
                 }
             },
@@ -319,6 +319,10 @@ const PaginationTable = () => {
                     const delete_type = row.original.files[0].folder_name ? 'folder' : 'file';
                   
                         return (<div className='flex gap-3  '>
+                             <AuthorityCheck
+                       userAuthority={[`${localStorage.getItem('role')}`]}
+                       authority={roleData?.data?.archive?.restore??[]}
+                       >
                                 <Tooltip title="Restore">
                                 <span className="cursor-pointer">
                             <LiaTrashRestoreSolid className='text-xl cursor-pointer hover:text-blue-500' onClick={()=>openDialog3(
@@ -332,6 +336,11 @@ const PaginationTable = () => {
                             )}/>
                             </span>
                             </Tooltip>
+                            </AuthorityCheck>
+                            <AuthorityCheck
+                       userAuthority={[`${localStorage.getItem('role')}`]}
+                       authority={roleData?.data?.archive?.delete??[]}
+                       >
                              <Tooltip title="Delete">
                 <span className="cursor-pointer">
                 <MdDeleteOutline
@@ -351,6 +360,7 @@ const PaginationTable = () => {
                             />
                 </span>
             </Tooltip>
+            </AuthorityCheck>
                             </div>
                         );
                    
@@ -415,7 +425,7 @@ const PaginationTable = () => {
             <DebouncedInput
                 value={globalFilter ?? ''}
                 className="p-2 font-lg shadow border border-block"
-                placeholder="Search all columns..."
+                placeholder="Search..."
                 onChange={(value) => setGlobalFilter(String(value))}
             />
             </div>

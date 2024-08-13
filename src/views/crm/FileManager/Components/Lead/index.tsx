@@ -6,7 +6,7 @@ import type { MouseEvent } from 'react'
 import YourFormComponent from './LeadForm';
 import { FaFolder, FaRegFolder } from 'react-icons/fa';
 import { useTheme } from '@emotion/react';
-import { ConfirmDialog, StickyFooter } from '@/components/shared';
+import { AuthorityCheck, ConfirmDialog, StickyFooter } from '@/components/shared';
 import { apiDeleteFileManagerFolders, apiGetCrmFileManagerLeads } from '@/services/CrmService';
 import Indexe from './Folders';
 import { BsThreeDotsVertical } from 'react-icons/bs';
@@ -35,6 +35,8 @@ import type { InputHTMLAttributes } from 'react'
 import { MdDeleteOutline } from 'react-icons/md';
 import NoData from '@/views/pages/NoData';
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton';
+import { useRoleContext } from '@/views/crm/Roles/RolesContext';
+import formateDate from '@/store/dateformate';
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -62,16 +64,15 @@ function DebouncedInput({
         }, debounce)
 
         return () => clearTimeout(timeout)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value])
 
     return (
         <div className="flex justify-end">
             <div className="flex items-center mb-4">
-                <span className="mr-2">Search:</span>
                 <Input
                     {...props}
                     value={value}
+                    size='sm'
                     onChange={(e) => setValue(e.target.value)}
                 />
             </div>
@@ -85,14 +86,20 @@ type Option = {
 }
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    
-    const itemRank = rankItem(row.getValue(columnId), value)
+    let itemValue:any = row.getValue(columnId);
 
+    
+    if (columnId === 'updated_date') {
+        itemValue = formateDate(itemValue);
+    }
+
+    const itemRank = rankItem(itemValue, value);
     addMeta({
         itemRank,
-    })
-    return itemRank.passed
-}
+    });
+
+    return itemRank.passed;
+};
 
 const Index = () => {
     const [leadData, setLeadData] = useState<FolderItem[]>([]);
@@ -102,6 +109,7 @@ const Index = () => {
     const leadId = queryParams.get('lead_id');
     const leadName = queryParams.get('lead_name');
     const role=localStorage.getItem('role')
+    const {roleData} = useRoleContext();
     useEffect(() => {
         const fetchData = async () => {
             const data = await fetchLeadData(leadId);
@@ -176,13 +184,7 @@ const Index = () => {
      }
      const theme=useTheme
      console.log(leadData);
-function formatDate(dateString:string) {
-  const date = new Date(dateString);
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
-}
+
 
 
 const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -216,7 +218,7 @@ const columns = useMemo<ColumnDef<FolderItem>[]>(
         { header: 'Modified', accessorKey: 'updated_date', cell: ({row}) => {
             const date=row.original.updated_date
             return(
-                <div>{formatDate(date)}</div>
+                <div>{formateDate(date)}</div>
             )
         }
         },
@@ -226,6 +228,10 @@ const columns = useMemo<ColumnDef<FolderItem>[]>(
             id: 'actions',
             cell: ({row}) => {
                 return(
+                    <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.file?.delete??[]}
+                    >
                     <div className=' ml-3 cursor-pointer' onClick={()=>openDialog2(row.original.folder_name)}>
                           <Tooltip title="Delete">
                           <span className="cursor-pointer">
@@ -233,6 +239,7 @@ const columns = useMemo<ColumnDef<FolderItem>[]>(
                   </span>
                   </Tooltip>
                   </div>
+                  </AuthorityCheck>
                 )
             }
         },
@@ -259,12 +266,15 @@ const onSelectChange = (value = 0) => {
 }
 
 const filteredProjectData = useMemo(() => {
-   if (role === '3D Visualizer' || role==="Project Architect" || role==="Jr. Interior Designer" || role==="Site Supervisor") {
+   if (!roleData?.data?.quotation?.read?.includes(`${role}`)) {
     return leadData.filter(item => 
-      item.folder_name.toLowerCase() !== 'contract' && 
       item.folder_name.toLowerCase() !== 'quotation' && 
       item.folder_name.toLowerCase() !== 'procurement data'
-    );
+    );}
+    else if (!roleData?.data?.contract?.read?.includes(`${role}`)) {
+        return leadData.filter(item => 
+          item.folder_name.toLowerCase() !== 'contract'
+        )
   }
   return leadData;
 }, [leadData, role]);
@@ -299,9 +309,14 @@ const table = useReactTable({
       <div>
           <div className=" flex justify-between mb-5">
               <h3 className="">Lead-{leadName}</h3>
+              <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.file?.create??[]}
+                    >
               <Button variant="solid" size="sm" onClick={() => openDialog()}>
                   Upload
               </Button>
+              </AuthorityCheck>
           </div>
     
     <>
@@ -323,7 +338,7 @@ const table = useReactTable({
             <DebouncedInput
                 value={globalFilter ?? ''}
                 className="p-2 font-lg shadow border border-block"
-                placeholder="Search all columns..."
+                placeholder="Search..."
                 onChange={(value) => setGlobalFilter(String(value))}
             />
             </div>
@@ -419,6 +434,7 @@ const table = useReactTable({
                   stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
               >
                   <div className="md:flex items-center">
+
                       <Button
                           size="sm"
                           className="ltr:mr-3 rtl:ml-3"

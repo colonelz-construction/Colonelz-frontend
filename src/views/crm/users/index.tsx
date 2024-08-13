@@ -19,6 +19,7 @@ import type { InputHTMLAttributes } from 'react'
 import { apiDeleteUsers, apiGetUsers } from '@/services/CommonService'
 import { BiTrash } from 'react-icons/bi'
 import { Notification, Pagination, Select, toast } from '@/components/ui'
+import { useRoleContext } from '../Roles/RolesContext'
 
 type User = {
     username: string;
@@ -99,7 +100,8 @@ const pageSizeOption = [
 const Users = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
-    const [data, setData] = useState<User[]>([]); // initialize data as an empty array
+    const [data, setData] = useState<User[]>([]);
+    const {roleData}=useRoleContext()
 
     useEffect(() => {
       const fetchData = async () => {
@@ -143,6 +145,7 @@ const Users = () => {
             { header: 'Username', accessorKey: 'username' },
             { header: 'Role', accessorKey: 'role' },
             { header: 'Email', accessorKey: 'email' },
+
             { header: 'Action',id:"action",
             cell: ({row}) => {
                 return (
@@ -216,7 +219,7 @@ console.log(data.length);
                                         key={header.id}
                                         colSpan={header.colSpan}
                                     >
-                                        {header.isPlaceholder ? null : (
+                                        {header.isPlaceholder ?  null : (
                                             <div
                                                 {...{
                                                     className:

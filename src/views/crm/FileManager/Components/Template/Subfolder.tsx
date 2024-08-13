@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { getTemplateData } from '../data'
 import { TemplateDataItem } from '../type'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Button, Card, Dialog, Notification, Skeleton, toast } from '@/components/ui'
+import { Button, Card, Dialog, Notification, Pagination, Select, Skeleton, toast } from '@/components/ui'
 import type { MouseEvent } from 'react'
 import YourFormComponent from './TemplateForm'
 import Footer from '@/views/crm/FileManager/Footer'
 import { HiTrash } from 'react-icons/hi'
 import { apiDeleteFileManagerFolders } from '@/services/CrmService'
-import { ConfirmDialog, StickyFooter } from '@/components/shared'
+import { AuthorityCheck, ConfirmDialog, StickyFooter } from '@/components/shared'
 
 import { useMemo } from 'react'
 import Table from '@/components/ui/Table'
@@ -33,6 +33,8 @@ import type {
 import type { InputHTMLAttributes } from 'react'
 import { AiOutlineDelete, AiOutlineFolder } from 'react-icons/ai'
 import NoData from '@/views/pages/NoData'
+import { useRoleContext } from '@/views/crm/Roles/RolesContext'
+import formateDate from '@/store/dateformate'
 
 interface DebouncedInputProps
     extends Omit<
@@ -45,6 +47,10 @@ interface DebouncedInputProps
 }
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
+type Option={
+    value:number;
+    label:string;
+  }
 
 function DebouncedInput({
     value: initialValue,
@@ -71,6 +77,7 @@ function DebouncedInput({
                 <span className="mr-2"></span>
                 <Input
                     {...props}
+                    size='sm'
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                 />
@@ -79,12 +86,20 @@ function DebouncedInput({
     )
 }
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    const itemRank = rankItem(row.getValue(columnId), value)
+    let itemValue:any = row.getValue(columnId);
+
+    
+    if (columnId === 'updated_date') {
+        itemValue = formateDate(itemValue);
+    }
+
+    const itemRank = rankItem(itemValue, value);
     addMeta({
         itemRank,
-    })
-    return itemRank.passed
-}
+    });
+
+    return itemRank.passed;
+};
 
 const Index = () => {
     const [templateData, setTemplateData] = useState<any>([])
@@ -93,6 +108,7 @@ const Index = () => {
     const queryParams = new URLSearchParams(location.search)
     const folderName = queryParams.get('folder')
     const type = queryParams.get('type')
+    const {roleData} = useRoleContext()
     useEffect(() => {
         const fetchDataAndLog = async () => {
             try {
@@ -182,16 +198,25 @@ const Index = () => {
         }
     }
 
-    function formatDate(dateString: string) {
-        const date = new Date(dateString)
-        const day = date.getDate().toString().padStart(2, '0')
-        const month = (date.getMonth() + 1).toString().padStart(2, '0')
-        const year = date.getFullYear()
-        return `${day}-${month}-${year}`
-    }
+  
 
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
+    const pageSizeOption = [
+        { value: 10, label: '10 / page' },
+        { value: 20, label: '20 / page' },
+        { value: 30, label: '30 / page' },
+        { value: 40, label: '40 / page' },
+        { value: 50, label: '50 / page' },
+    ]
+    
+    const onPaginationChange = (page: number) => {
+      table.setPageIndex(page - 1)
+    }
+    
+    const onSelectChange = (value = 0) => {
+      table.setPageSize(Number(value))
+    }
 
     const columns = useMemo<ColumnDef<any>[]>(
         () => [
@@ -221,7 +246,7 @@ const Index = () => {
                 header: 'modified',
                 accessorKey: 'updated_date',
                 cell: ({ row }) => {
-                    return formatDate(row.original.updated_date)
+                    return formateDate(row.original.updated_date)
                 },
             },
             {
@@ -230,6 +255,10 @@ const Index = () => {
                 id: 'actions',
                 cell: ({ row }) => {
                     return (
+                        <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.file?.delete??[]}
+                    >
                         <div
                             className=" flex justify-center"
                             onClick={() =>
@@ -238,6 +267,7 @@ const Index = () => {
                         >
                             <AiOutlineDelete className=" text-xl text-center hover:text-red-500" />
                         </div>
+                        </AuthorityCheck>
                     )
                 },
             },
@@ -273,13 +303,19 @@ const Index = () => {
         <div>
             <div className=" mb-5 flex justify-between">
                 <h3 className="">Folder</h3>
+                <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.file?.create??[]}
+                    >
                 <Button variant="solid" size="sm" onClick={() => openDialog()}>
                     Upload
                 </Button>
+                </AuthorityCheck>
             </div>
             {!loading ? templateData.length === 0 ?(<NoData />): (
                 <div className="h-screen w-full">
                     <div className="flex-1 p-4">
+                        <div className='flex justify-between'>
                         <div className="flex items-center mb-4">
                             <nav className="flex">
                                 <ol className="flex items-center space-x-2">
@@ -324,7 +360,12 @@ const Index = () => {
                                 </ol>
                             </nav>
                         </div>
-
+                        <DebouncedInput
+                value={globalFilter ?? ''}
+                className="p-2 font-lg shadow border border-block"
+                placeholder="Search..."
+                onChange={(value) => setGlobalFilter(String(value))}
+            /></div>
                         <>
                             <Table>
                                 <THead>
@@ -396,6 +437,27 @@ const Index = () => {
                                     })}
                                 </TBody>
                             </Table>
+                            <div className="flex items-center justify-between mt-4">
+                <Pagination
+                    pageSize={table.getState().pagination.pageSize}
+                    currentPage={table.getState().pagination.pageIndex + 1}
+                    total={templateData.length}
+                    onChange={onPaginationChange}
+                />
+                <div style={{ minWidth: 130 }}>
+                    <Select<Option>
+                        size="sm"
+                        isSearchable={false}
+                        value={pageSizeOption.filter(
+                            (option) =>
+                                option.value ===
+                                table.getState().pagination.pageSize
+                        )}
+                        options={pageSizeOption}
+                        onChange={(option) => onSelectChange(option?.value)}
+                    />
+                </div>
+            </div>
                         </>
                     </div>
                 </div>

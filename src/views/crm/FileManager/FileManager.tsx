@@ -9,39 +9,51 @@ import Leads from './Components/Leads';
 import Projects from './Components/Projects';
 import Template from './Components/Template';
 import { DataProvider } from './FileManagerContext/FIleContext';
+import { AuthorityCheck } from '@/components/shared';
+import { useRoleContext } from '../Roles/RolesContext';
 
 const FileManager = () => {
   const role=localStorage.getItem('role')
+  const {roleData}=useRoleContext()
   return (
     <div>
     <Tabs 
-    defaultValue={role === 'Jr. Executive HR & Marketing' ? 'tab3' : (role === 'ADMIN' || role === 'Senior Architect' || role==='Site Supervisor' || role==='Project Architect' || role==='Jr. Interior Designer') ? 'tab1' : 'tab2'}
+    defaultValue="leads"
     >
         <TabList>
-            {(role==='ADMIN' || role==='Senior Architect' || role==='Site Supervisor' || role==='Project Architect' || role==='Jr. Interior Designer' ) && <TabNav value="tab1" icon={<MdManageAccounts />}>
+          <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.lead?.read??[]}
+                    >
+           <TabNav value="leads" icon={<MdManageAccounts />}>
            
                 Leads
-            </TabNav>}
-            {role !== 'Jr. Executive HR & Marketing' && (
-  <TabNav value="tab2" icon={<LuFileStack />}>
+            </TabNav>
+            </AuthorityCheck>
+            <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.project?.read??[]}
+                    >
+  <TabNav value="project" icon={<LuFileStack />}>
     Projects
   </TabNav>
-)}
+  </AuthorityCheck>
+
          {(role === 'ADMIN' || role === 'Senior Architect' || role === 'Jr. Executive HR & Marketing') && (
-  <TabNav value="tab3" icon={<GoRepoTemplate />}>
+  <TabNav value="company" icon={<GoRepoTemplate />}>
     Company Data
   </TabNav>
 )}
         </TabList>
         <div className="p-4">
           <DataProvider>
-            <TabContent value="tab1">
+            <TabContent value="leads">
                <Leads/>
             </TabContent>
-            <TabContent value="tab2">
+            <TabContent value="project">
                <Projects />
             </TabContent>
-            <TabContent value="tab3">
+            <TabContent value="company">
                 <Template/>
             </TabContent>
             </DataProvider>

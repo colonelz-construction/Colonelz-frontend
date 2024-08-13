@@ -15,7 +15,7 @@ import {
     Upload,
     toast,
 } from '@/components/ui'
-import { ConfirmDialog, RichTextEditor, StickyFooter } from '@/components/shared'
+import { AuthorityCheck, ConfirmDialog, RichTextEditor, StickyFooter } from '@/components/shared'
 import CreatableSelect from 'react-select/creatable'
 import { CiFileOn, CiImageOn } from 'react-icons/ci'
 import {
@@ -51,6 +51,8 @@ import type { InputHTMLAttributes } from 'react'
 import { FaFile } from 'react-icons/fa';
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton';
 import { MdDeleteOutline } from 'react-icons/md';
+import { useRoleContext } from '@/views/crm/Roles/RolesContext'
+import formateDate from '@/store/dateformate'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -83,9 +85,9 @@ function DebouncedInput({
     return (
         <div className="flex justify-end">
             <div className="flex items-center mb-4">
-                <span className="mr-2">Search:</span>
                 <Input
                     {...props}
+                    size='sm'
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                 />
@@ -95,15 +97,20 @@ function DebouncedInput({
 }
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-  
-    const itemRank = rankItem(row.getValue(columnId), value)
+    let itemValue:any = row.getValue(columnId);
 
+    
+    if (columnId === 'date') {
+        itemValue = formateDate(itemValue)
+    }
+
+    const itemRank = rankItem(itemValue, value);
     addMeta({
         itemRank,
-    })
+    });
 
-    return itemRank.passed
-}
+    return itemRank.passed;
+};
 
 const Index = () => {
     const [leadData, setLeadData] = useState<FileItem[]>([])
@@ -131,6 +138,7 @@ const Index = () => {
     const [selectedFileId, setSelectedFileId] = React.useState<string | null>(
         null,
     )
+    const {roleData} = useRoleContext()
 
     interface User {
         role: string
@@ -231,20 +239,6 @@ type Option = {
     }, [leadId, folderName])
     console.log(leadData)
 
-    const handleFileSelect = (fileId: any) => {
-        if (
-            folderName?.toUpperCase() === 'QUOTATION' ||
-            folderName?.toUpperCase() === 'CONTRACT'
-        ) {
-            setSelectedFiles([fileId])
-        } else {
-            if (selectedFiles.includes(fileId)) {
-                setSelectedFiles(selectedFiles.filter((id) => id !== fileId))
-            } else {
-                setSelectedFiles([...selectedFiles, fileId])
-            }
-        }
-    }
     const deleteFiles = async (fileId: string) => {
         selectedFiles.push(fileId)
         function warn(text: string) {
@@ -471,13 +465,7 @@ type Option = {
         }
     }
 
-    function formatDate(dateString:string) {
-        const date = new Date(dateString);
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}-${month}-${year}`;
-      }
+    
 
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 const [globalFilter, setGlobalFilter] = useState('')
@@ -515,7 +503,7 @@ const columns = useMemo<ColumnDef<FileItem>[]>(
 
 
         { header: 'Created', accessorKey: 'date',cell:({row})=>{
-          return <div>{formatDate(row.original.date)}</div>
+          return <div>{formateDate(row.original.date)}</div>
         } },
         { header: 'Actions', accessorKey: 'actions',
         cell:({row})=>{
@@ -566,6 +554,10 @@ const onSelectChange = (value = 0) => {
         <div>
             <div className="flex justify-between">
                 <h3 className="mb-5 capitalize">Project-{ProjectName}</h3>
+                <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.file?.create??[]}
+                    >
 
                 <Button
                     className=""
@@ -575,12 +567,14 @@ const onSelectChange = (value = 0) => {
                 >
                     Upload Files
                 </Button>
+                </AuthorityCheck>
             </div>
         
              
              
                 <div className="w-full">
                     <div className="flex-1 p-4">
+                        <div className='flex justify-between'>
                         <div className="flex items-center mb-4">
                             <nav className="flex">
                                 <ol className="flex items-center space-x-2">
@@ -624,7 +618,13 @@ const onSelectChange = (value = 0) => {
                                 </ol>
                             </nav>
                         </div>
-
+                        <DebouncedInput
+                value={globalFilter ?? ''}
+                className="p-2 font-lg shadow border border-block"
+                placeholder="Search..."
+                onChange={(value) => setGlobalFilter(String(value))}
+            />
+</div>
                         <Table>
                 <THead>
                     {table.getHeaderGroups().map((headerGroup) => (

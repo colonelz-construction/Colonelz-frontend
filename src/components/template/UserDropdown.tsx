@@ -9,44 +9,55 @@ import type { CommonProps } from '@/@types/common'
 import { AiOutlineUser, AiOutlineUserAdd, } from 'react-icons/ai'
 import { useContext } from 'react'
 import { UserDetailsContext } from '@/views/Context/userdetailsContext'
+import { useRoleContext } from '@/views/crm/Roles/RolesContext'
+import { AuthorityCheck } from '../shared'
 
 type DropdownList = {
     label: string
     path: string
     icon: JSX.Element
+    authority?: string[]
 }
 
-const dropdownItemList: DropdownList[] = [
-    {
-        label:"My Profile",
-        path:"/app/crm/profile",
-        icon:<AiOutlineUser/>
-    
-        },
-    {
-    label:"Add User to Project",
-    path:"/app/crm/addmember",
-    icon:<AiOutlineUserAdd/>
 
-    },
-    {
-    label:"Add User to Lead",
-    path:"/app/crm/addUserToLead",
-    icon:<AiOutlineUserAdd/>
-
-    },
-    
-    {
-        label: 'Create User',
-        path: '/app/crm/register',
-        icon: <HiOutlineUserAdd />,
-    },
-    
-]
 const _UserDropdown = ({ className }: CommonProps) => {
     const role=localStorage.getItem('role')
     const data=useContext(UserDetailsContext)
-
+    const {roleData}=useRoleContext()
+    
+    const dropdownItemList: DropdownList[] = [
+        {
+            label:"My Profile",
+            path:"/app/crm/profile",
+            icon:<AiOutlineUser/>,
+            authority:[
+                `${localStorage.getItem('role')}`
+            ]
+        
+            },
+        {
+        label:"Add User to Project",
+        path:"/app/crm/addmember",
+        icon:<AiOutlineUserAdd/>,
+        authority:roleData?.data?.addMember?.create
+    
+        },
+        {
+        label:"Add User to Lead",
+        path:"/app/crm/addUserToLead",
+        icon:<AiOutlineUserAdd/>,
+        authority:roleData?.data?.addMember?.create
+    
+        },
+        
+        {
+            label: 'Create User',
+            path: '/app/crm/register',
+            icon: <HiOutlineUserAdd />,
+            authority: roleData?.data?.user?.create,
+        },
+        
+    ]
 
     const {  authority, email } = useAppSelector(
         (state) => state.auth.user
@@ -88,8 +99,12 @@ const _UserDropdown = ({ className }: CommonProps) => {
                 <Dropdown.Item variant="divider" />
 
                 {dropdownItemList.map((item) => {
-                    if (role==='ADMIN' || !['Add User to Project', 'Add User to Lead', 'Create User'].includes(item.label)) {
+                
                         return (
+                            <AuthorityCheck
+                            userAuthority={[`${localStorage.getItem('role')}`]}
+                            authority={item.authority??[]}
+                            >
                         <div key={item.label}>
                             <Dropdown.Item
                             key={item.label}
@@ -110,9 +125,10 @@ const _UserDropdown = ({ className }: CommonProps) => {
                             </Dropdown.Item>
                             <Dropdown.Item variant="divider" />
                         </div>
+                        </AuthorityCheck>
                         );
                     }
-                    })}
+                    )}
                 <Dropdown.Item
                     eventKey="Sign Out"
                     className="gap-2"

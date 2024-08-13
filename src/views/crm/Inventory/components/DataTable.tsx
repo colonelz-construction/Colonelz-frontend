@@ -23,6 +23,7 @@ import useThemeClass from '@/utils/hooks/useThemeClass'
 import { Button, Select } from '@/components/ui'
 import { ProjectMomItem } from '../store'
 import { apiGetMomData } from '@/services/CrmService'
+import formateDate from '@/store/dateformate'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -69,17 +70,21 @@ function DebouncedInput({
     )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    // Rank the item
-    const itemRank = rankItem(row.getValue(columnId), value)
+    let itemValue:any = row.getValue(columnId);
+
+    
+    if (columnId === 'meetingDate') {
+        itemValue = formateDate(itemValue);
+    }
+
+    const itemRank = rankItem(itemValue, value);
     addMeta({
         itemRank,
-    })
+    });
 
-    // Return if the item should be filtered in/out
-    return itemRank.passed
-}
+    return itemRank.passed;
+};
 type Option = {
     value: number
     label: string
@@ -116,14 +121,7 @@ const Filtering = () => {
             </div>
         )
     }
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString)
-        const day = String(date.getUTCDate()).padStart(2, '0')
-        const month = String(date.getUTCMonth() + 1).padStart(2, '0') // Months are 0-based in JavaScript
-        const year = date.getUTCFullYear()
-      
-        return `${day}-${month}-${year}`
-      }
+  
 
 
     const columns = useMemo<ColumnDef<ProjectMomItem>[]>(
@@ -160,10 +158,10 @@ const Filtering = () => {
             },
             {
                 header: 'Meeting Date',
-                accessorKey: 'meetingdate', 
+                accessorKey: 'meetingDate', 
                 cell: (props) => {
                   const row = props.row.original
-                  const FormattedDate=formatDate(row.meetingDate)
+                  const FormattedDate=formateDate(row.meetingDate)
               
                   return (
                       <span>{FormattedDate}</span>

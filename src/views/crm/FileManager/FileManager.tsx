@@ -13,12 +13,14 @@ import { AuthorityCheck } from '@/components/shared';
 import { useRoleContext } from '../Roles/RolesContext';
 
 const FileManager = () => {
-  const role=localStorage.getItem('role')
+  const role=localStorage.getItem('role') || '';
   const {roleData}=useRoleContext()
+  const hasProjectReadPermission = roleData?.data?.project?.read?.includes(role);
+  const hasLeadReadPermission = roleData?.data?.lead?.read?.includes(role);
   return (
     <div>
     <Tabs 
-    defaultValue="leads"
+    defaultValue={!hasLeadReadPermission?'project'?!hasProjectReadPermission?'company':'project':'leads':'leads'}
     >
         <TabList>
           <AuthorityCheck
@@ -39,13 +41,14 @@ const FileManager = () => {
   </TabNav>
   </AuthorityCheck>
 
-         {(role === 'ADMIN' || role === 'Senior Architect' || role === 'Jr. Executive HR & Marketing') && (
+       
   <TabNav value="company" icon={<GoRepoTemplate />}>
     Company Data
   </TabNav>
-)}
+
         </TabList>
         <div className="p-4">
+          
           <DataProvider>
             <TabContent value="leads">
                <Leads/>

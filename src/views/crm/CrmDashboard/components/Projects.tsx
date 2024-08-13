@@ -89,7 +89,7 @@ const Project = ({  className }: LeadsProps) => {
                         const dateDifference = Math.floor((projectEndDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24));
                         return (
                             <Tr key={index}>
-                                <Td className={`capitalize ${dateDifference <= 1 ? 'text-red-500' : ''} flex gap-2 items-center cursor-pointer`} onClick={() => navigate(`/app/crm/project-details?project_id=${item.project_id}&client_name=${item.client[0].client_name}&id=65c32e19e0f36d8e1f30955c&type=tab1`)}>
+                                <Td className={`capitalize ${dateDifference <= 1 ? 'text-red-500' : ''} flex gap-2 items-center cursor-pointer`} onClick={() => navigate(`/app/crm/project-details?project_id=${item.project_id}&client_name=${item.client[0].client_name}&id=65c32e19e0f36d8e1f30955c&type=details`)}>
                                     {item.project_name} {dateDifference <= 1 && <BiSolidBellRing />}
                                 </Td>
                                 <Td >

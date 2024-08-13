@@ -25,7 +25,7 @@ import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
 import { AiOutlineFolder } from 'react-icons/ai'
-import { apiGetCrmFileManager } from '@/services/CrmService'
+import {  apiGetCrmFileManagerCompanyData } from '@/services/CrmService'
 import NoData from '@/views/pages/NoData'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 
@@ -94,7 +94,9 @@ const Commercial = () => {
   const [loading,setIsLoading]=useState(true)
     useEffect(() => {
       const fetchDataAndLog = async () => {
-          const data = await apiGetCrmFileManager(); 
+          const data = await apiGetCrmFileManagerCompanyData(); 
+          console.log(data);
+          
           setIsLoading(false)
           const templateData=data.data.templateData
           const folderSubFolderPairs:folderpairs[] = [
@@ -107,9 +109,9 @@ const Commercial = () => {
             for (const pair of folderSubFolderPairs) {
               let count=0;
               let date=''
-              templateData.flatMap(
+              templateData?.flatMap(
                 (item:any) =>{
-                  item.files.filter(
+                  item?.files?.filter(
                     (file:any) =>{
                      if(file.folder_name === pair.folder_name && file.sub_folder_name_first === pair.sub_folder_name_first){
                       count++;

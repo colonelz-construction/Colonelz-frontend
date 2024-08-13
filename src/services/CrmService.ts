@@ -413,6 +413,20 @@ export async function apiGetCrmFileManager() {
     console.log('Received response from server:', data);
     return data;
 }
+export async function apiGetCrmFileManagerCompanyData() {
+    const response = await fetch(`${apiPrefix}admin/get/companydata`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        },
+        
+    });
+
+    const data = await response.json();
+    console.log('Received response from server:', data);
+    return data;
+}
 export async function apiGetCrmFileManagerArchive(userId:string | null) {
     const response = await fetch(`${apiPrefix}admin/get/archive?user_id=${userId}`, {
         method: 'GET',

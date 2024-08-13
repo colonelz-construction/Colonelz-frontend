@@ -5,6 +5,7 @@ import { Button, FormItem, Input, Notification, Select, toast } from '@/componen
 import { apiAddMember, apiAddMemberToLead } from '@/services/AuthService';
 import { apiGetUsers } from '@/services/CommonService';
 import { apiGetCrmLeads, apiGetCrmProjects } from '@/services/CrmService';
+import { useRoleContext } from '../Roles/RolesContext';
 
 interface FormValues {
   id: string;
@@ -32,13 +33,8 @@ const Index = () => {
   const [filteredLeads, setFilteredLeads] = useState<Projects[]>([]);
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [loading,setLoading]=useState(false)
-
-  const Options = [
-    { value: 'Jr. Interior Designer', label: 'Jr. Interior Designer' },
-    { label: 'Executive Assistant', value: 'Executive Assistant' },
-    { value: 'Project Architect', label: 'Project Architect' },
-    { value: 'Site Supervisor', label: 'Site Supervisor' },
-  ];
+  const {rolelist}=useRoleContext()
+  const Options = rolelist.data.map((role:string) => ({ value: role, label: role }));
 
   useEffect(() => {
     const fetchUsers = async () => {

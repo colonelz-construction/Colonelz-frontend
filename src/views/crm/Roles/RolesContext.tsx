@@ -1,4 +1,4 @@
-import { apiGetRoleWiseDetails } from '@/services/CommonService';
+import { apiGetRoleList, apiGetRoleWiseDetails } from '@/services/CommonService';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type RoleAccessPermissions = {
@@ -35,8 +35,13 @@ type RoleAccessPermissions = {
 // Define the context's shape
 interface RoleContextType {
     roleData: RoleAccessData;
+    rolelist:RoleList;
     fetchRoleData: () => Promise<void>;
 }
+type RoleList={
+        data:string[]
+}
+
 
 // Create the context
 const RoleContext = createContext<RoleContextType >(undefined!);
@@ -44,10 +49,16 @@ const RoleContext = createContext<RoleContextType >(undefined!);
 // Provide the context
 export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [roleData, setRoleData] = useState<RoleAccessData >(undefined!);
+    const [rolelist, setRoleList] = useState<RoleList>({data:["ADMIN"]});
 
     const fetchRoleData = async () => {
         try {
             const data = await apiGetRoleWiseDetails(); 
+            const response=await apiGetRoleList();
+            if(response.code===200){
+                setRoleList(response)
+            }
+
             if (data.status) {
                 setRoleData(data);
             }
@@ -61,7 +72,7 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     return (
-        <RoleContext.Provider value={{ roleData, fetchRoleData }}>
+        <RoleContext.Provider value={{ roleData, fetchRoleData,rolelist }}>
             {children}
         </RoleContext.Provider>
     );

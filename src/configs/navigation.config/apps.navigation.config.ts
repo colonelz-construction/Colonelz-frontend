@@ -5,6 +5,7 @@ import {
 import { ADMIN, USER } from '@/constants/roles.constant'
 import type { NavigationTree, RoleAccessData } from '@/@types/navigation'
 import { fetchRoleAccessData } from '@/views/crm/Roles/roleData';
+import { apiGetRoleList } from '@/services/CommonService';
 
 
   async function getRoleAccessData(): Promise<RoleAccessData> {
@@ -18,6 +19,7 @@ import { fetchRoleAccessData } from '@/views/crm/Roles/roleData';
 }
 
 const data: RoleAccessData = await getRoleAccessData();
+const rolelist=await apiGetRoleList();
 
 
 
@@ -31,7 +33,7 @@ const appsNavigationConfig: NavigationTree[] = [
                         translateKey: 'nav.appsCrm.dashboard',
                         icon: 'dashboard',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: ["ADMIN","Senior Architect","3D Visualizer","Jr. Interior Designer","Project Architect","Executive Assistant"],
+                        authority: rolelist.data,
                    subMenu: [],     
                     },
                     {

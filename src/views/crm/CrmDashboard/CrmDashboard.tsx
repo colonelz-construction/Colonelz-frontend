@@ -4,6 +4,7 @@ import Leads from "./components/Leads";
 import { ProjectProvider, useProjectContext } from "../Customers/store/ProjectContext";
 import { useRoleContext } from "../Roles/RolesContext";
 import { AuthorityCheck } from "@/components/shared";
+import FileManager from "../FileManager";
 
 interface Data{
     Execution_Phase:string,
@@ -34,11 +35,18 @@ const CrmDashboard = () => {
             growShrink: 2.6,
         },
     ]
-    const role=localStorage.getItem('role');
+    const role=localStorage.getItem('role') || '';
     const {roleData} = useRoleContext();
+    const hasProjectReadPermission = roleData?.data?.project?.read?.includes(role);
+    const hasLeadReadPermission = roleData?.data?.lead?.read?.includes(role);
     return (
         <div className="flex flex-col gap-4 h-full">
+            <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.project?.read??[]}
+                    >
                     <Statistic data={data} />
+                    </AuthorityCheck>
                 <div className="grid grid-cols-1 xl:grid-cols-7 gap-4">
                 </div>
                 <AuthorityCheck
@@ -53,6 +61,7 @@ const CrmDashboard = () => {
                     >
                <Leads />
                </AuthorityCheck>
+               {(!hasProjectReadPermission && !hasLeadReadPermission) && <FileManager />}
                 
           
         </div>

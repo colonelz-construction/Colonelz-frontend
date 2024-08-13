@@ -22,7 +22,7 @@ import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
 import { AiOutlineFolder } from 'react-icons/ai'
-import { apiGetCrmFileManager } from '@/services/CrmService'
+import {  apiGetCrmFileManagerCompanyData } from '@/services/CrmService'
 import NoData from '@/views/pages/NoData'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 
@@ -96,7 +96,7 @@ const Residential = () => {
     useEffect(() => {
       const fetchDataAndLog = async () => {
         
-          const data = await apiGetCrmFileManager()
+          const data = await apiGetCrmFileManagerCompanyData()
           const templateData=data.data.templateData
           setLoading(false)
           const folderSubFolderPairs:folderpairs[] = [
@@ -109,7 +109,7 @@ const Residential = () => {
             for (const pair of folderSubFolderPairs) {
               let count=0;
               let date=''
-              templateData.flatMap(
+              templateData?.flatMap(
                 (item:any) =>{
                   item.files.filter(
                     (file:any) =>{

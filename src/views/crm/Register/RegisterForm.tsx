@@ -8,6 +8,7 @@ import * as Yup from 'yup'
 import useAuth from '@/utils/hooks/useAuth'
 import type { CommonProps } from '@/@types/common'
 import { Notification, Select, toast,Button } from '@/components/ui'
+import { useRoleContext } from '../Roles/RolesContext'
 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
@@ -35,6 +36,9 @@ const SignUpForm = (props: SignUpFormProps) => {
     const { disableSubmit = false, className, signInUrl = '/sign-in' } = props
     const id=localStorage.getItem('userId')
     const { signUp } = useAuth()
+    const {rolelist}=useRoleContext()
+    
+    
 
     const [message, setMessage] = useTimeOutMessage()
 
@@ -62,17 +66,12 @@ const SignUpForm = (props: SignUpFormProps) => {
 
         setSubmitting(false)
     }
+    console.log(rolelist.data);
 
-    const rolesOptions = [
-        { label: 'Admin', value: 'ADMIN' },
-        { value: 'Senior Architect', label: 'Senior Architect ' },
-        { value: '3D Visualizer', label: '3D Visualizer' },
-        { value: 'Project Architect', label: 'Project Architect' },
-        { value: 'Jr. Interior Designer', label: 'Jr. Interior Designer' },
-        { label: 'Executive Assistant', value: 'Executive Assistant' },
-        { label: 'Jr. Executive HR & Marketing', value: 'Jr. Executive HR & Marketing' },
-        { label: 'Site Supervisor', value: 'Site Supervisor' }
-    ]
+    const rolesOptions = rolelist?.data?.map((role) => ({
+        label: role,
+        value: role,
+    }))
 
     return (
         <div className={className}>
@@ -138,7 +137,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                                             field={field}
                                             form={form}
                                             options={rolesOptions}
-                                            value={rolesOptions.filter(
+                                            value={rolesOptions?.filter(
                                                 (option) =>
                                                     option.value ===
                                                     values.role

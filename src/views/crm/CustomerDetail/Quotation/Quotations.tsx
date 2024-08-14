@@ -196,7 +196,7 @@ const Quotations=(data : FileItemProps )=> {
                                 <div>Rejected</div>
                             ):status==='pending'?
                             (
-                                roleData.data.quotation?.update?.includes(role || '') ? (
+                                !roleData.data.quotation?.update?.includes(role || '') ? (
                                     <div>Pending</div>
                                 ) : (
                                     <div className='flex gap-1'>

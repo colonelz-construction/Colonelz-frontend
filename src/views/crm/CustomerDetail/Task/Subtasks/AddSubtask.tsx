@@ -228,7 +228,7 @@ const priorityOptions = [
                             </FormItem>
 
 
-                            <FormItem label='Reporting To'
+                            <FormItem label='Report To'
                             asterisk
                             invalid={errors.sub_task_reporter && touched.sub_task_reporter}
                             errorMessage={errors.sub_task_reporter}

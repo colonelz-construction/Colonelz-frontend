@@ -34,7 +34,9 @@ const Index = () => {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [loading,setLoading]=useState(false)
   const {rolelist}=useRoleContext()
-  const Options = rolelist.data.map((role:string) => ({ value: role, label: role }));
+  const Options = rolelist.data.
+  filter((role)=>role!=='ADMIN'&&role!=='Senior Architect')
+  .map((role:string) => ({ value: role, label: role }));
 
   useEffect(() => {
     const fetchUsers = async () => {

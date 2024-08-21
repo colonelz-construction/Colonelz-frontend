@@ -35,7 +35,7 @@ const EditLead = ({ details }: any) => {
 
   return (
     <>
-      <h3 className='mb-3'>Add Follow-Up</h3>
+      <h3 className='mb-3'>Edit Lead</h3>
 
       <Formik
         initialValues={{

@@ -12,14 +12,18 @@ type SelectorProps = {
 
 const permissionsMap: { [key: string]: Permission[] } = {
     default: ['create', 'read', 'update', 'delete'],
-    archive: ['read', 'restore'],
+    task: ['create'],
+    file:['create','read','delete'],
+    archive: ['read', 'restore','delete'],
     addMember: ['create'],
     lead: ['create', 'read', 'update'],
     project: ['create', 'read', 'update'],
     mom: ['create', 'read'],
-    contract: ['create', 'read'],
-    quotation: ['create', 'read','update'],
-    user: ['create', 'read', 'delete']
+    contract: ['create', 'read','update'],
+    quotation: [ 'read','update'],
+    user: ['create', 'read', 'delete'],
+    CompanyData:['read']
+
 };
 
 const icons = {

@@ -211,24 +211,16 @@ const Filtering = () => {
         
         return (
             <div className="flex justify-end text-lg">
-                <AuthorityCheck
-                    userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.task?.update??[]}
-                    >
+               
                 <span
                     className={`cursor-pointer p-2  hover:${textTheme}`}>
                     <EditTask Data={row} task={false}/>
                     
                 </span>
-                </AuthorityCheck>
-                <AuthorityCheck
-                    userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.task?.delete??[]}
-                    >
+                
                 <span className={`cursor-pointer py-2  hover:${textTheme}`}>
                     <MdDeleteOutline onClick={()=>openDialog()}/>   
                 </span>
-                </AuthorityCheck>
     
                 <ConfirmDialog
               isOpen={dialogIsOpen}

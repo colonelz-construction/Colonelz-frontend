@@ -18,8 +18,9 @@ import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-ta
 import type { InputHTMLAttributes } from 'react'
 import { apiDeleteUsers, apiGetUsers } from '@/services/CommonService'
 import { BiTrash } from 'react-icons/bi'
-import { Notification, Pagination, Select, toast } from '@/components/ui'
+import { Button, Notification, Pagination, Select, toast } from '@/components/ui'
 import { useRoleContext } from '../Roles/RolesContext'
+import { Link } from 'react-router-dom'
 
 type User = {
     username: string;
@@ -68,9 +69,9 @@ function DebouncedInput({
     return (
         <div className="flex justify-end">
             <div className="flex items-center mb-4">
-                <span className="mr-2">Search:</span>
                 <Input
                     {...props}
+                    size='sm'
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                 />
@@ -202,12 +203,18 @@ console.log(data.length);
         <>
         <div className='flex flex-col sm:flex-row gap-5 justify-between mb-5'>
         <h3>Users</h3>
+        <div className='flex gap-3'>
+            
+        <Link to={`/app/crm/register`}>
+        <Button size='sm' variant='solid'>Create User</Button></Link>
             <DebouncedInput
                 value={globalFilter ?? ''}
                 className="p-2 font-lg shadow border border-block"
                 placeholder="Search ..."
                 onChange={(value) => setGlobalFilter(String(value))}
             />
+            
+            </div>
             </div>
             <Table>
                 <THead>

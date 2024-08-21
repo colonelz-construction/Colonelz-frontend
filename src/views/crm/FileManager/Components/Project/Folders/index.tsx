@@ -731,7 +731,7 @@ const onSelectChange = (value = 0) => {
                     >
                         Back
                     </Button>
-                    {(folderName?.toUpperCase() === 'QUOTATION' && (role==='ADMIN' || role==='Senior Architect' || role==='Executive Assistant')) ? (
+                    {(folderName?.toUpperCase() === 'QUOTATION' ) ? (
                         <Button
                             size="sm"
                             className="ltr:mr-3 rtl:ml-3"

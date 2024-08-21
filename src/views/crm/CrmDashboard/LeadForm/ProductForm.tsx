@@ -57,7 +57,9 @@ const LeadForm: React.FC = () => {
               date: null,
        }}
        validationSchema={Yup.object().shape({
-            name: Yup.string().required('Name is required'),
+        name: Yup.string()
+        .matches(/^[A-Za-z\s]+$/, 'Name can only contain letters and spaces')
+        .required('Name is required'),
             email: Yup.string().email('Must be a valid email').required('Email is required'),
             phone: Yup.string().required('Phone number is required'),
             location: Yup.string().required('Location is required'),
@@ -85,7 +87,7 @@ const LeadForm: React.FC = () => {
                 else{
                     toast.push(
                         <Notification type='danger' duration={2000}>
-                            {data.errorMessage}
+                            {data.errorMessage.length===0?data.message:data.errorMessage}
                         </Notification>
                     )
                 }
@@ -97,13 +99,14 @@ const LeadForm: React.FC = () => {
             <FormItem label='Lead Name'
             asterisk
             invalid={errors.name && touched.name}
-            errorMessage={errors.name}
+            
             >
                 <Field
                 component={Input}
                 name='name'
                 placeholder='Enter lead name'
                 />
+                <div className='text-red-500'>{errors.name}</div>
             </FormItem>
 
             <FormItem label='Email'

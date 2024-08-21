@@ -170,6 +170,7 @@ function ReactTable({
     const { leadData } = useMomContext();
     const { client } = useMomContext();
     const {roleData}=useRoleContext()
+    
     const projectId = new URLSearchParams(location.search).get('project_id');
 
     const [sorting, setSorting] = useState<ColumnSort[]>([]);
@@ -259,6 +260,11 @@ function ReactTable({
                     Add MOM{' '}
                 </Button>
                 </AuthorityCheck>
+                <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.mom?.read??[]}
+                    >
+
                 <Button
                     variant="solid"
                     onClick={() =>
@@ -267,6 +273,7 @@ function ReactTable({
                 >
                     View All MOM
                 </Button>
+                </AuthorityCheck>
             </div>
             {table.getRowModel().rows.length > 0 ? (
                 <>

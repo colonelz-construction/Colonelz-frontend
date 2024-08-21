@@ -55,6 +55,8 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const data = await apiGetRoleWiseDetails(); 
             const response=await apiGetRoleList();
+            console.log(response);
+            
             if(response.code===200){
                 setRoleList(response)
             }

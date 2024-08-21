@@ -237,7 +237,7 @@ const priorityOptions = [
                                     )}
                                 </Field>
                             </FormItem>
-                            <FormItem label='Reporting To'
+                            <FormItem label='Reporting'
                             asterisk
                             invalid={errors.reporter && touched.reporter}   
                             errorMessage={errors.reporter}

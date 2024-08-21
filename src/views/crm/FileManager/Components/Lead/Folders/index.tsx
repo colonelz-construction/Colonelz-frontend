@@ -614,7 +614,7 @@ const onSelectChange = (value = 0) => {
             Back
           </Button>
           {
-            folderName?.toLocaleLowerCase()==='contract' && (role==='ADMIN' || role==='Senior Architect')&& (
+            folderName?.toLocaleLowerCase()==='contract' && (
               <Button variant='solid' size='sm'  onClick={() => openDialog1()}>
                 Share For Approval
               </Button>

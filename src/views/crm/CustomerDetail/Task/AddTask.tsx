@@ -217,7 +217,7 @@ const priorityOptions = [
                                 <div className=' text-red-600'>{errors.estimated_task_end_date}</div>
                             </FormItem>
                            
-                            <FormItem label='Reporting To'
+                            <FormItem label='Reporting'
                             asterisk
                             invalid={errors.reporter && touched.reporter}
                             >

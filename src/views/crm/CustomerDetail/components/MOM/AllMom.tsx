@@ -53,7 +53,7 @@ const App = () => {
   }
 
   const location = useLocation();
-  const [data, setdata] = useState();
+  const [data, setdata] = useState([] as LeadDataItem[] | null);
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const projectId = searchParams.get('project_id');
@@ -72,8 +72,7 @@ const App = () => {
     }
   }, [location.search]);
 
-  const filteredMomData = data
-    ? data.filter((item) => {
+  const filteredMomData = data? data.filter((item) => {
       const searchIn = (str: string | unknown): boolean => {
         if (str === undefined) {
           return false;
@@ -121,7 +120,7 @@ const App = () => {
     )
   };
 
-  const highlightHtmlText = (html: string): JSX.Element => {
+  const highlightHtmlText = (html: string) => {
     const options: HTMLReactParserOptions = {
       replace: (domNode) => {
         if (domNode.type === 'text') {

@@ -19,6 +19,7 @@ import * as Yup from 'yup';
 import { apiGetCrmFileManagerShareContractFile, apiGetCrmProjectShareContractApproval, apiGetCrmProjectShareQuotation, apiGetCrmProjectShareQuotationApproval } from '@/services/CrmService'
 import { use } from 'i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 
 type FormData = {
   user_name: string;
@@ -87,6 +88,7 @@ const ContractDetails=(data : FileItemProps )=> {
     const queryParams=new URLSearchParams(location.search)
     const leadId=queryParams.get('id')
     const [approvalLoading,setApprovalLoading]=useState(false)
+    const {roleData}=useRoleContext()
     
     
 
@@ -129,7 +131,6 @@ const ContractDetails=(data : FileItemProps )=> {
             )
         }
     }
-    console.log(data.data);
     
     const role = localStorage.getItem('role');
     const columns =
@@ -175,7 +176,7 @@ const ContractDetails=(data : FileItemProps )=> {
                                 <div>Rejected</div>
                             ):status==='pending'?
                             (
-                                role === 'designer' ? (
+                                !roleData.data.contract?.update?.includes(`${role}`) ? (
                                     <div>Pending</div>
                                 ) : (
                                     <div className='flex gap-1'>

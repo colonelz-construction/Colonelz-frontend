@@ -50,13 +50,7 @@ const _UserDropdown = ({ className }: CommonProps) => {
     
         },
         
-        {
-            label: 'Create User',
-            path: '/app/crm/register',
-            icon: <HiOutlineUserAdd />,
-            authority: roleData?.data?.user?.create,
-        },
-        
+      
     ]
 
     const {  authority, email } = useAppSelector(

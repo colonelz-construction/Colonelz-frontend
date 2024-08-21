@@ -6,6 +6,7 @@ import { apiAddMember } from '@/services/AuthService';
 import { apiGetUsers } from '@/services/CommonService';
 import { apiGetCrmProjects } from '@/services/CrmService';
 import { set } from 'lodash';
+import { useRoleContext } from '../Roles/RolesContext';
 
 interface FormValues {
   id: string;
@@ -33,15 +34,11 @@ const Index = () => {
   const [filteredProjects, setFilteredProjects] = useState<Projects[]>([]);
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [loading,setLoading]=useState(false)
+  const {rolelist}=useRoleContext();
 
-  const Options = [
-    { value: '3D Visualizer', label: '3D Visualizer' },
-    { value: 'Jr. Interior Designer', label: 'Jr. Interior Designer' },
-    { label: 'Executive Assistant', value: 'Executive Assistant' },
-    { value: 'Project Architect', label: 'Project Architect' },
-    { label: 'Jr. Executive HR & Marketing', value: 'Jr. Executive HR & Marketing' },
-    { label: 'Site Supervisor', value: 'Site Supervisor' }
-  ];
+  const Options = rolelist.data.
+  filter((role)=>role!=='ADMIN'&& role!=='Senior Architect')
+  .map((role) => ({ value: role, label: role }));
 
   useEffect(() => {
     const fetchUsers = async () => {

@@ -11,7 +11,7 @@ import { BiPencil } from 'react-icons/bi'
 import { MdDeleteOutline } from 'react-icons/md'
 import formateDate from '@/store/dateformate'
 import { Link } from 'react-router-dom'
-import { ConfirmDialog } from '@/components/shared'
+import { AuthorityCheck, ConfirmDialog } from '@/components/shared'
 import { Notification, Pagination, Select, toast, Tooltip } from '@/components/ui'
 import Table from '@/components/ui/Table'
 import {
@@ -28,6 +28,8 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils'
 import type {  FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
+import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
+import { useRoleContext } from '../Roles/RolesContext'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -116,10 +118,11 @@ const pageSizeOption = [
 
 const Roles = () => {
     const [data, setData] = useState([])
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const [id,setId]=useState<string>('')
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
+    const {roleData}=useRoleContext()
    
 
     const [open, setOpen] = useState(false)
@@ -261,12 +264,16 @@ const Roles = () => {
     return (
         <>
             <div className="flex gap-3 justify-end">
-              
+            <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.role?.create??[]}
+                    >
                 <Link to={`/app/crm/roles/create`}>
                 <Button size="sm" className="ml-2" variant='solid'>
                     Create Role
                 </Button>
                 </Link>
+                </AuthorityCheck>
                 <DebouncedInput
                 value={globalFilter ?? ''}
                 className="p-2 font-lg shadow border border-block"
@@ -315,6 +322,12 @@ const Roles = () => {
                         </Tr>
                     ))}
                 </THead>
+                {loading?
+                     <TableRowSkeleton
+                     avatarInColumns={[0]}
+                     columns={columns.length}
+                     rows={10}
+                 />:
                 <TBody>
                     {table.getRowModel().rows.map((row) => {
                         return (
@@ -332,7 +345,7 @@ const Roles = () => {
                             </Tr>
                         )
                     })}
-                </TBody>
+                </TBody>}
             </Table>
             <div className="flex items-center justify-between mt-4">
                 <Pagination

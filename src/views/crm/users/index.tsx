@@ -21,6 +21,8 @@ import { BiTrash } from 'react-icons/bi'
 import { Button, Notification, Pagination, Select, toast } from '@/components/ui'
 import { useRoleContext } from '../Roles/RolesContext'
 import { Link } from 'react-router-dom'
+import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
+import { AuthorityCheck } from '@/components/shared'
 
 type User = {
     username: string;
@@ -103,11 +105,13 @@ const Users = () => {
     const [globalFilter, setGlobalFilter] = useState('')
     const [data, setData] = useState<User[]>([]);
     const {roleData}=useRoleContext()
+    const [loading,setLoading]=useState(true)
 
     useEffect(() => {
       const fetchData = async () => {
         const response = await apiGetUsers(); 
         const data: ApiResponse =  response
+        setLoading(false)
         setData(data.data);
       };
      
@@ -204,9 +208,13 @@ console.log(data.length);
         <div className='flex flex-col sm:flex-row gap-5 justify-between mb-5'>
         <h3>Users</h3>
         <div className='flex gap-3'>
-            
+        <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.user?.create??[]}
+                    >
         <Link to={`/app/crm/register`}>
         <Button size='sm' variant='solid'>Create User</Button></Link>
+        </AuthorityCheck>
             <DebouncedInput
                 value={globalFilter ?? ''}
                 className="p-2 font-lg shadow border border-block"
@@ -255,6 +263,13 @@ console.log(data.length);
                         </Tr>
                     ))}
                 </THead>
+                {loading?
+                 <TableRowSkeleton
+                 avatarInColumns={[0]}
+                 columns={columns.length}
+                 rows={10}
+                
+             />:
                 <TBody>
                     {table.getRowModel().rows.map((row) => {
                         return (
@@ -272,7 +287,7 @@ console.log(data.length);
                             </Tr>
                         )
                     })}
-                </TBody>
+                </TBody>}
             </Table>
             <div className="flex items-center justify-between mt-4">
                 <Pagination

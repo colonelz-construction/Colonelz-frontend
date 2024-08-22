@@ -53,6 +53,7 @@ function DebouncedInput({
             <div className="flex items-center mb-4">
                 <Input  
                     {...props}
+                    size='sm'
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                     className=' max-sm:w-full'
@@ -234,6 +235,7 @@ function ReactTable({
                     value={dateRange}
                     onChange={(dates) => setDateRange(dates)}
                     className='flex justify-end lg:!w-48'
+                    size='sm'
                     
                 />
 
@@ -245,11 +247,11 @@ function ReactTable({
                 />
                 <AuthorityCheck
                     userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.quotation?.read??[]}
+                    authority={roleData?.data?.mom?.create??[]}
                     >
                 <Button
                     className="flex justify-center items-center"
-                
+                    size='sm'
                     variant="solid"
                     onClick={() =>
                         navigate(
@@ -267,6 +269,7 @@ function ReactTable({
 
                 <Button
                     variant="solid"
+                    size='sm'
                     onClick={() =>
                         navigate(`/app/crm/project/AllMOM?project_id=${projectId}`)
                     }
@@ -389,7 +392,6 @@ const renderSubComponent = ({ row }: { row: Row<MomData> }) => {
           <div class="section-content">
             <p><strong>Client:</strong> ${rowData.attendees.client_name || '-'}</p>
             <p><strong>Organizer:</strong> ${rowData.attendees.organisor || '-'}</p>
-            <p><strong>Designer:</strong> ${rowData.attendees.designer || '-'}</p>
             <p><strong>Others:</strong> ${rowData.attendees.attendees || '-'}</p>
           </div>
         </div>
@@ -447,7 +449,6 @@ const handlePrint = () => {
                               <ul className="space-y-1">
                                   <li className="text-base"><span className="font-semibold text-lg">Client:</span> {rowData.attendees.client_name ? rowData.attendees.client_name : '-'}</li>
                                   <li className="text-base"><span className="font-semibold text-lg">Organizer:</span> {rowData.attendees.organisor ? rowData.attendees.organisor : '-'}</li>
-                                  <li className="text-base"><span className="font-semibold text-lg">Designer:</span> {rowData.attendees.designer ? rowData.attendees.designer : '-'}</li>
                                   <li className="text-base"><span className="font-semibold text-lg">Others:</span> {rowData.attendees.attendees ? rowData.attendees.attendees : '-'}</li>
                               </ul>
                           </div>

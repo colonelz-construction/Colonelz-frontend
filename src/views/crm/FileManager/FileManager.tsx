@@ -41,10 +41,14 @@ const FileManager = () => {
   </TabNav>
   </AuthorityCheck>
 
-       
+  <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.companyData?.read??[]}
+                    >
   <TabNav value="company" icon={<GoRepoTemplate />}>
     Company Data
   </TabNav>
+  </AuthorityCheck>
 
         </TabList>
         <div className="p-4">

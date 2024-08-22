@@ -126,12 +126,8 @@ const CustomerDetail = () => {
                     >
                     <TabNav value="activity">Project Activity</TabNav>
                     </AuthorityCheck>
-                    <AuthorityCheck
-                    userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.task?.read??[]}
-                    >
+                   
                     <TabNav value="timeline">Timeline</TabNav>
-                    </AuthorityCheck>
                   </>
               
             </TabList>

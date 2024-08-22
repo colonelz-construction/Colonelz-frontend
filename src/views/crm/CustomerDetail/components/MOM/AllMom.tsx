@@ -188,7 +188,6 @@ const App = () => {
                         <ul className="space-y-1">
                           <li className=' text-base'><span className='font-semibold text-lg'>Client:</span> {highlightText(rowData.attendees.client_name ? rowData.attendees.client_name : "-")} </li>
                           <li className=' text-base'><span className='font-semibold text-lg'>Organizer:</span> {highlightText(rowData.attendees.organisor ? rowData.attendees.organisor : "-")} </li>
-                          <li className=' text-base'><span className='font-semibold text-lg'>Designer:</span> {highlightText(rowData.attendees.designer ? rowData.attendees.designer : "-")} </li>
                           <li className=' text-base'><span className='font-semibold text-lg'>Others:</span> {highlightText(rowData.attendees.attendees ? rowData.attendees.attendees : "-")} </li>
                         </ul>
                       </div>

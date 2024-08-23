@@ -163,6 +163,43 @@ export async function apiDeleteUsers(userId: string) {
     });
     return response;
 }
+export async function apiGetDeletedUsers() {
+    const response = await fetch(`${apiPrefix}admin/archive/user`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+}
+export async function apiRestoreDeletedUsers(UserId: any) {
+    const response = await fetch(`${apiPrefix}admin/restore/user`, {
+        method: 'POST',
+        headers: {
+           'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({user_id:UserId})
+    });
+
+    return response;}
+export async function apiPermanantlyDeleteUsers(userId: string) {
+    const response=await fetch(`${apiPrefix}admin/delete/archive/user`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ user_id: userId })
+    });
+    return response;
+}
     
 export async function addMemberToProject(Data: any) {
     const response = await fetch(`${apiPrefix}admin/add/member`, {

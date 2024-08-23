@@ -10,6 +10,7 @@ import { UserDetailsProvider } from '@/views/Context/userdetailsContext'
 import Roles from './Roles'
 import { useRoleContext } from '../Roles/RolesContext'
 import { AuthorityCheck } from '@/components/shared'
+import ArchivedUsers from '../users/ArchivedUsers'
 
 const Index = () => {
     const userRole=localStorage.getItem('role')
@@ -32,6 +33,12 @@ const Index = () => {
                     >
         <TabNav value="tab4">Roles</TabNav>
         </AuthorityCheck>
+        <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.user?.read??[]}
+                    >
+         <TabNav value="Archived Users">Archived Users</TabNav>
+         </AuthorityCheck>
     </TabList>
     <div className="p-4">
         <TabContent value="tab1">
@@ -47,6 +54,9 @@ const Index = () => {
         </TabContent>
         <TabContent value="tab4">
            <Roles/>
+        </TabContent>
+        <TabContent value="Archived Users">
+           <ArchivedUsers/>
         </TabContent>
     </div>
 </Tabs>

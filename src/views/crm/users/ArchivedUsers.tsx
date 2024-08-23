@@ -16,13 +16,14 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
-import { apiDeleteUsers, apiGetUsers } from '@/services/CommonService'
+import { apiDeleteUsers, apiGetDeletedUsers, apiGetUsers, apiPermanantlyDeleteUsers, apiRestoreDeletedUsers } from '@/services/CommonService'
 import { BiTrash } from 'react-icons/bi'
 import { Button, Notification, Pagination, Select, toast, Tooltip } from '@/components/ui'
 import { useRoleContext } from '../Roles/RolesContext'
 import { Link } from 'react-router-dom'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import { AuthorityCheck, ConfirmDialog } from '@/components/shared'
+import { LiaTrashRestoreSolid } from 'react-icons/lia'
 import { AiOutlineDelete } from 'react-icons/ai'
 
 type User = {
@@ -101,13 +102,14 @@ const pageSizeOption = [
     { value: 50, label: '50 / page' },
 ]
 
-const Users = () => {
+const ArchivedUsers = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const [data, setData] = useState<User[]>([]);
     const {roleData}=useRoleContext()
     const [loading,setLoading]=useState(true)
     const [dialogIsOpen, setIsOpen] = useState(false)
+    const [dialogIsOpen1, setIsOpen1] = useState(false)
     const [userId, setUserId] = useState('')
     
         const openDialog = (UserId:any) => {
@@ -117,13 +119,23 @@ const Users = () => {
         const onDialogClose = () => {
             setIsOpen(false)
         }
+        const openDialog1 = (UserId:any) => {
+            setIsOpen1(true)  
+            setUserId(UserId)
+        }
+        const onDialogClose1 = () => {
+            setIsOpen1(false)
+        }
 
     useEffect(() => {
       const fetchData = async () => {
-        const response = await apiGetUsers(); 
+        const response = await apiGetDeletedUsers(); 
         const data: ApiResponse =  response
         setLoading(false)
         setData(data.data);
+        console.log(data.data);
+        
+        
       };
      
   
@@ -131,7 +143,34 @@ const Users = () => {
     }, []);
 
     const deleteuser=async(UserId:string)=>{
-        const response=await apiDeleteUsers(UserId);
+        const response=await apiPermanantlyDeleteUsers(UserId);
+        console.log(response);
+        const data=await response.json()
+        console.log(data);
+        
+        if(data.code===200){
+            toast.push(
+                <Notification closable type="success" duration={2000}>
+                    {data.message}
+                </Notification>
+
+            )
+            window.location.reload();
+        }
+        else{
+            toast.push(
+                <Notification closable type="danger" duration={2000}>
+                    {data.errorMessage}
+                </Notification>
+            )
+        }
+
+
+      }
+    const restoreuser=async(UserId:string)=>{
+        
+        
+        const response=await apiRestoreDeletedUsers(UserId);
         console.log(response);
         const data=await response.json()
         console.log(data);
@@ -166,7 +205,10 @@ const Users = () => {
             cell: ({row}) => {
                 return (
                     <div className="">
-                   <Tooltip title='Delete'>
+                       <Tooltip title='Restore'>
+                        <p className=" text-xl hover:text-red-500 cursor-pointer" onClick={()=>openDialog1(row.original.UserId)}><LiaTrashRestoreSolid/></p>
+                        </Tooltip>
+                       <Tooltip title='Delete'>
                         <p className=" text-xl hover:text-red-500 cursor-pointer" onClick={()=>openDialog(row.original.UserId)}><AiOutlineDelete/></p>
                         </Tooltip>
                     </div>
@@ -218,15 +260,8 @@ console.log(data.length);
     return (
         <>
         <div className='flex flex-col sm:flex-row gap-5 justify-between mb-5'>
-        <h3>Users</h3>
+        <h3>Archived Users</h3>
         <div className='flex gap-3'>
-        <AuthorityCheck
-                    userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.user?.create??[]}
-                    >
-        <Link to={`/app/crm/register`}>
-        <Button size='sm' variant='solid'>Create User</Button></Link>
-        </AuthorityCheck>
             <DebouncedInput
                 value={globalFilter ?? ''}
                 className="p-2 font-lg shadow border border-block"
@@ -333,9 +368,20 @@ console.log(data.length);
               onRequestClose={onDialogClose}>
                 <p> Are you sure you want to delete this user permanantly? </p>            
             </ConfirmDialog>
+            <ConfirmDialog
+              isOpen={dialogIsOpen1}
+              type="success"
+              onClose={onDialogClose1}
+              confirmButtonColor="green-600"
+              onCancel={onDialogClose1}
+              onConfirm={() => restoreuser(userId)}
+              title="Restore Archived User"
+              onRequestClose={onDialogClose1}>
+                <p> Are you sure you want to restore this user? </p>            
+            </ConfirmDialog>
         </>
     )
 }
 
-export default Users
+export default ArchivedUsers
 

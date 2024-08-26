@@ -243,7 +243,7 @@ const CustomerProfile = ({ data }: CustomerProfileProps) => {
                     <div className="mt-4 flex flex-col xl:flex-row gap-2">
                     <AuthorityCheck
                     userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.contract?.update??[]}
+                    authority={roleData?.data?.project?.update??[]}
                     >
                     <Button variant="solid" onClick={() => openDialog()} size='sm' className='flex justify-center items-center gap-1'>
             <span>  <HiOutlinePencil/></span><span>  Edit</span>

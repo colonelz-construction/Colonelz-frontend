@@ -92,7 +92,6 @@ const FormComponent = ({ children }:any) => {
         const fileName = `Contract_${lead_id}_${values.project_name}_${new Date().toLocaleString().replace(/[/,]/g, '-').replace(/:/g, '-')}`;
         setFieldValue('file_name', fileName);
     }, [values.project_name, setFieldValue]);
-    console.log(values.file_name);
     
     return (
         <div className=''>
@@ -386,6 +385,13 @@ const FormContent = () => {
                                                     value.map((v:any) =>v.value),
                                                 )
                                             }
+                                            onKeyDown={(e) => {
+                                                 const charCode = e.which ? e.which : e.keyCode;
+                            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                              e.preventDefault();
+                            }
+                                            }
+                                            }
                                             onBlur={() =>
                                                 form.setFieldTouched(
                                                     field.name,
@@ -523,12 +529,27 @@ const FormContent = () => {
                                             placeholder='Discount(%)'
                                             
                                             size='md'
-                                            onKeyPress={(e) => {
+                                            onKeyDown={(e:any) => {
                                                 const charCode = e.which ? e.which : e.keyCode;
-                                                if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                                                  e.preventDefault();
+                                                const value = e?.target?.value;
+                                                if (
+                                                    charCode === 8 || 
+                                                    charCode === 46 || 
+                                                    charCode === 9 || 
+                                                    charCode === 27 || 
+                                                    charCode === 13 || 
+                                                    (charCode >= 35 && charCode <= 40)
+                                                ) {
+                                                    return;
                                                 }
-                                              }}
+                                                if (charCode < 48 || charCode > 57) {
+                                                    e.preventDefault();
+                                                }
+                                                const newValue = parseInt(value + e.key, 10);
+                                                if (newValue < 0 || newValue > 100) {
+                                                    e.preventDefault();
+                                                }
+                                            }}
                                               onChange={(e) => {
                                                 const value = e.target.value.replace(/[^0-9]/g, '');
                                                 form.setFieldValue(field.name, value);

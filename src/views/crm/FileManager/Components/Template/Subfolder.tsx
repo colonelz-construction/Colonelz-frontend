@@ -222,7 +222,7 @@ const Index = () => {
         () => [
             {
                 header: 'Name',
-                accessorKey: 'folder_name',
+                accessorKey: 'sub_folder_name_second',
                 cell: ({ row }) => (
                     <div className="flex items-center">
                         <AiOutlineFolder className="mr-2 text-xl" />

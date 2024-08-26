@@ -40,8 +40,6 @@ const EditSubTask = (task:Data) => {
     const [userData,setUserData]=useState<any>(null)
     useEffect(() => {
         const UserData=async()=>{
-            const response = await apiGetUsersList();
-            setUserData(response.data)
         }
         UserData();
 
@@ -132,7 +130,6 @@ const priorityOptions = [
                          }
                          setLoading(true)
                          const response = await apiGetCrmProjectsSubTaskUpdate(values)
-                         const responseTimer=await apiGetCrmProjectsSingleSubTaskTimer(data);
                          console.log('response', response);
                          setLoading(false)
                          if(response.code===200){

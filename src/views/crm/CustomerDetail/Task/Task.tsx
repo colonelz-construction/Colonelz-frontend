@@ -152,6 +152,8 @@ const Filtering = () => {
             const response = await apiGetCrmProjectsTaskData(projectId);
             setLoading(false)
             setTaskData(response.data)
+            console.log(response);
+            
         }
         TaskData();
     }, [projectId])

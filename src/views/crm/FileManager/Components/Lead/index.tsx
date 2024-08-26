@@ -152,22 +152,24 @@ const Index = () => {
         type:"",
         project_id:""
       };
-      try {
-        await apiDeleteFileManagerFolders(postData);
+      
+       const response= await apiDeleteFileManagerFolders(postData);
+       const data = await response.json();
+         if (response.status === 200){
         toast.push(
           <Notification closable type="success" duration={2000}>
             Folder deleted successfully
           </Notification>,{placement:'top-center'}
         )
         window.location.reload()
-      } catch (error) {
+    }
+    else{
         toast.push(
           <Notification closable type="danger" duration={2000}>
-            Error deleting folder
+            {data.errorMessage}
           </Notification>,{placement:'top-center'}
         )
-      }
-      
+    }
     }
     
     const navigate=useNavigate()

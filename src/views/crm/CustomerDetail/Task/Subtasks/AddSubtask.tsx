@@ -33,8 +33,6 @@ const AddSubTask = (task:any) => {
     const task_id=queryParams.get('task')
     useEffect(() => {
         const UserData=async()=>{
-            const response = await apiGetUsersList();
-            setUserData(response.data)
         }
         UserData();
 

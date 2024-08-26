@@ -22,6 +22,7 @@ const permissionsMap: { [key: string]: Permission[] } = {
     contract: ['create', 'read','update'],
     quotation: [ 'read','update'],
     user: [ 'read'],
+    userArchive:['read','restore','delete'],
     companyData:['read']
 
 };

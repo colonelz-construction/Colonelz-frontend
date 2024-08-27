@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import Container from '@/components/shared/Container'
 import CustomerProfile from './components/CustomerProfile'
-import reducer, { getCustomer, useAppDispatch } from './store'
 import { injectReducer } from '@/store'
 import useQuery from '@/utils/hooks/useQuery'
 import MOM from './components/MOM/Mom'
@@ -11,7 +10,7 @@ import TabNav from '@/components/ui/Tabs/TabNav'
 import TabContent from '@/components/ui/Tabs/TabContent'
 import { useLocation, useNavigate } from 'react-router-dom'
 import AllMom from './components/MOM/AllMom'
-import {  apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjects } from '@/services/CrmService'
+import {  apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects } from '@/services/CrmService'
 import { FileItem } from '../FileManager/Components/Project/data'
 import Index from './Quotation'
 import { MomProvider } from './store/MomContext'
@@ -21,20 +20,12 @@ import Activity from './Project Progress/Activity'
 import Timeline from './Timeline/Timeline'
 import { AuthorityCheck } from '@/components/shared'
 import { useRoleContext } from '../Roles/RolesContext'
+import { Tasks } from './store'
 
-injectReducer('crmCustomerDetails', reducer)
 
 const CustomerDetail = () => {
-    const dispatch = useAppDispatch()
     const query = useQuery()
     const [loading, setLoading] = useState(true);
-
-    const fetchData = () => {
-        const id = query.get('lead_id')
-        if (id) {
-            dispatch(getCustomer({ id }))
-        }
-    }
     interface QueryParams {
         id: string;
         project_id: string;
@@ -46,7 +37,6 @@ const CustomerDetail = () => {
     const location = useLocation();
     const role=localStorage.getItem('role');
     const {roleData} = useRoleContext();
-
     const queryParams = new URLSearchParams(location.search);
     const allQueryParams: QueryParams = {
       id: queryParams.get('id') || '',
@@ -55,6 +45,8 @@ const CustomerDetail = () => {
     };
     const [details, setDetails] = useState<any | null>(null);
     const[momdata,setmomdata]= useState<any >(null);
+    const [task,setTaskData]=useState<Tasks[]>([])
+    const [report,setReport]=useState<any>()
 
     const handleTabChange = (selectedTab:any) => {
       const currentUrlParams = new URLSearchParams(location.search);
@@ -66,10 +58,14 @@ const CustomerDetail = () => {
         const fetchData = async () => {
             try {
                 const response = await apiGetCrmSingleProjects(allQueryParams.project_id);
+                const taskResponse = await apiGetCrmProjectsTaskData(allQueryParams.project_id);
+                const Report = await apiGetCrmSingleProjectReport(allQueryParams.project_id);
                 const data = response
                 setDetails(data.data[0]);
                 setLoading(false);
                 setmomdata(data.data[0].mom)
+                setTaskData(taskResponse.data)
+                setReport(Report)
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -96,7 +92,7 @@ const CustomerDetail = () => {
         <h3 className='pb-5'>Project-{loading?<Skeleton width={100}/>:details?details.project_name:""}</h3>
         <div>
           <ProjectProvider>
-          <MomProvider>
+       
 {loading?<Skeleton height={400}/>:
           <Tabs defaultValue={allQueryParams.mom} onChange={handleTabChange}>
             <TabList>
@@ -114,12 +110,8 @@ const CustomerDetail = () => {
                     >
                     <TabNav value="mom" >MOM</TabNav>
                     </AuthorityCheck>
-                    <AuthorityCheck
-                    userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.task?.read??[]}
-                    >
+                   
                     <TabNav value="task">Task Manager</TabNav>
-                    </AuthorityCheck>
                     <AuthorityCheck
                     userAuthority={[`${localStorage.getItem('role')}`]}
                     authority={['ADMIN']}
@@ -135,7 +127,7 @@ const CustomerDetail = () => {
                 <TabContent value="details">
                   {loading ? <Skeleton width={150}/> :
                     <Container>
-                        <CustomerProfile data={details}/>
+                        <CustomerProfile data={details} report={report}/>
                     </Container>}
                 </TabContent>
                 <TabContent value="Quotation">
@@ -146,7 +138,7 @@ const CustomerDetail = () => {
                 </TabContent>
               
                 <TabContent value="task">
-                  <Task/>
+                  <Task task={task}/>
                 </TabContent>
                 <TabContent value="activity">
                   <Activity Data={details} />
@@ -157,7 +149,6 @@ const CustomerDetail = () => {
 
             </div>
         </Tabs>}
-        </MomProvider>
         </ProjectProvider>
     </div>
     </>);

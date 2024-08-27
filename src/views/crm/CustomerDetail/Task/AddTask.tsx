@@ -21,10 +21,9 @@ type Task = {
     reporter: string;
   };
 
-const AddTask = ({project,userData}:any) => {
+const AddTask = ({project}:any) => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
-    console.log(userData);
     
 const openDialog = () => {
     setIsOpen(true)
@@ -45,17 +44,9 @@ const priorityOptions = [
     { label: "In Progress", value: "In Progress" },
     { label: "Cancelled", value: "Cancelled" },
   ];
-  const userOptions = userData?.map((user:any) => ({
-    label: user.username,
-    value: user.username
-  }));
+  const userOptions = [{label:'any',value:'any'}]
 
-  console.log(userOptions);
-  
- 
-  
-
-    return (
+  return (
         <div>
             <Button onClick={openDialog}  variant='solid' size='sm'>Add New Task</Button>
             <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>

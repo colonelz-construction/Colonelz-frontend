@@ -29,6 +29,7 @@ import EditTask from './EditTask'
 import NoData from '@/views/pages/NoData'
 import { useRoleContext } from '../../Roles/RolesContext'
 import formateDate from '@/store/dateformate'
+import { Tasks } from '../store'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -37,25 +38,10 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
 }
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
-type Task = {
-    project_id: string;
-    task_id: string;
-    task_name: string;
-    task_description: string;
-    actual_task_start_date: string;
-    actual_task_end_date: string;
-    estimated_task_start_date: string;
-    estimated_task_end_date: string;
-    task_status: string;
-    task_priority: string;
-    task_createdOn: string;
-    reporter: string;
-    task_createdBy: string;
-    number_of_subtasks: number;
-    user_id: string;
-    task_assignee: string;
-    percentage:string;
-};
+
+type Data={
+    task:Tasks[]
+  }
 
 
 const pageSizeOption = [
@@ -134,25 +120,22 @@ const statusColors: { [key: string]: string } = {
     'Not Interested': 'bg-red-200 text-red-700',
 };
 
-const Filtering = () => {
+const Filtering = ({task}:Data) => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const location=useLocation()
     const queryParams = new URLSearchParams(location.search);
     const projectId=queryParams.get('project_id') || '';
-    const [taskData,setTaskData]=useState<any>(null)
     const [loading,setLoading]=useState(true)
     const [userData,setUserData]=useState<any>(null)
 
     const role=localStorage.getItem('role')
     const {roleData}=useRoleContext()
+    
 
     useEffect(() => {
         const TaskData=async()=>{
-            const response = await apiGetCrmProjectsTaskData(projectId);
             setLoading(false)
-            setTaskData(response.data)
-            console.log(response);
             
         }
         TaskData();
@@ -171,7 +154,7 @@ const Filtering = () => {
 
 
 
-    const ActionColumn = ({ row }: { row: Task}) => {
+    const ActionColumn = ({ row }: { row: Tasks}) => {
         const navigate = useNavigate()
         const { textTheme } = useThemeClass()
         const { roleData } = useRoleContext()
@@ -250,7 +233,7 @@ const Filtering = () => {
         return `${day}-${month}-${year}`;
         }
 
-    const columns = useMemo<ColumnDef<Task>[]>(
+    const columns = useMemo<ColumnDef<Tasks>[]>(
         () => [
          {
             header:'Name',
@@ -295,7 +278,7 @@ const Filtering = () => {
 
 
     const table = useReactTable({
-        data:taskData?taskData:[],
+        data:task?task:[],
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -340,7 +323,7 @@ const Filtering = () => {
                     <AddTask project={projectId} userData={userData}/>
                     </AuthorityCheck>
                     </div>
-            {!loading ? taskData.length===0?(<NoData/>):(
+            {!loading ? task?.length===0?(<NoData/>):(
                 <Table>
                 <THead>
                     {table.getHeaderGroups().map((headerGroup) => (
@@ -405,7 +388,7 @@ const Filtering = () => {
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}
                     currentPage={table.getState().pagination.pageIndex + 1}
-                    total={taskData?taskData.length:0}
+                    total={task?task.length:0}
                     onChange={onPaginationChange}
                 />
                 <div style={{ minWidth: 130 }}>

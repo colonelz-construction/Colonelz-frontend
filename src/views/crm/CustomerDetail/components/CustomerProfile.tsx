@@ -23,6 +23,7 @@ type CustomerInfoFieldProps = {
 
 type CustomerProfileProps = {
     data: Customer
+    report:any
 }
 
 const formatDate = (dateString: string | undefined) => {
@@ -221,7 +222,7 @@ interface ProjectUpdateData {
   
 
 
-const CustomerProfile = ({ data }: CustomerProfileProps) => {
+const CustomerProfile = ({ data,report }: CustomerProfileProps) => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const {roleData} = useRoleContext()
 
@@ -319,7 +320,7 @@ const CustomerProfile = ({ data }: CustomerProfileProps) => {
             </div>
           
         </Card>
-        <Report/>
+        <Report report={report}/>
       
         </div>
     )

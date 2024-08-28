@@ -41,6 +41,7 @@ const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
 type Data={
     task:Tasks[]
+    users:string[]
   }
 
 
@@ -120,7 +121,7 @@ const statusColors: { [key: string]: string } = {
     'Not Interested': 'bg-red-200 text-red-700',
 };
 
-const Filtering = ({task}:Data) => {
+const Filtering = ({task,users}:Data) => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const location=useLocation()
@@ -142,8 +143,7 @@ const Filtering = ({task}:Data) => {
     }, [projectId])
     useEffect(() => {
         const UserData=async()=>{
-            const response = await apiGetUsersList();
-            setUserData(response.data)
+            setUserData(users)
         }
         UserData();
 
@@ -154,7 +154,7 @@ const Filtering = ({task}:Data) => {
 
 
 
-    const ActionColumn = ({ row }: { row: Tasks}) => {
+    const ActionColumn = ({ row,users }: { row: Tasks,users:any}) => {
         const navigate = useNavigate()
         const { textTheme } = useThemeClass()
         const { roleData } = useRoleContext()
@@ -199,7 +199,7 @@ const Filtering = ({task}:Data) => {
                
                 <span
                     className={`cursor-pointer p-2  hover:${textTheme}`}>
-                    <EditTask Data={row} task={false}/>
+                    <EditTask Data={row} users={users} task={false}/>
                     
                 </span>
                 
@@ -269,7 +269,7 @@ const Filtering = ({task}:Data) => {
                 header:'Action',
                 id: 'action',
                 accessorKey:'action',
-                cell: ({row}) => <ActionColumn row={row.original}/>,
+                cell: ({row}) => <ActionColumn row={row.original} users={users}/>,
             }
            
         ],

@@ -21,9 +21,11 @@ type Task = {
     reporter: string;
   };
 
-const AddTask = ({project}:any) => {
+const AddTask = ({project,userData}:any) => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    console.log(userData);
+    
     
 const openDialog = () => {
     setIsOpen(true)
@@ -44,7 +46,7 @@ const priorityOptions = [
     { label: "In Progress", value: "In Progress" },
     { label: "Cancelled", value: "Cancelled" },
   ];
-  const userOptions = [{label:'any',value:'any'}]
+  const userOptions = userData?.map((user:any) => ({label: user, value: user}))
 
   return (
         <div>
@@ -208,7 +210,7 @@ const priorityOptions = [
                                 <div className=' text-red-600'>{errors.estimated_task_end_date}</div>
                             </FormItem>
                            
-                            <FormItem label='Reporting'
+                            <FormItem label='Report to'
                             asterisk
                             invalid={errors.reporter && touched.reporter}
                             >

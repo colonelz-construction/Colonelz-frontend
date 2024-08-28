@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Container from '@/components/shared/Container'
 import CustomerProfile from './components/CustomerProfile'
-import { injectReducer } from '@/store'
+import { injectReducer, setUser } from '@/store'
 import useQuery from '@/utils/hooks/useQuery'
 import MOM from './components/MOM/Mom'
 import { Skeleton, Tabs } from '@/components/ui'
@@ -10,7 +10,7 @@ import TabNav from '@/components/ui/Tabs/TabNav'
 import TabContent from '@/components/ui/Tabs/TabContent'
 import { useLocation, useNavigate } from 'react-router-dom'
 import AllMom from './components/MOM/AllMom'
-import {  apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects } from '@/services/CrmService'
+import {  apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList } from '@/services/CrmService'
 import { FileItem } from '../FileManager/Components/Project/data'
 import Index from './Quotation'
 import { MomProvider } from './store/MomContext'
@@ -47,6 +47,7 @@ const CustomerDetail = () => {
     const[momdata,setmomdata]= useState<any >(null);
     const [task,setTaskData]=useState<Tasks[]>([])
     const [report,setReport]=useState<any>()
+    const [users,setUsers]=useState<any>()
 
     const handleTabChange = (selectedTab:any) => {
       const currentUrlParams = new URLSearchParams(location.search);
@@ -60,12 +61,14 @@ const CustomerDetail = () => {
                 const response = await apiGetCrmSingleProjects(allQueryParams.project_id);
                 const taskResponse = await apiGetCrmProjectsTaskData(allQueryParams.project_id);
                 const Report = await apiGetCrmSingleProjectReport(allQueryParams.project_id);
+                const list=await apiGetUsersList(allQueryParams.project_id)
                 const data = response
                 setDetails(data.data[0]);
                 setLoading(false);
                 setmomdata(data.data[0].mom)
                 setTaskData(taskResponse.data)
                 setReport(Report)
+                setUsers(list.data)
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -138,7 +141,7 @@ const CustomerDetail = () => {
                 </TabContent>
               
                 <TabContent value="task">
-                  <Task task={task}/>
+                  <Task task={task} users={users}/>
                 </TabContent>
                 <TabContent value="activity">
                   <Activity Data={details} />

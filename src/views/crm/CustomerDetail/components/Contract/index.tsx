@@ -342,36 +342,6 @@ const FormContent = () => {
                                     className=" text-red-600"
                                 />
                             </FormItem>
-                            <FormItem label="Client Email">
-                                <Field name="client_email">
-                                    {({ field, form }: FieldProps) => (
-                                        <Select
-                                            isMulti
-                                            className='h-[44px]'
-                                            componentAs={CreatableSelect}
-                                            components={animatedComponents}
-                                            onChange={(value) =>
-                                                form.setFieldValue(
-                                                    field.name,
-                                                    value.map((v:any) => v.value),
-                                                )
-                                            }
-                                            onBlur={() =>
-                                                form.setFieldTouched(
-                                                    field.name,
-                                                    true,
-                                                )
-                                            }
-                                        />
-                                    )}
-                                </Field>
-                                <ErrorMessage
-                                    name="client_email"
-                                    component="div"
-                                    className=" text-red-600"
-                                />
-                            </FormItem>
-                       
                             <FormItem label="Client Phone">
                                 <Field name="client_phone">
                                     {({ field, form }: FieldProps) => (
@@ -407,6 +377,36 @@ const FormContent = () => {
                                     className=" text-red-600"
                                 />
                             </FormItem>
+                            <FormItem label="Client Email">
+                                <Field name="client_email">
+                                    {({ field, form }: FieldProps) => (
+                                        <Select
+                                            isMulti
+                                            componentAs={CreatableSelect}
+                                            components={animatedComponents}
+                                            onChange={(value) =>
+                                                form.setFieldValue(
+                                                    field.name,
+                                                    value.map((v:any) => v.value),
+                                                )
+                                            }
+                                            onBlur={() =>
+                                                form.setFieldTouched(
+                                                    field.name,
+                                                    true,
+                                                )
+                                            }
+                                        />
+                                    )}
+                                </Field>
+                                <ErrorMessage
+                                    name="client_email"
+                                    component="div"
+                                    className=" text-red-600"
+                                />
+                            </FormItem>
+                       
+                           
                          
                             <FormItem label="Project Name">
                                 <Field

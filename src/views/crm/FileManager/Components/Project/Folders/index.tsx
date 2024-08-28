@@ -20,10 +20,10 @@ import CreatableSelect from 'react-select/creatable'
 import { CiFileOn, CiImageOn } from 'react-icons/ci'
 import {
     apiDeleteFileManagerFiles,
+    apiGetAllUsersList,
     apiGetCrmFileManagerCreateProjectFolder,
     apiGetCrmFileManagerShareFiles,
     apiGetCrmProjectShareQuotation,
-    apiGetUsersList,
 } from '@/services/CrmService'
 import { apiGetUsers } from '@/services/CommonService'
 import { HiShare, HiTrash } from 'react-icons/hi'
@@ -152,7 +152,7 @@ type Option = {
 
     useEffect(() => {
         const response = async () => {
-            const data = await apiGetUsersList()
+            const data = await apiGetAllUsersList()
             const userdata = data.data
             console.log(userdata)
 

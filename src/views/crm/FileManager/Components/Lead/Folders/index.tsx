@@ -5,7 +5,7 @@ import { Button, Dialog, FormItem, Input, Notification, Pagination, Select, Uplo
 import { AuthorityCheck, ConfirmDialog, RichTextEditor, StickyFooter } from '@/components/shared';
 import CreatableSelect from 'react-select/creatable';
 import { CiFileOn, CiImageOn } from 'react-icons/ci';
-import { apiDeleteFileManagerFiles, apiGetCrmFileManagerCreateLeadFolder, apiGetCrmFileManagerLeads, apiGetCrmFileManagerShareContractFile, apiGetCrmFileManagerShareFiles } from '@/services/CrmService';
+import { apiDeleteFileManagerFiles, apiGetAllUsersList, apiGetCrmFileManagerCreateLeadFolder, apiGetCrmFileManagerLeads, apiGetCrmFileManagerShareContractFile, apiGetCrmFileManagerShareFiles } from '@/services/CrmService';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 import { apiGetUsers } from '@/services/CommonService';
@@ -119,7 +119,7 @@ const Index = () => {
   useEffect(() => {
     const fetchDataAndLog = async () => {
       try {
-        const usersData = await apiGetUsers();
+        const usersData = await apiGetAllUsersList();
         setUsers(usersData?.data);
       } catch (error) {
         console.error('Error fetching users', error);
@@ -648,7 +648,7 @@ const onSelectChange = (value = 0) => {
     user_name: Yup.string().required('Required'),
     type: Yup.string().required('Required'),
   })}
-  onSubmit={async(values, { setSubmitting }) => {
+  onSubmit={async(values:any, { setSubmitting }) => {
     setSubmitting(true)
     const formData=new FormData()
     formData.append('lead_id',values.lead_id)

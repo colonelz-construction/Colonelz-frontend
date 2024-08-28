@@ -229,6 +229,7 @@ const columns = useMemo<ColumnDef<FolderItem>[]>(
             header: 'Actions',
             id: 'actions',
             cell: ({row}) => {
+                const {roleData} = useRoleContext();
                 return(
                     <AuthorityCheck
                     userAuthority={[`${localStorage.getItem('role')}`]}
@@ -280,6 +281,8 @@ const filteredProjectData = useMemo(() => {
   }
   return leadData;
 }, [leadData, role]);
+console.log(filteredProjectData);
+
 
 const table = useReactTable({
     data:filteredProjectData,

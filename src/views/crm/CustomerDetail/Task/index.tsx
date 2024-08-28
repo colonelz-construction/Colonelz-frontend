@@ -5,15 +5,17 @@ import { apiGetCrmProjectsTaskData } from '@/services/CrmService';
 import { Tasks } from '../store';
 type Data={
   task:Tasks[]
+  users:string[]
 }
 
-const Index = ({task}:Data) => {
-  console.log(task);
+
+const Index = ({task,users}:Data) => {
+  console.log(users);
   
   
   
   return (
-    <div><Task task={task} /></div>
+    <div><Task task={task} users={users} /></div>
   )
 }
 

@@ -31,6 +31,7 @@ import { AuthorityCheck, ConfirmDialog, StickyFooter } from '@/components/shared
 import NoData from '@/views/pages/NoData'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import formateDate from '@/store/dateformate'
+import { role } from '@/utils/hooks/useAuth'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -139,11 +140,14 @@ const PaginationTable = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const { roleData } = useRoleContext()
+    console.log('RoleData:', roleData);
+    
       const [deleteData,setDeleteData]=useState<ArchiveData>()
       const [restoreData,setRestoreData]=useState<Restore>()
       const [dialogIsOpen2, setIsOpen2] = useState(false)
       const [dialogIsOpen3, setIsOpen3] = useState(false)
       const [folderName, setFolderName] = useState<string>('')
+      
   
       const openDialog2 = (file_id:string,lead_id:string,project_id:string,type:string,folder_name:string,sub_folder_name_first:string,sub_folder_name_second:string,delete_type:string) => {
           setIsOpen2(true)
@@ -246,6 +250,10 @@ const PaginationTable = () => {
             )
           }
       }
+
+      
+      console.log(roleData);
+      
     const columns = useMemo<ColumnDef<DataItem>[]>(
         () => [
             {
@@ -317,11 +325,15 @@ const PaginationTable = () => {
                     const sub_folder_name_first = row.original.sub_folder_name_first || '';
                     const sub_folder_name_second = row.original.sub_folder_name_second || '';
                     const delete_type = row.original.files[0].folder_name ? 'folder' : 'file';
+                    const role = localStorage.getItem('role') || '';
+                    const {roleData} = useRoleContext();
+
+                    
                   
                         return (<div className='flex gap-3  '>
                              <AuthorityCheck
-                       userAuthority={[`${localStorage.getItem('role')}`]}
-                       authority={roleData?.data?.archive?.restore??[]}
+                       userAuthority={[`${role}`]??[]}
+                       authority={roleData?.data?.archive?.delete??[]}
                        >
                                 <Tooltip title="Restore">
                                 <span className="cursor-pointer">
@@ -337,8 +349,9 @@ const PaginationTable = () => {
                             </span>
                             </Tooltip>
                             </AuthorityCheck>
+                
                             <AuthorityCheck
-                       userAuthority={[`${localStorage.getItem('role')}`]}
+                       userAuthority={[`${role}`]??[]}
                        authority={roleData?.data?.archive?.delete??[]}
                        >
                              <Tooltip title="Delete">

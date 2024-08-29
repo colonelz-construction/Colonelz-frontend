@@ -183,6 +183,7 @@ type Option = {
     const [dialogIsOpen3, setIsOpen3] = useState(false)
     const [fileId, setFileId] = useState<string>('')
 
+
     const openDialog = (fileId: string) => {
         setIsOpen(true)
         setSelectedFiles([fileId])
@@ -308,7 +309,7 @@ type Option = {
             user_name: selectedUsername,
             type: 'Internal',
             file_id: selectedFileId,
-            folder_name: 'quotation',
+            folder_name: folderName,
             project_id: leadId,
             user_id: localStorage.getItem('userId'),
         }
@@ -1034,13 +1035,13 @@ const onSelectChange = (value = 0) => {
                                 {({ field, form }: any) => (
                                     <Upload
                                     draggable
+                                    multiple
                                         onChange={(
                                             files: File[],
                                             fileList: File[],
                                         ) => {
                                             form.setFieldValue('files', files)
                                         }}
-                                        multiple
                                     />
                                 )}
                             </Field>

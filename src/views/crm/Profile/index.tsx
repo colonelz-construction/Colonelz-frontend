@@ -26,7 +26,7 @@ const Index = () => {
     
   return (<div className='px-4'>
     <h3 className='mb-5'>My Profile</h3>
-    <Tabs defaultValue="archived">
+    <Tabs defaultValue="profile">
     <TabList>
         <TabNav value="profile">Profile</TabNav>
         <TabNav value="pass">Password</TabNav>

@@ -314,8 +314,8 @@ const PaginationTable = () => {
             
             {
                 header: 'Actions',
-                accessorKey: 'age',
-                id: 'age',
+                accessorKey: 'action',
+                id: 'action',
                 cell: ({row}) => {
                     const fileId=row.original.files[0].fileId
                     const leadId=row.original.lead_id
@@ -327,14 +327,13 @@ const PaginationTable = () => {
                     const delete_type = row.original.files[0].folder_name ? 'folder' : 'file';
                     const role = localStorage.getItem('role') || '';
                     const {roleData} = useRoleContext();
+                    const restoreAccess = roleData?.data?.archive?.restore?.includes(role); 
+                    const deleteAccess = roleData?.data?.archive?.delete?.includes(role);
 
                     
                   
                         return (<div className='flex gap-3  '>
-                             <AuthorityCheck
-                       userAuthority={[`${role}`]??[]}
-                       authority={roleData?.data?.archive?.delete??[]}
-                       >
+                            {restoreAccess &&
                                 <Tooltip title="Restore">
                                 <span className="cursor-pointer">
                             <LiaTrashRestoreSolid className='text-xl cursor-pointer hover:text-blue-500' onClick={()=>openDialog3(
@@ -348,12 +347,9 @@ const PaginationTable = () => {
                             )}/>
                             </span>
                             </Tooltip>
-                            </AuthorityCheck>
+                }
                 
-                            <AuthorityCheck
-                       userAuthority={[`${role}`]??[]}
-                       authority={roleData?.data?.archive?.delete??[]}
-                       >
+                            {deleteAccess &&
                              <Tooltip title="Delete">
                 <span className="cursor-pointer">
                 <MdDeleteOutline
@@ -373,7 +369,7 @@ const PaginationTable = () => {
                             />
                 </span>
             </Tooltip>
-            </AuthorityCheck>
+                }
                             </div>
                         );
                    
@@ -456,7 +452,7 @@ const PaginationTable = () => {
                                             key={header.id}
                                             colSpan={header.colSpan}
                                         >
-                                            {header.isPlaceholder ?  null : (
+                                            {header.isPlaceholder || header.id==='action' ?   null : (
                                                 <div
                                                     {...{
                                                         className:

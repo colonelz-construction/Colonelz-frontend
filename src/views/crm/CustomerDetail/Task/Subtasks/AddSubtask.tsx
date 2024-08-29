@@ -177,6 +177,7 @@ const priorityOptions = [
                                 <Field name='actual_sub_task_start_date'  placeholder='Start date'>
                                     {({field}:any)=>(
                                         <DatePicker name='actual_sub_task_start_date'
+                                        minDate={}
                                         onChange={(value) => { field.onChange({ target: {name:'actual_sub_task_start_date', value: `${value}` } }) }}
                                         />
                                     )}

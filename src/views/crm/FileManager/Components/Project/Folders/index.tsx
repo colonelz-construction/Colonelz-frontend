@@ -139,6 +139,7 @@ const Index = () => {
         null,
     )
     const {roleData} = useRoleContext()
+    const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
 
     interface User {
         role: string
@@ -507,8 +508,11 @@ const columns = useMemo<ColumnDef<FileItem>[]>(
         } },
         { header: 'Actions', accessorKey: 'actions',
         cell:({row})=>{
+            const {roleData}=useRoleContext()
+            const deleteAccess = roleData?.data?.file?.delete?.includes(`${localStorage.getItem('role')}`)
           return <div className='flex items-center gap-2'>
-              <MdDeleteOutline className='text-xl cursor-pointer hover:text-red-500' onClick={()=>openDialog3(row.original.fileId)} />
+            {deleteAccess &&
+              <MdDeleteOutline className='text-xl cursor-pointer hover:text-red-500' onClick={()=>openDialog3(row.original.fileId)} />}
                   <HiShare className='text-xl cursor-pointer'  onClick={() => openDialog(row.original.fileId)}/> 
           </div>
         }
@@ -554,11 +558,7 @@ const onSelectChange = (value = 0) => {
         <div>
             <div className="flex justify-between">
                 <h3 className="mb-5 capitalize">Project-{ProjectName}</h3>
-                <AuthorityCheck
-                    userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.file?.create??[]}
-                    >
-
+                {uploadAccess &&
                 <Button
                     className=""
                     size="sm"
@@ -566,8 +566,7 @@ const onSelectChange = (value = 0) => {
                     onClick={() => openDialog2()}
                 >
                     Upload Files
-                </Button>
-                </AuthorityCheck>
+                </Button>}
             </div>
         
              

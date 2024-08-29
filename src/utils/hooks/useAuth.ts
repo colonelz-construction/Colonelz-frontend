@@ -11,9 +11,6 @@ import { REDIRECT_URL_KEY } from '@/constants/app.constant'
 import { useNavigate } from 'react-router-dom'
 import useQuery from './useQuery'
 import type { SignInCredential, SignUpCredential } from '@/@types/auth'
-import { toast } from '@/components/ui'
-import { useEffect } from 'react'
-import socketIOClient from 'socket.io-client';
 
 type Status = 'success' | 'failed'
 export let role=''
@@ -94,7 +91,7 @@ function useAuth() {
     }
     const tokens=localStorage.getItem('auth')
     if (tokens) {
-    setTimeout(signOut, 24*60*60*1000);
+    setTimeout(signOut, 60*60*1000);
     }
     return {
         authenticated: token && signedIn,

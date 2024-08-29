@@ -50,7 +50,12 @@ type SubTask = {
     sub_task_reporter: string;
     sub_task_createdBy: string;
     sub_task_assignee: string;
+    remark:Remarks[]
 };
+type Remarks={
+    remark:string;
+    remark_by:string;
+    remark_date:string;}
 type Data={
     Data:SubTask
   }

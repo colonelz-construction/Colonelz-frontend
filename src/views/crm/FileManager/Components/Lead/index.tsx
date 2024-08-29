@@ -110,6 +110,7 @@ const Index = () => {
     const leadName = queryParams.get('lead_name');
     const role=localStorage.getItem('role')
     const {roleData} = useRoleContext();
+    const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
     useEffect(() => {
         const fetchData = async () => {
             const data = await fetchLeadData(leadId);
@@ -312,16 +313,13 @@ const table = useReactTable({
      
   return (
       <div>
-          <div className=" flex justify-between mb-5">
+          <div className="flex justify-between mb-5">
               <h3 className="">Lead-{leadName}</h3>
-              <AuthorityCheck
-                    userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.file?.create??[]}
-                    >
+              {uploadAccess &&
               <Button variant="solid" size="sm" onClick={() => openDialog()}>
                   Upload
               </Button>
-              </AuthorityCheck>
+              }
           </div>
     
     <>

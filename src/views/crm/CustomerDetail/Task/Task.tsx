@@ -161,6 +161,8 @@ const Filtering = ({task,users}:Data) => {
         const data={user_id:localStorage.getItem('userId'),
         project_id:row.project_id,
         task_id:row.task_id}
+        const editAccess = roleData?.data?.task?.update?.includes(`${localStorage.getItem('role')}`)
+        const deleteAccess = roleData?.data?.task?.delete?.includes(`${localStorage.getItem('role')}`)
         const [dialogIsOpen, setIsOpen] = useState(false)
     
         const openDialog = () => {
@@ -196,17 +198,18 @@ const Filtering = ({task,users}:Data) => {
         
         return (
             <div className="flex justify-end text-lg">
-               
+               {editAccess&&
                 <span
                     className={`cursor-pointer p-2  hover:${textTheme}`}>
                     <EditTask Data={row} users={users} task={false}/>
                     
                 </span>
-                
+    }
+    {deleteAccess&&
                 <span className={`cursor-pointer py-2  hover:${textTheme}`}>
                     <MdDeleteOutline onClick={()=>openDialog()}/>   
                 </span>
-    
+    }
                 <ConfirmDialog
               isOpen={dialogIsOpen}
               type="danger"

@@ -9,6 +9,8 @@ import StackedSideNav from '@/components/template/StackedSideNav'
 import View from '@/views'
 import { UserDetailsProvider } from '@/views/Context/userdetailsContext'
 import { RoleProvider } from '@/views/crm/Roles/RolesContext'
+import { LeadProvider } from '@/views/crm/LeadList/store/LeadContext'
+import { ProjectProvider } from '@/views/crm/Customers/store/ProjectContext'
 
 const HeaderActionsStart = () => {
     return (
@@ -38,6 +40,8 @@ const StackedSideLayout = () => {
             <div className="flex flex-auto min-w-0">
                 <StackedSideNav />
                 <UserDetailsProvider>
+                    <ProjectProvider>
+                <LeadProvider>
                     <RoleProvider>
                 <div className="flex flex-col flex-auto min-h-screen min-w-0 relative w-full">
                     <Header
@@ -50,6 +54,8 @@ const StackedSideLayout = () => {
                     </div>
                 </div>
                         </RoleProvider>
+                        </LeadProvider>
+                        </ProjectProvider>
                         </UserDetailsProvider>
             </div>
         </div>

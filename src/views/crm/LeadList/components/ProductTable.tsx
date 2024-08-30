@@ -25,18 +25,17 @@ import useThemeClass from '@/utils/hooks/useThemeClass'
 import { useRoleContext } from '../../Roles/RolesContext'
 import { AuthorityCheck } from '@/components/shared'
 import formateDate from '@/store/dateformate'
+import { useLeadContext } from '../store/LeadContext'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
     onChange: (value: string | number) => void
     debounce?: number
 }
-const data=await apiGetCrmLeads()
-const responseData=data.data.leads
-console.log(responseData);
+
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
-const totalData = responseData.length
+
 
 
 const pageSizeOption = [
@@ -86,7 +85,6 @@ function DebouncedInput({
     }, [value])
 
     const {roleData}=useRoleContext()
-    console.log(roleData.data.lead?.read);
     
     
     
@@ -147,6 +145,10 @@ const Filtering = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const navigate = useNavigate()
+    const apiData = useLeadContext()
+    const responseData=apiData
+    const totalData = responseData?.length
+    console.log(responseData);
 
     const columns = useMemo<ColumnDef<Product>[]>(
         () => [
@@ -185,7 +187,7 @@ const Filtering = () => {
 
 
     const table = useReactTable({
-        data:responseData,
+        data:responseData || [],
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,

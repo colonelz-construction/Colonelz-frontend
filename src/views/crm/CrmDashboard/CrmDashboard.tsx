@@ -1,7 +1,7 @@
 import Project from "./components/Projects";
 import Statistic from "./components/Statistic";
 import Leads from "./components/Leads";
-import { ProjectProvider, useProjectContext } from "../Customers/store/ProjectContext";
+import { useProjectContext } from "../Customers/store/ProjectContext";
 import { useRoleContext } from "../Roles/RolesContext";
 import { AuthorityCheck } from "@/components/shared";
 import FileManager from "../FileManager";

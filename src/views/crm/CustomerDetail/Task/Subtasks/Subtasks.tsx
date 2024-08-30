@@ -162,7 +162,6 @@ function DebouncedInput({
 
     return (
         <div className="flex justify-between md:flex-col lg:flex-row">
-            <h3>Leads</h3>
             <div className="flex items-center mb-4 gap-3">
                 <Input
                 size='sm'
@@ -170,15 +169,7 @@ function DebouncedInput({
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                 />
-                  <Link
-                className="block lg:inline-block md:mb-0 mb-4"
-                to="/app/crm/lead-new"
-            >
-                {(role==='ADMIN' || role==='Senior Architect' || role==='Project Architect') && 
-                <Button block variant="solid" size="sm" icon={<HiPlusCircle />}>
-                    Add Lead
-                </Button>}
-            </Link>
+                  
             </div>
         </div>
     )
@@ -192,12 +183,7 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     })
     return itemRank.passed
 }
-const statusColors: { [key: string]: string } = {
-    'Follow Up': 'bg-green-200 text-green-700',
-    'Interested': 'bg-blue-200 text-blue-700',
-    'No Response': 'bg-red-200 text-red-700',
-    'Not Interested': 'bg-red-200 text-red-700',
-};
+
 
 const Subtasks = ({task,users}:any) => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])

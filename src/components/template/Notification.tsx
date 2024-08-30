@@ -4,7 +4,6 @@ import Dropdown from '@/components/ui/Dropdown';
 import useResponsive from '@/utils/hooks/useResponsive';
 import { Badge, Button, Tooltip } from '../ui';
 import { apiGetNotification, apiPutNotificationUpdate } from '@/services/CommonService';
-import Cookies from 'js-cookie';
 
 interface Notification {
   _id: string;

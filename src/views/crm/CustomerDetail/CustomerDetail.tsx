@@ -13,7 +13,6 @@ import AllMom from './components/MOM/AllMom'
 import {  apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList } from '@/services/CrmService'
 import { FileItem } from '../FileManager/Components/Project/data'
 import Index from './Quotation'
-import { MomProvider } from './store/MomContext'
 import { ProjectProvider } from '../Customers/store/ProjectContext'
 import Task from './Task/index'
 import Activity from './Project Progress/Activity'
@@ -107,9 +106,9 @@ const CustomerDetail = () => {
       
       return (
         <>
-        <h3 className='pb-5'>Project-{loading?<Skeleton width={100}/>:details?details.project_name:""}</h3>
+        <h3 className='pb-5 capitalize'>Project-{loading?<Skeleton width={100}/>:details?details.project_name:""}</h3>
         <div>
-          <ProjectProvider>
+      
        
 {loading?<Skeleton height={400}/>:
           <Tabs defaultValue={allQueryParams.mom} onChange={handleTabChange}>
@@ -163,7 +162,6 @@ const CustomerDetail = () => {
 
             </div>
         </Tabs>}
-        </ProjectProvider>
     </div>
     </>);
  

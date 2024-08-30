@@ -156,8 +156,9 @@ interface ProjectUpdateData {
   ]
   
     return (
-      <div>
+      <div className='max-h-96 overflow-y-auto mt-6'>
         <form>
+          <h3 className=' mb-3'>Edit Project</h3>
         <FormItem label="Timeline Date">
           <DatePicker
             value={new Date(formData.timeline_date)}
@@ -212,6 +213,7 @@ interface ProjectUpdateData {
            variant='solid'
              onClick={handleUpdate}
              loading={loading}
+             block
            >
             {loading?"Updating...":"Update Project"}
           </Button>

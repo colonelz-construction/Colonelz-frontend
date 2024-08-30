@@ -22,7 +22,15 @@ const Report = ({report}:any) => {
   const projectId = query.get('project_id');
   const [data, setData] = useState<TaskData[]>([]);
   const [chartData, setChartData] = useState<ChartData>({ series: [], categories: [] });
-
+  const colorPalette = [
+    '#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF33A1', '#33FFF5', '#F5FF33', '#FF8C33', '#8C33FF', '#33FF8C'
+  ];
+  const getColorForTask = (taskName: string) => {
+    const firstLetter = taskName.charAt(0).toUpperCase();
+    const index = firstLetter.charCodeAt(0) % colorPalette.length;
+    return colorPalette[index];
+  };
+  const taskColors = chartData.categories.map(taskName => getColorForTask(taskName));
   useEffect(() => {
     const handleResize = () => {
       const updatedWidth = window.innerWidth > 768 ? 500 : window.innerWidth - 40;
@@ -79,7 +87,7 @@ const Report = ({report}:any) => {
                 }},
             
           },
-          colors: COLORS,
+          colors: taskColors,
           dataLabels: {
             enabled: false,
           },

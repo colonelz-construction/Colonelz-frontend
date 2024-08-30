@@ -23,17 +23,21 @@ type Task = {
     sub_task_assignee: string;
     reporter: string;
   };
-  type Users={
+ 
+  type Data={
     users:String[]
+    data:any
   }
 
-const AddSubTask = ({users}:Users) => {
+const AddSubTask = ({data,users}:Data) => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const location=useLocation()
     const queryParams=new URLSearchParams(location.search)
     const project_id=queryParams.get('project_id')
     const task_id=queryParams.get('task')
+    console.log(data);
+    
     
 const openDialog = () => {
     setIsOpen(true)
@@ -177,7 +181,7 @@ const priorityOptions = [
                                 <Field name='actual_sub_task_start_date'  placeholder='Start date'>
                                     {({field}:any)=>(
                                         <DatePicker name='actual_sub_task_start_date'
-                                        
+                                        minDate={new Date(data.actual_task_start_date)}
                                         onChange={(value) => { field.onChange({ target: {name:'actual_sub_task_start_date', value: `${value}` } }) }}
                                         />
                                     )}
@@ -204,6 +208,7 @@ const priorityOptions = [
                                 <Field name='estimated_sub_task_start_date'  placeholder='Start date'>
                                     {({field}:any)=>(
                                         <DatePicker name='estimated_sub_task_start_date'
+                                        minDate={new Date(data.estimated_task_start_date)}
                                         onChange={(value) => { field.onChange({ target: {name:'estimated_sub_task_start_date', value: `${value}` } }) }}
                                         />
                                     )}

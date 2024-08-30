@@ -10,6 +10,8 @@ import SideNav from '@/components/template/SideNav'
 import View from '@/views'
 import { UserDetailsProvider } from '@/views/Context/userdetailsContext'
 import { RoleProvider } from '@/views/crm/Roles/RolesContext'
+import { LeadProvider } from '@/views/crm/LeadList/store/LeadContext'
+import { ProjectProvider } from '@/views/crm/Customers/store/ProjectContext'
 
 const HeaderActionsStart = () => {
     return (
@@ -38,6 +40,8 @@ const ModernLayout = () => {
             <div className="flex flex-auto min-w-0">
                 <SideNav />
                 <UserDetailsProvider>
+                    <ProjectProvider>
+                <LeadProvider>
                     <RoleProvider>
                 <div className="flex flex-col flex-auto min-h-screen min-w-0 relative w-full bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700">
                     <Header
@@ -48,6 +52,8 @@ const ModernLayout = () => {
                     <View />
                 </div>
                     </RoleProvider>
+                    </LeadProvider>
+                    </ProjectProvider>
                     </UserDetailsProvider>
             </div>
         </div>

@@ -10,6 +10,8 @@ import SideNav from '@/components/template/SideNav'
 import View from '@/views'
 import { UserDetailsProvider } from '@/views/Context/userdetailsContext'
 import { RoleProvider } from '@/views/crm/Roles/RolesContext'
+import { LeadProvider } from '@/views/crm/LeadList/store/LeadContext'
+import { ProjectProvider } from '@/views/crm/Customers/store/ProjectContext'
 
 const HeaderActionsStart = () => {
     return (
@@ -40,7 +42,10 @@ const ClassicLayout = () => {
             <div className="flex flex-auto min-w-0">
                 <SideNav />
                 <UserDetailsProvider>
+                    <ProjectProvider>
+                <LeadProvider>
                 <RoleProvider>
+                
 
                
                 <div className="flex flex-col flex-auto min-h-screen min-w-0 relative w-full">
@@ -50,12 +55,14 @@ const ClassicLayout = () => {
                         headerEnd={<HeaderActionsEnd />}
                     />
                     <div className="h-full flex flex-auto flex-col">
-                        
                         <View />
                     </div>
                 </div>
                         </RoleProvider>
+                        </LeadProvider>
+                        </ProjectProvider>
                         </UserDetailsProvider>
+
             </div>
         </div>
     )

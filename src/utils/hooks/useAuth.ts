@@ -13,7 +13,7 @@ import useQuery from './useQuery'
 import type { SignInCredential, SignUpCredential } from '@/@types/auth'
 
 type Status = 'success' | 'failed'
-export let role=''
+export let tok: string | null=null
 
 function useAuth() {
     const dispatch = useAppDispatch()
@@ -34,9 +34,8 @@ function useAuth() {
             console.log(resp);
             if (resp.code===200) {
                 const { token } = resp.data
-                console.log('token',resp.data.role);
-                role=resp.data.role
-                console.log(role);
+                console.log('token',resp.data.token);
+                tok=resp.data.token
                 
                 dispatch(signInSuccess({ token, userId: resp.data.userID,role:resp.data.role }))
                 if (resp.data) {

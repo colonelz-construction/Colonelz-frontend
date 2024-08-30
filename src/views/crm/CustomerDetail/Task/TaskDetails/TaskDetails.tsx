@@ -109,7 +109,7 @@ const TaskDetails = () => {
   
         <div className='flex justify-between mb-4 items-center'>
         <h5>Subtasks</h5>
-        <AddSubTask   users={users}/>
+        <AddSubTask   users={users} data={taskData}/>
         </div>
     
     <Subtasks task={task_id} users={users}/>

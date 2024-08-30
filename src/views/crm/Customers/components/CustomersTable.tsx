@@ -24,7 +24,7 @@ import classNames from 'classnames'
 import {  Dropdown, Select } from '@/components/ui'
 import { StatisticCard } from './CustomerStatistic'
 import { BiSolidBellRing } from 'react-icons/bi'
-import { apiGetCrmProjects } from '@/services/CrmService'
+import { useProjectContext } from '../store/ProjectContext'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -34,10 +34,7 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
-const userDetailData = await apiGetCrmProjects();
-const projectData=userDetailData.data
-const projects=userDetailData.data.projects
-console.log('userDetailData', projectData);
+
 
 function DebouncedInput({
     value: initialValue,
@@ -100,7 +97,7 @@ const pageSizeOption = [
     { value: 40, label: '40 / page' },
     { value: 50, label: '50 / page' },
 ]
-const totalData=projects.length
+
 
 const formateDate = (dateString:string) => {
     const date = new Date(dateString);
@@ -114,6 +111,11 @@ const Filtering = () => {
     const [selectedStatus] = useState<string>('');
     const [globalFilter, setGlobalFilter] = useState('')
     const userId=localStorage.getItem('userId')
+    const {projects,apiData,loading}=useProjectContext();
+    const projectsData=projects
+    const totalData=projectsData.length
+    console.log(projects,projectsData);
+    
     const navigate=useNavigate()
     const ActionColumn = ({ row }: { row: Project }) => {
         const navigate = useNavigate()
@@ -215,7 +217,7 @@ const Filtering = () => {
     const [data,setData] = useState(() => projects)
 
     const table = useReactTable({
-        data,
+        data:projects,
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -242,8 +244,8 @@ const Filtering = () => {
     useEffect(() => {
         const filteredData =
             selectedStatus !== ''
-                ? projects.projects.filter((project:Project) => project.project_status === selectedStatus)
-                : projects.projects;
+                ? projects.filter((project:Project) => project.project_status === selectedStatus)
+                : projects;
 
         setData(filteredData);
     }, [selectedStatus]);
@@ -256,9 +258,6 @@ const Filtering = () => {
         table.setPageSize(Number(value))
     }
 
-    const loading = useAppSelector(
-        (state) => state.crmCustomers.data.statisticLoading
-    )
 
     const handleStatusChange = (label: string) => {
         let status: string | string[] = '';
@@ -279,12 +278,12 @@ const Filtering = () => {
         }
 
         if (Array.isArray(status)) {
-            const filteredData = userDetailData.data.projects.filter((project:Project) =>
+            const filteredData = projects.filter((project:Project) =>
                 status.includes(project.project_status)
             );
             setData(filteredData);
         } else {
-            const filteredData = projectData.projects.filter(
+            const filteredData = projects.filter(
                 (project:Project) => project.project_status === status
             );
             setData(filteredData);
@@ -298,7 +297,7 @@ const Filtering = () => {
                     icon={<HiOutlineUserGroup />}
                     avatarClass="!bg-indigo-600"
                     label="Total Projects"
-                    value={projectData.total_Project}
+                    value={apiData?.total_Project??0}
                     loading={loading}
                     onClick={() => handleStatusChange('Total Projects')}
                 />
@@ -306,7 +305,7 @@ const Filtering = () => {
                     icon={<HiOutlineUsers />}
                     avatarClass="!bg-blue-500"
                     label="Active Projects"
-                    value={projectData.active_Project}
+                    value={apiData?.active_Project??0}
                     loading={loading}
                     onClick={() => handleStatusChange('Active Projects')}
                 />
@@ -314,7 +313,7 @@ const Filtering = () => {
                     icon={<HiOutlineUserAdd />}
                     avatarClass="!bg-emerald-500"
                     label="Completed Projects"
-                    value={projectData.completed}
+                    value={apiData?.completed??0}
                     loading={loading}
                     onClick={() => handleStatusChange('Completed Projects')}
                 />

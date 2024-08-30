@@ -4,6 +4,8 @@ import { setPanelExpand, useAppSelector, useAppDispatch } from '@/store'
 import { HiOutlineCog } from 'react-icons/hi'
 import classNames from 'classnames'
 import { RoleProvider } from '@/views/crm/Roles/RolesContext'
+import { LeadProvider } from '@/views/crm/LeadList/store/LeadContext'
+import { ProjectProvider } from '@/views/crm/Customers/store/ProjectContext'
 
 const ConfiguratorToggle = () => {
     const dispatch = useAppDispatch()
@@ -30,9 +32,13 @@ const ConfiguratorToggle = () => {
 const BlankLayout = () => {
     return (
         <div className="app-layout-blank flex flex-auto flex-col h-[100vh]">
-            <RoleProvider>
+                <ProjectProvider>
+                <LeadProvider>
+                 <RoleProvider>
                 <View />
                 </RoleProvider>
+                </LeadProvider>
+                </ProjectProvider>
             <ConfiguratorToggle />
             <SidePanel className="hidden" />
         </div>

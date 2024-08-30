@@ -1,14 +1,10 @@
 import appConfig from '@/configs/app.config';
 import ApiService from './ApiService'
 import Cookies from 'js-cookie';
-import { json } from 'd3-fetch';
 
 const { apiPrefix } = appConfig
 const token = localStorage.getItem('auth');
 const userId=localStorage.getItem('userId');
-const tokens = Cookies.get('auth')
-const userIds = Cookies.get('userId')
-console.log('token',token);
 
 
 

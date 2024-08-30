@@ -8,17 +8,7 @@ import { fetchRoleAccessData } from '../Roles/roleData'
 import { RoleAccessData } from '@/@types/navigation'
 
 injectReducer('salesProductList', reducer)
-async function getRoleAccessData(): Promise<RoleAccessData> {
-    try {
-        const roleAccessData = await fetchRoleAccessData();
-        return roleAccessData;
-    } catch (error) {
-        console.error("Error fetching role access data:", error);
-        throw error;
-    }
-}
 
-const data: RoleAccessData = await getRoleAccessData();
 
 const ProductList = () => {
     return (

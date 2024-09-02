@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import { APP_NAME } from '@/constants/app.constant'
 import type { CommonProps } from '@/@types/common'
-import img from './Group 48095675 (2).png'
+import img from './logoback.png'
 
 
 interface LogoProps extends CommonProps {

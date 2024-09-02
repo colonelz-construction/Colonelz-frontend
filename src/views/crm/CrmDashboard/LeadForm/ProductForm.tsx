@@ -239,6 +239,7 @@ const LeadForm: React.FC = () => {
                     {({ field ,form}:any) => (
                         <DateTimepicker
                         maxDate={new Date()}
+                        
                         onChange={(date) => {
                          form.setFieldValue(field.name, `${date}`)
                         }}

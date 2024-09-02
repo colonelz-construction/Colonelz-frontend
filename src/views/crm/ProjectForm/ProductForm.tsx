@@ -194,6 +194,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
                 type='text'
                 placeholder='Client Name'
                 onChange={(e) => form.setFieldValue(field.name, e.target.value)}
+                value={values.client_name}
                 onKeyDown={(e) => {
                   const regex = /^[a-zA-Z\s]*$/;
                   if (!regex.test(e.key)) {
@@ -219,6 +220,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
         asterisk
         invalid={errors.client_contact && touched.client_contact}
         errorMessage={errors.client_contact}
+        
         >
           <Field
             
@@ -231,6 +233,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
                 type='text'
                 placeholder='Client Contact'
                 maxLength={10}
+                value={values.client_contact}
                 onChange={(e) => form.setFieldValue(field.name, e.target.value)}
               onKeyDown={(e) => {
                   const charCode = e.which ? e.which : e.keyCode;

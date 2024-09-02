@@ -93,7 +93,7 @@ const SideNav = () => {
                             className={
                                 sideNavCollapse
                                     ? SIDE_NAV_CONTENT_GUTTER
-                                    : LOGO_X_GUTTER
+                                    : LOGO_X_GUTTER + ' items-center flex justify-center'
                             }
                         />
                     </div>

@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import Table from '@/components/ui/Table'
 import Input from '@/components/ui/Input'
 import Pagination from '@/components/ui/Pagination'
@@ -21,10 +21,11 @@ import { HiOutlineEye, HiOutlineUserAdd, HiOutlineUserGroup, HiOutlineUsers } fr
 import { useNavigate } from 'react-router-dom'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import classNames from 'classnames'
-import {  Dropdown, Select } from '@/components/ui'
+import {  Dropdown, Select, Tooltip } from '@/components/ui'
 import { StatisticCard } from './CustomerStatistic'
 import { BiSolidBellRing } from 'react-icons/bi'
 import { useProjectContext } from '../store/ProjectContext'
+import { Timeout } from 'react-number-format/types/types'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -151,7 +152,7 @@ const Filtering = () => {
                     'text-red-500': dateDifference <= 1 && row.project_status !== 'completed',
                 });
                 return (
-                    <span className={`${cellClassName} flex gap-2 items-center cursor-pointer` } onClick={()=>navigate(`/app/crm/project-details?project_id=${row.project_id}&id=${userId}&type=details`)}>
+                    <span className={`${cellClassName} flex gap-2 items-center cursor-pointer` } >
                         {projectName} {dateDifference <= 1 && row.project_status!=='completed' && <BiSolidBellRing/>}
                     </span>
                 );
@@ -177,17 +178,38 @@ const Filtering = () => {
         {
             header: 'Client Name',
             accessorKey: 'client_name',
+            
             cell: (props) => {
                 const row = props.row.original;
+                const [isHovered, setIsHovered] = useState(false);
+                const hoverTimeout = useRef<Timeout | null>(null);
+
+                const handleMouseEnter = () => {
+                    if (hoverTimeout.current) {
+                        clearTimeout(hoverTimeout.current);
+                    }
+                    setIsHovered(true);
+                };
+
+                const handleMouseLeave = () => {
+                    hoverTimeout.current = setTimeout(() => {
+                        setIsHovered(false);
+                    }, 200); 
+                };
                 return (
-                    <div className=' cursor-pointer text-nowrap'>
-                        <Dropdown placement="middle-start-top" renderTitle={<span>{row.client_name}</span>} className=' cursor-pointer' style={{width:'auto'}}>
-                            <div className='px-2'>
+                    <div
+                        className='relative inline-block'
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                    >
+                        <span className='cursor-pointer whitespace-nowrap'>{row.client_name}</span>
+                        {isHovered && (
+                            <div className='absolute bottom-0 left-full ml-2 bg-white border border-gray-300 p-2 shadow-lg z-9999 whitespace-nowrap transition-opacity duration-200'>
                                 <p>Client Name: {row.client[0].client_name}</p>
                                 <p>Client Email: {row.client[0].client_email}</p>
                                 <p>Client Contact: {row.client[0].client_contact}</p>
                             </div>
-                        </Dropdown>
+                        )}
                     </div>
                 );
             },
@@ -368,7 +390,7 @@ const Filtering = () => {
                 <TBody>
                     {table.getRowModel().rows.map((row) => {
                         return (
-                            <Tr key={row.id} className=' capitalize'>
+                            <Tr key={row.id} className=' capitalize' onClick={()=>navigate(`/app/crm/project-details?project_id=${row.original.project_id}&id=${userId}&type=details`)}>
                                 {row.getVisibleCells().map((cell) => {
                                     return (
                                         <Td key={cell.id}>

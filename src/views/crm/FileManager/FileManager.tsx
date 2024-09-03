@@ -30,6 +30,7 @@ const FileManager = () => {
 
   const hasProjectReadPermission = roleData?.data?.project?.read?.includes(role);
   const hasLeadReadPermission = roleData?.data?.lead?.read?.includes(role);
+  const hascompanyDataReadPermission = roleData?.data?.companyData?.read?.includes(role);
 
   return (
     <div>
@@ -47,14 +48,11 @@ const FileManager = () => {
               Projects
             </TabNav>
           }
-          <AuthorityCheck
-            userAuthority={[`${localStorage.getItem('role')}`]}
-            authority={roleData?.data?.companyData?.read ?? []}
-          >
+          {hascompanyDataReadPermission &&
             <TabNav value="company" icon={<GoRepoTemplate />}>
               Company Data
             </TabNav>
-          </AuthorityCheck>
+}
         </TabList>
         <div className="p-4">
           <DataProvider>

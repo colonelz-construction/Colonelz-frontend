@@ -167,8 +167,8 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
         }
 
         const handleClear = () => {
-            setValue(null)
-            setLastValidValue(null)
+            setValue('' as any)
+            setLastValidValue('' as any)
             setInputState('')
             openPickerOnClear && openDropdown()
             inputRef.current?.focus()

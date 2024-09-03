@@ -104,16 +104,16 @@ const Project = ({ className }: LeadsProps) => {
                                 (projectEndDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)
                             );
                             return (
-                                <Tr key={index}>
+                                <Tr key={index}  onClick={() =>
+                                    navigate(
+                                        `/app/crm/project-details?project_id=${item.project_id}&client_name=${item.client[0].client_name}&id=65c32e19e0f36d8e1f30955c&type=details`
+                                    )
+                                }>
                                     <Td
                                         className={`capitalize ${
                                             dateDifference <= 1 ? 'text-red-500' : ''
                                         } flex gap-2 items-center cursor-pointer`}
-                                        onClick={() =>
-                                            navigate(
-                                                `/app/crm/project-details?project_id=${item.project_id}&client_name=${item.client[0].client_name}&id=65c32e19e0f36d8e1f30955c&type=details`
-                                            )
-                                        }
+                                       
                                     >
                                         {item.project_name} {dateDifference <= 1 && <BiSolidBellRing />}
                                     </Td>
@@ -135,7 +135,7 @@ const Project = ({ className }: LeadsProps) => {
                                     >
                                         {item.client[0].client_name}
                                         {hoveredClient === index && (
-                                            <div className="absolute bottom-0 left-20 ml-2 bg-white border border-gray-300 p-2 shadow-lg z-50 whitespace-nowrap transition-opacity duration-200">
+                                            <div className="absolute bottom-0 left-20 ml-2 bg-white border border-gray-300 p-2 shadow-lg z-99999 whitespace-nowrap transition-opacity duration-200">
                                                 <p>Client Name: {item.client[0].client_name}</p>
                                                 <p>Client Email: {item.client[0].client_email}</p>
                                                 <p>Client Contact: {item.client[0].client_contact}</p>

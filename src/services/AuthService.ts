@@ -122,9 +122,7 @@ export async function apiAddMemberToLead(data:any,token:string | null) {
 }
 export async function apiSignUp(data: SignUpCredential,token:string) {
    data.email=data.email.toLowerCase();
- 
-    
-        const response = await fetch(`${apiPrefix}admin/create/user`, {
+    const response = await fetch(`${apiPrefix}admin/create/user`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -134,6 +132,7 @@ export async function apiSignUp(data: SignUpCredential,token:string) {
         });
 
         const responseData = await response.json();
+        
         return responseData;
 }
 
@@ -148,12 +147,9 @@ export async function apiSignOut() {
             },
             body: JSON.stringify({ userId,token })
         });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
         const responseData = await response.json();
         console.log('Received response from server:', responseData);
+        
         return responseData;
 }
 

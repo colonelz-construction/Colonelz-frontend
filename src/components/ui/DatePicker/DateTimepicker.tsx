@@ -166,12 +166,12 @@ const DateTimepicker = forwardRef<HTMLInputElement, DateTimepickerProps>(
         }
 
         const handleClear = () => {
-            setValue(null)
-            setLastValidValue(null)
+            setValue('' as any)
+            setLastValidValue('' as any)
             setInputState('')
             openPickerOnClear && openDropdown()
             inputRef.current?.focus()
-            onChange?.(null)
+            onChange?.('' as any)
         }
 
         const parseDate = (date: string) =>

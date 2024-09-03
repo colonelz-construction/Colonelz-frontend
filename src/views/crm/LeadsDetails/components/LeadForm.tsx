@@ -39,14 +39,16 @@ const LeadForm = () => {
     userId: localStorage.getItem('userId') || '',
     lead_id: LeadId,
     status: '',
-    date: null,
+    date: '',
     content: '',
     createdBy: 'ADMIN'
   }}
-  validationSchema={Yup.object().shape({
-    status: Yup.string().required('Required'),
-    date: Yup.date().required('Required'),
-  })}
+  validationSchema={
+    Yup.object().shape({
+      status:Yup.string().required('Status is Required'),
+      date:Yup.date().required('Date is Required'),
+    })
+  }
   
   onSubmit={async(values:any,{setSubmitting}) => {
     setSubmitting(true)
@@ -74,17 +76,21 @@ const LeadForm = () => {
   }
   }
   >
-    {({values,isSubmitting,errors}) => (
+    {({values,isSubmitting,errors,touched}:any) => (
       
     <Form className='max-h-96 overflow-y-auto'>
     <FormItem label='Lead Status'
     asterisk
+    invalid={errors.status && touched.status}
+    errorMessage={errors.status}
     >
-      <Field>
+      <Field
+      name='status'
+      placeholder='Status'>
       {({field,form}:any) => (
        <Select
        options={statusOptions}
-        onChange={(value) => form.setFieldValue('status', value?.value)}
+        onChange={(value) => form.setFieldValue(field.name, value?.value)}
        />
       )}
       </Field>
@@ -92,6 +98,8 @@ const LeadForm = () => {
 
 
     <FormItem label='Date'
+    invalid={errors.date && touched.date}
+    errorMessage={errors.date}
     asterisk>
       <Field>
       {({field,form}:any) => (

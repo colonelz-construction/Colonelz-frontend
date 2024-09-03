@@ -54,7 +54,7 @@ const LeadForm: React.FC = () => {
               content: '',
               createdBy: 'ADMIN',
               role: localStorage.getItem('role') || 'ADMIN',
-              date: null,
+              date: '',
        }}
        validationSchema={Yup.object().shape({
         name: Yup.string()
@@ -72,6 +72,8 @@ const LeadForm: React.FC = () => {
               async(values) => {
                 setLoading(true)
                 const response = await apiGetCrmCreateLead(values)
+                console.log(values);
+                
                 const data= await response.json()
                 setLoading(false)
                 console.log(data);
@@ -221,7 +223,7 @@ const LeadForm: React.FC = () => {
                 <Field
                 name='source'
                 component={Input}
-                placeholder='Select source'
+                placeholder='Enter source'
 
                 />
             </FormItem>
@@ -239,14 +241,15 @@ const LeadForm: React.FC = () => {
                     {({ field ,form}:any) => (
                         <DateTimepicker
                         maxDate={new Date()}
-                        
                         onChange={(date) => {
                          form.setFieldValue(field.name, `${date}`)
                         }}
                         />
                     )}
                 </Field>
+                
             </FormItem>
+            
 
            
 

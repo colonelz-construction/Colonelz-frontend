@@ -18,8 +18,6 @@ export let tok: string | null=null
 function useAuth() {
     const dispatch = useAppDispatch()
 
-
-
     const navigate = useNavigate()
 
     const query = useQuery()
@@ -34,9 +32,8 @@ function useAuth() {
             console.log(resp);
             if (resp.code===200) {
                 const { token } = resp.data
-                console.log('token',resp.data.token);
                 tok=resp.data.token
-                
+                localStorage.setItem('loginTime',new Date().getTime().toString())
                 dispatch(signInSuccess({ token, userId: resp.data.userID,role:resp.data.role }))
                 if (resp.data) {
                     dispatch(
@@ -84,9 +81,8 @@ function useAuth() {
     }
 
     const signOut = async () => {
-
-        await apiSignOut()
-        handleSignOut()
+       const response= await apiSignOut()
+    handleSignOut()
     }
     const tokens=localStorage.getItem('auth')
     if (tokens) {

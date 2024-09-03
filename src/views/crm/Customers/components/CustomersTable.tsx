@@ -169,6 +169,7 @@ const Filtering = () => {
                     '': projectType === 'commercial' || projectType==='Commercial',
                     'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-100 border-0 rounded capitalize font-semibold text-xs px-2 py-1': projectType === 'residential',
                     'bg-light-green-600': projectType === 'residential' || projectType==='Residential',
+                    
                 });
                 return (
                     <span className={cellClassName}>{row.project_type}</span>
@@ -390,7 +391,7 @@ const Filtering = () => {
                 <TBody>
                     {table.getRowModel().rows.map((row) => {
                         return (
-                            <Tr key={row.id} className=' capitalize' onClick={()=>navigate(`/app/crm/project-details?project_id=${row.original.project_id}&id=${userId}&type=details`)}>
+                            <Tr key={row.id} className=' capitalize cursor-pointer' onClick={()=>navigate(`/app/crm/project-details?project_id=${row.original.project_id}&id=${userId}&type=details`)}>
                                 {row.getVisibleCells().map((cell) => {
                                     return (
                                         <Td key={cell.id}>

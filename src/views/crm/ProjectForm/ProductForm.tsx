@@ -75,6 +75,8 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
   const projectStatusOptions = [
     { value: 'designing', label: 'Designing' },
     { value: 'executing', label: 'Executing' },
+    { value: 'design & execution', label: 'Design & Execution' },
+
   ];
 
 
@@ -194,7 +196,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
                 type='text'
                 placeholder='Client Name'
                 onChange={(e) => form.setFieldValue(field.name, e.target.value)}
-                value={values.client_name}
+                value={field.value}
                 onKeyDown={(e) => {
                   const regex = /^[a-zA-Z\s]*$/;
                   if (!regex.test(e.key)) {
@@ -233,7 +235,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
                 type='text'
                 placeholder='Client Contact'
                 maxLength={10}
-                value={values.client_contact}
+                value={field.value}
                 onChange={(e) => form.setFieldValue(field.name, e.target.value)}
               onKeyDown={(e) => {
                   const charCode = e.which ? e.which : e.keyCode;
@@ -256,21 +258,54 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
             type='text'
             placeholder='Project Name'/>
         </FormItem>
+        <FormItem label='Project Start Date'
+        asterisk
+        invalid={errors.project_start_date && touched.project_start_date}
+        >
+          <Field
+            name='project_start_date'>
+            {({ field,form }:any) => {
+              return (
+                <DatePicker
+                
+                  onChange={(date) => form.setFieldValue(field.name, `${date}`)}
+                />
+              );
+            }}
+            </Field>
+            <div className=' text-red-500'>{errors.project_start_date}</div>
+        </FormItem>
+        <FormItem label='Timeline Date'
+        asterisk
+        invalid={errors.timeline_date && touched.timeline_date}
+        >
+          <Field
+            name='timeline_date'>
+            {({ field,form }:any) => {
+              return (
+                <DatePicker
+                  onChange={(date) => form.setFieldValue(field.name, `${date}`)}
+                />
+              );
+            }}
+            </Field>
+            <div className=' text-red-500'>{errors.timeline_date}</div>
+        </FormItem>
         <FormItem label='Location'
         asterisk
         invalid={errors.location && touched.location}
-        errorMessage={errors.location}
         >
+          
           <Field
             component={Input}
             name='location'
             type='text'
             placeholder='Location'/>
+             <div className=' text-red-500'>{errors.location}</div>
         </FormItem>
         <FormItem label='Designer'
         asterisk
         invalid={errors.designer && touched.designer}
-        errorMessage={errors.designer}
         >
           <Field
             name='designer'
@@ -292,6 +327,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
               );
             }}
             </Field>
+            <div className=' text-red-500'>{errors.designer}</div>
         </FormItem>
         <FormItem label='Project Budget'
         asterisk
@@ -340,38 +376,8 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
             </Field>
 
         </FormItem>
-        <FormItem label='Project Start Date'
-        asterisk
-        invalid={errors.project_start_date && touched.project_start_date}
-        errorMessage={'Start Date is required'}
-        >
-          <Field
-            name='project_start_date'>
-            {({ field,form }:any) => {
-              return (
-                <DatePicker
-                  onChange={(date) => form.setFieldValue(field.name, `${date}`)}
-                />
-              );
-            }}
-            </Field>
-        </FormItem>
-        <FormItem label='Timeline Date'
-        asterisk
-        invalid={errors.timeline_date && touched.timeline_date}
-        errorMessage={errors.timeline_date}
-        >
-          <Field
-            name='timeline_date'>
-            {({ field,form }:any) => {
-              return (
-                <DatePicker
-                  onChange={(date) => form.setFieldValue(field.name, `${date}`)}
-                />
-              );
-            }}
-            </Field>
-        </FormItem>
+       
+       
         <FormItem label='Contract'
         asterisk
         invalid={Boolean(

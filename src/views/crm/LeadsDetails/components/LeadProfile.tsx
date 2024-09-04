@@ -27,6 +27,7 @@ type Customer = {
     notes?: Note[];
     date:string
     project:boolean
+    contract_Status:boolean
 }
 interface Note {
     _id: string;
@@ -197,7 +198,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
                                                 <p className="text-gray-700 dark:text-gray-200 font-semibold text-wrap">
                                                    <div className="remark-content" dangerouslySetInnerHTML={{ __html: data?.notes?data?.notes[0]?.content:"" }} /></p>
                                             </div>
-                                       { createProjectAccess &&<>
+                                       { createProjectAccess && data?.contract_Status &&<>
                            {data?.project?
                         <Button onClick={()=>openDialog2()} block variant='solid'>
                             Add Another Project

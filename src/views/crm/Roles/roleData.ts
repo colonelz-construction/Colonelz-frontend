@@ -35,7 +35,7 @@ type RoleAccessPermissions = {
 
 
   export async function fetchRoleAccessData(): Promise<RoleAccessData> {
-    const response = await apiGetRoleWiseDetails(); 
+    const response = await apiGetRoleWiseDetails();
     return response;
   }
   fetchRoleAccessData()

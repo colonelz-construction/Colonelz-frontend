@@ -1,17 +1,21 @@
 import { apiGetUserData } from '@/services/CrmService';
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 
-type ProfileFormModel = {
+export type ProfileFormModel = {
+  data: Data
+};
+
+type Data = {
   username: string;
   email: string;
   title: string;
   avatar: string;
-};
+}
 
-export const UserDetailsContext = createContext<ProfileFormModel | null>(null);
+export const UserDetailsContext = createContext<Data | null>(null);
 
 export const UserDetailsProvider = ({ children }: { children: ReactNode }) => {
-  const [data, setData] = useState<ProfileFormModel | null>(null);
+  const [data, setData] = useState<Data | null>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {

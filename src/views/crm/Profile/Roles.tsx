@@ -30,6 +30,22 @@ import type {  FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import { useRoleContext } from '../Roles/RolesContext'
+import { FormValues } from '../Roles/EditRoles'
+
+  export type RoleResponse={
+    data:Data[]
+  }
+  
+//   type RoleData={
+//     data:Data[]
+//   }
+  
+  type Data = {
+    _id: string;
+    role: string;
+    createdAt: string;
+    access: FormValues;
+  }
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -117,7 +133,7 @@ const pageSizeOption = [
 ]
 
 const Roles = () => {
-    const [data, setData] = useState([])
+    const [data, setData] = useState<Data[] | []>([])
     const [loading, setLoading] = useState(true)
     const [id,setId]=useState<string>('')
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -233,10 +249,12 @@ const Roles = () => {
         const fetchData = async () => {
             setLoading(true)
             const response = await apiGetRoleDetails()
+           
             if (response) {
+                console.log(response.data)
                 setData(response.data)
                 setLoading(false)
-                console.log(response.data);
+             
         }
     }
     fetchData()

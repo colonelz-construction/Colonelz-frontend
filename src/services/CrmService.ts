@@ -1,6 +1,10 @@
 import appConfig from '@/configs/app.config';
 import ApiService from './ApiService'
 import { NotificationResponse } from '@/components/template/Notification';
+import { ProfileFormModel } from '@/views/Context/userdetailsContext';
+import { RoleResponse } from '@/views/crm/Profile/Roles';
+import { RoleList } from '@/views/crm/Roles/RolesContext';
+import { RoleAccessData } from '@/@types/navigation';
 
 const { apiPrefix } = appConfig
 const token = localStorage.getItem('auth');
@@ -19,57 +23,52 @@ export async function apiGetNotification<T>(userId: string | null) {
     )
 }
 
-export async function apiGetUserData(UserId:string | null) {
-    const response = await fetch(`${apiPrefix}users/getdata?userId=${userId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        }
-    });
-    const data = await response.json();
-    return data;
-}
-export async function apiGetRoleDetails() {
-    const response = await fetch(`${apiPrefix}admin/get/role`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        }
-    });
-    const data = await response.json();
-    return data;
-}
-export async function apiGetRoleList() {
-    const response = await fetch(`${apiPrefix}admin/get/rolename`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        }
-    });
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
-}
-export async function apiGetRoleWiseDetails() {
-    const response = await fetch(`${apiPrefix}admin/rolewise/access?role=ADMIN`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        }
-    });
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
+export async function apiGetUserData<T>(UserId:string | null) {
+    return ApiService.fetchData<ProfileFormModel>({
+        url: `users/getdata?userId=${userId}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+
+    })
 }
 
+export async function apiGetRoleDetails<T>() {
+    return ApiService.fetchData<RoleResponse>({
+        url: `admin/get/role`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+
+    })
+}
+
+
+export async function apiGetRoleList<T>() {
+    return ApiService.fetchData<RoleList>({
+        url: `admin/get/rolename`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+
+    }).catch((error) => {
+        throw new Error(`HTTP error! status: ${error}`);
+
+    })
+}
+
+export async function apiGetRoleWiseDetails<T>() {
+    return ApiService.fetchData<RoleAccessData>({
+        url: `admin/rolewise/access?role=ADMIN`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+
+    }).catch((error) => {
+        throw new Error(`HTTP error! status: ${error}`);
+
+    })
+}
 
 
 export async function apiCreateRole(Data: any) {
@@ -82,8 +81,11 @@ export async function apiCreateRole(Data: any) {
         body: JSON.stringify(Data)
     });
     const responseData = await response.json();
+    console.log(responseData)
     return responseData;
 }
+
+
 export async function apiEditRoles(Data: any,id:string |null) {
     const response = await fetch(`${apiPrefix}admin/update/role?id=${id}`, {
         method: 'PUT',
@@ -138,7 +140,10 @@ export async function EditPassword(Data: any) {
         body: JSON.stringify(Data)
     });
 
-    return response;}
+    return response;
+}
+
+
 export async function apiGetUsers() {
     const response = await fetch(`${apiPrefix}admin/get/alluser?id=${localStorage.getItem('userId')}`, {
         method: 'GET',
@@ -154,6 +159,7 @@ export async function apiGetUsers() {
     const data = await response.json();
     return data;
 }
+
 
 export async function apiDeleteUsers(userid: string) {
     const response=await fetch(`${apiPrefix}admin/delete/user?userId=${userid}&id=${userId}`, {

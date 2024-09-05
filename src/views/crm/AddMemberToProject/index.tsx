@@ -24,6 +24,7 @@ interface Projects {
   project_name: string;
 }
 const response = await apiGetUsers();
+console.log(response)
 const projects = await apiGetCrmProjects();
 const id=localStorage.getItem('userId');
 const token=localStorage.getItem('auth');
@@ -36,9 +37,9 @@ const Index = () => {
   const [loading,setLoading]=useState(false)
   const {rolelist}=useRoleContext();
 
-  const Options = rolelist.data.
-  filter((role)=>role!=='ADMIN'&& role!=='Senior Architect')
-  .map((role) => ({ value: role, label: role }));
+  console.log(rolelist)
+  console.log(rolelist)
+  const Options = rolelist.filter((role)=>role!=='ADMIN'&& role!=='Senior Architect').map((role) => ({ value: role, label: role }));
 
   useEffect(() => {
     const fetchUsers = async () => {

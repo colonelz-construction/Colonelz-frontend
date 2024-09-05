@@ -35,14 +35,17 @@ type RoleAccessPermissions = {
   };
 
 // Define the context's shape
-interface RoleContextType {
-    roleData: RoleAccessData;
-    rolelist:RoleList;
-    fetchRoleData: () => Promise<void>;
-}
-type RoleList={
+    interface RoleContextType {
+        roleData: RoleAccessData;
+        rolelist:string[];
+        fetchRoleData: () => Promise<void>;
+    }
+
+
+   export type RoleList={
         data:string[]
-}
+        code:number
+    }
 
 
 // Create the context
@@ -51,16 +54,16 @@ export const RoleContext = createContext<RoleContextType >(undefined!);
 // Provide the context
 export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [roleData, setRoleData] = useState<RoleAccessData >(undefined!);
-    const [rolelist, setRoleList] = useState<RoleList>({data:["ADMIN"]});
+    const [rolelist, setRoleList] = useState<string[]>(["ADMIN"]);
 
     const fetchRoleData = async () => {
         try {
             const data = await apiGetRoleWiseDetails(); 
             const response=await apiGetRoleList();
             console.log(response);
-            
             if(response.code===200){
-                setRoleList(response)
+                setRoleList(response.data)
+
             }
 
             if (data.status) {

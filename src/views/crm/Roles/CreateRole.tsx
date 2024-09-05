@@ -73,27 +73,27 @@ const EditRoles = () => {
     
     
 
-    const handleSubmit = async (values: FormValues,setSubmitting:any) => {
-        console.log(values);      
-        const access = Object.keys(values).reduce((acc, key) => {
-            const permissions = values[key as AccessType];
-            if (permissions.length > 0) {
-                acc[key as AccessType] = permissions; 
-            }
-            return acc;
-        }, {} as { [key in AccessType]?: AccessPermissions });
+    // const handleSubmit = async (values: FormValues,setSubmitting:any) => {
+    //     console.log(values);      
+    //     const access = Object.keys(values).reduce((acc, key) => {
+    //         const permissions = values[key as AccessType];
+    //         if (permissions.length > 0) {
+    //             acc[key as AccessType] = permissions; 
+    //         }
+    //         return acc;
+    //     }, {} as { [key in AccessType]?: AccessPermissions });
     
-        const payload = {
-            role:role,
-            access
-        };
-        console.log('payload', payload);
+    //     const payload = {
+    //         role:role,
+    //         access
+    //     };
+    //     console.log('payload', payload);
         
     
-        const response = await apiCreateRole(payload);
-        setSubmitting(false)
-        console.log(response);
-    };
+    //     const response = await apiCreateRole(payload);
+    //     setSubmitting(false)
+    //     console.log(response);
+    // };
     
 
     return (

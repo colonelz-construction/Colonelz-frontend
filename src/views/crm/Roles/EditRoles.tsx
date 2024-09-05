@@ -13,7 +13,7 @@ type AccessType = 'lead' | 'user' | 'project' | 'task' | 'contract' | 'quotation
 
 type AccessPermissions = Permission[];
 
-type FormValues = {
+export type FormValues = {
     [key in AccessType]: AccessPermissions;
 };
 
@@ -39,13 +39,16 @@ const EditRoles = () => {
         const fetchData = async () => {
             if (id) {
                 const response = await apiGetRoleDetails();
+                console.log(response)
                 if (response && response.data) {
                     const roleData = response.data.find((r: any) => r._id === id);
                     if (roleData && roleData.access) {
                         const newInitialValues = accessTypes.reduce((acc, type) => {
+                            console.log(type)
                             acc[type] = roleData.access[type] || [];
                             return acc;
                         }, {} as FormValues);
+                        console.log(newInitialValues)
                         setInitialValues(newInitialValues);
                     } else {
                         const emptyInitialValues = accessTypes.reduce((acc, type) => {

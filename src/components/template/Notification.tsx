@@ -4,16 +4,6 @@ import Dropdown from '@/components/ui/Dropdown';
 import useResponsive from '@/utils/hooks/useResponsive';
 import { Badge, Button, Tooltip } from '../ui';
 import { apiGetNotification, apiPutNotificationUpdate } from '@/services/CrmService';
-import type   FilterFn from '@tanstack/react-table';
-import Notification from '@/components/template/Notification';
-
-export type NotificationResponse={
-  data:NotificatioData
-}
-
-type NotificatioData={
-  NotificationData:Notification[]
-}
 
 interface Notification {
   _id: string;
@@ -22,17 +12,13 @@ interface Notification {
   notification_id:string;
 }
 const userId=localStorage.getItem('userId');
-console.log(userId);
-
 const userDetailData = await apiGetNotification(userId);
-console.log(userDetailData.data.NotificationData);
-
 const Notification1 = () => {
-  const [notificationData, setNotificationData] = useState<Notification[] | []>([]);
+  const [notificationData, setNotificationData] = useState<Notification[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      setNotificationData(userDetailData.data.NotificationData|| []);
+      setNotificationData(userDetailData.data.NotificationData || []);
     };
     fetchData();
   }, []);
@@ -53,7 +39,7 @@ const Notification1 = () => {
   };
 
   
-  const unreadNotifications = (notificationData || []).filter((notification:Notification) => !notification.status);
+  const unreadNotifications = (notificationData || []).filter(notification => !notification.status);
 
   
 

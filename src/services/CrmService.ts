@@ -1,22 +1,20 @@
 import appConfig from '@/configs/app.config';
 import ApiService from './ApiService'
-import { NotificationResponse } from '@/components/template/Notification';
 
 const { apiPrefix } = appConfig
 const token = localStorage.getItem('auth');
 const userId=localStorage.getItem('userId');
 
 
-
-export async function apiGetNotification<T>(userId: string | null) {
-    return ApiService.fetchData<NotificationResponse>({
-        url: `admin/get/notification?userId=${userId}`,
-        method: 'get',
-    }).then(
-        (response)=>{
-            return response.data
+export async function apiGetNotification(userId: string | null) {
+    const response = await fetch(`${apiPrefix}admin/get/notification?userId=${userId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
         }
-    )
+    });    
+    return response.json();
 }
 
 export async function apiGetUserData(UserId:string | null) {

@@ -104,7 +104,7 @@ const Project = ({ className }: LeadsProps) => {
                                 (projectEndDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)
                             );
                             return (
-                                <Tr key={index}  onClick={() =>
+                                <Tr key={index} className=' cursor-pointer' onClick={() =>
                                     navigate(
                                         `/app/crm/project-details?project_id=${item.project_id}&client_name=${item.client[0].client_name}&id=65c32e19e0f36d8e1f30955c&type=details`
                                     )

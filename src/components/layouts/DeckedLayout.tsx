@@ -6,7 +6,6 @@ import Notification from '@/components/template/Notification'
 import HeaderLogo from '@/components/template/HeaderLogo'
 import SecondaryHeader from '@/components/template/SecondaryHeader'
 import MobileNav from '@/components/template/MobileNav'
-import Search from '@/components/template/Search'
 import View from '@/views'
 import { UserDetailsProvider } from '@/views/Context/userdetailsContext'
 import { RoleProvider } from '@/views/crm/Roles/RolesContext'
@@ -25,7 +24,7 @@ const HeaderActionsStart = () => {
 const HeaderActionsEnd = () => {
     return (
         <>
-            <Search />
+           
             
             <Notification />
             <SidePanel />

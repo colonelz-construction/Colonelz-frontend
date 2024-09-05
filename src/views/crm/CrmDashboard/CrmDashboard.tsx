@@ -16,32 +16,30 @@ interface Data{
 }
 const CrmDashboard = () => {
     const {apiData,loading}=useProjectContext()
+    console.log(apiData);
+    
 
     const data=[
         {
             key: 'inReview',
             label: 'Design',
             value: apiData?.Design_Phase,
-            growShrink: -0.7,
         },
         {
-            key: 'inReview',
+            key: 'design & execution',
             label: 'Design & Execution',
-            value: apiData?.Design_Phase,
-            growShrink: -0.7,
+            value: apiData?.Design_Execution
         },
         {
             key: 'inProgress',
             label: 'Execution',
             value:apiData?.Execution_Phase,
-            growShrink: 5.5,
         },
         
         {
             key: 'completed',
             label: 'Completed',
             value: apiData?.completed,
-            growShrink: 2.6,
         },
     ]
     const role=localStorage.getItem('role') || '';
@@ -50,15 +48,12 @@ const CrmDashboard = () => {
     const hasLeadReadPermission = roleData?.data?.lead?.read?.includes(role);
     return (
         <div className="flex flex-col gap-4 h-full">
-         <div className="flex justify-between gap-4">
-            <AuthorityCheck
-                    userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.project?.read??[]}
-                    >
-                        <Card className="w-1/2">
+         <div className="flex justify-between flex-col lg:flex-row gap-4">
+           {hasProjectReadPermission &&<>
+                        <Card className="lg:w-1/2">
                     <Statistic data={data} />
                     </Card>
-                        <Card className="w-1/2">
+                        <Card className="lg:w-1/2">
                         <h3 className="mb-3">Project Type</h3>
                         <Chart
             options={{
@@ -79,28 +74,21 @@ const CrmDashboard = () => {
                     },
                 ],
             }}
-            series={[75, 25]}
+            series={[parseInt(apiData?.commercial), parseInt(apiData?.residential)]}
             height={250}
             type="pie"
         />
                     </Card>
-                    
-                    </AuthorityCheck>
+                    </>
+        }
                     </div>
                 <div className="grid grid-cols-1 xl:grid-cols-7 gap-4">
                 </div>
-                <AuthorityCheck
-                    userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.project?.read??[]}
-                    >
+                {hasProjectReadPermission &&
                 <Project />
-                </AuthorityCheck>
-                <AuthorityCheck
-                    userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.lead?.read??[]}
-                    >
-               <Leads />
-               </AuthorityCheck>
+}
+                {hasLeadReadPermission &&
+               <Leads />}
                {(!hasProjectReadPermission && !hasLeadReadPermission) && <FileManager />}
                 
           

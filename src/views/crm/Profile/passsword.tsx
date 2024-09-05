@@ -22,7 +22,7 @@ type LoginHistory = {
 }
 
 type PasswordFormModel = {
-    userId: string
+    userId: string | null
     old_password: string
     new_password: string
     confirm_new_password: string

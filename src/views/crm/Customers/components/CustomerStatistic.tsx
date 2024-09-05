@@ -31,6 +31,7 @@ export const StatisticCard: React.FC<{
                 <div
                     className="flex justify-between items-center"
                     style={{ cursor: onClick ? 'pointer' : 'default' }} 
+                    onClick={onClick}
                 >
                     <div className="flex items-center gap-4">
                         <Avatar

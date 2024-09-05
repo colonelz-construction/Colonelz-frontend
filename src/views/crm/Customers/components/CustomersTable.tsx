@@ -109,13 +109,11 @@ const formateDate = (dateString:string) => {
     }
 const Filtering = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-    const [selectedStatus] = useState<string>('');
     const [globalFilter, setGlobalFilter] = useState('')
     const userId=localStorage.getItem('userId')
     const {projects,apiData,loading}=useProjectContext();
     const projectsData=projects
     const totalData=projectsData.length
-    console.log(projects,projectsData);
     
     const navigate=useNavigate()
     const ActionColumn = ({ row }: { row: Project }) => {
@@ -229,7 +227,6 @@ const Filtering = () => {
             cell: (props) => {
                 
                 const row = props.row.original;
-                console.log('row', row.project_end_date);
                 return formateDate(row.project_end_date);
                 
             },
@@ -238,9 +235,19 @@ const Filtering = () => {
     ], [navigate])
 
     const [data,setData] = useState(() => projects)
+    const [selectedStatus, setSelectedStatus] = useState<string | string[]>('');
+    useEffect(() => {
+        let filteredData = selectedStatus.length ? projects.filter((project: Project) =>
+            Array.isArray(selectedStatus)
+                ? selectedStatus.includes(project.project_status)
+                : project.project_status === selectedStatus
+        ) : projects;
+
+        setData(filteredData);
+    }, [selectedStatus, projects]);
 
     const table = useReactTable({
-        data:projects,
+        data:data,
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -264,14 +271,7 @@ const Filtering = () => {
     })
     
 
-    useEffect(() => {
-        const filteredData =
-            selectedStatus !== ''
-                ? projects.filter((project:Project) => project.project_status === selectedStatus)
-                : projects;
 
-        setData(filteredData);
-    }, [selectedStatus]);
 
     const onPaginationChange = (page: number) => {
         table.setPageIndex(page - 1)
@@ -284,13 +284,13 @@ const Filtering = () => {
 
     const handleStatusChange = (label: string) => {
         let status: string | string[] = '';
-    
+        
         switch (label) {
             case 'Total Projects':
-                status = [ 'executing','designing','completed'];
+                status = ['executing', 'designing', 'completed'];
                 break;
             case 'Active Projects':
-                status = [ 'executing','designing'];
+                status = ['executing', 'designing'];
                 break;
             case 'Completed Projects':
                 status = 'completed';
@@ -299,47 +299,38 @@ const Filtering = () => {
                 status = '';
                 break;
         }
-
-        if (Array.isArray(status)) {
-            const filteredData = projects.filter((project:Project) =>
-                status.includes(project.project_status)
-            );
-            setData(filteredData);
-        } else {
-            const filteredData = projects.filter(
-                (project:Project) => project.project_status === status
-            );
-            setData(filteredData);
-        }
+    
+        setSelectedStatus(status);
     };
 
     return (
         <>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-                <StatisticCard
-                    icon={<HiOutlineUserGroup />}
-                    avatarClass="!bg-indigo-600"
-                    label="Total Projects"
-                    value={apiData?.total_Project??0}
-                    loading={loading}
-                    onClick={() => handleStatusChange('Total Projects')}
-                />
-                <StatisticCard
-                    icon={<HiOutlineUsers />}
-                    avatarClass="!bg-blue-500"
-                    label="Active Projects"
-                    value={apiData?.active_Project??0}
-                    loading={loading}
-                    onClick={() => handleStatusChange('Active Projects')}
-                />
-                <StatisticCard
-                    icon={<HiOutlineUserAdd />}
-                    avatarClass="!bg-emerald-500"
-                    label="Completed Projects"
-                    value={apiData?.completed??0}
-                    loading={loading}
-                    onClick={() => handleStatusChange('Completed Projects')}
-                />
+            <StatisticCard
+    icon={<HiOutlineUserGroup />}
+    avatarClass="!bg-indigo-600"
+    label="Total Project"
+    value={apiData?.total_Project ?? 0}
+    loading={loading}
+    onClick={() => handleStatusChange('Total Projects')} // Add correct function here
+/>
+<StatisticCard
+    icon={<HiOutlineUsers />}
+    avatarClass="!bg-blue-500"
+    label="Active Projects"
+    value={apiData?.active_Project ?? 0}
+    loading={loading}
+    onClick={() => handleStatusChange('Active Projects')} // Same here
+/>
+<StatisticCard
+    icon={<HiOutlineUserAdd />}
+    avatarClass="!bg-emerald-500"
+    label="Completed Projects"
+    value={apiData?.completed ?? 0}
+    loading={loading}
+    onClick={() => handleStatusChange('Completed Projects')} // Same here
+/>
+
             </div>
             <div className='flex justify-end'>
             <DebouncedInput

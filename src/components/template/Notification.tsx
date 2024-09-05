@@ -3,7 +3,7 @@ import { HiOutlineBell, HiOutlineMailOpen } from 'react-icons/hi';
 import Dropdown from '@/components/ui/Dropdown';
 import useResponsive from '@/utils/hooks/useResponsive';
 import { Badge, Button, Tooltip } from '../ui';
-import { apiGetNotification, apiPutNotificationUpdate } from '@/services/CommonService';
+import { apiGetNotification, apiPutNotificationUpdate } from '@/services/CrmService';
 
 interface Notification {
   _id: string;

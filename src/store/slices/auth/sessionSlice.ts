@@ -42,6 +42,7 @@ const sessionSlice = createSlice({
             localStorage.removeItem('userId');
             localStorage.removeItem('role');
             Cookies.remove('userId'); 
+            window.location.reload();
         },
     },
 });

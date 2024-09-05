@@ -1,27 +1,8 @@
-import { useEffect } from 'react'
 import Card from '@/components/ui/Card'
 import Avatar from '@/components/ui/Avatar'
-import GrowShrinkTag from '@/components/shared/GrowShrinkTag'
 import MediaSkeleton from '@/components/shared/loaders/MediaSkeleton'
 import Loading from '@/components/shared/Loading'
-import { getCustomerStatistic, useAppDispatch, useAppSelector } from '../store'
-import {
-    HiOutlineUserGroup,
-    HiOutlineUserAdd,
-    HiOutlineUsers,
-} from 'react-icons/hi'
 import { NumericFormat } from 'react-number-format'
-import type { ReactNode } from 'react'
-
-type StatisticCardProps = {
-    icon: ReactNode
-    avatarClass: string
-    label: string
-    value?: number
-    growthRate?: number
-    loading: boolean
-    onClick?: () => void;
-}
 
 export const StatisticCard: React.FC<{
     icon: React.ReactElement;
@@ -49,8 +30,7 @@ export const StatisticCard: React.FC<{
             >
                 <div
                     className="flex justify-between items-center"
-                    onClick={onClick} // Attach the onClick event to the wrapping div
-                    style={{ cursor: onClick ? 'pointer' : 'default' }} // Set cursor style based on onClick presence
+                    style={{ cursor: onClick ? 'pointer' : 'default' }} 
                 >
                     <div className="flex items-center gap-4">
                         <Avatar
@@ -76,50 +56,4 @@ export const StatisticCard: React.FC<{
 };
 
 
-const CustomerStatistic = () => {
-    const dispatch = useAppDispatch()
 
-    const statisticData = useAppSelector(
-        (state) => state.crmCustomers.data.statisticData
-    )
-    const loading = useAppSelector(
-        (state) => state.crmCustomers.data.statisticLoading
-    )
-
-    useEffect(() => {
-        dispatch(getCustomerStatistic())
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
-
-    return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-            <StatisticCard
-                icon={<HiOutlineUserGroup />}
-                avatarClass="!bg-indigo-600"
-                label="Total Projects"
-                value={statisticData?.totalCustomers?.value}
-                growthRate={statisticData?.totalCustomers?.growShrink}
-                loading={loading}
-            />
-            <StatisticCard
-                icon={<HiOutlineUsers />}
-                avatarClass="!bg-blue-500"
-                label="Active Projects"
-                value={statisticData?.activeCustomers?.value}
-                growthRate={statisticData?.activeCustomers?.growShrink}
-                loading={loading}
-            />
-
-            <StatisticCard
-                icon={<HiOutlineUserAdd />}
-                avatarClass="!bg-emerald-500"
-                label="Completed Projects"
-                value={statisticData?.newCustomers?.value}
-                growthRate={statisticData?.newCustomers?.growShrink}
-                loading={loading}
-            />
-        </div>
-    )
-}
-
-export default CustomerStatistic

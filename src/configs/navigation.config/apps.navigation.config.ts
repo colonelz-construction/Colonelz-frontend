@@ -5,7 +5,7 @@ import {
 import { ADMIN, USER } from '@/constants/roles.constant'
 import type { NavigationTree, RoleAccessData } from '@/@types/navigation'
 import { fetchRoleAccessData } from '@/views/crm/Roles/roleData';
-import { apiGetRoleList } from '@/services/CommonService';
+import { apiGetRoleList } from '@/services/CrmService';
 
 
   async function getRoleAccessData(): Promise<RoleAccessData> {

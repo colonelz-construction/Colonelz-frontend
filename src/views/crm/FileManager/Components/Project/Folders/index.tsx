@@ -25,7 +25,7 @@ import {
     apiGetCrmFileManagerShareFiles,
     apiGetCrmProjectShareQuotation,
 } from '@/services/CrmService'
-import { apiGetUsers } from '@/services/CommonService'
+import { apiGetUsers } from '@/services/CrmService'
 import { HiShare, HiTrash } from 'react-icons/hi'
 import { FolderItem } from '../../type'
 import { format, parseISO } from 'date-fns'

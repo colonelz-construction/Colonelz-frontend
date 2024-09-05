@@ -15,7 +15,7 @@ import * as Yup from 'yup'
 import type { FormikProps, FieldInputProps, FieldProps } from 'formik'
 import FormRow from '@/views/account/Settings/components/FormRow'
 import { useContext, useEffect, useState } from 'react'
-import { addProfilePhoto } from '@/services/CommonService'
+import { addProfilePhoto } from '@/services/CrmService'
 import { UserDetailsContext } from '@/views/Context/userdetailsContext'
 
 export type ProfileFormModel = {

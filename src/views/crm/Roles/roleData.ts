@@ -1,4 +1,4 @@
-import { apiGetRoleDetails, apiGetRoleWiseDetails } from "@/services/CommonService";
+import { apiGetRoleDetails, apiGetRoleWiseDetails } from "@/services/CrmService";
 
 type RoleAccessPermissions = {
     read?: string[];

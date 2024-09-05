@@ -61,7 +61,7 @@ const Leads = ({ data = [], className }: any) => {
     return (
         <Card className={className}>
             <div className="flex items-center justify-between mb-4">
-                <h4>Leads</h4>
+                <h3>Leads</h3>
                 <Button size="sm" onClick={onNavigate}>
                     View All Leads
                 </Button>

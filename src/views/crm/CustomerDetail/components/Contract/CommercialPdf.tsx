@@ -1,7 +1,7 @@
 import { Document, Page, Text, View, Image, BlobProvider, StyleSheet, Font, PDFViewer } from '@react-pdf/renderer';
 import { useContext, useState } from 'react';
 import { FormikValuesContext } from './index';
-import { addcontractinfileManager } from '@/services/CommonService';
+import { addcontractinfileManager } from '@/services/CrmService';
 import { Button, Notification, toast } from '@/components/ui';
 import { useNavigate } from 'react-router-dom';
 

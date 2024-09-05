@@ -2,8 +2,8 @@ import { theme } from 'twin.macro'
 
 const twColor: Record<string, string> = theme`colors`
 
-export const COLOR_1 = twColor.indigo['600']
-export const COLOR_2 = twColor.blue['500']
+export const COLOR_1 = twColor.indigo['500']
+export const COLOR_2 = twColor.blue['400']
 export const COLOR_3 = twColor.emerald['500']
 export const COLOR_4 = twColor.amber['500']
 export const COLOR_5 = twColor.red['500']
@@ -20,8 +20,8 @@ export const COLOR_7_LIGHT = twColor.cyan['100']
 
 export const COLORS = [
     COLOR_1,
-    COLOR_2,
     COLOR_3,
+    COLOR_2,
     COLOR_4,
     COLOR_5,
     COLOR_6,

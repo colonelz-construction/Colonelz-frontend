@@ -16,7 +16,7 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
-import { apiDeleteUsers, apiGetUsers } from '@/services/CommonService'
+import { apiDeleteUsers, apiGetUsers } from '@/services/CrmService'
 import { BiTrash } from 'react-icons/bi'
 import { Button, Notification, Pagination, Select, toast, Tooltip } from '@/components/ui'
 import { useRoleContext } from '../Roles/RolesContext'

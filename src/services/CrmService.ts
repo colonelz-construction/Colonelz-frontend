@@ -1,10 +1,234 @@
 import appConfig from '@/configs/app.config';
 import ApiService from './ApiService'
-import Cookies from 'js-cookie';
 
 const { apiPrefix } = appConfig
 const token = localStorage.getItem('auth');
 const userId=localStorage.getItem('userId');
+
+
+export async function apiGetNotification(userId: string | null) {
+    const response = await fetch(`${apiPrefix}admin/get/notification?userId=${userId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        }
+    });    
+    return response.json();
+}
+
+export async function apiGetUserData(UserId:string | null) {
+    const response = await fetch(`${apiPrefix}users/getdata?userId=${userId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+export async function apiGetRoleDetails() {
+    const response = await fetch(`${apiPrefix}admin/get/role`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+export async function apiGetRoleList() {
+    const response = await fetch(`${apiPrefix}admin/get/rolename`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        }
+    });
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+}
+export async function apiGetRoleWiseDetails() {
+    const response = await fetch(`${apiPrefix}admin/rolewise/access?role=ADMIN`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        }
+    });
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+}
+
+
+
+export async function apiCreateRole(Data: any) {
+    const response = await fetch(`${apiPrefix}admin/create/role`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(Data)
+    });
+    const responseData = await response.json();
+    return responseData;
+}
+export async function apiEditRoles(Data: any,id:string |null) {
+    const response = await fetch(`${apiPrefix}admin/update/role?id=${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(Data)
+    });
+
+    return response;}
+export async function apiDeleteRole(id:string |null) {
+    const response = await fetch(`${apiPrefix}admin/delete/role?id=${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        
+    });
+    const responseData = await response.json();
+
+    return responseData;}
+export async function addProfilePhoto(Data: any) {
+    const response = await fetch(`${apiPrefix}users/profileurl`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+        body: Data
+    });
+
+    return response;}
+export async function addcontractinfileManager(Data: any) {
+    const response = await fetch(`${apiPrefix}admin/view/contract`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+        body: Data
+    });
+
+    return response;}
+
+export async function EditPassword(Data: any) {
+    const response = await fetch(`${apiPrefix}users/change/password`, {
+        method: 'POST',
+        headers: {
+           'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(Data)
+    });
+
+    return response;}
+export async function apiGetUsers() {
+    const response = await fetch(`${apiPrefix}admin/get/alluser?id=${localStorage.getItem('userId')}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+}
+
+export async function apiDeleteUsers(userid: string) {
+    const response=await fetch(`${apiPrefix}admin/delete/user?userId=${userid}&id=${userId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ userId: userId })
+    });
+    return response;
+}
+export async function apiGetDeletedUsers() {
+    const response = await fetch(`${apiPrefix}admin/archive/user`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+}
+export async function apiRestoreDeletedUsers(UserId: any) {
+    const response = await fetch(`${apiPrefix}admin/restore/user`, {
+        method: 'POST',
+        headers: {
+           'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({user_id:UserId})
+    });
+
+    return response;}
+export async function apiPermanantlyDeleteUsers(userId: string) {
+    const response=await fetch(`${apiPrefix}admin/delete/archive/user`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ user_id: userId })
+    });
+    return response;
+}
+    
+export async function addMemberToProject(Data: any) {
+    const response = await fetch(`${apiPrefix}admin/add/member`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(Data)
+    });
+
+    return response;}
+export async function apiPutNotificationUpdate(notificationId: string,type:string) {
+    const response = await fetch(`${apiPrefix}admin/update/notification`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ userId: userId,type: type, notification_id: notificationId })
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+}
 
 
 
@@ -740,54 +964,7 @@ export async function apiGetCrmEditLead(formData: any) {
     return responseData;
 }
 
-export async function apPutCrmCustomer<T, U extends Record<string, unknown>>(
-    data: U
-) {
-    return ApiService.fetchData<T>({
-        url: '/crm/customers',
-        method: 'put',
-        data,
-    })
-}
 
-export async function apiGetCrmCustomerDetails<
-    T,
-    U extends Record<string, unknown>
->(params: U) {
-    return ApiService.fetchData<T>({
-        url: '/crm/customer-details',
-        method: 'get',
-        params,
-    })
-}
 
-export async function apiDeleteCrmCustomer<
-    T,
-    U extends Record<string, unknown>
->(data: U) {
-    return ApiService.fetchData<T>({
-        url: '/crm/customer/delete',
-        method: 'delete',
-        data,
-    })
-}
 
-export async function apiGetCrmMails<T, U extends Record<string, unknown>>(
-    params: U
-) {
-    return ApiService.fetchData<T>({
-        url: '/crm/mails',
-        method: 'get',
-        params,
-    })
-}
 
-export async function apiGetCrmMail<T, U extends Record<string, unknown>>(
-    params: U
-) {
-    return ApiService.fetchData<T>({
-        url: '/crm/mail',
-        method: 'get',
-        params,
-    })
-}

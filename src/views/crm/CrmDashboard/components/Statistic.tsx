@@ -84,11 +84,15 @@ const StatisticCard = ({ data = {} }: { data: Partial<Statistic> }) => {
 
 const Statistic = ({ data = [] }: { data?: Partial<Statistic>[] }) => {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className=''>
+             <h3 className='mb-8'>Projects Status</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-4">
+              
             {data.map((card) => (
                 <StatisticCard key={card.key} data={card} />
             ))}
-        </div>  
+        </div> 
+        </div> 
     )
 }
 

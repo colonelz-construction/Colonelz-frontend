@@ -1,4 +1,4 @@
-import { apiGetRoleList, apiGetRoleWiseDetails } from '@/services/CommonService';
+import { apiGetRoleList, apiGetRoleWiseDetails } from '@/services/CrmService';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type RoleAccessPermissions = {

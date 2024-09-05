@@ -1,14 +1,10 @@
 import classNames from 'classnames'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
-import Tag from '@/components/ui/Tag'
 import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import { FormContainer, FormItem } from '@/components/ui/Form'
-
-import FormRow from '@/views/account/Settings/components/FormRow'
 import { Field, Form, Formik } from 'formik'
-import isLastChild from '@/utils/isLastChild'
 import {
     HiOutlineDesktopComputer,
     HiOutlineDeviceMobile,
@@ -16,7 +12,7 @@ import {
 } from 'react-icons/hi'
 import dayjs from 'dayjs'
 import * as Yup from 'yup'
-import { EditPassword } from '@/services/CommonService'
+import { EditPassword } from '@/services/CrmService'
 
 type LoginHistory = {
     type: string

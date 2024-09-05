@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import {
    
-    apPutCrmCustomer,
-   
 } from '@/services/CrmService'
 import type { TableQueries } from '@/@types/common'
 
@@ -31,12 +29,12 @@ export type Project = {
   superviser: string;
   visualizer: string;
   project_status: string;
-  project_start_date: string; // Assuming you want the date as a string, adjust as needed
+  project_start_date: string; 
   timeline_date: string;
   project_end_date: string;
   project_budget: string;
   project_location: string;
-  createdAt: string; // Assuming you want the date as a string, adjust as needed
+  createdAt: string;
   __v: number;
 }
 
@@ -75,24 +73,9 @@ export type CustomersState = {
 
 export const SLICE_NAME = 'crmCustomers'
 
-export const getCustomerStatistic = createAsyncThunk(
-    'crmCustomers/data/getCustomerStatistic',
-    async () => {
-        const response =
-            await apiGetCrmCustomersStatistic<GetCrmCustomersStatisticResponse>()
-        return response.data
-    }
-)
 
 
 
-export const putCustomer = createAsyncThunk(
-    'crmCustomers/data/putCustomer',
-    async (data: Project) => {
-        const response = await apPutCrmCustomer(data)
-        return response.data
-    }
-)
 
 export const initialTableData: TableQueries = {
     total: 0,

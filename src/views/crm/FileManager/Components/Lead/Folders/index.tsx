@@ -8,7 +8,7 @@ import { CiFileOn, CiImageOn } from 'react-icons/ci';
 import { apiDeleteFileManagerFiles, apiGetAllUsersList, apiGetCrmFileManagerCreateLeadFolder, apiGetCrmFileManagerLeads, apiGetCrmFileManagerShareContractFile, apiGetCrmFileManagerShareFiles } from '@/services/CrmService';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
-import { apiGetUsers } from '@/services/CommonService';
+import { apiGetUsers } from '@/services/CrmService';
 import { HiShare } from 'react-icons/hi';
   
 

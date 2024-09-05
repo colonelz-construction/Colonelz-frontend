@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import Selector from './Selector'; // Adjust import path as necessary
 import { Button, Notification, toast } from '@/components/ui';
 import useQuery from '@/utils/hooks/useQuery';
-import { apiEditRoles, apiGetRoleDetails } from '@/services/CommonService';
+import { apiEditRoles, apiGetRoleDetails } from '@/services/CrmService';
 import { StickyFooter } from '@/components/shared';
 import { useNavigate } from 'react-router-dom';
 

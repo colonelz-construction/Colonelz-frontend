@@ -71,7 +71,7 @@ const Project = ({ className }: LeadsProps) => {
     return (
         <Card className={className}>
             <div className="flex items-center justify-between mb-4">
-                <h4>Projects</h4>
+                <h3>Projects</h3>
                 <Button size="sm" onClick={onNavigate}>
                     View All Projects
                 </Button>

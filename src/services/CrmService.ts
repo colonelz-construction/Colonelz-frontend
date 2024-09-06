@@ -11,6 +11,9 @@ import { UserListResponse } from '@/views/crm/FileManager/Components/Lead/Folder
 import { MomResponse } from '@/views/crm/Inventory/components/DataTable';
 import { ProjectResponse } from '@/views/crm/AddMemberToProject';
 import { ApiResponse, DataType } from '@/views/crm/CustomerDetail/store/MomContext';
+import { TaskDataResponse } from '@/views/crm/CustomerDetail/Task/TaskDetails/TaskDetails';
+import { SubTaskResponse } from '@/views/crm/CustomerDetail/Task/Subtasks/Subtasks';
+import { UsersResponse } from '@/views/crm/users';
 
 const { apiPrefix } = appConfig
 const token = localStorage.getItem('auth');
@@ -152,7 +155,7 @@ export async function EditPassword(Data: any) {
 }
 
 export async function apiGetUsers<T>() {
-    return ApiService.fetchData<UserResponse>({
+    return ApiService.fetchData<UsersResponse>({
         url: `admin/get/alluser?id=${localStorage.getItem('userId')}`,
         method: 'get',
     }).then((response) => {
@@ -470,22 +473,16 @@ export async function apiGetCrmProjectsTaskData<T>(projectId:string) {
     })
 }
 
-export async function apiGetCrmProjectsSingleTaskData(projectId:string |null,taskId:string | null) {
-    const response = await fetch(`${apiPrefix}admin/get/single/task?user_id=${userId}&project_id=${projectId}&task_id=${taskId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        },
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    console.log('Received response from server:', data);
-    return data;
+export async function apiGetCrmProjectsSingleTaskData<T>(projectId:string |null,taskId:string | null) {
+    return ApiService.fetchData<TaskDataResponse>({
+        url: `admin/get/single/task?user_id=${userId}&project_id=${projectId}&task_id=${taskId}`,
+        method: 'get',
+    }).then((response) => {
+        console.log(response.data)
+        return response.data
+    })
 }
+
 export async function apiGetCrmProjectsTaskUpdate(task:any) {
     const response = await fetch(`${apiPrefix}admin/update/task`, {
         method: 'PUT',
@@ -513,23 +510,16 @@ export async function apiGetCrmProjectsTaskDelete(Data:any) {
     console.log('Received response from server:', data);
     return data;
 }
-export async function apiGetCrmProjectsSubTaskData(projectId:string,taskId:string) {
-    
-    const response = await fetch(`${apiPrefix}admin/get/all/subtask?user_id=${userId}&project_id=${projectId}&task_id=${taskId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        },
-    });
 
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    console.log('Received response from server:', data);
-    return data;
+export async function apiGetCrmProjectsSubTaskData<T>(projectId:string,taskId:string) {
+    return ApiService.fetchData<SubTaskResponse>({
+        url: `admin/get/all/subtask?user_id=${userId}&project_id=${projectId}&task_id=${taskId}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
 }
+
 export async function apiGetCrmProjectsAddSubTask(Data: any) {
     const response = await fetch(`${apiPrefix}admin/create/subtask`, {
         method: 'Post',
@@ -544,6 +534,7 @@ export async function apiGetCrmProjectsAddSubTask(Data: any) {
     console.log('Received response from server:', data);
     return data;
 }
+
 export async function apiGetCrmProjectsSingleSubTaskDetails(projectId:string,taskId:string,subTaskId:string) {
     const response = await fetch(`${apiPrefix}admin/get/single/subtask?user_id=${userId}&project_id=${projectId}&task_id=${taskId}&sub_task_id=${subTaskId}`, {
         method: 'GET',
@@ -557,6 +548,8 @@ export async function apiGetCrmProjectsSingleSubTaskDetails(projectId:string,tas
     console.log('Received response from server:', data);
     return data;
 }
+
+
 export async function apiGetCrmProjectsSubTaskUpdate(task:any) {
     const response = await fetch(`${apiPrefix}admin/update/subtask`, {
         method: 'PUT',

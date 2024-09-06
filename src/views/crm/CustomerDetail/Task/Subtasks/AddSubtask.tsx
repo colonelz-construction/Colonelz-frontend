@@ -9,7 +9,7 @@ import * as Yup from 'yup'
 import { useLocation } from 'react-router-dom'
 import { setUser } from '@/store'
 
-type Task = {
+export type Task = {
     user_id: string;
     project_id: string;
     sub_task_name: string;

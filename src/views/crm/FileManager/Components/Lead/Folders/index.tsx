@@ -91,6 +91,11 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed;
 };
 
+export type UserListResponse = {
+  code : number;
+  data: User[]
+}
+
 interface User {
   username: string;
   role:string

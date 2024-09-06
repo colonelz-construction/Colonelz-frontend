@@ -8,6 +8,43 @@ import { apiGetCrmProjects } from '@/services/CrmService';
 import { set } from 'lodash';
 import { useRoleContext } from '../Roles/RolesContext';
 
+export type ProjectResponse = {
+  code: number;
+  data: Data;
+}
+
+type Data = {
+  Design_Execution: number;
+  Design_Phase: number;
+  Execution_Phase: number;
+  active_Project: number;
+  archive: number;
+  commercial: string;
+  residential: string;
+  completed: number;
+  total_Project: number;
+  projects: ProjectData[];
+
+}
+
+type ProjectData = {
+  client: Client[];
+  client_name: string;
+  designer: string;
+  project_end_date: string;
+  project_id: string;
+  project_name: string;
+  project_start_date: string;
+  project_status: string;
+  project_type: string;
+}
+
+type Client = {
+  client_contact: string;
+  client_email: string;
+  client_name: string;
+}
+
 interface FormValues {
   id: string;
   role: string;
@@ -26,6 +63,7 @@ interface Projects {
 const response = await apiGetUsers();
 console.log(response)
 const projects = await apiGetCrmProjects();
+console.log(projects)
 const id=localStorage.getItem('userId');
 const token=localStorage.getItem('auth');
 const Index = () => {
@@ -33,7 +71,7 @@ const Index = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Projects[]>([]);
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [selectedProject, setSelectedProject] = useState<ProjectData[]>([]);
   const [loading,setLoading]=useState(false)
   const {rolelist}=useRoleContext();
 

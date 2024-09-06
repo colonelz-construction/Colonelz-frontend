@@ -25,6 +25,28 @@ import { ProjectMomItem } from '../store'
 import { apiGetMomData } from '@/services/CrmService'
 import formateDate from '@/store/dateformate'
 
+
+export type MomResponse = {
+    code: number;
+    data: MomData;
+}
+
+type MomData = {
+    MomData: Data[];
+}
+
+type Data = {
+    client_name: string;
+    location: string;
+    meetingDate: string;
+    mom_id: string;
+    project_id: string;
+    project_name: string;
+
+}
+
+
+
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
     onChange: (value: string | number) => void

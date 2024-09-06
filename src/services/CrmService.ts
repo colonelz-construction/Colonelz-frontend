@@ -5,6 +5,11 @@ import { ProfileFormModel } from '@/views/Context/userdetailsContext';
 import { RoleResponse } from '@/views/crm/Profile/Roles';
 import { RoleList } from '@/views/crm/Roles/RolesContext';
 import { RoleAccessData } from '@/@types/navigation';
+import { UserResponse } from '@/views/crm/AddUserToLead';
+import { UserList } from '@/views/crm/CustomerDetail/CustomerDetail';
+import { UserListResponse } from '@/views/crm/FileManager/Components/Lead/Folders';
+import { MomResponse } from '@/views/crm/Inventory/components/DataTable';
+import { ProjectResponse } from '@/views/crm/AddMemberToProject';
 
 const { apiPrefix } = appConfig
 const token = localStorage.getItem('auth');
@@ -143,21 +148,16 @@ export async function EditPassword(Data: any) {
     return response;
 }
 
+export async function apiGetUsers<T>() {
+    return ApiService.fetchData<UserResponse>({
+        url: `admin/get/alluser?id=${localStorage.getItem('userId')}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
 
-export async function apiGetUsers() {
-    const response = await fetch(`${apiPrefix}admin/get/alluser?id=${localStorage.getItem('userId')}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        }
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
+    }).catch((error) => {
+        throw new Error(`HTTP error! status: ${error}`);
+    })
 }
 
 
@@ -238,50 +238,36 @@ export async function apiPutNotificationUpdate(notificationId: string,type:strin
     return data;
 }
 
+export async function apiGetUsersList<T>(projectId:string) {
+    return ApiService.fetchData<UserList>({
+        url: `admin/get/user/project?project_id=${projectId}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
 
-
-export async function apiGetUsersList(projectId:string) {
-    const response = await fetch(`${apiPrefix}admin/get/user/project?project_id=${projectId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        }
-    });
-
-    
-    const data = await response.json();
-    console.log('Received response from server:', data);
-    return data;
+    })
 }
-export async function apiGetAllUsersList() {
-    const response = await fetch(`${apiPrefix}admin/get/userlist?user_id=${userId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        }
-    });
 
-    
-    const data = await response.json();
-    console.log('Received response from server:', data);
-    return data;
-}
-export async function apiGetMomData() {
-    const response = await fetch(`${apiPrefix}admin/getall/project/mom?id=${userId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        }
-    });
+export async function apiGetAllUsersList<T>() {
+    return ApiService.fetchData<UserListResponse>({
+        url: `admin/get/userlist?user_id=${userId}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
 
-    
-    const data = await response.json();
-    console.log('Received response from server:', data);
-    return data;
+    })
 }
+
+
+export async function apiGetMomData<T>() {
+    return ApiService.fetchData<MomResponse>({
+        url: `admin/getall/project/mom?id=${userId}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiCreateMom(formData: any) {
     const response=await fetch(`${apiPrefix}admin/create/mom/`, {
         method: 'POST',
@@ -298,6 +284,9 @@ export async function apiCreateMom(formData: any) {
     console.log('Received response from server:', data);
     return data;
 }
+
+
+
 export async function apishareMom(formData: any) {
     const response=await fetch(`${apiPrefix}admin/send/momdata`, {
         method: 'POST',
@@ -315,22 +304,14 @@ export async function apishareMom(formData: any) {
     return data;
 }
 
-export async function apiGetCrmProjects() {
-    const response = await fetch(`${apiPrefix}admin/getall/project/?id=${userId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        },
-        
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    console.log('Received response from server:', data);
-    return data;
+export async function apiGetCrmProjects<T>() {
+    return ApiService.fetchData<ProjectResponse>({
+        url: `admin/getall/project/?id=${userId}`,
+        method: 'get',
+    }).then((response) => {
+        console.log(response.data)
+        return response.data
+    })
 }
 
 export async function apiGetCrmProjectMakeContract(formData: any) {

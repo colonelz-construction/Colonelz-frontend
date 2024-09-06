@@ -14,9 +14,18 @@ interface FormValues {
   lead_id: string;
 }
 
-interface User {
+export type UserResponse = {
+
+  code: number;
+  data: User[];
+
+}
+
+export interface User {
   username: string;
   role: string;
+  email: string;
+  UserId: string;
 }
 interface Projects {
   lead_id: string;
@@ -34,7 +43,7 @@ const Index = () => {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [loading,setLoading]=useState(false)
   const {rolelist}=useRoleContext()
-  const Options = rolelist.data.
+  const Options = rolelist.
   filter((role)=>role!=='ADMIN'&&role!=='Senior Architect')
   .map((role:string) => ({ value: role, label: role }));
 

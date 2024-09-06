@@ -155,7 +155,6 @@ type Option = {
         const response = async () => {
             const data = await apiGetAllUsersList()
             const userdata = data.data
-            console.log(userdata)
 
             const usernames = userdata
                 .filter((user: User) => (user.role === 'Senior Architect') || (user.role === 'ADMIN'))

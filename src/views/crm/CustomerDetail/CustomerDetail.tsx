@@ -21,6 +21,11 @@ import { AuthorityCheck } from '@/components/shared'
 import { useRoleContext } from '../Roles/RolesContext'
 import { Tasks } from './store'
 
+export type UserList = {
+  code: number;
+  data: string[];
+}
+
 
 const CustomerDetail = () => {
     const query = useQuery()
@@ -46,7 +51,7 @@ const CustomerDetail = () => {
     const[momdata,setmomdata]= useState<any >(null);
     const [task,setTaskData]=useState<Tasks[]>([])
     const [report,setReport]=useState<any>()
-    const [users,setUsers]=useState<any>()
+    const [users,setUsers]=useState<string[]>([])
     const quotationAccess = roleData?.data?.quotation?.read?.includes(`${localStorage.getItem('role')}`)
     const momAccess = roleData?.data?.mom?.read?.includes(`${localStorage.getItem('role')}`)
     const taskAccess = roleData?.data?.task?.read?.includes(`${localStorage.getItem('role')}`)

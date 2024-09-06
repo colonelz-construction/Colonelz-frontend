@@ -19,6 +19,22 @@ import { GiSquare } from "react-icons/gi";
 import { apiGetCrmProjectsSingleSubTaskDataTimer, apiGetCrmProjectsSingleSubTaskTimer } from '@/services/CrmService';
 import { time } from 'console';
 
+export type TimerResponse = {
+  code: number;
+  data: TimerData
+}
+
+type TimerData={
+  project_id:string,
+  task_id:string,
+  sub_task_id:string
+  sub_task_assignee:string,
+  time:string,
+  isrunning:boolean,
+  current:string,
+  total_time:string,
+}
+
 type SubTask = {
     project_id: string;
     task_id: string;

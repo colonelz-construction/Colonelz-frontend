@@ -31,7 +31,13 @@ import { AuthorityCheck, ConfirmDialog, StickyFooter } from '@/components/shared
 import NoData from '@/views/pages/NoData'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import formateDate from '@/store/dateformate'
-import { role } from '@/utils/hooks/useAuth'
+
+export type ArchiveResponse = {
+    code: number;
+    data: DataItem[]
+
+}
+
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -379,7 +385,7 @@ const PaginationTable = () => {
         []
     )
 
-    const [filesData,setFilesData] = useState([])
+    const [filesData,setFilesData] = useState<DataItem[]>([])
     const [loading,setLoading] = useState(true)
     const userId=localStorage.getItem('userId')
     const navigate=useNavigate()

@@ -98,7 +98,7 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed
 }
 
-interface Access {
+export interface AccessType {
     file?: string[];
     lead?: string[];
     project?: string[];
@@ -115,7 +115,7 @@ interface Access {
   interface Role {
     _id: string;
     role: string;
-    access: Access;
+    access: AccessType;
     createdAt: string;
     __v: number;
   }

@@ -7,6 +7,26 @@ import { apiGetUsers } from '@/services/CrmService';
 import { apiGetCrmLeads, apiGetCrmProjects } from '@/services/CrmService';
 import { useRoleContext } from '../Roles/RolesContext';
 
+export type LeadResponseType = {
+  code: number;
+  data: LeadDataType;
+}
+
+type LeadDataType = {
+  leads: DataType[];
+}
+
+type DataType = {
+  date: string;
+  email: string;
+  lead_id: string;
+  location: string;
+  name: string;
+  phone: string;
+  status: string;
+
+}
+
 interface FormValues {
   id: string;
   role: string;
@@ -33,6 +53,7 @@ interface Projects {
 }
 const response = await apiGetUsers();
 const leads = await apiGetCrmLeads();
+console.log(leads)
 const id=localStorage.getItem('userId');
 const token=localStorage.getItem('auth');
 const Index = () => {
@@ -40,7 +61,7 @@ const Index = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [filteredLeads, setFilteredLeads] = useState<Projects[]>([]);
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [selectedProject, setSelectedProject] = useState<DataType[]>([]);
   const [loading,setLoading]=useState(false)
   const {rolelist}=useRoleContext()
   const Options = rolelist.

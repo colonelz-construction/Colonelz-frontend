@@ -17,7 +17,7 @@ interface Note {
     date: string;
   }
   
-  interface Contract {
+  export interface Contract {
     admin_status: string;
     itemId: string;
     file_name: string;

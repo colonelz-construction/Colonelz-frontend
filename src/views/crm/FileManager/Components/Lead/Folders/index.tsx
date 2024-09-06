@@ -1,6 +1,6 @@
 import React, {  useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FileItem } from '../data';
+import { FileItem, FolderItem } from '../data';
 import { Button, Dialog, FormItem, Input, Notification, Pagination, Select, Upload, toast } from '@/components/ui';
 import { AuthorityCheck, ConfirmDialog, RichTextEditor, StickyFooter } from '@/components/shared';
 import CreatableSelect from 'react-select/creatable';
@@ -33,6 +33,12 @@ import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton';
 import { MdDeleteOutline } from 'react-icons/md';
 import { useRoleContext } from '@/views/crm/Roles/RolesContext';
 import formateDate from '@/store/dateformate';
+
+
+export type FileManagerLeadType = {
+  code: number;
+  data: FolderItem[];
+}
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -199,6 +205,7 @@ const onDialogClose3 = () => {
     const fetchDataAndLog = async () => {
       try {
         const leadData = await apiGetCrmFileManagerLeads(leadId);
+        console.log(leadData)
         setLoading(false)
         const folderData = leadData?.data
         console.log(folderData);

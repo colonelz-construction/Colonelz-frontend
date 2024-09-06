@@ -1,5 +1,21 @@
 import { apiGetCrmFileManager, apiGetCrmFileManagerCompanyData } from "@/services/CrmService";
-import { ApiResponse, LeadDataItem, ProjectDataItem, TemplateDataItem } from "./type";
+import { ApiResponse, ApiResponseData, LeadDataItem, ProjectDataItem, TemplateDataItem } from "./type";
+
+export type FileManagerResponseType = {
+  message: string;
+  status: boolean;
+  errorMessage: string;
+  code: number;
+  data: ApiResponseData;
+};
+
+export type CompanyDataResponse = {
+  message: string;
+  status: boolean;
+  errorMessage: string;
+  code: number;
+  data: TemplateDataItem[];
+}
 
 let cachedData: ApiResponse | null = null;
 export const fetchData = async (): Promise<ApiResponse> => {
@@ -9,7 +25,6 @@ export const fetchData = async (): Promise<ApiResponse> => {
       return cachedData;
     }
     const response = await apiGetCrmFileManager();
-    const data=await apiGetCrmFileManagerCompanyData();
     
     cachedData = response;
     return response;
@@ -18,7 +33,7 @@ export const fetchData = async (): Promise<ApiResponse> => {
     throw error;
   }
 };
-export const comapnyData = async (): Promise<ApiResponse> => {
+export const comapnyData = async (): Promise<FileManagerResponseType> => {
   
   try {
     if (cachedData) {
@@ -34,6 +49,7 @@ export const comapnyData = async (): Promise<ApiResponse> => {
 
 export const getLeadData = async (): Promise<LeadDataItem[]> => {
   const data = await fetchData();
+  console.log(data)
   return data.data.leadData;
 };
 

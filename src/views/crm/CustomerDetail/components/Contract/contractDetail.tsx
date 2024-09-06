@@ -47,16 +47,21 @@ const { Tr, Th, Td, THead, TBody } = Table
 export type FileItemProps = {
     data:FileItem[]
 }
-type FileItem = {
+export type FileItem = {
    admin_status:string,
    client_status:string,   
    file_name:string,
    files:Files[],
    itemId:string,
-   remark:string
+   remark:string,
+   _id: string
 }
 type Files = {
     fileUrl:string,
+    date: string;
+    fileId: string;
+    fileName: string;
+    fileSize: string;
 }
 
 

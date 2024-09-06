@@ -32,11 +32,7 @@ type User = {
     UserId: string;
   };
   
-  type ApiResponse = {
-    message: string;
-    status: boolean;
-    errorMessage: string;
-    code: number;
+export type UsersResponse = {
     data: User[];
   };
 
@@ -121,7 +117,7 @@ const Users = () => {
     useEffect(() => {
       const fetchData = async () => {
         const response = await apiGetUsers(); 
-        const data: ApiResponse =  response
+        const data: UsersResponse =  response
         setLoading(false)
         setData(data.data);
       };

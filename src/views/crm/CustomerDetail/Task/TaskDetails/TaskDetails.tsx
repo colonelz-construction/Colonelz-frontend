@@ -6,6 +6,12 @@ import { apiGetCrmProjectsSingleTaskData, apiGetUsersList } from '@/services/Crm
 import AddSubTask from '../Subtasks/AddSubtask'
 import EditTask from '../EditTask'
 import NoData from '@/views/pages/NoData'
+import { Tasks } from '../../store'
+
+export type TaskDataResponse = {
+    code: number;
+    data: Tasks[]
+}
 
 type CustomerInfoFieldProps = {
     title?: string
@@ -20,13 +26,31 @@ const TaskDetails = () => {
     console.log(task_id,project_id);
     const [users,setUsers]=useState<any>() 
     
+    const tempTasks = {
+        project_id: "",
+        task_id: "",
+        task_name: "",
+        task_description: "",
+        actual_task_start_date: "",
+        actual_task_end_date: "",
+        estimated_task_start_date: "",
+        estimated_task_end_date: "",
+        task_status: "",
+        task_priority: "",
+        task_createdOn: "",
+        reporter: "",
+        task_createdBy: "",
+        number_of_subtasks: 0,
+        user_id: "",
+        task_assignee: "",
+        percentage:"",
+    };
 
-    const [taskData, setTaskData] = React.useState<any>([])
+    const [taskData, setTaskData] = React.useState<Tasks>(tempTasks)
     const [loading, setLoading] = useState(true)
     useEffect(() => {
         const fetchData = async () => {
             const response = await apiGetCrmProjectsSingleTaskData(project_id,task_id);
-            console.log(response)
             const list=await apiGetUsersList(project_id)
             setLoading(false)
             setTaskData(response.data[0]);
@@ -41,7 +65,7 @@ const TaskDetails = () => {
     console.log(taskData);
     const header = (
         <div className="flex items-center justify-between mt-2">
-            <h5 className="pl-5">Task-{taskData.task_name}</h5>
+            <h5 className="pl-5">Task-{taskData?.task_name}</h5>
         </div>
     )
     console.log(users);

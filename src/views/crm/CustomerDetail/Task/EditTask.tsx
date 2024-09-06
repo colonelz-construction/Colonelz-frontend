@@ -6,6 +6,7 @@ import { DatePicker, FormItem, Input, Notification, Select, toast } from '@/comp
 import { apiGetCrmProjectsAddTask, apiGetCrmProjectsTaskUpdate, apiGetUsersList } from '@/services/CrmService'
 import { HiOutlinePencil } from 'react-icons/hi'
 import * as Yup from 'yup'
+import { Tasks } from '../store'
 
 type Task = {
     user_id: string;
@@ -23,7 +24,7 @@ type Task = {
     task_id: string;
   };
   type Data={
-    Data:Task
+    Data:Tasks
   }
 
   interface EditTaskProps extends Data {

@@ -34,6 +34,11 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
 }
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
+
+export type SubTaskResponse = {
+    code: number;
+    data: SubTask[]
+}
 type SubTask = {
     project_id: string;
     task_id: string;
@@ -194,15 +199,16 @@ const Subtasks = ({task,users}:any) => {
     const location=useLocation()
     const queryParams = new URLSearchParams(location.search);
     const projectId=queryParams.get('project_id') || '';
-    const [taskData,setTaskData]=useState<any>(null)
+    const [taskData,setTaskData]=useState<SubTask[]>([])
     console.log(projectId,task);
     
   
     useEffect(() => {
         const TaskData=async()=>{
             const response = await apiGetCrmProjectsSubTaskData(projectId,task);
-            setTaskData(response.data)
             console.log('response',response);
+
+            setTaskData(response.data)
         }
         TaskData();
   

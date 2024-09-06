@@ -373,7 +373,7 @@ const Quotations=(data : FileItemProps )=> {
         }
         console.log(responseData);
       };
-     const approvedFiles = data.data.filter(file => file.admin_status === 'approved').map(file => ({ value: file.itemId, label: file.file_name }));
+     const approvedFiles = data.data?.filter(file => file.admin_status === 'approved').map(file => ({ value: file.itemId, label: file.file_name }));
 
     return (
         <div>

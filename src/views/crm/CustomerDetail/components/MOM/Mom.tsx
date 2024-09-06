@@ -20,6 +20,7 @@ import { MdDownload } from 'react-icons/md';
 import { useRoleContext } from '@/views/crm/Roles/RolesContext';
 import { AuthorityCheck } from '@/components/shared';
 import formateDate from '@/store/dateformate';
+import NoData from '@/views/pages/NoData';
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number;
@@ -354,7 +355,7 @@ function ReactTable({
             </div>
                 </>
             ) : (
-                <div style={{ textAlign: 'center' }}>No Mom Data</div>
+                <NoData/>
             )}
         </>
     );

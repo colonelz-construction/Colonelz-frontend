@@ -61,49 +61,36 @@ export async function registerandSignin(data:any) {
         console.log('Received response from server:', responseData);
         return responseData;
 }
-export async function QuotationApproval(data:any) {
-        const response = await fetch(`${apiPrefix}users/approval/client`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
 
-
-        const responseData = await response.json();
-        console.log('Received response from server:', responseData);
-        return responseData;
+export async function QuotationApproval(data: any) {
+    return ApiService.fetchData({
+        url: 'users/approval/client',
+        method: 'post',
+        data,
+    }).then((response) => {
+        return response.data;
+    });
 }
-export async function apiSignIn(data: SignInCredential): Promise<SignInResponse> {
-        const response = await fetch(`${apiPrefix}users/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
 
-
-        const responseData = await response.json();
-        console.log('Received response from server:', responseData);
-        return responseData;
+export async function apiSignIn(data: SignInCredential) {
+    return ApiService.fetchData<any>({
+        url: 'users/login',
+        method: 'post',
+        data,
+    }).then((response) => {
+        return response.data;
+    });
 }
+
 
 export async function apiAddMember(data:any,token:string | null) {
-    
-    
-        const response = await fetch(`${apiPrefix}admin/add/member`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(data)
-        });
-
-       
-        return response;
+    return ApiService.fetchData({
+        url: 'admin/add/member',
+        method: 'post',
+        data,
+    }).then((response) => {
+        return response.data;
+    });
 }
 export async function apiAddMemberToLead(data:any,token:string | null) {
     

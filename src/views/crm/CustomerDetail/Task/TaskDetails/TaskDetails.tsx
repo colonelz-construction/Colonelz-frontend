@@ -26,6 +26,7 @@ const TaskDetails = () => {
     useEffect(() => {
         const fetchData = async () => {
             const response = await apiGetCrmProjectsSingleTaskData(project_id,task_id);
+            console.log(response)
             const list=await apiGetUsersList(project_id)
             setLoading(false)
             setTaskData(response.data[0]);

@@ -19,12 +19,32 @@ import Activity from './Project Progress/Activity'
 import Timeline from './Timeline/Timeline'
 import { AuthorityCheck } from '@/components/shared'
 import { useRoleContext } from '../Roles/RolesContext'
-import { Tasks } from './store'
+import { Customer, Tasks } from './store'
+
+export type TaskResponse = {
+  code: number;
+  data: Tasks[]
+
+}
 
 export type UserList = {
   code: number;
   data: string[];
 }
+export type ProjectResponseType={
+  data:Customer[]
+}
+
+export type ReportResponse = {
+  code: number;
+  data: ReportData[];
+}
+
+type ReportData = {
+  percentage: number;
+  task_name: string;
+}
+
 
 
 const CustomerDetail = () => {
@@ -49,7 +69,7 @@ const CustomerDetail = () => {
     };
     const [details, setDetails] = useState<any | null>(null);
     const [task,setTaskData]=useState<Tasks[]>([])
-    const [report,setReport]=useState<any>()
+    const [report,setReport]=useState<ReportResponse>()
     const [users,setUsers]=useState<string[]>([])
     const quotationAccess = roleData?.data?.quotation?.read?.includes(`${localStorage.getItem('role')}`)
     const momAccess = roleData?.data?.mom?.read?.includes(`${localStorage.getItem('role')}`)
@@ -66,7 +86,7 @@ const CustomerDetail = () => {
             try {
                 const response = await apiGetCrmSingleProjects(allQueryParams.project_id);
                 const Report = await apiGetCrmSingleProjectReport(allQueryParams.project_id);
-                const list=await apiGetUsersList(allQueryParams.project_id)
+                const list=await apiGetUsersList(allQueryParams.project_id)                
                 const data = response
                 setDetails(data.data[0]);
                 setLoading(false);
@@ -81,8 +101,7 @@ const CustomerDetail = () => {
 
     useEffect(() => {
         const fetchDataAndLog = async () => {
-          if (!quotationAccess) {
-            return;}
+         
           try {
             const leadData = await apiGetCrmSingleProjectQuotation(allQueryParams.project_id)
            setFileData(leadData.data)
@@ -95,17 +114,15 @@ const CustomerDetail = () => {
       }, []);
       useEffect(() => {
         const fetchDataAndLog = async () => {
-          if (!taskAccess) {
-            return;}
-          try {
             const taskResponse = await apiGetCrmProjectsTaskData(allQueryParams.project_id);
-            setTaskData(taskResponse.data);
-          } catch (error) {
-            console.error('Error fetching task data', error);
-          }
+            console.log(taskResponse)
+            setTaskData(taskResponse.data)
         };
-        fetchDataAndLog();
+        console.log(taskAccess);
+        
+      fetchDataAndLog();
       }, [allQueryParams.project_id]);
+      
 
       
       return (

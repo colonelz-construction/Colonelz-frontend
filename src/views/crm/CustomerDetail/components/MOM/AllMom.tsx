@@ -1,11 +1,11 @@
 import { Button, Card, Dropdown, Input } from '@/components/ui';
 import React, { useContext, useEffect, useState } from 'react';
-import { MomData } from './data';
 import { useLocation } from 'react-router-dom';
 import { apiGetCrmProjectsMom } from '@/services/CrmService';
-import { useMomContext } from '../../store/MomContext';
+import { MomDataType, useMomContext } from '../../store/MomContext';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import parse, { domToReact, HTMLReactParserOptions } from 'html-react-parser';
+
 
 interface Attendees {
   client_name: string[];
@@ -53,7 +53,7 @@ const App = () => {
   }
 
   const location = useLocation();
-  const [data, setdata] = useState([] as LeadDataItem[] | null);
+  const [data, setdata] = useState<MomDataType[]>();
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const projectId = searchParams.get('project_id');
@@ -73,7 +73,7 @@ const App = () => {
   }, [location.search]);
 
   const filteredMomData = data? data.filter((item) => {
-      const searchIn = (str: string | unknown): boolean => {
+      const searchIn = (str: string | any): boolean => {
         if (str === undefined) {
           return false;
         }

@@ -10,15 +10,16 @@ export type Attendees = {
 export type MomData = {
   mom_id: string;
   meetingdate: string;
+  client_name:string;
   location: string;
   attendees: Attendees;
   remark: string;
-  imaportant_note: string;
+  important_note: string;
   files: any[]; // Add a proper type for files if needed
 };
 export type Data={
   client_name:string;
-  momdata:MomData[]
+  mom_data:MomData[]
 }
 export type ApiResponse = {
   message: string;

@@ -100,28 +100,35 @@ const CustomerDetail = () => {
     }, []);
 
     useEffect(() => {
-        const fetchDataAndLog = async () => {
-         
-          try {
-            const leadData = await apiGetCrmSingleProjectQuotation(allQueryParams.project_id)
-           setFileData(leadData.data)
-          } catch (error) {
-            console.error('Error fetching lead data', error);
-          }
-        };
-    
-        fetchDataAndLog();
-      }, []);
-      useEffect(() => {
-        const fetchDataAndLog = async () => {
-            const taskResponse = await apiGetCrmProjectsTaskData(allQueryParams.project_id);
-            console.log(taskResponse)
-            setTaskData(taskResponse.data)
-        };
-        console.log(taskAccess);
-        
+      if (!quotationAccess) return;
+  
+      const fetchDataAndLog = async () => {
+        try {
+          const leadData = await apiGetCrmSingleProjectQuotation(allQueryParams.project_id);
+          setFileData(leadData.data);
+        } catch (error) {
+          console.error('Error fetching lead data', error);
+        }
+      };
+  
       fetchDataAndLog();
-      }, [allQueryParams.project_id]);
+    }, [allQueryParams.project_id, quotationAccess]);
+     
+    
+    useEffect(() => {
+      if (!taskAccess) return;
+  
+      const fetchDataAndLog = async () => {
+        try {
+          const taskResponse = await apiGetCrmProjectsTaskData(allQueryParams.project_id);
+          setTaskData(taskResponse.data);
+        } catch (error) {
+          console.error('Error fetching task data', error);
+        }
+      };
+  
+      fetchDataAndLog();
+    }, [allQueryParams.project_id, taskAccess]);
       
 
       

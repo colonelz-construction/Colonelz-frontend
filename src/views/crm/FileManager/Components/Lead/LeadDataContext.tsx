@@ -17,7 +17,7 @@ export const LeadDataProvider = ({ children }: { children: React.ReactNode }) =>
     const fetchLeadData = async () => {
       try {
         const response = await apiGetCrmFileManagerLeads(leadId);
-        const data: ApiResponse = response;
+        const data = response;
         setLeadData(data.data);
       } catch (error) {
         console.error('Error fetching lead data', error);

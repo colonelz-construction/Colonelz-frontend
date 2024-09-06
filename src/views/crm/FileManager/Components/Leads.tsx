@@ -101,6 +101,8 @@ const pageSizeOption = [
 ]
 
 console.log(getLeadData);
+const temp = await getLeadData();
+console.log(temp)
 
 const Filtering = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])

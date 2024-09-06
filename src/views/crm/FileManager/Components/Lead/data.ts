@@ -42,7 +42,7 @@ export interface FileItem {
   export const fetchLeadData = async (leadId: string | null): Promise<FolderItem[]> => {
     try {
       const response = await apiGetCrmFileManagerLeads(leadId);
-      const data: ApiResponse = response
+      const data = response
       return data.data;
     } catch (error) {
       console.error('Error fetching lead data', error);

@@ -19,6 +19,12 @@ import LeadActivity from './components/LeadActivity'
 import { Link } from 'react-router-dom'
 import { AuthorityCheck } from '@/components/shared'
 import { useRoleContext } from '../Roles/RolesContext'
+import { Lead } from '../LeadList/store/LeadContext'
+
+export type LeadDetailsResponse = {
+    code: number;
+    data: Lead[]
+}
 
 injectReducer('crmCustomerDetails', reducer)
 

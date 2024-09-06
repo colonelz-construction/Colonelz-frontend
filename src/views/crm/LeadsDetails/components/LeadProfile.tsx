@@ -12,9 +12,9 @@ type CustomerInfoFieldProps = {
 }
 
 type CustomerProfileProps = {
-    data?: Partial<Customer>
+    data?: Partial<CustomerType>
 }
-type Customer = {
+export type CustomerType = {
     _id: string
     name: string
     lead_id:string

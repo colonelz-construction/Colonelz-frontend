@@ -25,7 +25,22 @@ import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import { AuthorityCheck, ConfirmDialog } from '@/components/shared'
 import { LiaTrashRestoreSolid } from 'react-icons/lia'
 import { AiOutlineDelete } from 'react-icons/ai'
+import { AccessType } from '../Profile/Roles'
 
+
+export type ArchiveUserResponseType = {
+    code: number;
+    data: ArchiveUserType[]
+
+}
+
+type ArchiveUserType = {
+    UserId: string;
+    email: string;
+    role: string;
+    username: string;
+    access: AccessType;
+}
 type User = {
     username: string;
     role: string;
@@ -130,7 +145,8 @@ const ArchivedUsers = () => {
     useEffect(() => {
       const fetchData = async () => {
         const response = await apiGetDeletedUsers(); 
-        const data: ApiResponse =  response
+        console.log(response)
+        const data =  response
         setLoading(false)
         setData(data.data);
         console.log(data.data);

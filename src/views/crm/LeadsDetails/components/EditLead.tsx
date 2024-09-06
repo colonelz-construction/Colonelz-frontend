@@ -64,6 +64,7 @@ const EditLead = ({ details }: any) => {
                 Lead Updated Successfully
               </Notification>
             );
+            window.location.reload();
           } else {
             toast.push(
               <Notification type='danger' duration={2000} closable>

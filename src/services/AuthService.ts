@@ -12,18 +12,9 @@ import type {
 import Cookies from 'js-cookie';
 import appConfig from '@/configs/app.config';
 import { Alert, Notification, toast } from '@/components/ui';
-import { ProjectResponse } from '@/views/crm/AddMemberToProject';
-import { UserResponse } from '@/views/crm/AddUserToLead';
 
 const token=localStorage.getItem('auth');   
 const userId=localStorage.getItem('userId');
-
-type Response={
-    code:number;
-    data:any;
-    message:string;
-    errorMessage:string;
-}
 
 
  const { apiPrefix } = appConfig
@@ -72,7 +63,7 @@ export async function registerandSignin(data:any) {
 }
 
 export async function QuotationApproval(data: any) {
-    return ApiService.fetchData<Response>({
+    return ApiService.fetchData({
         url: 'users/approval/client',
         method: 'post',
         data,
@@ -92,8 +83,8 @@ export async function apiSignIn(data: SignInCredential) {
 }
 
 
-export async function apiAddMember(data:any) {
-    return ApiService.fetchData<ProjectResponse>({
+export async function apiAddMember(data:any,token:string | null) {
+    return ApiService.fetchData({
         url: 'admin/add/member',
         method: 'post',
         data,
@@ -101,68 +92,83 @@ export async function apiAddMember(data:any) {
         return response.data;
     });
 }
+export async function apiAddMemberToLead(data:any,token:string | null) {
+    
+    
+        const response = await fetch(`${apiPrefix}admin/add/member/lead`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        });
 
-export async function apiAddMemberToLead(data:any) {
-    return ApiService.fetchData<UserResponse>({
-        url: 'admin/add/member/lead',
-        method: 'post',
-        data,
-    }).then((response) => {
-        return response.data;
-    });
+       
+        return response;
 }
+export async function apiSignUp(data: SignUpCredential,token:string) {
+   data.email=data.email.toLowerCase();
+    const response = await fetch(`${apiPrefix}admin/create/user`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        });
 
-
-export async function apiSignUp(data:SignUpCredential) {
-    data.email=data.email.toLowerCase();
-    return ApiService.fetchData<Response>({
-        url: 'admin/create/user',
-        method: 'post',
-        data,
-    }).then((response) => {
-        return response.data;
-    });
+        const responseData = await response.json();
+        
+        return responseData;
 }
 
 export async function apiSignOut() {
-    return ApiService.fetchData({
-        url: 'users/logout',
-        method: 'post',
-        data: { userId,token },
-    }).then((response) => {
-        return response.data;
-    });
+     const token=localStorage.getItem('auth');
+     const userId=localStorage.getItem('userId');
+        const response = await fetch(`${apiPrefix}users/logout`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Add the token to the Authorization header
+            },
+            body: JSON.stringify({ userId,token })
+        });
+        const responseData = await response.json();
+        console.log('Received response from server:', responseData);
+        
+        return responseData;
 }
 
-
-export async function apiForgotPassword(data:ForgotPassword) {
-    const Data:ForgotPassword={
+export async function apiForgotPassword(data: ForgotPassword) {
+     const Data:ForgotPassword={
         email:data.email.toLowerCase(),
      }
-    return ApiService.fetchData({
-        url: 'users/sendotp/forget/password',
-        method: 'post',
-        data:Data,
-    }).then((response) => {
-        return response.data;
-    });
+        const response = await fetch(`${apiPrefix}users/sendotp/forget/password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(Data)
+        });        
+        return response.json();
 }
-
-
 export async function apiOtpVerify(data: OtpVerify) {
     const Data={
         email:data.email.toLowerCase(),
         otp:data.otp
     }
-    return ApiService.fetchData({
-        url: 'users/verifyotp/forget/password',
-        method: 'post',
-        data:Data,
-    }).then((response) => {
-        return response.data;
-    });
+        const response = await fetch(`${apiPrefix}users/verifyotp/forget/password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(Data)
+        });
+        const responseData = await response.json();
+        return responseData;
+    
 }
-
 
 export async function apiResetPassword(data: ResetPassword) {
     const Data={
@@ -170,11 +176,20 @@ export async function apiResetPassword(data: ResetPassword) {
         password:data.password,
         token:data.token
     }
-    return ApiService.fetchData({
-        url: 'users/reset/password',
-        method: 'post',
-        data:Data,
-    }).then((response) => {
-        return response.data;
-    });
+      
+    try {
+        const response = await fetch(`${apiPrefix}users/reset/password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(Data)
+        });
+
+        const responseData = await response.json();
+        return responseData;
+    } catch (error) {
+        console.error('Error sending request to server:', error);
+        throw error;
+    }
 }

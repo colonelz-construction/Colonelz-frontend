@@ -72,8 +72,12 @@ const LeadForm: React.FC = () => {
               async(values) => {
                 setLoading(true)
                 const response = await apiGetCrmCreateLead(values)
+                console.log(values);
+                
+                const data= await response.json()
                 setLoading(false)
-                if (response.code===200){
+                console.log(data);
+                if (data.code===200){
                     toast.push(
                         <Notification type='success' duration={2000}>
                             Lead Created Successfully
@@ -85,7 +89,7 @@ const LeadForm: React.FC = () => {
                 else{
                     toast.push(
                         <Notification type='danger' duration={2000}>
-                            {response.errorMessage.length===0?response.message:response.errorMessage}
+                            {data.errorMessage.length===0?data.message:data.errorMessage}
                         </Notification>
                     )
                 }

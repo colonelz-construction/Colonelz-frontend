@@ -56,8 +56,6 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
     const [project, setProject] = useState<AddProject>()
     const {roleData} = useRoleContext()
     const createProjectAccess = roleData?.data?.project?.create?.includes(`${localStorage.getItem('role')}`)
-    console.log(data);
-    
 
     const onDialogClose = () => {
         setIsOpen(false)
@@ -91,10 +89,11 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
         console.log(project);
         
             const response=await apiLeadsAnotherProject(project)
-            if(response.code===200){
+            const responseData=await response.json()
+            if(responseData.code===200){
                 toast.push(
                     <Notification closable type="success" duration={2000}>
-                        {response.message}
+                        {responseData.message}
                     </Notification>
                 )
                 window.location.reload()
@@ -102,7 +101,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
                 else{
                     toast.push(
                         <Notification closable type="danger" duration={2000}>
-                            {response.errorMessage}
+                            {responseData.errorMessage}
                         </Notification>
                     )
                 }

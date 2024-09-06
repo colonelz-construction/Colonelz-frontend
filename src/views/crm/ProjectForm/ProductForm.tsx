@@ -149,8 +149,9 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
        
        
         const response =await apiGetCrmCreateLeadToProject(formData);
+        const responseData=await response.json();
         setLoading(false);
-        if(response.code===200){
+        if(responseData.code===200){
           toast.push(
             <Notification
               key={Math.random()}
@@ -163,7 +164,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
           window.location.reload();
         }
         else{
-          const errorMessage = response.errorMessage || 'Internal Server Error';
+          const errorMessage = responseData.errorMessage || 'Internal Server Error';
           toast.push(
             <Notification
               key={Math.random()}

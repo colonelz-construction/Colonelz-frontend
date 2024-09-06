@@ -63,8 +63,10 @@ function useAuth() {
     }
 
     const signUp = async (values: SignUpCredential) => {
-       const resp = await apiSignUp(values)
-    return resp
+       
+        
+            const resp = await apiSignUp(values,token)
+          return resp
     }
 
     const handleSignOut = () => {

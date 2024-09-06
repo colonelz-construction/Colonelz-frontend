@@ -66,9 +66,9 @@ const SignUpForm = (props: SignUpFormProps) => {
 
         setSubmitting(false)
     }
-    console.log(rolelist);
+    console.log(rolelist.data);
 
-    const rolesOptions = rolelist?.map((role) => ({
+    const rolesOptions = rolelist?.data?.map((role) => ({
         label: role,
         value: role,
     }))

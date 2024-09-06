@@ -58,7 +58,8 @@ const RegisterForm = (props: SignInFormProps) => {
         
         if (result?.code === 200) {
             setSubmitting(false)
-            userData({username,organization,email,password}) 
+            userData({username,organization,email,password})
+            
         }
 
         setSubmitting(false)

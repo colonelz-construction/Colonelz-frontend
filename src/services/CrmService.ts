@@ -91,6 +91,7 @@ export async function apiCreateRole<
         (response)=>{
             console.log(response.data);
             return response.data
+            
         }
     )
 }
@@ -329,6 +330,7 @@ export async function apiGetCrmProjectMakeContract(formData: any) {
         body: JSON.stringify(formData)
         
     });
+
     return response;
 }
 export async function apiGetCrmSingleProjectQuotation(projectId:string ) {
@@ -872,52 +874,69 @@ export async function apiGetCrmLeadsDetails(leadId:string | null) {
     return data;
 }
 
+export async function apiLeadsAnotherProject(formData: any) {
+    const response = await fetch(`${apiPrefix}admin/lead/multiple/project`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+        
+    });
 
+    return response;
+}
+export async function apiGetCrmCreateLead(formData: any) {
+    const response = await fetch(`${apiPrefix}admin/create/lead/`, {
+        method: 'POST',
+        headers: {
+            'Content-type':'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+        
+    });
 
-export async function apiLeadsAnotherProject(data: any) {
-    return ApiService.fetchData<any>({
-        url: 'admin/lead/multiple/project',
-        method: 'post',
-        data,
-    }).then((response) => {
-        return response.data;
-    });
+    return response;
 }
-export async function apiGetCrmCreateLead(data: any) {
-    return ApiService.fetchData<any>({
-        url: 'admin/create/lead/',
-        method: 'post',
-        data,
-    }).then((response) => {
-        return response.data;
+export async function apiGetCrmCreateLeadToProject(formData: any) {
+    const response = await fetch(`${apiPrefix}admin/create/lead/project`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData,
+        
     });
+
+    return response;
 }
-export async function apiGetCrmCreateLeadToProject(data: any) {
-    return ApiService.fetchData<any>({
-        url: 'admin/create/lead/project',
-        method: 'post',
-        data,
-    }).then((response) => {
-        return response.data;
+export async function apiGetCrmLeadsUpdates(formData: any) {
+    const response = await fetch(`${apiPrefix}admin/update/lead/`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+           'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+        
     });
+    const responseData = await response.json();
+    return responseData;
 }
-export async function apiGetCrmLeadsUpdates(data: any) {
-    return ApiService.fetchData<any>({
-        url: 'admin/update/lead/',
-        method: 'put',
-        data,
-    }).then((response) => {
-        return response.data;
+export async function apiGetCrmEditLead(formData: any) {
+    const response = await fetch(`${apiPrefix}admin/update/lead/data/`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+           'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+        
     });
-}
-export async function apiGetCrmEditLead(data: any) {
-    return ApiService.fetchData<any>({
-        url: 'admin/update/lead/data/',
-        method: 'put',
-        data,
-    }).then((response) => {
-        return response.data;
-    });
+    const responseData = await response.json();
+    return responseData;
 }
 
 

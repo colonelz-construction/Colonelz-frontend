@@ -18,7 +18,7 @@ export type UserResponse = {
 
   code: number;
   data: User[];
-  errorMessage: string;
+
 }
 
 export interface User {
@@ -70,9 +70,10 @@ const Index = () => {
 
   const handleSubmit = async (values: FormValues) => {
     setLoading(true)
-    const response=await apiAddMemberToLead(values);
+    const response=await apiAddMemberToLead(values,token);
+    const responseData=  await response.json();
     setLoading(false)
-    if(response.code===200){
+    if(response.status===200){
      
       toast.push(
         <Notification closable type="success" duration={2000}>
@@ -85,12 +86,14 @@ const Index = () => {
     else{
       toast.push(
         <Notification closable type="danger" duration={2000}>
-            {response.errorMessage}
+            {responseData.errorMessage}
         </Notification>
     
      )
+      console.log(responseData);
       
     }
+    console.log(responseData);
   };
 
   return (

@@ -48,7 +48,6 @@ const CustomerDetail = () => {
       mom: queryParams.get('type') || '',
     };
     const [details, setDetails] = useState<any | null>(null);
-    const[momdata,setmomdata]= useState<any >(null);
     const [task,setTaskData]=useState<Tasks[]>([])
     const [report,setReport]=useState<any>()
     const [users,setUsers]=useState<string[]>([])
@@ -66,14 +65,11 @@ const CustomerDetail = () => {
         const fetchData = async () => {
             try {
                 const response = await apiGetCrmSingleProjects(allQueryParams.project_id);
-                
                 const Report = await apiGetCrmSingleProjectReport(allQueryParams.project_id);
                 const list=await apiGetUsersList(allQueryParams.project_id)
                 const data = response
                 setDetails(data.data[0]);
                 setLoading(false);
-                setmomdata(data.data[0].mom)
-                
                 setReport(Report)
                 setUsers(list.data)
             } catch (error) {
@@ -85,6 +81,8 @@ const CustomerDetail = () => {
 
     useEffect(() => {
         const fetchDataAndLog = async () => {
+          if (!quotationAccess) {
+            return;}
           try {
             const leadData = await apiGetCrmSingleProjectQuotation(allQueryParams.project_id)
            setFileData(leadData.data)
@@ -95,18 +93,19 @@ const CustomerDetail = () => {
     
         fetchDataAndLog();
       }, []);
-    useEffect(() => {
+      useEffect(() => {
         const fetchDataAndLog = async () => {
+          if (!taskAccess) {
+            return;}
           try {
             const taskResponse = await apiGetCrmProjectsTaskData(allQueryParams.project_id);
-            setTaskData(taskResponse.data)
+            setTaskData(taskResponse.data);
           } catch (error) {
-            console.error('Error fetching lead data', error);
+            console.error('Error fetching task data', error);
           }
         };
-    
         fetchDataAndLog();
-      }, []);
+      }, [allQueryParams.project_id]);
 
       
       return (

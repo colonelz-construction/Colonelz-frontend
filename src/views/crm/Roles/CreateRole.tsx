@@ -120,14 +120,20 @@ const EditRoles = () => {
                 
             
                 const response = await apiCreateRole(payload);
+                
                 setSubmitting(false)
+                console.log(response);
+                
                 if(response.code===200){
                     toast.push(
                         <Notification type='success' duration={2000} closable>
                             {response.message}
                         </Notification>
                     )
-                    window.location.reload()
+                    setTimeout(() => {
+                        navigate('/app/crm/profile');
+                        window.location.reload();
+                    }, 2000);
                 }
                  else{
                         toast.push(

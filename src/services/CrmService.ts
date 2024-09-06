@@ -71,37 +71,37 @@ export async function apiGetRoleWiseDetails<T>() {
 
     }).catch((error) => {
         throw new Error(`HTTP error! status: ${error}`);
-
     })
 }
 
 
-export async function apiCreateRole(Data: any) {
-    const response = await fetch(`${apiPrefix}admin/create/role`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(Data)
-    });
-    const responseData = await response.json();
-    console.log(responseData)
-    return responseData;
+
+export async function apiCreateRole<
+    U extends Record<string, unknown>
+>(data: U) {
+    return ApiService.fetchData<any>({
+        url: 'admin/create/role',
+        method: 'post',
+        data,
+    }).then(
+        (response)=>{
+            console.log(response.data);
+            return response.data
+            
+        }
+    )
 }
 
 
-export async function apiEditRoles(Data: any,id:string |null) {
-    const response = await fetch(`${apiPrefix}admin/update/role?id=${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(Data)
-    });
+    export async function apiEditRoles(data: any,id:string |null) {
+    return ApiService.fetchData<any>({
+        url: `admin/update/role?id=${id}`,
+        method: 'put',
+        data,}).then(
+        (response)=>{return response.data})}
 
-    return response;}
+
+
 export async function apiDeleteRole(id:string |null) {
     const response = await fetch(`${apiPrefix}admin/delete/role?id=${id}`, {
         method: 'DELETE',
@@ -114,6 +114,8 @@ export async function apiDeleteRole(id:string |null) {
     const responseData = await response.json();
 
     return responseData;}
+
+
 export async function addProfilePhoto(Data: any) {
     const response = await fetch(`${apiPrefix}users/profileurl`, {
         method: 'POST',

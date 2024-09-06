@@ -80,17 +80,18 @@ const EditRoles = () => {
         };
 
         const response = await apiEditRoles(payload, id);
-        const data = await response.json();
-        if (data.code === 200) {
+        console.log(response);
+        
+        if (response.code === 200) {
             toast.push(
                 <Notification type='success' duration={2000} closable>
-                    {data.message}
+                    {response.message}
                 </Notification>
             );
         } else {
             toast.push(
                 <Notification type='danger' duration={2000} closable>
-                    {data.errorMessage}
+                    {response.errorMessage}
                 </Notification>
             );
         }

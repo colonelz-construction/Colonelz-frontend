@@ -4,6 +4,7 @@ import { TOKEN_TYPE, REQUEST_HEADER_AUTH_KEY } from '@/constants/api.constant'
 import { PERSIST_STORE_NAME } from '@/constants/app.constant'
 import deepParseJson from '@/utils/deepParseJson'
 import store, { signOutSuccess } from '../store'
+import { toast } from '@/components/ui'
 
 const unauthorizedCode = [401]
 
@@ -42,6 +43,8 @@ BaseService.interceptors.response.use(
     (response) => response,
     (error) => {
         const { response } = error
+        console.log(response);
+        
 
         if (response && unauthorizedCode.includes(response.status)) {
             store.dispatch(signOutSuccess())

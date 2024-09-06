@@ -14,6 +14,8 @@ const ApiService = {
                 .catch((errors: AxiosError<Response>) => {
                    if(errors.response){
                     resolve(errors.response)
+                    console.log(errors.response);
+                    
                    }
                     reject(errors)
                 })

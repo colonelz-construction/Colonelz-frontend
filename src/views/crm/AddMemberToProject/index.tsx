@@ -11,6 +11,7 @@ import { useRoleContext } from '../Roles/RolesContext';
 export type ProjectResponse = {
   code: number;
   data: Data;
+  errorMessage: string;
 }
 
 type Data = {
@@ -98,10 +99,11 @@ const Index = () => {
 
   const handleSubmit = async (values: FormValues) => {
     setLoading(true)
-    const response=await apiAddMember(values,token);
-    const responseData=  await response.json();
+    const response=await apiAddMember(values);
+    console.log(response);
+    
     setLoading(false)
-    if(response.status===200){
+    if(response?.code===200){
      
       toast.push(
         <Notification closable type="success" duration={2000}>
@@ -114,14 +116,10 @@ const Index = () => {
     else{
       toast.push(
         <Notification closable type="danger" duration={2000}>
-            {responseData.errorMessage}
+            {response.errorMessage}
         </Notification>
-    
      )
-      console.log(responseData);
-      
     }
-    console.log(responseData);
   };
 
   return (

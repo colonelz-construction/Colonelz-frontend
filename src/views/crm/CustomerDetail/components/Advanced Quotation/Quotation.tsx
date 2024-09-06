@@ -37,14 +37,10 @@ const TabbedContent: React.FC<TabbedContentProps> = ({ data }) => {
           </div>
       
         </div>
-        <TabContent value='Final Estimate'>
-           <FinalEstimate/>
-        </TabContent>
+        
         {data.data.main_quotation.map((quotation) => (
           <TabContent key={quotation.type} value={quotation.type}>
-            <div className="p-4">
-              <Filtering quotation_type={quotation.type} quotation_id={quotation.qutation_id} project_id={projectId} />
-            </div>
+            
           </TabContent>
         ))}
       </Tabs>

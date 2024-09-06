@@ -3,29 +3,31 @@ import React, { createContext, useState, useEffect, useContext, ReactNode } from
 import { useLocation } from 'react-router-dom';
 
 
-const MomContext = createContext({ leadData: null, client: null });
+const MomContext = createContext<Context>({ leadData:null, client: null });
 
 export const useMomContext = () => useContext(MomContext);
 
+type Context={
+  leadData:MomDataType[] | null
+  client:DataType | null
+}
+
 export interface ApiResponse {
-  message: string;
-  status: boolean;
-  errorMessage: string;
-  code: number;
-  data: Data;
+  data: DataType;
 }
 
-interface Data {
+export interface DataType {
   client_name: string;
-  mom_data: MomData[];
+  mom_data: MomDataType[];
 }
 
-interface MomData {
+export interface MomDataType {
   mom_id: string;
   meetingdate: string;
   location: string;
   attendees: Attendees;
   remark: string;
+  important_note: string;
   files: File[];
 }
 
@@ -45,8 +47,8 @@ interface File {
 }
 
 export const MomProvider = ({ children }: { children: ReactNode }) => {
-  const [leadData, setLeadData] = useState(null);
-  const [client, setClient] = useState(null);
+  const [leadData, setLeadData] = useState<MomDataType[] | null>(null);
+  const [client, setClient] = useState<DataType | null>(null);
   const location = useLocation();
 
   useEffect(() => {

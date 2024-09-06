@@ -6,10 +6,11 @@ import { RoleResponse } from '@/views/crm/Profile/Roles';
 import { RoleList } from '@/views/crm/Roles/RolesContext';
 import { RoleAccessData } from '@/@types/navigation';
 import { UserResponse } from '@/views/crm/AddUserToLead';
-import { UserList } from '@/views/crm/CustomerDetail/CustomerDetail';
+import { ProjectResponseType, ReportResponse, TaskResponse, UserList } from '@/views/crm/CustomerDetail/CustomerDetail';
 import { UserListResponse } from '@/views/crm/FileManager/Components/Lead/Folders';
 import { MomResponse } from '@/views/crm/Inventory/components/DataTable';
 import { ProjectResponse } from '@/views/crm/AddMemberToProject';
+import { ApiResponse, DataType } from '@/views/crm/CustomerDetail/store/MomContext';
 
 const { apiPrefix } = appConfig
 const token = localStorage.getItem('auth');
@@ -343,8 +344,20 @@ export async function apiGetCrmSingleProjectQuotation(projectId:string ) {
         throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
+    console.log(data)
     return data;
 }
+
+// export async function apiGetCrmSingleProjectQuotation<T>(projectId:string) {
+//     return ApiService.fetchData<T>({
+//         url: `admin/get/quotationdata/?project_id=${projectId}`,
+//         method: 'get',
+//     }).then((response) => {
+//         console.log(response.data)
+//         return response.data
+//     })
+// }
+
 export async function apiGetCrmProjectShareQuotation(formData: any) {
     const response = await fetch(`${apiPrefix}admin/share/quotation`, {
         method: 'POST',
@@ -383,37 +396,25 @@ export async function apiGetCrmProjectShareQuotationApproval(formData: any) {
     });
 
     return response;
+} 
+
+export async function apiGetCrmSingleProjects<T>(projectId:string) {
+    return ApiService.fetchData<ProjectResponseType>({
+        url: `admin/getsingle/project/?project_id=${projectId}&id=${userId}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
 }
 
-export async function apiGetCrmSingleProjects(projectId:string ) {
-    const response = await fetch(`${apiPrefix}admin/getsingle/project/?project_id=${projectId}&id=${userId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        },
-    });
 
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
-}
-export async function apiGetCrmSingleProjectReport(projectId:string | null ) {
-    const response = await fetch(`${apiPrefix}admin/gettask/details?project_id=${projectId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        },
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
+export async function apiGetCrmSingleProjectReport<T>(projectId:string | null) {
+    return ApiService.fetchData<ReportResponse>({
+        url: `admin/gettask/details?project_id=${projectId}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
 }
 
 export async function apiGetCrmSingleProjectEdit(formData: any) {
@@ -433,22 +434,16 @@ export async function apiGetCrmSingleProjectEdit(formData: any) {
       console.error('Error in apiGetCrmSingleProjectEdit:', error);
     }
   }
-export async function apiGetCrmProjectsMom(projectId:string) {
-    const response = await fetch(`${apiPrefix}admin/getall/mom/?project_id=${projectId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        },
-    });
 
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    console.log('Received response from server:', data);
-    return data;
+export async function apiGetCrmProjectsMom<T>(projectId:string) {
+    return ApiService.fetchData<ApiResponse>({
+        url: `admin/getall/mom/?project_id=${projectId}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
 }
+
 export async function apiGetCrmProjectsAddTask(Data: any) {
     const response = await fetch(`${apiPrefix}admin/create/task`, {
         method: 'Post',
@@ -463,22 +458,18 @@ export async function apiGetCrmProjectsAddTask(Data: any) {
     console.log('Received response from server:', data);
     return data;
 }
-export async function apiGetCrmProjectsTaskData(projectId:string) {
-    const response = await fetch(`${apiPrefix}admin/get/all/task?user_id=${userId}&project_id=${projectId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        },
-    });
 
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    console.log('Received response from server:', data);
-    return data;
+
+export async function apiGetCrmProjectsTaskData<T>(projectId:string) {
+    return ApiService.fetchData<TaskResponse>({
+        url: `admin/get/all/task?user_id=${userId}&project_id=${projectId}`,
+        method: 'get',
+    }).then((response) => {
+        console.log(response.data)
+        return response.data
+    })
 }
+
 export async function apiGetCrmProjectsSingleTaskData(projectId:string |null,taskId:string | null) {
     const response = await fetch(`${apiPrefix}admin/get/single/task?user_id=${userId}&project_id=${projectId}&task_id=${taskId}`, {
         method: 'GET',

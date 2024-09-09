@@ -82,11 +82,10 @@ const YourFormComponent: React.FC<Data> = (data) => {
     console.log('Post Data:', postData);
     
       const response = await apiGetCrmFileManagerCreateProjectFolder(postData);
-      const responseData = await response.json(); 
       setSubmit(false);
-      console.log('Response Data:', responseData);
+      console.log('Response Data:', response);
   
-      if (responseData.code===200) {
+      if (response.code===200) {
         toast.push(
           <Notification closable type="success" duration={3000}>
             File Uploaded Successfully
@@ -98,7 +97,7 @@ const YourFormComponent: React.FC<Data> = (data) => {
       } else {
         toast.push(
           <Notification closable type="danger" duration={3000}>
-            {responseData.errorMessage}
+            {response.errorMessage}
           </Notification>,
           { placement: 'top-center' }
         );

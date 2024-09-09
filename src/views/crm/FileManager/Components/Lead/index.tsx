@@ -155,8 +155,7 @@ const Index = () => {
       };
       
        const response= await apiDeleteFileManagerFolders(postData);
-       const data = await response.json();
-         if (response.status === 200){
+         if (response.code === 200){
         toast.push(
           <Notification closable type="success" duration={2000}>
             Folder deleted successfully
@@ -167,7 +166,7 @@ const Index = () => {
     else{
         toast.push(
           <Notification closable type="danger" duration={2000}>
-            {data.errorMessage}
+            {response.errorMessage}
           </Notification>,{placement:'top-center'}
         )
     }

@@ -67,8 +67,7 @@ const Password = ({ data }: { data?: LoginHistory[] }) => {
         };
     
         const response = await EditPassword(data);
-        const responseData= await response.json();
-        if (responseData.code===200) {
+        if (response.code===200) {
             toast.push(<Notification title={'Password updated'} type="success" />, {
                 placement: 'top-center',
             });

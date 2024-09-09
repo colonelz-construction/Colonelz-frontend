@@ -31,8 +31,8 @@ const sessionSlice = createSlice({
             state.token = action.payload.token;
             state.userId = action.payload.userId; 
             localStorage.setItem('auth', action.payload.token);
-  localStorage.setItem('userId', action.payload.userId);
-  localStorage.setItem('role', action.payload.role);
+            localStorage.setItem('userId', action.payload.userId);
+            localStorage.setItem('role', action.payload.role);
 },
         signOutSuccess(state) {
             state.signedIn = false;

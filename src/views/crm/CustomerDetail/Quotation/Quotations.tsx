@@ -45,10 +45,11 @@ interface IndeterminateCheckboxProps extends Omit<CheckboxProps, 'onChange'> {
 const { Tr, Th, Td, THead, TBody } = Table
 
 export type FileItemProps = {
-    data:FileItem[]
+    data:FileItemType[]
 }
-type FileItem = {
+export type FileItemType = {
    admin_status:string,
+   client_remark:string,
    client_status:string,   
    file_name:string,
    files:Files[],
@@ -112,11 +113,11 @@ const Quotations=(data : FileItemProps )=> {
           };
         try{
             const response=await apiGetCrmProjectShareQuotationApproval(postData);
-            const responseData=await response.json();
-            if(response.status===200){
+            console.log(response)
+            if(response.code===200){
                 toast.push(
                     <Notification closable type='success' duration={2000}>
-                        {responseData.message}
+                        {response.message}
                     </Notification>
                 )
                 window.location.reload();
@@ -215,11 +216,10 @@ const Quotations=(data : FileItemProps )=> {
                                                     console.log(values);
                                                     
                                                     const response = await apiGetCrmProjectShareQuotationApproval(values);
-                                                    const responseData=await response.json();
-                                                    if(response.status===200){
+                                                    if(response.code===200){
                                                         toast.push(
                                                             <Notification closable type='success' duration={2000}>
-                                                                {responseData.message}
+                                                                {response.message}
                                                             </Notification>
                                                         )
                                                         window.location.reload();
@@ -227,7 +227,7 @@ const Quotations=(data : FileItemProps )=> {
                                                     else{
                                                         toast.push(
                                                             <Notification closable type='danger' duration={2000}>
-                                                                {responseData.errorMessage}
+                                                                {response.errorMessage}
                                                             </Notification>
                                                         )
                                                     }
@@ -355,23 +355,22 @@ const Quotations=(data : FileItemProps )=> {
     const handleSubmit = async (values:FormValues) => {
         setSubmit(true);
         const response=await apiGetCrmProjectShareQuotation(values);
-        const responseData=  await response.json();
         setSubmit(false);
-        if(responseData.code===200){
+        if(response.code===200){
             toast.push(
                 <Notification closable type="success" duration={2000}>
-                   {responseData.message}
+                   {response.message}
                 </Notification>
             )
         }
         else{
             toast.push(
                 <Notification closable type="danger" duration={2000}>
-                   {responseData.errorMessage}
+                   {response.errorMessage}
                 </Notification>
             )
         }
-        console.log(responseData);
+        console.log(response);
       };
      const approvedFiles = data.data?.filter(file => file.admin_status === 'approved').map(file => ({ value: file.itemId, label: file.file_name }));
 

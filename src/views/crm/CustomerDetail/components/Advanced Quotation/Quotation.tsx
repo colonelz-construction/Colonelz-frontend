@@ -49,7 +49,7 @@ const TabbedContent: React.FC<TabbedContentProps> = ({ data }) => {
 
 const YourMainComponent: React.FC = () => {
   const location = useLocation();
-  const [mainQuotationData, setMainQuotationData] = useState<MainQuotationData | null>(null);
+  const [mainQuotationData, setMainQuotationData] = useState<any>(null);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -59,6 +59,7 @@ const YourMainComponent: React.FC = () => {
       const fetchData = async () => {
         try {
           const data = await apiGetCrmSingleProjectQuotation(projectId);
+          console.log(data)
           setMainQuotationData(data);
         } catch (error) {
           console.error('Error fetching data:', error);

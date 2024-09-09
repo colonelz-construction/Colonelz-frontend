@@ -854,12 +854,12 @@ const onSelectChange = (value = 0) => {
                           formData.append('files', values.files[i]);
                         }
                         const response=await apiGetCrmFileManagerCreateLeadFolder(formData)
-                        const responseData=await response.json()
+                        // const responseData=await response.json()
                         setFormLoading(false)
                         setLoading(false)
-                        console.log(responseData);
+                        console.log(response);
                         
-                        if(responseData.code===200){
+                        if(response.code===200){
                           toast.push(
                             <Notification closable type="success" duration={2000}>
                                 Files uploaded successfully
@@ -870,7 +870,7 @@ const onSelectChange = (value = 0) => {
                     else{
                       toast.push(
                         <Notification closable type="danger" duration={2000}>
-                            {responseData.errorMessage}
+                            {response.errorMessage}
                         </Notification>,{placement:'top-center'}
                     )
                     }}

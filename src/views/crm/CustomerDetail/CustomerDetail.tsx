@@ -20,6 +20,13 @@ import Timeline from './Timeline/Timeline'
 import { AuthorityCheck } from '@/components/shared'
 import { useRoleContext } from '../Roles/RolesContext'
 import { Customer, Tasks } from './store'
+import { FileItemType } from './Quotation/Quotations'
+
+
+export type QuotationResponseType = {
+  code: number;
+  data: FileItemType[];
+}
 
 export type TaskResponse = {
   code: number;
@@ -56,7 +63,7 @@ const CustomerDetail = () => {
         mom:string
       
       }
-    const [fileData,setFileData]=useState<FileItem[]>();
+    const [fileData,setFileData]=useState<FileItemType[]>();
     const navigate = useNavigate();
     const location = useLocation();
     const role=localStorage.getItem('role');
@@ -105,6 +112,7 @@ const CustomerDetail = () => {
       const fetchDataAndLog = async () => {
         try {
           const leadData = await apiGetCrmSingleProjectQuotation(allQueryParams.project_id);
+          console.log(leadData)
           setFileData(leadData.data);
         } catch (error) {
           console.error('Error fetching lead data', error);

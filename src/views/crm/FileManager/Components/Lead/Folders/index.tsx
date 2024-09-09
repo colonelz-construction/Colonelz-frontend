@@ -667,18 +667,20 @@ const onSelectChange = (value = 0) => {
     formData.append('type',values.type)
     
     const response = await apiGetCrmFileManagerShareContractFile(formData)
+    const responseData = await response.json() 
     setSubmitting(false)
-    if(response.code===200){
+    if(responseData.code===200){
       toast.push(
         <Notification closable type="success" duration={2000}>
           Shared for approval successfully
         </Notification>,{placement:'top-center'}
       )
+      window.location.reload()
     }
     else{
       toast.push(
         <Notification closable type="danger" duration={2000}>
-          {response.errorMessage}
+          {responseData.errorMessage}
         </Notification>,{placement:'top-center'}
       )
     }

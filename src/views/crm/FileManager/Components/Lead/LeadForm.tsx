@@ -98,7 +98,7 @@ function closeAfter2000ms(data:string,type:any) {
       closeAfter2000ms('File uploaded successfully.','success');
       window.location.reload();
     } else {
-      closeAfter2000ms(`Error: ${responseData.errorMessage}`,'danger');
+      closeAfter2000ms(`Error: ${responseData.message}`,'warning');
     }
   } catch (error) {
     console.error('Error submitting form:', error);

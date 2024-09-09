@@ -62,7 +62,7 @@ const Leads = ({ data = [], className }: any) => {
         <Card className={className}>
             <div className="flex items-center justify-between mb-4">
                 <h3>Leads</h3>
-                <Button size="sm" onClick={onNavigate} variant='solid'>
+                <Button size="sm" onClick={onNavigate}>
                     View All Leads
                 </Button>
             </div>

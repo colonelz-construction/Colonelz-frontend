@@ -262,9 +262,10 @@ type Option = {
         }
         try {
             const response = await apiDeleteFileManagerFiles(postData)
-            console.log(response)
+            const responseJson = await response.json()
+            console.log(responseJson)
 
-            if (response.code===200) {
+            if (response.ok) {
                 toast.push(
                     <Notification closable type="success" duration={2000}>
                         Files deleted successfully
@@ -275,7 +276,7 @@ type Option = {
             } else {
                 toast.push(
                     <Notification closable type="danger" duration={2000}>
-                        {response.errorMessage}
+                        {responseJson.errorMessage}
                     </Notification>,
                     { placement: 'top-center' },
                 )
@@ -993,9 +994,10 @@ const onSelectChange = (value = 0) => {
                                 await apiGetCrmFileManagerCreateProjectFolder(
                                     formData,
                                 )
-                            console.log(response)
+                            const responseData = await response.json()
+                            console.log(responseData)
 
-                            if (response.code === 200) {
+                            if (responseData.code === 200) {
                                 toast.push(
                                     <Notification
                                         closable
@@ -1014,7 +1016,7 @@ const onSelectChange = (value = 0) => {
                                         type="danger"
                                         duration={2000}
                                     >
-                                        {response.errorMessage}
+                                        {responseData.errorMessage}
                                     </Notification>,
                                     { placement: 'top-center' },
                                 )

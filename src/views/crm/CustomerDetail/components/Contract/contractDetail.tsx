@@ -116,12 +116,11 @@ const ContractDetails=(data : FileItemProps )=> {
           };
         try{
             const response=await apiGetCrmProjectShareContractApproval(postData);
-            const responseData=await response.json();
             setApprovalLoading(false);
-            if(response.status===200){
+            if(response.code===200){
                 toast.push(
                     <Notification closable type='success' duration={2000}>
-                        {responseData.message}
+                        {response.message}
                     </Notification>
                 )
                 window.location.reload();
@@ -199,12 +198,11 @@ const ContractDetails=(data : FileItemProps )=> {
                                                 onSubmit={async (values, { setSubmitting }) => {
                                                     setSubmitting(true);
                                                     const response = await apiGetCrmProjectShareContractApproval(values);
-                                                    const responseData=await response.json();
                                                     setSubmitting(false);
-                                                    if(response.status===200){
+                                                    if(response.code===200){
                                                         toast.push(
                                                             <Notification closable type='success' duration={2000}>
-                                                                {responseData.message}
+                                                                {response.message}
                                                             </Notification>
                                                         )
                                                         window.location.reload();
@@ -212,7 +210,7 @@ const ContractDetails=(data : FileItemProps )=> {
                                                     else{
                                                         toast.push(
                                                             <Notification closable type='danger' duration={2000}>
-                                                                {responseData.errorMessage}
+                                                                {response.errorMessage}
                                                             </Notification>
                                                         )
                                                     }
@@ -364,7 +362,8 @@ const ContractDetails=(data : FileItemProps )=> {
         };
         try{
           const response=await apiGetCrmProjectShareQuotation(postData);
-          const responseJson=await response.json()
+          console.log(response)
+        //   const responseJson=await response.json()
           if (response.ok) {
             toast.push(
               <Notification closable type="success" duration={2000}>
@@ -411,7 +410,7 @@ const ContractDetails=(data : FileItemProps )=> {
                     {responseData.message}
                 </Notification>
             )
-            window.location.reload();
+            // window.location.reload();
         }
         else{
             toast.push(

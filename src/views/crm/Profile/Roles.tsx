@@ -166,6 +166,7 @@ const Roles = () => {
 
     const deleteRole=async(id:string)=>{
         const response=await apiDeleteRole(id)
+        console.log(response)
         if(response.code===200){
             toast.push(
                 <Notification type='success' duration={2000} closable>

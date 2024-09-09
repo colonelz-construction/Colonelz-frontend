@@ -121,12 +121,13 @@ interface ProjectUpdateData {
     setLoading(true);
     try {
       const response = await apiGetCrmSingleProjectEdit(formData);
-      const data=await response?.json()
+      console.log(response)
+      // const data=await response?.json()
       setLoading(false);
-      if (data.errorMessage) {
+      if (response?.errorMessage) {
         toast.push(
           <Notification closable type="danger" duration={2000}>
-              {data.errorMessage}
+              {response?.errorMessage}
           </Notification>
       )
     } else {

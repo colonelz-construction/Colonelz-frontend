@@ -161,13 +161,11 @@ const ArchivedUsers = () => {
     const deleteuser=async(UserId:string)=>{
         const response=await apiPermanantlyDeleteUsers(UserId);
         console.log(response);
-        const data=await response.json()
-        console.log(data);
         
-        if(data.code===200){
+        if(response.code===200){
             toast.push(
                 <Notification closable type="success" duration={2000}>
-                    {data.message}
+                    {response.message}
                 </Notification>
 
             )
@@ -176,7 +174,7 @@ const ArchivedUsers = () => {
         else{
             toast.push(
                 <Notification closable type="danger" duration={2000}>
-                    {data.errorMessage}
+                    {response.errorMessage}
                 </Notification>
             )
         }
@@ -186,9 +184,8 @@ const ArchivedUsers = () => {
     const restoreuser=async(UserId:string)=>{
         
         
-        const response=await apiRestoreDeletedUsers(UserId);
-        console.log(response);
-        const data=await response.json()
+        const data=await apiRestoreDeletedUsers(UserId);
+        console.log(data);
         console.log(data);
         
         if(data.code===200){

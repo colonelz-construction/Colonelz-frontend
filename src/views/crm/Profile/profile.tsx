@@ -29,7 +29,7 @@ export type ProfileUpdate = {
     avatar: string
 }
 
-type ProfileProps = {
+export type ProfileProps = {
     data?: ProfileFormModel | null
 }
 const validationSchema = Yup.object().shape({
@@ -59,8 +59,9 @@ const Profile = ({
         const formData = new FormData();
         formData.append('userId', values.userId);
         formData.append('file', values.avatar); 
-    
+        
         const response = await addProfilePhoto(formData); 
+
         setAvatarUrl(data?.avatar);
         toast.push(<Notification title={'Profile updated'} type="success" />, {
             placement: 'top-center',

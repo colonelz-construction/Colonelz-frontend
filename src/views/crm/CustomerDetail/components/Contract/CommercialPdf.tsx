@@ -1221,10 +1221,8 @@ const MyComponent = (data:any) => {
     formData.append('file', blob, `${data.data.file_name}.pdf`);
   
     const response = await addcontractinfileManager(formData);
-    const result = await response.json();
-  
     setIsLoading(false);
-    if(result.code===200){
+    if(response.code===200){
       toast.push(
         <Notification type='success' duration={2000}>
           Contract Created Successfully
@@ -1234,7 +1232,7 @@ const MyComponent = (data:any) => {
     else{
       toast.push(
         <Notification type='danger' duration={2000}>
-          {result.errorMessage}
+          {response.errorMessage}
         </Notification>
       )
     

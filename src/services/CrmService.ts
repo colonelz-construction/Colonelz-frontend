@@ -6,7 +6,7 @@ import { RoleResponse } from '@/views/crm/Profile/Roles';
 import { RoleList } from '@/views/crm/Roles/RolesContext';
 import { RoleAccessData } from '@/@types/navigation';
 import { LeadResponseType, UserResponse } from '@/views/crm/AddUserToLead';
-import { ProjectResponseType, ReportResponse, TaskResponse, UserList } from '@/views/crm/CustomerDetail/CustomerDetail';
+import { ProjectResponseType, QuotationResponseType, ReportResponse, TaskResponse, UserList } from '@/views/crm/CustomerDetail/CustomerDetail';
 import { FileManagerLeadType, UserListResponse } from '@/views/crm/FileManager/Components/Lead/Folders';
 import { MomResponse } from '@/views/crm/Inventory/components/DataTable';
 import { ProjectResponse } from '@/views/crm/AddMemberToProject';
@@ -106,27 +106,24 @@ export async function apiCreateRole<
 }
  
  
-    export async function apiEditRoles(data: any,id:string |null) {
+export async function apiEditRoles(data: any,id:string |null) {
+return ApiService.fetchData<any>({
+    url: `admin/update/role?id=${id}`,
+    method: 'put',
+    data,}).then(
+    (response)=>{return response.data})
+
+}
+
+export async function apiDeleteRole(id:any) {
     return ApiService.fetchData<any>({
-        url: `admin/update/role?id=${id}`,
-        method: 'put',
-        data,}).then(
-        (response)=>{return response.data})}
- 
- 
- 
-export async function apiDeleteRole(id:string |null) {
-    const response = await fetch(`${apiPrefix}admin/delete/role?id=${id}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-       
-    });
-    const responseData = await response.json();
- 
-    return responseData;}
+        url: `admin/delete/role?id=${id}`,
+        method: 'delete',
+        data: id
+    }).then(
+        (response)=>{return response.data})
+    
+}
  
  
  
@@ -143,20 +140,19 @@ export async function addProfilePhoto(data: any) {
         }
     )
 }
- 
- 
+
 export async function addcontractinfileManager(Data: any) {
-    const response = await fetch(`${apiPrefix}admin/view/contract`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
-        body: Data
-    });
- 
-    console.log("addcontractin file mainager", response)
- 
-    return response;
+    return ApiService.fetchData<any>({
+        url: 'admin/view/contract',
+        method: 'post',
+        data: Data,
+    }).then(
+        (response)=>{
+            console.log(response.data);
+            return response.data
+           
+        }
+    )
 }
  
 export async function EditPassword<
@@ -187,19 +183,16 @@ export async function apiGetUsers<T>() {
     })
 }
  
- 
-export async function apiDeleteUsers(userid: string) {
-    const response=await fetch(`${apiPrefix}admin/delete/user?userId=${userid}&id=${userId}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ userId: userId })
-    });
-    return response;
+
+export async function apiDeleteUsers(userid: any) {
+    return ApiService.fetchData<any>({
+        url: `admin/delete/user?userId=${userid}&id=${userId}`,
+        method: 'delete',
+        data: { userId: userId }
+    }).then(
+        (response)=>{return response.data})
+    
 }
- 
  
  
 export async function apiGetDeletedUsers<T>() {
@@ -227,18 +220,15 @@ export async function apiRestoreDeletedUsers(UserId: any) {
         }
     )
 }
- 
- 
-export async function apiPermanantlyDeleteUsers(userId: string) {
-    const response=await fetch(`${apiPrefix}admin/delete/archive/user`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ user_id: userId })
-    });
-    return response;
+
+export async function apiPermanantlyDeleteUsers(userid: any) {
+    return ApiService.fetchData<any>({
+        url: `admin/delete/archive/user`,
+        method: 'delete',
+        data: { user_id: userid }
+    }).then(
+        (response)=>{return response.data})
+    
 }
  
 export async function addMemberToProject(Data: any) { //Not in use
@@ -253,23 +243,15 @@ export async function addMemberToProject(Data: any) { //Not in use
         }
     )
 }
- 
- 
-export async function apiPutNotificationUpdate(notificationId: string,type:string) {
-    const response = await fetch(`${apiPrefix}admin/update/notification`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ userId: userId,type: type, notification_id: notificationId })
-    });
- 
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
+
+export async function apiPutNotificationUpdate(notificationId: any,type:any) {
+    return ApiService.fetchData<any>({
+        url: `admin/update/notification`,
+        method: 'put',
+        data: { userId: userId,type: type, notification_id: notificationId }
+    }).then(
+        (response)=>{return response.data})
+    
 }
  
 export async function apiGetUsersList<T>(projectId:string) {
@@ -353,35 +335,15 @@ export async function apiGetCrmProjectMakeContract(formData: any) {  //Not in us
     )
 }
  
-export async function apiGetCrmSingleProjectQuotation(projectId:string ) {
-    const response = await fetch(`${apiPrefix}admin/get/quotationdata/?project_id=${projectId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-       
-    });
- 
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    console.log(data)
-    return data;
+export async function apiGetCrmSingleProjectQuotation<T>(projectId:string) {
+    return ApiService.fetchData<QuotationResponseType>({
+        url: `admin/get/quotationdata/?project_id=${projectId}`,
+        method: 'get',
+    }).then((response) => {
+        console.log(response.data)
+        return response.data
+    })
 }
- 
-// export async function apiGetCrmSingleProjectQuotation<T>(projectId:string) {
-//     return ApiService.fetchData<T>({
-//         url: `admin/get/quotationdata/?project_id=${projectId}`,
-//         method: 'get',
-//     }).then((response) => {
-//         console.log(response.data)
-//         return response.data
-//     })
-// }
- 
- 
  
 export async function apiGetCrmProjectShareQuotation(formData: any) {
     return ApiService.fetchData<any>({
@@ -397,46 +359,30 @@ export async function apiGetCrmProjectShareQuotation(formData: any) {
 }
  
 export async function apiGetCrmProjectShareContractApproval(formData: any) {
-    const response = await fetch(`${apiPrefix}admin/contract/approval`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
-       
-    });
- 
-    return response;
+    return ApiService.fetchData<any>({
+        url: 'admin/contract/approval',
+        method: 'post',
+        data: formData,
+    }).then(
+        (response)=>{
+            console.log(response.data);
+            return response.data
+        }
+    )
 }
  
-// export async function apiGetCrmProjectShareContractApproval(formData: any) {
-//     return ApiService.fetchData<any>({
-//         url: 'admin/contract/approval',
-//         method: 'post',
-//         data: formData,
-//     }).then(
-//         (response)=>{
-//             console.log(response.data);
-//             return response.data
-//         }
-//     )
-// }
- 
+
 export async function apiGetCrmProjectShareQuotationApproval(formData: any) {
-    const response = await fetch(`${apiPrefix}admin/quotation/approval`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
-       
-    });
- 
-    console.log("Q approval")
- 
-    return response;
+    return ApiService.fetchData<any>({
+        url: 'admin/quotation/approval',
+        method: 'post',
+        data: formData,
+    }).then(
+        (response)=>{
+            console.log(response.data);
+            return response.data
+        }
+    )
 }
  
 export async function apiGetCrmSingleProjects<T>(projectId:string) {
@@ -457,24 +403,17 @@ export async function apiGetCrmSingleProjectReport<T>(projectId:string | null) {
         return response.data
     })
 }
- 
+
+
 export async function apiGetCrmSingleProjectEdit(formData: any) {
-    try {
-      const response = await fetch(`${apiPrefix}admin/update/project/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          ...formData,
-        }),
-      });
-      return response;
-    } catch (error) {
-      console.error('Error in apiGetCrmSingleProjectEdit:', error);
-    }
-  }
+return ApiService.fetchData<any>({
+    url: `admin/update/project`,
+    method: 'put',
+    data: {...formData}
+}).then(
+    (response)=>{return response.data})
+
+}
  
 export async function apiGetCrmProjectsMom<T>(projectId:string) {
     return ApiService.fetchData<ApiResponse>({
@@ -518,33 +457,26 @@ export async function apiGetCrmProjectsSingleTaskData<T>(projectId:string |null,
         return response.data
     })
 }
- 
-export async function apiGetCrmProjectsTaskUpdate(task:any) {
-    const response = await fetch(`${apiPrefix}admin/update/task`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(task)
-    });
-    const data = await response.json();
-    console.log('Received response from server:', data);
-    return data;
+
+  export async function apiGetCrmProjectsTaskUpdate(task: any) {
+    return ApiService.fetchData<any>({
+        url: `admin/update/task`,
+        method: 'put',
+        data: task,
+    }).then(
+        (response)=>{return response.data})
+    
 }
-export async function apiGetCrmProjectsTaskDelete(Data:any) {
-    const response = await fetch(`${apiPrefix}admin/delete/task`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(Data)
-    });
- 
-    const data = await response.json();
-    console.log('Received response from server:', data);
-    return data;
+
+
+export async function apiGetCrmProjectsTaskDelete(Data: any) {
+    return ApiService.fetchData<any>({
+        url: `admin/delete/task`,
+        method: 'delete',
+        data: Data
+    }).then(
+        (response)=>{return response.data})
+    
 }
  
 export async function apiGetCrmProjectsSubTaskData<T>(projectId:string,taskId:string) {
@@ -568,7 +500,9 @@ export async function apiGetCrmProjectsAddSubTask(Data: any) {
         }
     )
 }
- 
+
+
+//NOT IN USE ->
 export async function apiGetCrmProjectsSingleSubTaskDetails(projectId:string,taskId:string,subTaskId:string) {
     const response = await fetch(`${apiPrefix}admin/get/single/subtask?user_id=${userId}&project_id=${projectId}&task_id=${taskId}&sub_task_id=${subTaskId}`, {
         method: 'GET',
@@ -582,50 +516,37 @@ export async function apiGetCrmProjectsSingleSubTaskDetails(projectId:string,tas
     console.log('Received response from server:', data);
     return data;
 }
- 
- 
-export async function apiGetCrmProjectsSubTaskUpdate(task:any) {
-    const response = await fetch(`${apiPrefix}admin/update/subtask`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(task)
-    });
- 
-    const data = await response.json();
-    console.log('Received response from server:', data);
-    return data;
+
+
+export async function apiGetCrmProjectsSubTaskUpdate(task: any) {
+    return ApiService.fetchData<any>({
+        url: `admin/update/subtask`,
+        method: 'put',
+        data: task
+    }).then(
+        (response)=>{return response.data})
+    
 }
-export async function apiGetCrmProjectsSubTaskDelete(Data:any) {
-    const response = await fetch(`${apiPrefix}admin/delete/subtask`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(Data)
-    });
- 
-    const data = await response.json();
-    console.log('Received response from server:', data);
-    return data;
+
+export async function apiGetCrmProjectsSubTaskDelete(Data: any) {
+    return ApiService.fetchData<any>({
+        url: `admin/delete/subtask`,
+        method: 'delete',
+        data: Data
+    }).then(
+        (response)=>{return response.data})
+    
 }
- 
-export async function apiGetCrmProjectsSingleSubTaskTimer(Data:any) {
-    const response = await fetch(`${apiPrefix}admin/update/subtask/time`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(Data)
-    });
- 
-    const data = await response.json();
-    console.log('Received response from server:', data);
-    return data;
+
+
+export async function apiGetCrmProjectsSingleSubTaskTimer(Data: any) {
+    return ApiService.fetchData<any>({
+        url: `admin/update/subtask/time`,
+        method: 'put',
+        data: Data
+    }).then(
+        (response)=>{return response.data})
+    
 }
  
 export async function apiGetCrmProjectsSingleSubTaskDataTimer<T>(projectId:string,taskId:string,subTaskId:string) {
@@ -667,25 +588,7 @@ export async function apiGetCrmFileManagerArchive<T>(userId:string | null) {
     })
 }
  
-export async function apiGetCrmFileManagerArchiveRestore(Formdata:any) {
-    const response = await fetch(`${apiPrefix}admin/restore/file`, {
-        method: 'Post',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(Formdata)
-       
-    });
- 
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
-}
- 
-export async function apiGetCrmFileManagerArchiveRestore2(Formdata: any) {
+export async function apiGetCrmFileManagerArchiveRestore(Formdata: any) {
     return ApiService.fetchData<any>({
         url: 'admin/restore/file',
         method: 'post',
@@ -697,24 +600,15 @@ export async function apiGetCrmFileManagerArchiveRestore2(Formdata: any) {
         }
     )
 }
- 
+
 export async function apiGetCrmFileManagerDeleteArchiveFiles(postData: any) {
-    const response = await fetch(`${apiPrefix}admin/delete/archive`, {
-        method: 'Delete',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(postData)
-       
-    });
- 
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    console.log('Received response from server:', data);
-    return data;
+    return ApiService.fetchData<any>({
+        url: `admin/delete/archive`,
+        method: 'delete',
+        data: postData
+    }).then(
+        (response)=>{return response.data})
+    
 }
  
 export async function apiGetCrmFileManagerProjects<T>(projectId:string | null) {
@@ -726,18 +620,18 @@ export async function apiGetCrmFileManagerProjects<T>(projectId:string | null) {
         return response.data
     })
 }
- 
-export async function apiGetCrmFileManagerCreateLeadFolder(formData: any) {
-    const response = await fetch(`${apiPrefix}admin/fileupload/`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
-        body: formData
-       
-    });
- 
-    return response;
+
+export async function apiGetCrmFileManagerCreateLeadFolder(Formdata: any) {
+    return ApiService.fetchData<any>({
+        url: 'admin/fileupload/',
+        method: 'post',
+        data: Formdata,
+    }).then(
+        (response)=>{
+            console.log(response.data);
+            return response.data
+        }
+    )
 }
  
  

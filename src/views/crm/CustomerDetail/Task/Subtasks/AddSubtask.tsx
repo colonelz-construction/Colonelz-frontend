@@ -222,6 +222,7 @@ const priorityOptions = [
                                 <Field name='estimated_sub_task_end_date' placeholder='End Date'>
                                     {({field}:any)=>(
                                         <DatePicker name='estimated_sub_task_end_date'
+                                        maxDate={new Date(data.estimated_task_end_date)}
                                         onChange={(value) => { field.onChange({ target: {name:'estimated_sub_task_end_date', value: `${value }`} }) }}
                                         />
                                     )}

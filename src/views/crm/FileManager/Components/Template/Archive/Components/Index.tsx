@@ -198,7 +198,8 @@ const PaginationTable = () => {
         console.log(postData);
         
         try {
-          await apiGetCrmFileManagerDeleteArchiveFiles(postData);
+          const response = await apiGetCrmFileManagerDeleteArchiveFiles(postData);
+          console.log(response)
 
           toast.push(
             <Notification closable type="success" duration={2000}>

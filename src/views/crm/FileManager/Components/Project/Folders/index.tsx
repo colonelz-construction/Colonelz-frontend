@@ -313,9 +313,9 @@ type Option = {
         }
 
         const response = await apiGetCrmProjectShareQuotation(postData)
-        const responseJson = await response.json()
+        // const responseJson = await response.json()
         setApprovalLoading(false)
-        if (responseJson.code === 200) {
+        if (response.code === 200) {
             toast.push(
                 <Notification closable type="success" duration={2000}>
                     File shared successfully
@@ -326,7 +326,7 @@ type Option = {
         } else {
             toast.push(
                 <Notification closable type="danger" duration={2000}>
-                    {responseJson.errorMessage}
+                    {response.errorMessage}
                 </Notification>,
                 { placement: 'top-center' },
             )

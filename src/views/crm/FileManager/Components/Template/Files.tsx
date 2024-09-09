@@ -215,10 +215,9 @@ const onDialogClose3 = () => {
     };
     try {
       const response=await apiDeleteFileManagerFiles(postData);
-      const responseJson=await response.json()
-      console.log(responseJson);
+      console.log(response);
       
-      if (response.ok) {
+      if (response.code===200) {
         toast.push(
           <Notification closable type="success" duration={2000}>
             Files deleted successfully
@@ -229,7 +228,7 @@ const onDialogClose3 = () => {
       else{
         toast.push(
           <Notification closable type="danger" duration={2000}>
-            {responseJson.errorMessage}
+            {response.errorMessage}
           </Notification>,{placement:'top-center'}
         )
       }
@@ -758,11 +757,10 @@ const onSelectChange = (value = 0) => {
                           formData.append('files', values.files[i]);
                         }
                         const response=await apiGetCrmFileManagerCreateTemplateFolder(formData)
-                        const responseData=await response.json()
                         setSubmitting(false)
-                        console.log(responseData);
+                        console.log(response);
                         
-                        if(responseData.code===200){
+                        if(response.code===200){
                           toast.push(
                             <Notification closable type="success" duration={2000}>
                                 Files uploaded successfully
@@ -773,7 +771,7 @@ const onSelectChange = (value = 0) => {
                     else{
                       toast.push(
                         <Notification closable type="danger" duration={2000}>
-                            {responseData.errorMessage}
+                            {response.errorMessage}
                         </Notification>,{placement:'top-center'}
                     )
                     }}

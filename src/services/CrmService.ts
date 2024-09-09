@@ -701,61 +701,41 @@ export async function apiGetCrmFileManagerCreateLeadFolder(formData: any) {
     return response;
 }
 
-export async function apiDeleteFileManagerFolders(postData: any) {     
-    const response = await fetch(`${apiPrefix}admin/delete/folder`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(postData)
+export async function apiDeleteFileManagerFolders(data: any) {
+    return ApiService.fetchData<any>({
+        url: 'admin/delete/folder',
+        method: 'delete',
+        data,
+    }).then((response) => {
+        return response.data;
     });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return response;
 }
-export async function apiDeleteFileManagerFiles(postData: any) {     
-    const response = await fetch(`${apiPrefix}admin/delete/file/`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(postData)
+export async function apiDeleteFileManagerFiles(data: any) {
+    return ApiService.fetchData<any>({
+        url: 'admin/delete/file',
+        method: 'delete',
+        data,
+    }).then((response) => {
+        return response.data;
     });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return response;
 }
-export async function apiGetCrmFileManagerCreateProjectFolder(formData: any) {
-    const response = await fetch(`${apiPrefix}admin/project/fileupload`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
-        body: formData
-        
+export async function apiGetCrmFileManagerCreateProjectFolder(data: any) {
+    return ApiService.fetchData<any>({
+        url: 'admin/project/fileupload',
+        method: 'post',
+        data,
+    }).then((response) => {
+        return response.data;
     });
-
-    return response;
 }
-export async function apiGetCrmFileManagerCreateTemplateFolder(formData: any) {
-    const response = await fetch(`${apiPrefix}admin/template/fileupload`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
-        body: formData
-        
+export async function apiGetCrmFileManagerCreateTemplateFolder(data: any) {
+    return ApiService.fetchData<any>({
+        url: 'admin/template/fileupload',
+        method: 'post',
+        data,
+    }).then((response) => {
+        return response.data;
     });
-
-    return response;
 }
 
 export async function apiGetCrmFileManagerLeads<T>(leadId:string | null) {
@@ -779,34 +759,28 @@ export async function apiGetCrmContractDetails<T>(leadId:string | null) {
 }
 
 
-export async function apiGetCrmFileManagerShareFiles(formData: any) {
-    const response = await fetch(`${apiPrefix}admin/share/file`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
-        
+
+
+
+export async function apiGetCrmFileManagerShareFiles(data: any) {
+    return ApiService.fetchData<any>({
+        url: 'admin/share/file',
+        method: 'post',
+        data,
+    }).then((response) => {
+        return response.data;
     });
-    const data = await response.json();
-
-    return data;
-
 }
-export async function apiGetCrmFileManagerShareContractFile(formData: any) {
-    const response = await fetch(`${apiPrefix}admin/share/contract`, {
-        method: 'POST',
-        headers: {
-            
-            'Authorization': `Bearer ${token}`
-        },
-        body: (formData)
-        
+export async function apiGetCrmFileManagerShareContractFile(data: any) {
+    return ApiService.fetchData<any>({
+        url: 'admin/share/contract',
+        method: 'post',
+        data,
+    }).then((response) => {
+        return response.data;
     });
-
-    return response;
 }
+
 
 export async function apiGetCrmLeads<T>() {
     return ApiService.fetchData<LeadResponseType>({

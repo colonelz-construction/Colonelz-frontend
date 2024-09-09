@@ -3,6 +3,14 @@ import { apiGetCrmProjectsTaskData } from '@/services/CrmService'
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
+type TaskData = {
+    task_name: string;
+    estimated_task_start_date: string;
+    estimated_task_end_date: string;
+    actual_task_start_date: string;
+    actual_task_end_date: string;   
+}
+
 const Timeline = () => {
     const location=useLocation()
     const queryParams = new URLSearchParams(location.search);

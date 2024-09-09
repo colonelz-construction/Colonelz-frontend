@@ -90,13 +90,6 @@ const YourFormComponent: React.FC = () => {
       
     }
 }
-function closeAfter2000ms(data:string,type:string) {
-  toast.push(
-      <Notification closable type={type} duration={2000}>
-          {data}
-      </Notification>,{placement:'top-center'}
-  )
-}
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -123,21 +116,30 @@ function closeAfter2000ms(data:string,type:string) {
 
     try {
       const response = await apiGetCrmFileManagerCreateTemplateFolder(postData);
-
-    
-      const responseData = await response.json();
       setSubmitting(false); 
   
-      if (response.ok) {
-        closeAfter2000ms('File uploaded successfully.','success');
+      if (response.code === 200) {
+       toast.push(
+        <Notification closable type="success" duration={2000}>
+          {response.message}
+        </Notification>,
+       )
       
         window.location.reload();
       } else {
-        closeAfter2000ms(`Error: ${responseData.message}`,'warning');
+        toast.push(
+          <Notification closable type="warning" duration={2000}>
+            {response.message}
+          </Notification>,
+        );
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      closeAfter2000ms('An error occurred while submitting the form.','warning');
+      toast.push(
+        <Notification closable type="danger" duration={2000}>
+          "Internal Server Error"
+        </Notification>,
+      );
     }
   };
 

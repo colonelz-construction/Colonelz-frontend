@@ -13,6 +13,9 @@ import { HiOutlinePencil } from 'react-icons/hi'
 import Report from '../Project Progress/Report'
 import { useRoleContext } from '../../Roles/RolesContext'
 import { AuthorityCheck } from '@/components/shared'
+import * as Yup from 'yup'
+import { Field, Form, Formik } from 'formik'
+import { format } from 'date-fns'
 
 
 type CustomerInfoFieldProps = {
@@ -78,6 +81,7 @@ interface ProjectUpdateData {
     project_status:string;
     timeline_date:string;
     designer:string
+    email: string;
   }
   const ProjectUpdate: React.FC<Data> = (data) => {
     const location=useLocation()
@@ -85,71 +89,14 @@ interface ProjectUpdateData {
     const projectId = searchParams.get('project_id');
     const userId = localStorage.getItem('userId');
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState<ProjectUpdateData>({
-      user_id:userId,
-      project_id: projectId,
-      timeline_date: new Date(data.data.timeline_date).toISOString().split('T')[0],
-      project_budget: data.data.project_budget,
-      project_status:data.data.project_status,
-      designer:data.data.designer
-    });
+    const validationSchema = Yup.object().shape({
+      project_budget: Yup.string().required('Project Budget is required'),
+      designer: Yup.string().required('Designer is required'),
+      timeline_date: Yup.string().required('Timeline Date is required'),
+      project_status: Yup.string().required('Project Status is required'),
+      client_email: Yup.string().email('Invalid email').required('Client Email is required')
+  });
   
- 
-   
-  
-    const handleInputChange = (
-      e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-    ) => {
-      setFormData({
-        ...formData,
-        [e.target.name]: e.target.value,
-      });
-    };
-    const handleDateChange = (date: Date | null) => {
-      if (date) {
-          date.setHours(date.getHours() + 5);
-          date.setMinutes(date.getMinutes() + 30);
-          setFormData({
-              ...formData,
-              timeline_date: date.toISOString().split('T')[0],
-          });
-      }
-  };
-  
-
-  const handleUpdate = async () => {
-    setLoading(true);
-    try {
-      const response = await apiGetCrmSingleProjectEdit(formData);
-      console.log(response)
-      // const data=await response?.json()
-      setLoading(false);
-      if (response?.errorMessage) {
-        toast.push(
-          <Notification closable type="danger" duration={2000}>
-              {response?.errorMessage}
-          </Notification>
-      )
-    } else {
-        toast.push(
-            <Notification closable type="success" duration={2000}>
-             Project Updated Successfully
-          </Notification>
-      )
-      window.location.reload()
-      }
-    } catch (error) {
-      setLoading(false);
-      toast.push(
-        <Notification closable type="danger" duration={2000}>
-           Error updating project status
-        </Notification>
-    )
-    }
-  };
-  
-
-
     const projectStatusOptions = [
       { value: 'completed', label: 'Completed' },
       { value: 'designing', label: 'Designing' },
@@ -158,67 +105,151 @@ interface ProjectUpdateData {
   
     return (
       <div className='max-h-96 overflow-y-auto mt-6'>
-        <form>
+        <Formik
+        initialValues={{
+          user_id: userId,
+          project_id: projectId,
+          project_budget:data.data.project_budget,
+          designer:data.data.designer,
+          timeline_date:new Date(data.data.timeline_date),
+          project_status:data.data.project_status,
+          client_email:data.data.client[0].client_email
+        }}
+        validationSchema={validationSchema}
+        onSubmit={
+          async(values,{setSubmitting})=>{
+            console.log(values);
+            
+            try {
+              const response = await apiGetCrmSingleProjectEdit(values);
+              console.log(response)
+              setSubmitting(false);
+              if (response?.errorMessage) {
+                toast.push(
+                  <Notification closable type="danger" duration={2000}>
+                      {response?.errorMessage}
+                  </Notification>
+              )
+            } else {
+                toast.push(
+                    <Notification closable type="success" duration={2000}>
+                     Project Updated Successfully
+                  </Notification>
+              )
+              window.location.reload()
+              }
+            } catch (error) {
+              setSubmitting(false);
+              toast.push(
+                <Notification closable type="danger" duration={2000}>
+                   Error updating project status
+                </Notification>
+            )
+            }
+          }
+        }
+        >
+          {({ values, isSubmitting, errors,touched }:any) => (
+            <Form>
           <h3 className=' mb-3'>Edit Project</h3>
-        <FormItem label="Timeline Date">
+        <FormItem label='Client Email'
+        asterisk
+        invalid={errors.client_email && touched.client_email}
+        errorMessage={errors.client_email}
+        >
+           <Field>
+            {({ field, form }: any) => (
+              <Input
+                type='text'
+                name='client_email'
+                value={values.client_email}
+              onChange={(e)=>form.setFieldValue('client_email',e.target.value)}
+              />
+            )}
+           </Field>
+          </FormItem>
+        <FormItem label='Timeline Date'
+        asterisk
+        invalid={errors.timeline_date && touched.timeline_date}
+        errorMessage={errors.timeline_date}
+        >
+          <Field>
+          {({field,form}:any) => (
           <DatePicker
-            value={new Date(formData.timeline_date)}
-            onChange={handleDateChange}
+          name='timeline_date'
+          minDate={new Date(data.data.project_start_date)}
+          inputFormat='DD-MM-YYYY'
+          value={values.timeline_date}
+          onChange={(date) => form.setFieldValue('timeline_date', `${date}`)}
           />
-        </FormItem>
-          <br />
-          <FormItem label='Project Budget'>
-            
+          )}
+          </Field>
+          </FormItem>
+
+         <FormItem label='Project Budget'
+          asterisk
+          invalid={errors.project_budget && touched.project_budget}
+          errorMessage={errors.project_budget}
+          >
+            <Field>
+            {({field,form}:any) => (
             <Input
-              type="text"
-              name="project_budget"
-              value={formData.project_budget}
-              onChange={handleInputChange}
+            type='text'
+            name='project_budget'
+            value={values.project_budget}
+            onChange={(e)=>form.setFieldValue('project_budget',e.target.value)}
+            onKeyPress={(e) => {
+              const charCode = e.which ? e.which : e.keyCode;
+              if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                e.preventDefault();
+              }
+            }}
             />
+            )}
+            </Field>
           </FormItem>
-          <FormItem label='Project Incharge'>
-            
+         
+          <FormItem label='Project Incharge'
+          asterisk
+          invalid={errors.designer && touched.designer}
+          errorMessage={errors.designer}
+          >
+            <Field>
+            {({field,form}:any) => (
             <Input
-              type="text"
-              name="designer"
-              value={formData.designer}
-              onChange={handleInputChange}
+            type='text'
+            name='designer'
+            value={values.designer}
+            onChange={(e)=>form.setFieldValue('designer',e.target.value)}
             />
-          </FormItem>
-          <br />
-          <FormItem>
-            Project Status:
-            <Select 
-                        options={projectStatusOptions}
-                        value={projectStatusOptions.find(
-                            (option) =>
-                                option.value === formData.project_status,
-                        )}
-                        onChange={(selectedOption) => {
-                            setFormData({
-                                ...formData,
-                                project_status: selectedOption
-                                    ? (
-                                          selectedOption as {
-                                              value: string
-                                              label: string
-                                          }
-                                      ).value
-                                    : '',
-                            })
-                          }}
-                    />
-          </FormItem>
-          <br />
-          <Button type="button" 
+            )}
+            </Field>
+            </FormItem>
+         
+          <FormItem label='Project Status'
+          asterisk
+          invalid={errors.project_status && touched.project_status}
+          errorMessage={errors.project_status}
+          >
+            <Field>
+            {({field,form}:any) => (
+            <Select
+            options={projectStatusOptions}
+            value={projectStatusOptions.find(option=>option.value===values.project_status)}
+            onChange={(value) => form.setFieldValue('project_status', value?.value)}
+            />
+            )}
+            </Field>
+            </FormItem>
+          <Button type="submit" 
            variant='solid'
-             onClick={handleUpdate}
-             loading={loading}
+             loading={isSubmitting}
              block
            >
-            {loading?"Updating...":"Update Project"}
+            {isSubmitting?"Updating...":"Update Project"}
           </Button>
-        </form>
+          </Form>)}
+        </Formik>
       </div>
     );
   };

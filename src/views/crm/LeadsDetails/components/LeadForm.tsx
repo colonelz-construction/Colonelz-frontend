@@ -59,7 +59,7 @@ const LeadForm = () => {
       
       toast.push(
         <Notification type='success' duration={2000} closable>
-          Lead Updated Successfully
+          Lead Status Updated Successfully
         </Notification>
       )
       window.location.reload()

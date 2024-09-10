@@ -50,7 +50,16 @@ const EditLead = ({ details }: any) => {
           lead_manager: data.lead_manager,
         }}
         validationSchema={Yup.object().shape({
-         
+         lead_name: Yup.string().required('Lead Name is required'),
+          email: Yup.string().email('Invalid email').required('Email is required'),
+          phone: Yup.string()
+          .required('Phone is required')
+          .matches(/^[0-9]*$/, 'Phone number must be numeric')
+          .length(10, 'Phone number must be exactly 10 digits'),          
+          location: Yup.string().required('Location is required'),
+          source: Yup.string().required('Source is required'),
+          lead_manager: Yup.string().required('Lead Manager is required'),
+
         })}
         onSubmit={async (values: any, { setSubmitting }) => {
           setSubmitting(true);
@@ -75,17 +84,30 @@ const EditLead = ({ details }: any) => {
           setSubmitting(false);
         }}
       >
-        {({ values, isSubmitting, errors }) => (
+        {({ values, isSubmitting, errors,touched }:any) => (
           <Form className='max-h-96 overflow-y-auto'>
-            <FormItem label='Lead Name'>
+            <FormItem label='Lead Name'
+            asterisk={true}
+            invalid={errors.lead_name && touched.lead_name}
+            errorMessage={errors.lead_name}
+
+            >
               <Field component={Input} name='lead_name' placeholder='Enter Lead Name' />
             </FormItem>
 
-            <FormItem label='Email'>
+            <FormItem label='Email'
+            asterisk={true}
+            invalid={errors.email && touched.email}
+            errorMessage={errors.email}
+            >
               <Field component={Input} name='email' placeholder='Enter Email' />
             </FormItem>
 
-            <FormItem label='Phone'>
+            <FormItem label='Phone'
+            asterisk
+            invalid={errors.phone && touched.phone}
+            errorMessage={errors.phone}
+            >
               <Field name='phone' placeholder=''>
                 {({ field, form }: any) => (
                   <Input
@@ -108,19 +130,35 @@ const EditLead = ({ details }: any) => {
               </Field>
             </FormItem>
 
-            <FormItem label='Location'>
+            <FormItem label='Location'
+            asterisk
+            invalid={errors.location && touched.location}
+            errorMessage={errors.location}
+            >
               <Field component={Input} name='location' placeholder='Enter location' />
             </FormItem>
 
-            <FormItem label='Source'>
+            <FormItem label='Source'
+            asterisk
+            invalid={errors.source && touched.source}
+            errorMessage={errors.source}
+            >
               <Field component={Input} name='source' placeholder='Enter Source' />
             </FormItem>
 
-            <FormItem label='Lead Manager'>
+            <FormItem label='Lead Manager'
+            asterisk
+            invalid={errors.lead_manager && touched.lead_manager}
+            errorMessage={errors.lead_manager}
+            >
               <Field component={Input} name='lead_manager' placeholder='Enter lead manager' />
             </FormItem>
 
-            <FormItem label='Created Date'>
+            <FormItem label='Created Date'
+            asterisk
+            invalid={errors.date && touched.date}
+            errorMessage={errors.date}
+            >
               <Field name='date'>
                 {({ field, form }: any) => (
                   <DateTimepicker

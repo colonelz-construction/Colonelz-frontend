@@ -22,7 +22,7 @@ const Activity = ({ Data} : CustomerProfileProps) => {
     <Card className=''>
         <h4 className='font-bold capitalize py-3'>Project Activity</h4>
             <Timeline className='mt-4'>
-                {Data.project_updated_by.map((item, index) => (
+                {Data.project_updated_by.reverse().map((item, index) => (
             <Timeline.Item  media={
                         <TimelineAvatar className="bg-amber-500">
                             {item.username[0]}

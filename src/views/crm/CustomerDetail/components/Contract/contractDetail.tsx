@@ -402,24 +402,24 @@ const ContractDetails=(data : FileItemProps )=> {
             formData.append('quotation',file);
         })
         const response=await apiGetCrmFileManagerShareContractFile(formData);
-        const responseData=  await response.json();
+        // const responseData=  await response.json();
         setLoading(false);
-        if(response.status===200){
+        if(response.code===200){
             toast.push(
                 <Notification closable type='success' duration={2000}>
-                    {responseData.message}
+                    {response.message}
                 </Notification>
             )
-            // window.location.reload();
+            window.location.reload();
         }
         else{
             toast.push(
                 <Notification closable type='danger' duration={2000}>
-                    {responseData.errorMessage}
+                    {response.errorMessage}
                 </Notification>
             )
         }
-        console.log(responseData);
+        console.log(response);
         
       };
      

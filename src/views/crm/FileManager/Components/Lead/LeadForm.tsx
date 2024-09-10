@@ -94,7 +94,7 @@ function closeAfter2000ms(data:string,type:any) {
 
     console.log('Response Data:', response);
 
-    if (response.code===true) {
+    if (response.code===200) {
       closeAfter2000ms('File uploaded successfully.','success');
       window.location.reload();
     } else {

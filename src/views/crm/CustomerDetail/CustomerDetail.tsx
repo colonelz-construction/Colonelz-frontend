@@ -10,7 +10,7 @@ import TabNav from '@/components/ui/Tabs/TabNav'
 import TabContent from '@/components/ui/Tabs/TabContent'
 import { useLocation, useNavigate } from 'react-router-dom'
 import AllMom from './components/MOM/AllMom'
-import {  apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList } from '@/services/CrmService'
+import {  apiGetCrmProjectsMom, apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList } from '@/services/CrmService'
 import { FileItem } from '../FileManager/Components/Project/data'
 import Index from './Quotation'
 import { ProjectProvider } from '../Customers/store/ProjectContext'
@@ -95,7 +95,6 @@ const CustomerDetail = () => {
                 const Report = await apiGetCrmSingleProjectReport(allQueryParams.project_id);
                 const list=await apiGetUsersList(allQueryParams.project_id)                
                 const data = response
-                setDetails(data.data[0]);
                 setLoading(false);
                 setReport(Report)
                 setUsers(list.data)
@@ -114,6 +113,20 @@ const CustomerDetail = () => {
           const leadData = await apiGetCrmSingleProjectQuotation(allQueryParams.project_id);
           console.log(leadData)
           setFileData(leadData.data);
+        } catch (error) {
+          console.error('Error fetching lead data', error);
+        }
+      };
+  
+      fetchDataAndLog();
+    }, [allQueryParams.project_id, quotationAccess]);
+    useEffect(() => {
+      if (!momAccess) return;
+  
+      const fetchDataAndLog = async () => {
+        try {
+          const response = await apiGetCrmProjectsMom(allQueryParams.project_id);
+          setDetails(response.data);
         } catch (error) {
           console.error('Error fetching lead data', error);
         }

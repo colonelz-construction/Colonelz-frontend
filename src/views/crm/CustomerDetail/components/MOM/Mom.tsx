@@ -8,7 +8,6 @@ import {
     flexRender,
 } from '@tanstack/react-table';
 import { HiOutlineChevronRight, HiOutlineChevronDown } from 'react-icons/hi';
-import type { MomData } from './data';
 import type { ColumnDef, Row, ColumnSort, FilterFn } from '@tanstack/react-table';
 import type { InputHTMLAttributes, ReactElement } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -21,6 +20,7 @@ import { useRoleContext } from '@/views/crm/Roles/RolesContext';
 import { AuthorityCheck } from '@/components/shared';
 import formateDate from '@/store/dateformate';
 import NoData from '@/views/pages/NoData';
+import { DataType, MomDataType } from '../../store/MomContext';
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number;
@@ -83,19 +83,7 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 type ReactTableProps<T> = {
     renderRowSubComponent: (props: { row: Row<T> }) => ReactElement;
     getRowCanExpand: (row: Row<T>) => boolean;
-    data: Data;
-};
-type Client={
-    client_name:string
-}
-
-type Data = {
-    client: Client[];
-    mom: MomData[];
-};
-
-type MOM = {
-    mom_id: string;
+    data: DataType;
 };
 
 const { Tr, Th, Td, THead, TBody } = Table;
@@ -103,19 +91,23 @@ type Option={
     value:number;
     label:string;
   }
+type Data={
+    data:DataType
+}
 
 function ReactTable({
     renderRowSubComponent,
     getRowCanExpand,
     data
-}: ReactTableProps<MomData>) {
+}: ReactTableProps<MomDataType>) {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+
     console.log(data);
     
 
-    const columns = useMemo<ColumnDef<MomData>[]>(
+    const columns = useMemo<ColumnDef<MomDataType>[]>(
         () => [
             {
                 header: () => null,
@@ -147,11 +139,11 @@ function ReactTable({
                 accessorKey: 'client_name',
                 cell: (props) => {
                     const row = props.row.original;
-                    const clientNames = Array.isArray(row.attendees?.client_name)
+                    const clientNames = Array.isArray(row)
                         ? row.attendees.client_name
                         : [row.attendees.client_name];
 
-                    return <span>{clientNames.join(', ')}</span>;
+                    return <span>{clientNames?.join(', ')}</span>;
                 },
             },
             {
@@ -174,8 +166,10 @@ function ReactTable({
     );
 
     const location = useLocation();
-    const  leadData  = data.mom
+    const  leadData  = data.mom_data
+    
     const {roleData}=useRoleContext()
+
     
     const projectId = new URLSearchParams(location.search).get('project_id');
 
@@ -197,8 +191,9 @@ function ReactTable({
     }
     
 
+
     const table = useReactTable({
-        data: leadData || [],
+        data: leadData ?? [],
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -222,7 +217,7 @@ function ReactTable({
     const { DatePickerRange } = DatePicker;
     const filteredRows = table.getRowModel().rows.filter((row) => {
         const [startDate, endDate] = dateRange;
-        const rowDate = new Date(row.original.meetingdate); // Adjust according to your data structure
+        const rowDate = new Date(row.original?.meetingdate); // Adjust according to your data structure
         const start = startDate ? new Date(startDate) : null;
         const end = endDate ? new Date(endDate) : null;
     
@@ -260,7 +255,7 @@ function ReactTable({
                     variant="solid"
                     onClick={() =>
                         navigate(
-                            `/app/crm/project/momform?project_id=${projectId}&client_name=${data.client[0].client_name}`,
+                            `/app/crm/project/momform?project_id=${projectId}&client_name=${data?.client_name}`,
                         )
                     }
                 >
@@ -364,7 +359,7 @@ function ReactTable({
 
 
 
-const renderSubComponent = ({ row }: { row: Row<MomData> }) => {
+const renderSubComponent = ({ row }: { row: Row<MomDataType> }) => {
   const rowData = row.original;
  
   const files = Array.isArray(rowData.files) ? rowData.files : [];

@@ -97,7 +97,7 @@ const LeadForm: React.FC = () => {
             <FormItem label='Lead Name'
             asterisk
             invalid={errors.name && touched.name}
-            
+            errorMessage={errors.name}
             >
                 <Field
                 name='name'
@@ -119,7 +119,7 @@ const LeadForm: React.FC = () => {
                         />
                     )}
                 </Field>
-                <div className='text-red-500'>{errors.name}</div>
+              
             </FormItem>
 
             <FormItem label='Email'
@@ -128,10 +128,19 @@ const LeadForm: React.FC = () => {
             errorMessage={errors.email}
             >
                 <Field
-                component={Input}
                 name='email'
                 placeholder='Enter email'
-                />
+                >
+                    {({ field,form }:any) => (
+                        <Input
+                        name='email'
+                        placeholder='Enter email'
+                        onChange={(e) => {
+                            form.setFieldValue(field.name, e.target.value)
+                        }}
+                        />
+                    )}
+                </Field>
             </FormItem>
 
             <FormItem label='Phone'
@@ -170,10 +179,19 @@ const LeadForm: React.FC = () => {
             errorMessage={errors.location}
             >
                 <Field
-                component={Input}
                 name='location'
                 placeholder='Enter location'
-                />
+                >
+                    {({ field,form }:any) => (
+                        <Input
+                        name='location'
+                        placeholder='Enter location'
+                        onChange={(e) => {
+                            form.setFieldValue(field.name, e.target.value)
+                        }}
+                        />
+                    )}
+                </Field>
             </FormItem>
 
             <FormItem label='Lead Manager'
@@ -182,10 +200,19 @@ const LeadForm: React.FC = () => {
             errorMessage={errors.lead_manager}
             >
                 <Field
-                component={Input}
                 name='lead_manager'
                 placeholder='Enter lead manager'
-                />
+                >
+                    {({ field,form }:any) => (
+                        <Input
+                        name='lead_manager'
+                        placeholder='Enter lead manager'
+                        onChange={(e) => {
+                            form.setFieldValue(field.name, e.target.value)
+                        }}
+                        />
+                    )}
+                </Field>
             </FormItem>
 
             <FormItem label='Lead Status'
@@ -212,9 +239,6 @@ const LeadForm: React.FC = () => {
             </FormItem>
 
             <FormItem label='Source'
-            asterisk
-            invalid={errors.source && touched.source}
-            errorMessage={errors.source}
             >
                 <Field
                 name='source'

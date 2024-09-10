@@ -53,7 +53,7 @@ const App = () => {
   }
 
   const location = useLocation();
-  const [data, setdata] = useState<MomDataType[]>();
+  const [data, setdata] = useState<MomDataType[] | []>([]);
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const projectId = searchParams.get('project_id');

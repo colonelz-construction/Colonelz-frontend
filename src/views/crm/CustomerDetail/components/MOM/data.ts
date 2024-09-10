@@ -1,5 +1,3 @@
-
-
 export type Attendees = {
   client_name: string[] | null;
   organisor: string[];

@@ -259,6 +259,7 @@ interface ProjectUpdateData {
 const CustomerProfile = ({ data,report }: CustomerProfileProps) => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const {roleData} = useRoleContext()
+    console.log(data)
 
     const openDialog = () => {
         setIsOpen(true)

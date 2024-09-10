@@ -75,8 +75,10 @@ const CustomerDetail = () => {
       mom: queryParams.get('type') || '',
     };
     const [details, setDetails] = useState<any | null>(null);
+    const [projectData,setProjectData]=useState<Customer[]>([])
     const [task,setTaskData]=useState<Tasks[]>([])
     const [report,setReport]=useState<ReportResponse>()
+    const [activity,setActivity]=useState<any>()
     const [users,setUsers]=useState<string[]>([])
     const quotationAccess = roleData?.data?.quotation?.read?.includes(`${localStorage.getItem('role')}`)
     const momAccess = roleData?.data?.mom?.read?.includes(`${localStorage.getItem('role')}`)
@@ -95,6 +97,9 @@ const CustomerDetail = () => {
                 const Report = await apiGetCrmSingleProjectReport(allQueryParams.project_id);
                 const list=await apiGetUsersList(allQueryParams.project_id)                
                 const data = response
+                console.log(data);
+                setActivity(data.data)
+                setProjectData(data.data)
                 setLoading(false);
                 setReport(Report)
                 setUsers(list.data)
@@ -155,7 +160,7 @@ const CustomerDetail = () => {
       
       return (
         <>
-        <h3 className='pb-5 capitalize'>Project-{loading?<Skeleton width={100}/>:details?details.project_name:""}</h3>
+        <h3 className='pb-5 capitalize flex items-center'><span>Project-</span>{loading?<Skeleton width={100}/>:projectData[0].project_name}</h3>
         <div>
       
        
@@ -189,7 +194,7 @@ const CustomerDetail = () => {
                 <TabContent value="details">
                   {loading ? <Skeleton width={150}/> :
                     <Container>
-                        <CustomerProfile data={details} report={report}/>
+                        <CustomerProfile data={projectData[0]} report={report}/>
                     </Container>}
                 </TabContent>
                 <TabContent value="Quotation">
@@ -203,7 +208,7 @@ const CustomerDetail = () => {
                   <Task task={task} users={users}/>
                 </TabContent>
                 <TabContent value="activity">
-                  <Activity Data={details} />
+                  <Activity Data={activity[0]} />
                 </TabContent>
                 <TabContent value="timeline">
                   <Timeline/>

@@ -23,6 +23,7 @@ import { ContractResponseType } from '@/views/crm/CustomerDetail/components/Cont
 import { LeadDetailsResponse } from '@/views/crm/LeadsDetails/LeadDetail';
 import { ArchiveUserResponseType } from '@/views/crm/users/ArchivedUsers';
 import { ProfileProps } from '@/views/crm/Profile/profile';
+import { LeadApiResponse } from '@/views/crm/LeadList/store/LeadContext';
  
 const { apiPrefix } = appConfig
 const token = localStorage.getItem('auth');
@@ -716,7 +717,7 @@ export async function apiGetCrmFileManagerShareContractFile(data: any) {
 }
  
 export async function apiGetCrmLeads<T>() {
-    return ApiService.fetchData<LeadResponseType>({
+    return ApiService.fetchData<LeadApiResponse>({
         url: `admin/getall/lead/`,
         method: 'get',
     }).then((response) => {

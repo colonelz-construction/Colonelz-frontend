@@ -16,7 +16,7 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
-import { apiGetCrmLeads, apiGetCrmProjectsTaskData, apiGetCrmProjectsTaskDelete, apiGetUsersList } from '@/services/CrmService'
+import {  apiGetCrmProjectsTaskDelete, apiGetUsersList } from '@/services/CrmService'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button, Notification, Pagination, Select, Skeleton, toast } from '@/components/ui'
 import { HiOutlineEye, HiOutlinePencil, HiPlusCircle } from 'react-icons/hi'

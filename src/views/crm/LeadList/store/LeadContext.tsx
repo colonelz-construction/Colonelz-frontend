@@ -1,4 +1,4 @@
-import { apiGetCrmLeads } from '@/services/CryptoService';
+import { apiGetCrmLeads } from '@/services/CrmService';
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 
 interface Note {
@@ -48,7 +48,7 @@ interface Note {
     leads: Lead[];
   }
   
-  interface ApiResponse {
+  export interface LeadApiResponse {
     message: string;
     status: boolean;
     errorMessage: string;

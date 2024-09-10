@@ -3,8 +3,6 @@ import Button from '@/components/ui/Button'
 import Table from '@/components/ui/Table'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
-import { apiGetCrmLeads } from '@/services/CrmService'
 import { Lead, useLeadContext } from '../../LeadList/store/LeadContext'
 import { Skeleton, Spinner } from '@/components/ui'
 

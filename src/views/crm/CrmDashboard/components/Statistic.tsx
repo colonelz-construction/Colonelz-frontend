@@ -20,7 +20,7 @@ import { Skeleton } from '@/components/ui'
 
 const StatisticIcon = ({ type }: { type?: string }) => {
     switch (type) {
-        case 'toDo':
+        case 'design & execution':
             return (
                 <Avatar
                     size={55}

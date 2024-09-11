@@ -31,6 +31,7 @@ import { AuthorityCheck, ConfirmDialog, StickyFooter } from '@/components/shared
 import NoData from '@/views/pages/NoData'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import formateDate from '@/store/dateformate'
+import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 
 export type ArchiveResponse = {
     code: number;
@@ -435,6 +436,7 @@ const PaginationTable = () => {
     }
 
     return (
+        <>
         <div className=''>
             <div className='flex justify-between mb-5'>
             <h3 className='mb-5'>Archive</h3>
@@ -448,7 +450,7 @@ const PaginationTable = () => {
             <div className='h-screen'>
 
             {
-                !loading ?filesData.length === 0 ?(<NoData/>) :(
+                
                     <Table >
                     <THead>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -488,6 +490,12 @@ const PaginationTable = () => {
                             </Tr>
                         ))}
                     </THead>
+                    {loading?
+                    <TableRowSkeleton
+                    avatarInColumns= {[0]}
+                    columns={columns.length}
+                    avatarProps={{ width: 14, height: 14 }}
+                />:filesData.length===0?<Td colSpan={columns.length}><NoData/></Td>:
                     <TBody>
                         {table.getRowModel().rows.map((row) => {
                             return (
@@ -505,18 +513,16 @@ const PaginationTable = () => {
                                 </Tr>
                             )
                         })}
-                    </TBody>
+                    </TBody>}
                 </Table>
-                ):(
-                    <Skeleton height={300}/>
-                )
+                
             }
            
             <div className="flex items-center justify-between mt-4">
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}
                     currentPage={table.getState().pagination.pageIndex + 1}
-                    total={filesData.length}
+                    total={table.getFilteredRowModel().rows.length}
                     onChange={onPaginationChange}
                 />
                 <div style={{ minWidth: 130 }}>
@@ -561,17 +567,10 @@ const PaginationTable = () => {
           onRequestClose={onDialogClose3}>
             <p> Are you sure, restore this file/folder? </p>            
         </ConfirmDialog>
-        <StickyFooter
-        className="-mx-8 px-8 flex items-center justify-between py-4 mt-7"
-        stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-      >
-                <div className="md:flex items-center">
-                    <Button size="sm" className="ltr:mr-3 rtl:ml-3" onClick={()=>navigate('/app/crm/fileManager')}>
-                        Back
-                    </Button>
-                </div>
-            </StickyFooter>
+      
         </div>
+       a
+        </>
     )
 }
 

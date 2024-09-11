@@ -391,7 +391,7 @@ const Filtering = ({task,users}:Data) => {
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}
                     currentPage={table.getState().pagination.pageIndex + 1}
-                    total={task?task.length:0}
+                    total={table.getFilteredRowModel().rows.length}
                     onChange={onPaginationChange}
                 />
                 <div style={{ minWidth: 130 }}>

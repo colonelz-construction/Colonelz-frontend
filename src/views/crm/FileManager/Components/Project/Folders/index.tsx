@@ -118,11 +118,11 @@ const Index = () => {
     const [selectedEmails, setSelectedEmails] = useState<string[]>([])
     const [selectedEmailsCc, setSelectedEmailsCc] = useState<string[]>([])
     const [selectedEmailsBcc, setSelectedEmailsBcc] = useState<string[]>([])
-    const [selectedType, setSelectedType] = useState('Internal')
-    const [selectedUsername, setSelectedUsername] = useState('')
-    const [usernameError, setUsernameError] = useState('')
-    const [clientNameError, setClientNameError] = useState('')
-    const [clientEmailError, setClientEmailError] = useState('')
+    // const [selectedType, setSelectedType] = useState('Internal')
+    // const [selectedUsername, setSelectedUsername] = useState('')
+    // const [usernameError, setUsernameError] = useState('')
+    // const [clientNameError, setClientNameError] = useState('')
+    // const [clientEmailError, setClientEmailError] = useState('')
     const [approvalLoading, setApprovalLoading] = useState(false)
     const [subject, setSubject] = useState('')
     const [body, setBody] = useState('')
@@ -304,7 +304,7 @@ type Option = {
         setApprovalLoading(true)
 
         const postData = {
-            user_name: selectedUsername,
+            // user_name: selectedUsername,
             type: 'Internal',
             file_id: selectedFileId,
             folder_name: folderName,
@@ -691,7 +691,7 @@ const onSelectChange = (value = 0) => {
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}
                     currentPage={table.getState().pagination.pageIndex + 1}
-                    total={totalData}
+                    total={table.getFilteredRowModel().rows.length}
                     onChange={onPaginationChange}
                 />
                 <div style={{ minWidth: 130 }}>
@@ -866,7 +866,7 @@ const onSelectChange = (value = 0) => {
             >
                 <h3 className="mb-5">Share Files For Approval</h3>
                 <div className=" ">
-                    <FormItem label="Username" className="mt-4">
+                    {/* <FormItem label="Username" className="mt-4">
                         <Select
                             componentAs={CreatableSelect}
                             options={usernames.map((username) => ({
@@ -908,7 +908,7 @@ const onSelectChange = (value = 0) => {
                     )}
                     {clientEmailError && (
                         <div className=" text-red-600">{clientEmailError}</div>
-                    )}
+                    )} */}
                     <FormItem label="File" className="">
                         <Select
                             className=""

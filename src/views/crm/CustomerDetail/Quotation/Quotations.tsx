@@ -386,6 +386,7 @@ const Quotations=(data : FileItemProps )=> {
                    {response.message}
                 </Notification>
             )
+            window.location.reload();
         }
         else{
             toast.push(
@@ -438,7 +439,7 @@ const Quotations=(data : FileItemProps )=> {
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}
                     currentPage={table.getState().pagination.pageIndex + 1}
-                    total={data.data?data.data.length:0}
+                    total={table.getFilteredRowModel().rows.length}
                     onChange={onPaginationChange}
                 />
                 <div style={{ minWidth: 130 }}>

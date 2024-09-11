@@ -375,7 +375,7 @@ const Roles = () => {
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}
                     currentPage={table.getState().pagination.pageIndex + 1}
-                    total={data.length}
+                    total={table.getFilteredRowModel().rows.length}
                     onChange={onPaginationChange}
                 />
                 <div style={{ minWidth: 130 }}>

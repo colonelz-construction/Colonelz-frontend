@@ -78,7 +78,7 @@ const Project = ({ className }: LeadsProps) => {
             <div className="flex items-center justify-between mb-4">
                 <h3>Projects</h3>
                 <Button size="sm" onClick={onNavigate} variant='solid'>
-                    View All Leads
+                    View All Projects
                 </Button>
             </div>
             <Table>

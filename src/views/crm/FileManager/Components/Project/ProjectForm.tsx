@@ -91,7 +91,7 @@ const YourFormComponent: React.FC<Data> = (data) => {
             File Uploaded Successfully
           </Notification>,
           { placement: 'top-center' }
-        );
+        )
       
         window.location.reload();
       } else {

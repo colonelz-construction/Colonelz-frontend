@@ -585,7 +585,7 @@ const onSelectChange = (value = 0) => {
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}
                     currentPage={table.getState().pagination.pageIndex + 1}
-                    total={totalData}
+                    total={table.getFilteredRowModel().rows.length}
                     onChange={onPaginationChange}
                 />
                 <div style={{ minWidth: 130 }}>
@@ -647,27 +647,28 @@ const onSelectChange = (value = 0) => {
     lead_id: leadId,
     folder_name: folderName,
     file_id:"" ,
-    user_name: '',
+    // user_name: '',
     type: "Internal",
   }}
   validationSchema={Yup.object({
     lead_id: Yup.string().required('Required'),
     folder_name: Yup.string().required('Required'),
     file_id: Yup.string().required('Required'),
-    user_name: Yup.string().required('Required'),
+    // user_name: Yup.string().required('Required'),
     type: Yup.string().required('Required'),
   })}
   onSubmit={async(values:any, { setSubmitting }) => {
-    setSubmitting(true)
+
     const formData=new FormData()
     formData.append('lead_id',values.lead_id)
     formData.append('folder_name',values.folder_name)
     formData.append('file_id',values.file_id)
-    formData.append('user_name',values.user_name)
+    // formData.append('user_name',values.user_name)
     formData.append('type',values.type)
     
     const response = await apiGetCrmFileManagerShareContractFile(formData)
-    setSubmitting(false)
+    console.log(response);
+    
     if(response.code===200){
       toast.push(
         <Notification closable type="success" duration={2000}>
@@ -687,21 +688,21 @@ const onSelectChange = (value = 0) => {
   {({ handleChange, handleBlur, values,isSubmitting }) => (
     <Form>
       <h3 className='mb-5'>Share For Approval</h3>
-      <FormItem label='Username' className=''>
+      {/* <FormItem label='Username' className=''>
       <Select
   options={adminUsers.map(user => ({ value: user.username, label: user.username })) as any}
   onChange={(option: any) => handleChange('user_name')(option ? option.value : '')}
   value={adminUsers.find(user => user.username === values.user_name) ? { value: values.user_name, label: values.user_name } : null}
 />
-
+</FormItem> */}
 <FormItem label='File' className='mt-4'>
-  <Select
-    options={leadData.map(file => ({ value: file.fileId, label: file.fileName })) as any}
+<Select
+    options={leadData.map(file => ({ value: file.fileId, label: file.fileName }))}
     onChange={(option: any) => handleChange('file_id')(option ? option.value : '')}
-    value={leadData.find(file => file.fileId === values.file_id) ? { value: values.file_id, label: values.file_id } : null}
+    value={leadData.find(file => file.fileId === values.file_id) ? { value: values.file_id, label: leadData.find(file => file.fileId === values.file_id)?.fileName } : null}
   />
 </FormItem>
-      </FormItem>
+      
       <Button type="submit" variant='solid' loading={isSubmitting} block>{isSubmitting?'Sharing':'Share'}</Button>
     </Form>
   )}

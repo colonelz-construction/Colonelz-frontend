@@ -54,6 +54,10 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
 }
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
+const userDetailData = await apiGetMomData();
+const ordersData=userDetailData.data.MomData
+const totalData=ordersData.length
+
 
 function DebouncedInput({
     value: initialValue,
@@ -119,9 +123,7 @@ const pageSizeOption = [
     { value: 40, label: '40 / page' },
     { value: 50, label: '50 / page' },
 ]
-const userDetailData = await apiGetMomData();
-const ordersData=userDetailData.data.MomData
-const totalData=ordersData.length
+
 
 const Filtering = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -234,8 +236,8 @@ console.log(ordersData);
     }
   
 
-
-
+    const filteredRowCount = table.getFilteredRowModel().rows.length
+    
     return (
         <>
          
@@ -307,7 +309,7 @@ console.log(ordersData);
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}
                     currentPage={table.getState().pagination.pageIndex + 1}
-                    total={totalData}
+                    total={filteredRowCount}
                     onChange={onPaginationChange}
                 />
                 <div style={{ minWidth: 130 }}>

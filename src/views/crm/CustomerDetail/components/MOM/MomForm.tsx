@@ -40,7 +40,6 @@ interface FormData {
 
 const YourFormComponent = () => {
     const navigate = useNavigate()
-    const [submitting, setSubmitting] = useState(false)
     interface QueryParams {
         project_id: string
         client_name: string
@@ -94,7 +93,7 @@ const optionsSource = [
                 location: Yup.string().required('Location is required'),
             })
             }
-            onSubmit={async(values) => {
+            onSubmit={async(values,{setSubmitting}) => {
                 const formData = new FormData()
                 console.log(values);
                 
@@ -128,7 +127,7 @@ const optionsSource = [
                     navigate(-1)
                 } else {
                     toast.push(
-                        <Notification closable type="success" duration={2000}>
+                        <Notification closable type="danger" duration={2000}>
                             {response.errorMessage}
                         </Notification>
                     )
@@ -144,10 +143,10 @@ const optionsSource = [
             }
             }
             >
-                     {({ errors, setFieldValue,setSubmitting,values }) => (
+                     {({ errors, setFieldValue,isSubmitting,values }) => (
                 <Form>
                 <FormContainer>
-                    <div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-x-5 min-h-96">
+                    <div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-x-5">
                     <FormItem label="Client's Name" asterisk>
                                 <Field name="client_name">
                                     {({ field, form }:any) => (
@@ -246,6 +245,7 @@ const optionsSource = [
                                     variant="solid"
                                     icon={<HiOutlineCloudUpload />}
                                     type="button"
+                                    block
                                 >
                                     Upload your file
                                 </Button>
@@ -256,13 +256,14 @@ const optionsSource = [
 
                       
                     </div>
+                    <div className='lg:mb-32'>
                     <App
                         value={values.remark}
                         onChange={(value) => {
                             setFieldValue('remark', value)
                         }}
                     />
-                   
+                   </div>
                
                 
                 <StickyFooter
@@ -270,8 +271,8 @@ const optionsSource = [
                 stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
         >
               
-                        <Button type="submit" className="mr-4" variant="solid" size='sm' loading={submitting}>
-                            {submitting ? 'Submitting...' : 'Submit'}
+                        <Button type="submit" className="mr-4" variant="solid" size='sm' loading={isSubmitting}>
+                            {isSubmitting ? 'Submitting...' : 'Submit'}
                         </Button>
                         <Button type="submit" onClick={() => navigate(-1)} size='sm'>
                             Discard

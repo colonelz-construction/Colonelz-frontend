@@ -17,6 +17,8 @@ const TimelineAvatar = ({ children, ...rest }: TimelineAvatarProps) => {
 const Activity = ({ Data} : CustomerProfileProps) => {
     console.log(Data);
     const [activityData, setActivityData] = useState<ProjectUpdate[]>([]);
+    console.log(Data);
+    
     
 
     //at first the activity is not on reverse but after reload it appears in reverse, using useEffect fixs the problem.
@@ -42,7 +44,7 @@ const Activity = ({ Data} : CustomerProfileProps) => {
                         </span>
                         <span className="mx-2">{item.message} </span>
                         <span className="ml-3 rtl:mr-3">
-          {new Date(item.updated_date).toLocaleString('en/GD', {
+          {new Date(item.updated_date)?.toLocaleString('en-GB', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',

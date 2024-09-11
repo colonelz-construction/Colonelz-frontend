@@ -6,6 +6,7 @@ import {
     getFilteredRowModel,
     getSortedRowModel,
     flexRender,
+    getPaginationRowModel,
 } from '@tanstack/react-table';
 import { HiOutlineChevronRight, HiOutlineChevronDown } from 'react-icons/hi';
 import type { ColumnDef, Row, ColumnSort, FilterFn } from '@tanstack/react-table';
@@ -143,7 +144,7 @@ function ReactTable({
                         ? row.attendees.client_name
                         : [row.attendees.client_name];
 
-                    return <span>{clientNames?.join(', ')}</span>;
+                    return <span>{clientNames}</span>;
                 },
             },
             {
@@ -166,7 +167,7 @@ function ReactTable({
     );
 
     const location = useLocation();
-    const  leadData  = data.mom_data
+    const  leadData  = data?.mom_data
     
     const {roleData}=useRoleContext()
 
@@ -209,6 +210,7 @@ function ReactTable({
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
         debugHeaders: true,
         debugColumns: false,
     });
@@ -307,7 +309,7 @@ function ReactTable({
                             ))}
                         </THead>
                         <TBody>
-                            {filteredRows.slice(0, 10).map((row) => (
+                            {filteredRows.map((row) => (
                                 <Fragment key={row.id}>
                                     <Tr>
                                         {row.getVisibleCells().map((cell) => (
@@ -328,12 +330,12 @@ function ReactTable({
                         </TBody>
                     </Table>
                     <div className="flex items-center justify-between mt-4">
-                <Pagination
-                    pageSize={table.getState().pagination.pageSize}
-                    currentPage={table.getState().pagination.pageIndex + 1}
-                    total={leadData?leadData.length:0}
-                    onChange={onPaginationChange}
-                />
+                    <Pagination
+    pageSize={table.getState().pagination.pageSize}
+    currentPage={table.getState().pagination.pageIndex + 1}
+    total={table.getFilteredRowModel().rows.length} // Ensure this targets filtered rows
+    onChange={onPaginationChange}
+/>
                 <div style={{ minWidth: 130 }}>
                     <Select<Option>
                         size="sm"

@@ -159,7 +159,7 @@ const Filtering = () => {
     const totalData=projectData.length
     
     const table = useReactTable({
-        data:projectData,
+        data:projectData.reverse(),
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -269,7 +269,7 @@ const Filtering = () => {
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}
                     currentPage={table.getState().pagination.pageIndex + 1}
-                    total={totalData}
+                    total={table.getFilteredRowModel().rows.length}
                     onChange={onPaginationChange}
                 />
                 <div style={{ minWidth: 130 }}>

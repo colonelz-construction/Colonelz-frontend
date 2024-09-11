@@ -6,6 +6,7 @@ import { StickyFooter } from '@/components/shared';
 import { apiGetCrmCreateLeadToProject } from '@/services/CrmService';
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
+import { HiOutlineCloudUpload } from 'react-icons/hi';
 
 interface FormData {
   lead_id: string | null;
@@ -252,10 +253,19 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
         errorMessage={errors.project_name}
         >
           <Field
-            component={Input}
             name='project_name'
             type='text'
-            placeholder='Project Name'/>
+            placeholder='Project Name'>
+            {({ field,form }:any) => {
+              return (
+                <Input
+                type='text'
+                placeholder='Project Name'
+                onChange={(e) => form.setFieldValue(field.name, e.target.value)}
+                />
+              );
+            }}
+            </Field>
         </FormItem>
         <FormItem label='Project Start Date'
         asterisk
@@ -331,18 +341,33 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
         <FormItem label='Project Budget'
         asterisk
         invalid={errors.project_budget && touched.project_budget}
-        errorMessage={errors.project_budget}
         >
           <Field
-            component={Input}
             name='project_budget'
             type='text'
-            placeholder='Project Budget'/>
+            placeholder='Project Budget'>
+              {({ field,form }:any) => {
+                return (
+                  <Input
+                  type='text'
+                  placeholder='Project Budget'
+                  onChange={(e) => form.setFieldValue(field.name, e.target.value)}
+                  onKeyDown={(e) => {
+                    const charCode = e.which ? e.which : e.keyCode;
+                    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                      e.preventDefault();
+                    }
+                  }}
+                  />
+                );
+              }
+            }
+            </Field>
+            <div className=' text-red-500'>{errors.project_budget}</div>
         </FormItem>
         <FormItem label='Project Type'
         asterisk
         invalid={errors.project_type && touched.project_type}
-        errorMessage={errors.project_type}
         >
           <Field
             name='project_type'>
@@ -355,11 +380,11 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
                 );
               }}
             </Field>
+            <div className=' text-red-500'>{errors.project_type}</div>
         </FormItem>
         <FormItem label='Project Status'
         asterisk
         invalid={errors.project_status && touched.project_status}
-        errorMessage={errors.project_status}
         >
           <Field
             name='project_status'>
@@ -373,7 +398,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
               }
             }
             </Field>
-
+            <div className=' text-red-500'>{errors.project_status}</div>
         </FormItem>
        
        
@@ -382,22 +407,28 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
         invalid={Boolean(
           errors.contract && touched.contract
       )}
-      errorMessage={errors.contract as string}
+      
         >
         <Field name='contract'>
   {({ field, form }: any) => {
     return (
       <Upload
+      className=''
             onChange={(files) =>
             form.setFieldValue(field.name, files)
           }
-        onFileRemove={(files) =>form.setFieldValue(field.name, files)}/>
+        onFileRemove={(files) =>form.setFieldValue(field.name, files)}>
+          <Button variant="solid" icon={<HiOutlineCloudUpload />} type='button' block>
+                        Upload your file
+                    </Button>
+        </Upload>
     );
   }}
 
 </Field>
+
+        <div className=' text-red-500'>{errors.contract}</div>
         </FormItem>
-      
        
         </FormContainer>
         <div className='grid lg:grid-cols-2 '>

@@ -6,12 +6,13 @@ import {
     getFilteredRowModel,
     getPaginationRowModel,
     useReactTable,
+    FilterFn
 } from '@tanstack/react-table'
 import Table from '@/components/ui/Table'
 import Checkbox from '@/components/ui/Checkbox'
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, InputHTMLAttributes } from 'react'
 import type { CheckboxProps } from '@/components/ui/Checkbox'
-import type { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef, ColumnFiltersState } from '@tanstack/react-table'
 import { Button, Dialog, FormItem, Input, Notification, Select, Upload, toast } from '@/components/ui'
 import Pagination from '@/components/ui/Pagination'
 import { Formik, Field, Form} from 'formik';
@@ -20,6 +21,7 @@ import { apiGetCrmFileManagerShareContractFile, apiGetCrmProjectShareContractApp
 import { use } from 'i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
+import { rankItem } from '@tanstack/match-sorter-utils'
 
 type FormData = {
   user_name: string;
@@ -44,6 +46,58 @@ interface IndeterminateCheckboxProps extends Omit<CheckboxProps, 'onChange'> {
 
 const { Tr, Th, Td, THead, TBody } = Table
 
+interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
+    value: string | number
+    onChange: (value: string | number) => void
+    debounce?: number
+}
+function DebouncedInput({
+    value: initialValue,
+    onChange,
+    debounce = 500,
+    ...props
+}: DebouncedInputProps) {
+    const [value, setValue] = useState(initialValue)
+
+    useEffect(() => {
+        setValue(initialValue)
+    }, [initialValue])
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            onChange(value)
+        }, debounce)
+
+        return () => clearTimeout(timeout)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [value])
+
+    return (
+        <div className="flex justify-end">
+            <div className="flex items-center mb-4">
+                <Input
+                size='sm'
+                    {...props}
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                />
+            </div>
+        </div>
+    )
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+    // Rank the item
+    const itemRank = rankItem(row.getValue(columnId), value)
+
+    // Store the itemRank info
+    addMeta({
+        itemRank,
+    })
+
+    // Return if the item should be filtered in/out
+    return itemRank.passed
+}
 export type FileItemProps = {
     data:FileItem[]
 }
@@ -94,6 +148,9 @@ const ContractDetails=(data : FileItemProps )=> {
     const leadId=queryParams.get('id')
     const [approvalLoading,setApprovalLoading]=useState(false)
     const {roleData}=useRoleContext()
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+    const [globalFilter, setGlobalFilter] = useState('')
+    console.log(data)
     
     
 
@@ -143,7 +200,7 @@ const ContractDetails=(data : FileItemProps )=> {
             return [
                 {
                     header: 'File Name',
-                    accessorKey: 'fileName',
+                    accessorKey: 'file_name',
                     cell:({row})=>{
                         const fileName=row.original.file_name;
                         return(
@@ -154,7 +211,7 @@ const ContractDetails=(data : FileItemProps )=> {
                
                {
                     header: 'Admin Status',
-                    accessorKey: 'itemId',
+                    accessorKey: 'admin_status',
                     cell:({row})=>{
                         const fileId=row.original.itemId;
                         const status=row.original.admin_status;
@@ -294,11 +351,19 @@ const ContractDetails=(data : FileItemProps )=> {
     const table = useReactTable({
         data:data?.data || [],
         columns,
+        filterFns: {
+            fuzzy: fuzzyFilter,
+        },
         state: {
             rowSelection,
+            columnFilters,
+            globalFilter,
         },
         enableRowSelection: true, 
+        onColumnFiltersChange: setColumnFilters,
         onRowSelectionChange: setRowSelection,
+        onGlobalFilterChange: setGlobalFilter,
+        globalFilterFn: fuzzyFilter,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -427,9 +492,17 @@ const ContractDetails=(data : FileItemProps )=> {
     const approvedFiles = data.data.filter(file => file.admin_status === 'approved').map(file => ({ value: file.itemId, label: file.file_name }));
     return (
         <div>
-        <div className=' flex justify-end mb-4 gap-3'>
-            <Button variant='solid' size='sm' onClick={()=>openDialog()} >Share to Client</Button>
-    </div>
+            <div className='flex items-center gap-2 justify-end'>
+                <DebouncedInput
+                    value={globalFilter ?? ''}
+                    className="p-2 font-lg shadow border border-block"
+                    placeholder="Search..."
+                    onChange={(value) => setGlobalFilter(String(value))}
+                />
+                <div className=' flex mb-4 gap-3'>
+                    <Button variant='solid' size='sm' onClick={()=>openDialog()} >Share to Client</Button>
+                </div>
+            </div>
     {table.getRowModel().rows.length > 0 ? (
         <div>
     <Table>
@@ -460,7 +533,7 @@ const ContractDetails=(data : FileItemProps )=> {
        <Pagination
            pageSize={table.getState().pagination.pageSize}
            currentPage={table.getState().pagination.pageIndex + 1}
-           total={data.data.length}
+           total={table.getFilteredRowModel().rows.length}
            onChange={onPaginationChange}
        />
        <div style={{ minWidth: 130 }}>

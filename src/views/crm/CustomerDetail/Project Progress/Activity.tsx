@@ -1,6 +1,6 @@
 import { Avatar, AvatarProps, Card, Timeline } from '@/components/ui'
-import React from 'react'
-import { Customer } from '../store'
+import React, { useEffect, useState } from 'react'
+import { Customer, ProjectUpdate } from '../store'
 
 type CustomerProfileProps = {
     Data: Customer
@@ -16,7 +16,15 @@ const TimelineAvatar = ({ children, ...rest }: TimelineAvatarProps) => {
 }
 const Activity = ({ Data} : CustomerProfileProps) => {
     console.log(Data);
-    const activityData = Data.project_updated_by.reverse()
+    const [activityData, setActivityData] = useState<ProjectUpdate[]>([]);
+    
+
+    //at first the activity is not on reverse but after reload it appears in reverse, using useEffect fixs the problem.
+    useEffect(() => {
+        const data = Data.project_updated_by.reverse()
+        setActivityData(data)
+
+    }, [])
     
   return (
     <Card className=''>
@@ -34,7 +42,7 @@ const Activity = ({ Data} : CustomerProfileProps) => {
                         </span>
                         <span className="mx-2">{item.message} </span>
                         <span className="ml-3 rtl:mr-3">
-          {new Date(item.updated_date).toLocaleString('default', {
+          {new Date(item.updated_date).toLocaleString('en/GD', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',

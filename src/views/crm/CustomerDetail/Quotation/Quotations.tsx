@@ -12,7 +12,7 @@ import Checkbox from '@/components/ui/Checkbox'
 import type { ChangeEvent } from 'react'
 import type { CheckboxProps } from '@/components/ui/Checkbox'
 import type { ColumnDef } from '@tanstack/react-table'
-import { Button, Dialog, FormItem, Input, Notification, Select, toast } from '@/components/ui'
+import { Button, Dialog, FormItem, Input, Notification, Pagination, Select, toast } from '@/components/ui'
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { apiGetCrmProjectShareQuotation, apiGetCrmProjectShareQuotationApproval } from '@/services/CrmService'
@@ -21,6 +21,7 @@ import { useLocation } from 'react-router-dom'
 import NoData from '@/views/pages/NoData'
 import { useRoleContext } from '../../Roles/RolesContext'
 import { AuthorityCheck } from '@/components/shared'
+import { PropsValue } from 'react-select'
 
 type FormData = {
   user_name: string;
@@ -43,6 +44,19 @@ interface IndeterminateCheckboxProps extends Omit<CheckboxProps, 'onChange'> {
 }
 
 const { Tr, Th, Td, THead, TBody } = Table
+
+const pageSizeOption = [
+    { value: 10, label: '10 / page' },
+    { value: 20, label: '20 / page' },
+    { value: 30, label: '30 / page' },
+    { value: 40, label: '40 / page' },
+    { value: 50, label: '50 / page' },
+]
+
+type OptionType = {
+    value: number
+    label: string
+}
 
 export type FileItemProps = {
     data:FileItemType[]
@@ -306,8 +320,10 @@ const Quotations=(data : FileItemProps )=> {
         },
         [])
 
+        const latestData = data?.data.reverse();
+
     const table = useReactTable({
-        data:data?.data || [],
+        data:latestData || [],
         columns,
         state: {
             rowSelection,
@@ -318,6 +334,14 @@ const Quotations=(data : FileItemProps )=> {
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
     })
+
+    const onPaginationChange = (page: number) => {
+        table.setPageIndex(page - 1)
+    }
+
+    const onSelectChange = (value = 0) => {
+        table.setPageSize(Number(value))
+    }
   console.log(data.data);
   
     interface FormValues {
@@ -385,30 +409,56 @@ const Quotations=(data : FileItemProps )=> {
             </AuthorityCheck>
     </div>
     {table.getRowModel().rows.length > 0 ? (
-    <Table>
-        <THead>
-            {table.getHeaderGroups().map((headerGroup) => (
-                <Tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                        <Th key={header.id} colSpan={header.colSpan}>
-                            {flexRender(header.column.columnDef.header, header.getContext())}
-                        </Th>
+        <div>
+            <Table>
+                <THead>
+                    {table.getHeaderGroups().map((headerGroup) => (
+                        <Tr key={headerGroup.id}>
+                            {headerGroup.headers.map((header) => (
+                                <Th key={header.id} colSpan={header.colSpan}>
+                                    {flexRender(header.column.columnDef.header, header.getContext())}
+                                </Th>
+                            ))}
+                        </Tr>
                     ))}
-                </Tr>
-            ))}
-        </THead>
-        <TBody>
-            {table.getRowModel().rows.map((row) => (
-                <Tr key={row.id}>
-                    {row.getVisibleCells().map((cell) => (
-                        <Td key={cell.id}>
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </Td>
+                </THead>
+                <TBody>
+                    {table.getRowModel().rows.map((row) => (
+                        <Tr key={row.id}>
+                            {row.getVisibleCells().map((cell) => (
+                                <Td key={cell.id}>
+                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                </Td>
+                            ))}
+                        </Tr>
                     ))}
-                </Tr>
-            ))}
-        </TBody>
-    </Table>
+                </TBody>
+            </Table>
+            <div className="flex items-center justify-between mt-4">
+                <Pagination
+                    pageSize={table.getState().pagination.pageSize}
+                    currentPage={table.getState().pagination.pageIndex + 1}
+                    total={data.data?data.data.length:0}
+                    onChange={onPaginationChange}
+                />
+                <div style={{ minWidth: 130 }}>
+                    <Select<OptionType>
+                        size="sm"
+                        isSearchable={false}
+                        value={pageSizeOption.filter(
+                            (option) =>
+                                option.value ===
+                                table.getState().pagination.pageSize
+                        )}
+                        options={pageSizeOption}
+                        onChange={(option) => onSelectChange(option?.value)}
+                    />
+                </div>
+            </div>
+
+    </div>
+
+    
 ) : (
     <div style={{ textAlign: 'center'}  }><NoData/></div>
 )}

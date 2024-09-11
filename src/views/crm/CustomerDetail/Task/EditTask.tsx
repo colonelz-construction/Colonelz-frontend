@@ -36,6 +36,8 @@ const EditTask = ({ Data,users,task }: EditTaskProps) => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [userData,setUserData]=useState<any>(null)
+    console.log('Data',Data);
+    
 
     
     

@@ -71,6 +71,7 @@ const TaskDetails = () => {
     console.log(users);
     
     const cardFooter = (
+        loading? <div className='flex justify-center'><Skeleton width={400}/></div>:
         <EditTask Data={taskData} users={users} task={true}/>
     )
 

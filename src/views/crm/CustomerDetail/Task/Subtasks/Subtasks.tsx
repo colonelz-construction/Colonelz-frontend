@@ -228,7 +228,6 @@ const Subtasks = ({task,users}:any) => {
             header:'Subtask',
             accessorKey:'sub_task_name',
            cell:({row})=>{
-
             return <SubTaskDetails data={row.original}/>
            }
          },
@@ -262,7 +261,7 @@ const Subtasks = ({task,users}:any) => {
             }
            
         ],
-        []
+        [users]
     )
 
 

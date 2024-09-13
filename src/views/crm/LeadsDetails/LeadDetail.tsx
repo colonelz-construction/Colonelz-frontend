@@ -93,7 +93,7 @@ const CustomerDetail = () => {
       return (
         <>    
         <div className='flex justify-between'>
-        <h3 className='pb-5'>Lead-{lead?.name || <Skeleton/>}</h3>
+        <h3 className='pb-5 capitalize flex items-center'><span>Lead-</span>{loading?<Skeleton width={80}/>:lead?.name}</h3>
         <div>
             <Dropdown renderTitle={Toggle} placement='middle-end-top'>
                     <AuthorityCheck

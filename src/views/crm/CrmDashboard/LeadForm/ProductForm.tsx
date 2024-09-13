@@ -274,7 +274,7 @@ const LeadForm: React.FC = () => {
            
 
             </div>
-            <FormItem label='Content'
+            <FormItem label='Description'
             >
                 <Field
                 name='content'

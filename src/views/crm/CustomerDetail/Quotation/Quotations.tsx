@@ -473,7 +473,7 @@ const Quotations=(data : FileItemProps )=> {
                   <h3 className='mb-4'>Share To Client</h3>
 
                  <Formik
-                 initialValues={{ client_name: '', client_email: '', file_id: '',type:'Client',project_id:projectId,folder_name:'quotation',user_id:localStorage.getItem('userId') }}
+                 initialValues={{ client_name: '', client_email: '', file_id: '',type:'Client',project_id:projectId,folder_name:'Quotation',user_id:localStorage.getItem('userId') }}
                  validationSchema={Yup.object({
                      client_name: Yup.string().required('Required'),
                      client_email: Yup.string().email('Invalid email address').required('Required'),

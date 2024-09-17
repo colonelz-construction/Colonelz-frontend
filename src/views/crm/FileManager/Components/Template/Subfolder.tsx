@@ -114,6 +114,8 @@ const Index = () => {
         const fetchDataAndLog = async () => {
             try {
                 const templateData = (await getTemplateData()) || []
+                console.log(templateData);
+                
                 setLoading(false)
                 setTemplateData(
                     templateData
@@ -273,7 +275,8 @@ const Index = () => {
         ],
         [],
     )
-
+    console.log(templateData);
+    
     const table = useReactTable({
         data: templateData,
         columns,

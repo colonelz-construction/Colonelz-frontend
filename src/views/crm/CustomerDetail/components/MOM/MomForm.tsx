@@ -26,17 +26,6 @@ type Option = {
     label: string
 }
 
-interface FormData {
-    user_id:string | null
-    client_name: string
-    organisor: string
-    attendees: string
-    meetingDate: string
-    location: string
-    remark: string
-    files: File[]
-    project_id: string
-}
 
 const YourFormComponent = () => {
     const navigate = useNavigate()
@@ -108,8 +97,7 @@ const optionsSource = [
                     formData.append('files', file)
                 })
                 formData.append('project_id', values.project_id)
-                
-                
+
                 setSubmitting(true)
                 try{
                 const response = await apiCreateMom(formData)

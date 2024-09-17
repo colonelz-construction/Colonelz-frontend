@@ -1,7 +1,7 @@
 import React from 'react';
 import { HiPlusCircle, HiEye, HiPencilAlt, HiTrash, HiCheck } from 'react-icons/hi';
 import classNames from 'classnames';
-import { Segment } from '@/components/ui';
+import { Button, Segment } from '@/components/ui';
 
 type Permission = 'create' | 'read' | 'update' | 'delete' | 'restore';
 
@@ -45,8 +45,10 @@ const Selector = ({ field, form }: SelectorProps) => {
 
         form.setFieldValue(field.name, newValue);
     };
+ 
 
     return (
+        <div>
         <Segment className="gap-2 md:flex-row flex-col">
             {permissions.map((perm) => (
                 <Segment.Item
@@ -71,6 +73,7 @@ const Selector = ({ field, form }: SelectorProps) => {
                 </Segment.Item>
             ))}
         </Segment>
+        </div>
     );
 };
 

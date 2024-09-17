@@ -284,6 +284,22 @@ export async function apiGetMomData<T>() {
         return response.data
     })
 }
+export async function apiGetMomUpdate<T>() {
+    return ApiService.fetchData<MomResponse>({
+        url: `admin/update/mom`,
+        method: 'put',
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiGetMomDelete<T>(data:any) {
+    return ApiService.fetchData<any>({
+        url: `admin/delete/mom`,
+        method: 'delete',
+    }).then((response) => {
+        return response.data
+    })
+}
  
  
 export async function apiCreateMom(formData: any) {

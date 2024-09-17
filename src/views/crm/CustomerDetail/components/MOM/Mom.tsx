@@ -8,20 +8,23 @@ import {
     flexRender,
     getPaginationRowModel,
 } from '@tanstack/react-table';
-import { HiOutlineChevronRight, HiOutlineChevronDown } from 'react-icons/hi';
+import { HiOutlineChevronRight, HiOutlineChevronDown, HiOutlinePencil } from 'react-icons/hi';
 import type { ColumnDef, Row, ColumnSort, FilterFn } from '@tanstack/react-table';
 import type { InputHTMLAttributes, ReactElement } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, DatePicker, Input, Pagination, Select } from '@/components/ui';
+import { Button, DatePicker, Input, Notification, Pagination, Select, toast } from '@/components/ui';
 import type { ColumnFiltersState } from '@tanstack/react-table';
 import { rankItem } from '@tanstack/match-sorter-utils';
 import Sorter from '@/components/ui/Table/Sorter';
-import { MdDownload } from 'react-icons/md';
+import { MdDeleteOutline, MdDownload } from 'react-icons/md';
 import { useRoleContext } from '@/views/crm/Roles/RolesContext';
-import { AuthorityCheck } from '@/components/shared';
+import { AuthorityCheck, ConfirmDialog } from '@/components/shared';
 import formateDate from '@/store/dateformate';
 import NoData from '@/views/pages/NoData';
 import { DataType, MomDataType } from '../../store/MomContext';
+import useThemeClass from '@/utils/hooks/useThemeClass';
+import { apiGetMomDelete } from '@/services/CrmService';
+import { AnyMxRecord } from 'dns';
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number;
@@ -96,6 +99,74 @@ type Data={
     data:DataType
 }
 
+const ActionColumn = (data:any) => {
+    const navigate = useNavigate()
+    const { roleData } = useRoleContext()
+    const { textTheme } = useThemeClass()
+    
+    const editAccess = roleData?.data?.task?.update?.includes(`${localStorage.getItem('role')}`)
+    const deleteAccess = roleData?.data?.task?.delete?.includes(`${localStorage.getItem('role')}`)
+    const [dialogIsOpen, setIsOpen] = useState(false)
+
+    const openDialog = () => {
+        setIsOpen(true)  
+    }
+    const onDialogClose = () => {
+        setIsOpen(false)
+    }
+    
+    const onDelete = async () => {
+        try{
+        const response = await apiGetMomDelete(data)
+        if(response.code===200){
+            toast.push(
+                <Notification type='success' duration={2000} closable>Task Deleted Successfully</Notification>
+            )
+            window.location.reload()
+        }
+        else{
+            toast.push(
+                <Notification type='danger' duration={2000} closable>{response.errorMessage}</Notification>
+            )
+        
+        }
+        }
+        catch(e){
+            toast.push(
+                <Notification type='danger' duration={2000} closable>Internal Server Error</Notification>
+            )
+        }
+    }
+    
+    return (
+        <div className="flex justify-end text-lg">
+           {editAccess&&
+            <span
+                className={`cursor-pointer p-2  hover:${textTheme}`}>
+                <HiOutlinePencil/>
+                
+            </span>
+}
+{deleteAccess&&
+            <span className={`cursor-pointer py-2  hover:${textTheme}`}>
+                <MdDeleteOutline onClick={()=>openDialog()}/>   
+            </span>
+}
+            <ConfirmDialog
+          isOpen={dialogIsOpen}
+          type="danger"
+          onClose={onDialogClose}
+          confirmButtonColor="red-600"
+          onCancel={onDialogClose}
+          onConfirm={() => onDelete()}
+          title="Delete Task"
+          onRequestClose={onDialogClose}>
+            <p> Are you sure you want to delete this task? </p>            
+        </ConfirmDialog>
+        </div>
+    )
+}
+
 function ReactTable({
     renderRowSubComponent,
     getRowCanExpand,
@@ -162,6 +233,18 @@ function ReactTable({
                 header: 'Location',
                 accessorKey: 'location',
             },
+            {
+                header:'Actions',
+                accessorKey:'actions',
+                cell:({row})=>
+                {
+                    return (
+                        <div>
+                <ActionColumn row={row.original} />
+                        </div>
+                    )
+                }
+            }
         ],
         []
     );

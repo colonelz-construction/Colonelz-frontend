@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import Selector from './Selector'; // Adjust import path as necessary
-import { Button, Notification, toast } from '@/components/ui';
+import { Button, Checkbox, FormItem, Input, Notification, toast } from '@/components/ui';
 import useQuery from '@/utils/hooks/useQuery';
 import { apiEditRoles, apiGetRoleDetails } from '@/services/CrmService';
 import { StickyFooter } from '@/components/shared';
 import { useNavigate } from 'react-router-dom';
+import { permissionsMap } from './CreateRole';
 
-type Permission = 'create' | 'read' | 'update' | 'delete';
+type Permission = 'create' | 'read' | 'update' | 'delete'| 'restore';
 type AccessType = 'lead' | 'user' | 'project' | 'task' | 'contract' | 'quotation' | 'file' | 'archive' | 'mom' | 'addMember' | 'role' | 'companyData'| 'userArchive';
 
 type AccessPermissions = Permission[];
@@ -62,6 +63,19 @@ const EditRoles = () => {
         };
         fetchData();
     }, [id]);
+    const handleSelectAll = (setFieldValue: any, selectAll: boolean) => {
+        if (selectAll) {
+            accessTypes.forEach((type) => {
+                const permissions = permissionsMap[type] || permissionsMap.default;
+                setFieldValue(type, permissions);
+            });
+        } else {
+            // Deselect all permissions
+            accessTypes.forEach((type) => {
+                setFieldValue(type, []);
+            });
+        }
+    };
 
     const handleSubmit = async (values: FormValues) => {
         console.log('values', values);
@@ -97,15 +111,52 @@ const EditRoles = () => {
         }
     };
 
+   
+
     return (
         <div className='p-6'>
-            <h3>Edit Role({role})</h3>
+            <h3>Edit Role</h3>
+
+        
             <Formik
                 initialValues={initialValues}
                 onSubmit={handleSubmit}
                 enableReinitialize
             >
-                {({ isSubmitting }) => (
+                {({ isSubmitting,setFieldValue,values }) => {
+                     const [selectAll, setSelectAll] = useState(false);
+                     useEffect(() => {
+                        const allSelected = accessTypes.every(type => {
+                            const permissions = permissionsMap[type] || permissionsMap.default;
+                            return permissions.every(permission => values[type].includes(permission));
+                        });
+                        setSelectAll(allSelected);
+                    }, [values]);
+                    return(
+                        <div>
+                            <div className="flex items-center gap-4">
+                                <FormItem label='Role' className='w-1/3 !mb-0 mt-5'>
+                                    <Input
+                                        name='role'
+                                        placeholder='Role'
+                                        value={role || ''}
+                                        disabled
+                                    />
+                                    
+                                </FormItem>
+                                <div className="mt-5">
+                                <Checkbox
+                                        checked={selectAll}
+                                        onChange={(value: boolean, e: ChangeEvent<HTMLInputElement>) => {
+                                            setSelectAll(value);
+                                            handleSelectAll(setFieldValue, value);
+                                        }}
+                                    >
+                                        Select All Permissions
+                                    </Checkbox>
+                                    </div>
+                                    </div>
+
                     <Form>
                         {accessTypes.map((type) => (
                             <div
@@ -145,7 +196,8 @@ const EditRoles = () => {
                             </div>
                         </StickyFooter>
                     </Form>
-                )}
+                    </div>
+                )}}
             </Formik>
         </div>
     );

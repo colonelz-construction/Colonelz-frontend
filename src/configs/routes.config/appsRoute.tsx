@@ -306,6 +306,14 @@ const appsRoute: Routes = [
     },
     {
         key: 'appsCrm.form',
+        path: `${APP_PREFIX_PATH}/crm/project/MOM/Update`,
+        component: lazy(() => import('@/views/crm/CustomerDetail/components/MOM/MOMUpdate')),
+        
+        
+    authority:[],
+    },
+    {
+        key: 'appsCrm.form',
         path: `${APP_PREFIX_PATH}/crm/project/AllMOM`,
         component: lazy(() => import('@/views/crm/CustomerDetail/components/MOM/AllMom')),
         

@@ -98,6 +98,8 @@ const Residential = () => {
         
           const data = await apiGetCrmFileManagerCompanyData()
           const templateData=data.data.templateData
+          console.log(templateData);
+          
           setLoading(false)
           const folderSubFolderPairs:folderpairs[] = [
             { folder_name: 'residential', sub_folder_name_first: 'designing',folder:"Design" },

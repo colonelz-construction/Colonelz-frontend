@@ -422,7 +422,7 @@ const ContractDetails=(data : FileItemProps )=> {
         const postData = {
           type: 'Internal',
           file_id: selectedFileIds[0], 
-          folder_name: 'quotation',
+          folder_name: 'Quotation',
           lead_id: leadId,
         };
         try{

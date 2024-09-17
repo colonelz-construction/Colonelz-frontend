@@ -33,19 +33,7 @@ export const fetchData = async (): Promise<ApiResponse> => {
     throw error;
   }
 };
-export const comapnyData = async (): Promise<FileManagerResponseType> => {
-  
-  try {
-    if (cachedData) {
-      return cachedData;
-    }
-    const data=await apiGetCrmFileManagerCompanyData();
-    return data
-  } catch (error) {
-    console.error('Error fetching data', error);
-    throw error;
-  }
-};
+
 
 export const getLeadData = async (): Promise<LeadDataItem[]> => {
   const data = await fetchData();
@@ -58,8 +46,7 @@ export const getProjectData = async (): Promise<ProjectDataItem[]> => {
   return data.data.projectData;
 };
 export const getTemplateData = async (): Promise<TemplateDataItem[]> => {
-  
-  const data = await comapnyData();
+  const data = await apiGetCrmFileManagerCompanyData();
   console.log(data);
   return data.data.templateData;
 };

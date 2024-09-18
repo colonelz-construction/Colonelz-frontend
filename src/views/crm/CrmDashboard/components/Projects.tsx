@@ -114,13 +114,12 @@ const Project = ({ className }: LeadsProps) => {
                         `/app/crm/project-details?project_id=${item.project_id}&client_name=${item.client[0].client_name}&id=65c32e19e0f36d8e1f30955c&type=details`
                     )
                 }>
-                    <Td
-                        className={`capitalize ${
+                    <Td>
+
+                        <span className={`capitalize ${
                             dateDifference <= 1 ? 'text-red-500' : ''
-                        } flex gap-2 items-center cursor-pointer`}
-                       
-                    >
-                        {item.project_name} {dateDifference <= 1 && <BiSolidBellRing />}
+                        } flex gap-2 items-center cursor-pointer`}>{item.project_name} {dateDifference <= 1 && <BiSolidBellRing />}</span>
+                        
                     </Td>
                     <Td>
                         <span

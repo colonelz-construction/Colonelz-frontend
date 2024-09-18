@@ -1,7 +1,8 @@
 import React from 'react';
 import { HiPlusCircle, HiEye, HiPencilAlt, HiTrash, HiCheck } from 'react-icons/hi';
 import classNames from 'classnames';
-import { Button, Segment } from '@/components/ui';
+import { Segment } from '@/components/ui';
+import useThemeClass from '@/utils/hooks/useThemeClass';
 
 type Permission = 'create' | 'read' | 'update' | 'delete' | 'restore';
 
@@ -37,6 +38,7 @@ const icons = {
 
 const Selector = ({ field, form }: SelectorProps) => {
     const permissions = permissionsMap[field.name] || permissionsMap.default;
+    const { textTheme, bgTheme, borderTheme, ringTheme } = useThemeClass()
 
     const handleChange = (permission: Permission) => {
         const newValue = field.value.includes(permission)
@@ -45,10 +47,8 @@ const Selector = ({ field, form }: SelectorProps) => {
 
         form.setFieldValue(field.name, newValue);
     };
- 
 
     return (
-        <div>
         <Segment className="gap-2 md:flex-row flex-col">
             {permissions.map((perm) => (
                 <Segment.Item
@@ -59,11 +59,11 @@ const Selector = ({ field, form }: SelectorProps) => {
                     className={classNames(
                         'flex items-center !rounded-md cursor-pointer',
                         field.value.includes(perm)
-                            ? perm === 'create' ? 'bg-green-200 text-green-700' :
-                              perm === 'read' ? 'bg-blue-200 text-blue-700' :
-                              perm === 'update' ? 'bg-yellow-200 text-yellow-700' :
-                              perm === 'restore' ? 'bg-green-200 text-green-700' :
-                              'bg-red-200 text-red-700'
+                            ? perm === 'create' ? `${bgTheme}` :
+                              perm === 'read' ? `${bgTheme}` :
+                              perm === 'update' ? `${bgTheme}` :
+                              perm === 'restore' ? `${bgTheme}` :
+                              `${bgTheme}`
                             : 'bg-gray-100 text-gray-700'
                     )}
                 >
@@ -73,7 +73,6 @@ const Selector = ({ field, form }: SelectorProps) => {
                 </Segment.Item>
             ))}
         </Segment>
-        </div>
     );
 };
 

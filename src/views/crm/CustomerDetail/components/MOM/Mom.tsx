@@ -106,8 +106,8 @@ const ActionColumn = (data:any) => {
     const location=useLocation()
     const proj = new URLSearchParams(location.search).get('project_id')
     const mom_id=data.row.mom_id
-    const editAccess = roleData?.data?.task?.update?.includes(`${localStorage.getItem('role')}`)
-    const deleteAccess = roleData?.data?.task?.delete?.includes(`${localStorage.getItem('role')}`)
+    const editAccess = roleData?.data?.mom?.update?.includes(`${localStorage.getItem('role')}`)
+    const deleteAccess = roleData?.data?.mom?.delete?.includes(`${localStorage.getItem('role')}`)
     const [dialogIsOpen, setIsOpen] = useState(false)
 
     const openDialog = () => {
@@ -148,12 +148,12 @@ const ActionColumn = (data:any) => {
                 <HiOutlinePencil />
                 
             </span>
-}
-{deleteAccess&&
-            <span className={`cursor-pointer py-2  hover:text-red-600`}>
-                <MdDeleteOutline onClick={()=>openDialog()}/>   
-            </span>
-}
+        }
+        {deleteAccess&&
+                    <span className={`cursor-pointer py-2  hover:text-red-600`}>
+                        <MdDeleteOutline onClick={()=>openDialog()}/>   
+                    </span>
+        }
             <ConfirmDialog
           isOpen={dialogIsOpen}
           type="danger"
@@ -237,12 +237,13 @@ function ReactTable({
             },
             {
                 header:'Actions',
+                id: 'action',
                 accessorKey:'actions',
                 cell:({row})=>
                 {
                     return (
                         <div>
-                <ActionColumn row={row.original} />
+                        <ActionColumn row={row.original} />
                         </div>
                     )
                 }
@@ -373,7 +374,7 @@ function ReactTable({
                                 <Tr key={headerGroup.id}>
                                     {headerGroup.headers.map((header) => (
                                         <Th key={header.id} colSpan={header.colSpan}>
-                                            {header.isPlaceholder ? null : (
+                                            {header.isPlaceholder || header.id==='action' ? null : (
                                                 <div
                                                     {...{
                                                         className: header.column.getCanSort()

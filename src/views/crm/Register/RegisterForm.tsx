@@ -9,6 +9,8 @@ import useAuth from '@/utils/hooks/useAuth'
 import type { CommonProps } from '@/@types/common'
 import { Notification, Select, toast,Button } from '@/components/ui'
 import { useRoleContext } from '../Roles/RolesContext'
+import { useNavigate } from 'react-router-dom';
+
 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
@@ -37,6 +39,7 @@ const SignUpForm = (props: SignUpFormProps) => {
     const id=localStorage.getItem('userId')
     const { signUp } = useAuth()
     const {rolelist}=useRoleContext()
+    const navigate = useNavigate();
     
     
 
@@ -92,6 +95,9 @@ const SignUpForm = (props: SignUpFormProps) => {
                 onSubmit={(values, { setSubmitting }) => {
                     if (!disableSubmit) {
                         onSignUp(values, setSubmitting)
+                        values.user_name = '';
+                        values.role = '';
+                        values.email = '';
                     } else {
                         setSubmitting(false)
                     }
@@ -152,6 +158,8 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     )}
                                 </Field>
                                 </FormItem>
+                          <div className='gap-4 flex items-center'>
+
                           
                           
                             <Button
@@ -167,6 +175,15 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     ? 'Creating Account...'
                                     : 'Register'}
                             </Button>
+                            <Button
+                                        size='md'
+                                        type="button"
+                                        onClick={() => navigate('/app/crm/profile')}
+                                    >
+                                        Back
+                                    </Button>
+
+                                    </div>
                  
                     </Form>
                 )}

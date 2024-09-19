@@ -197,7 +197,7 @@ const Filtering = ({task,users}:Data) => {
         console.log(userData);
         
         return (
-            <div className="flex justify-end text-lg">
+            <div className="flex justify-end text-lg gap-5">
                {editAccess&&
                 <span
                     className={`cursor-pointer p-2  hover:${textTheme}`}>

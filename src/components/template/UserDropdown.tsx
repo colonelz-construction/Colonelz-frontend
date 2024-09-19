@@ -43,6 +43,12 @@ const _UserDropdown = ({ className }: CommonProps) => {
     
         },
         {
+        label:"Create User",
+        path:"/app/crm/register",
+        icon:<AiOutlineUserAdd/>,
+        authority:roleData?.data?.user?.create    
+        },
+        {
         label:"Add User to Lead",
         path:"/app/crm/addUserToLead",
         icon:<AiOutlineUserAdd/>,

@@ -24,12 +24,13 @@ const accessTypes: AccessType[] = [
 export const permissionsMap: { [key: string]: Permission[] } = {
     default: ['create', 'read', 'update', 'delete'],
     task: ['create', 'read', 'update', 'delete'],
+    role: ['create', 'read', 'update', 'delete'],
     file: ['create', 'read', 'delete'],
     archive: ['read', 'restore', 'delete'],
     addMember: ['create'],
     lead: ['create', 'read', 'update'],
     project: ['create', 'read', 'update'],
-    mom: ['create', 'read'],
+    mom: ['create', 'read', 'delete', 'update'],
     contract: ['create', 'read', 'update'],
     quotation: ['read', 'update'],
     user: ['create', 'read', 'delete'],
@@ -44,6 +45,24 @@ const validationSchema = Yup.object().shape(
     }, {} as any)
 );
 
+export const obj: Record<AccessType, boolean> = {
+    // default: false,
+    task: false,
+    file: false,
+    archive: false,
+    addMember: false,
+    lead: false,
+    project: false,
+    mom: false,
+    contract: false,
+    quotation: false,
+    role: false,
+    user: false,
+    userArchive: false,
+    companyData: false
+    
+}
+
 const EditRoles = () => {
     const query = useQuery();
     const id = query.get('id');
@@ -56,22 +75,59 @@ const EditRoles = () => {
         }, {} as FormValues)
     );
 
+    
+
+    const [checkType, setCheckType] = useState(obj);
+
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         setRole(e.target.value);
     };
 
-    const handleSelectAll = (setFieldValue: any, selectAll: boolean) => {
-        if (selectAll) {
+    const [selectAll, setSelectAll] = useState(false);
+
+
+
+    const handleSelectAll = (setFieldValue: any, value: boolean) => {
+        setSelectAll(value);
+
+        if (value) {
+            Object.keys(checkType).forEach((key) => {
+                checkType[key as AccessType] = true;
+              });
+
+              setCheckType(checkType)
             accessTypes.forEach((type) => {
                 const permissions = permissionsMap[type] || permissionsMap.default;
                 setFieldValue(type, permissions);
             });
         } else {
+            Object.keys(checkType).forEach((key) => {
+                checkType[key as AccessType] = false;
+              });
+              setCheckType(checkType)
             // Deselect all permissions
             accessTypes.forEach((type) => {
                 setFieldValue(type, []);
             });
         }
+    };
+
+    const handleSelectType = (setFieldValue: any, type: AccessType, value: boolean, selectAll:boolean) => {
+        // console.log(type)
+        // console.log("type", checkType[type])
+        // console.log("selectall", selectAll)
+        // console.log("value", value)
+
+            if (!checkType[type]) {
+                setCheckType({...checkType, [type]: true})              
+                const permissions = permissionsMap[type] || permissionsMap.default;
+                console.log(permissions)
+                setFieldValue(type, permissions);
+             
+            } else {
+                setCheckType({...checkType, [type]: false})
+                setFieldValue(type, []);
+            }
     };
 
     return (
@@ -83,7 +139,7 @@ const EditRoles = () => {
                 enableReinitialize
                 onSubmit={async (values, { setSubmitting }) => {
                     console.log(values);
-                    
+
                     setSubmitting(true);
                     const access = Object.keys(values).reduce((acc, key) => {
                         const permissions = values[key as AccessType];
@@ -121,14 +177,20 @@ const EditRoles = () => {
                 }}
             >
                 {({ isSubmitting, setFieldValue, values }) => {
-                    const [selectAll, setSelectAll] = useState(false);
+                    
+                    // useEffect(() => {
+                    //     const allSelected = accessTypes.every(type => {
+                    //         const permissions = permissionsMap[type] || permissionsMap.default;
+                    //         return permissions.every(permission => values[type].includes(permission));
+                    //     });
+                    //     setSelectAll(allSelected);
+                    // }, [values]);
 
                     useEffect(() => {
-                        const allSelected = accessTypes.every(type => {
-                            const permissions = permissionsMap[type] || permissionsMap.default;
-                            return permissions.every(permission => values[type].includes(permission));
-                        });
-                        setSelectAll(allSelected);
+                        let flag = Object.values(checkType).every(value => value === true);
+                        console.log("flag", flag)
+                        setSelectAll(flag)
+                        
                     }, [values]);
 
                     return (
@@ -146,8 +208,8 @@ const EditRoles = () => {
                                     <Checkbox
                                         checked={selectAll}
                                         onChange={(value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-                                            setSelectAll(value);
-                                            handleSelectAll(setFieldValue, value);
+                                            // setSelectAll(value);
+                                            handleSelectAll(setFieldValue, !selectAll);
                                         }}
                                     >
                                         Select All Permissions
@@ -160,11 +222,27 @@ const EditRoles = () => {
                                     key={type}
                                     className='grid md:grid-cols-4 gap-4 py-8 border-b border-gray-200 dark:border-gray-600 items-center'
                                 >
-                                    <div className="font-semibold">{type.charAt(0).toUpperCase() + type.slice(1)}</div>
+
+                                    <div className='flex items-center gap-2'>
+
+                                        <div className="">
+                                            <Checkbox
+                                                className='h-3 w-3'
+                                                checked={checkType[type]}
+                                                onChange={(value: boolean, e: ChangeEvent<HTMLInputElement>) => {
+                                                    handleSelectType(setFieldValue, type, value, selectAll)
+                                                }}
+                                            >
+                                            </Checkbox>
+                                        </div>
+
+                                        <div className="font-semibold">{type.charAt(0).toUpperCase() + type.slice(1)}</div>
+                                    </div>
+
                                     <div className='flex gap-2'>
                                         <Field name={type}>
                                             {({ field, form }: any) => (
-                                                <Selector field={field} form={form} />
+                                                <Selector field={field} form={form} checkType={checkType} setCheckType={setCheckType} />
                                             )}
                                         </Field>
                                     </div>

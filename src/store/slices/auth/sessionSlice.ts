@@ -6,20 +6,23 @@ export interface SessionState {
     signedIn: boolean
     token: string 
     userId: string | null
-    role:string | null 
+    role:string | null
+    refreshToken:string | null 
 }
 const token=localStorage.getItem('auth');
 const initialState: SessionState = {
     signedIn: false,
-    token: token || '',
-    userId: Cookies.get('userId') || null, 
-    role:Cookies.get('role') || null
+    token: '',
+    userId:  "",
+    role:'',
+    refreshToken:''
 }
 
 interface SignInPayload {
     token: string;
     userId: string;
     role:string
+    refreshToken:string
 }
 
 const sessionSlice = createSlice({
@@ -30,6 +33,8 @@ const sessionSlice = createSlice({
             state.signedIn = true;
             state.token = action.payload.token;
             state.userId = action.payload.userId; 
+            state.role=action.payload.role;
+            state.refreshToken=action.payload.refreshToken;
             localStorage.setItem('auth', action.payload.token);
             localStorage.setItem('userId', action.payload.userId);
             localStorage.setItem('role', action.payload.role);
@@ -38,6 +43,8 @@ const sessionSlice = createSlice({
             state.signedIn = false;
             state.token = '';
             state.userId = null; 
+            state.role='';
+            state.refreshToken='';
             localStorage.removeItem('auth');
             localStorage.removeItem('userId');
             localStorage.removeItem('role');

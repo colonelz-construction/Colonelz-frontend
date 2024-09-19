@@ -367,7 +367,7 @@ console.log(data.length);
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}
                     currentPage={table.getState().pagination.pageIndex + 1}
-                    total={table.getFilteredRowModel().rows.length}
+                    total={table.getFilteredRowModel().rows.lengtha}
                     onChange={onPaginationChange}
                 />
                 <div style={{ minWidth: 130 }}>

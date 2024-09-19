@@ -73,7 +73,7 @@ const ResetPasswordForm = (props: ResetPasswordFormProps) => {
 
     return (
         <div className={className}>
-            <div className="mb-6">
+            <div className="mb-6 ">
                 {resetComplete ? (
                     <>
                         <h3 className="mb-1">Reset done</h3>
@@ -127,7 +127,7 @@ const ResetPasswordForm = (props: ResetPasswordFormProps) => {
                                             component={PasswordInput}
                                         />
                                     </FormItem>
-                                    <div className=" text-red-500 mb-4" >
+                                    <div className=" text-red-500 mb-4 text-wrap break-words" >
           {errors.password}
         </div>
                                

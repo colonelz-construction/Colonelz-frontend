@@ -160,7 +160,7 @@ const CustomerDetail = () => {
       
       return (
         <>
-        <h3 className='pb-5 capitalize flex items-center'><span>Project-</span>{loading?<Skeleton width={100}/>:projectData[0].project_name}</h3>
+        <h3 className='pb-5 capitalize flex items-center'><span>Project-</span>{loading?<Skeleton width={100}/>:projectData[0]?.project_name}</h3>
         <div>
       
        

@@ -103,13 +103,15 @@ const ActionColumn = (data:any) => {
     const navigate = useNavigate()
     const { roleData } = useRoleContext()
     const { textTheme } = useThemeClass()
-    
+    const location=useLocation()
+    const proj = new URLSearchParams(location.search).get('project_id')
+    const mom_id=data.row.mom_id
     const editAccess = roleData?.data?.task?.update?.includes(`${localStorage.getItem('role')}`)
     const deleteAccess = roleData?.data?.task?.delete?.includes(`${localStorage.getItem('role')}`)
     const [dialogIsOpen, setIsOpen] = useState(false)
 
     const openDialog = () => {
-        setIsOpen(true)  
+        setIsOpen(true)
     }
     const onDialogClose = () => {
         setIsOpen(false)
@@ -117,10 +119,10 @@ const ActionColumn = (data:any) => {
     
     const onDelete = async () => {
         try{
-        const response = await apiGetMomDelete(data)
+        const response = await apiGetMomDelete({project_id:proj,mom_id:mom_id})
         if(response.code===200){
             toast.push(
-                <Notification type='success' duration={2000} closable>Task Deleted Successfully</Notification>
+                <Notification type='success' duration={2000} closable>MOM Deleted Successfully</Notification>
             )
             window.location.reload()
         }
@@ -139,16 +141,16 @@ const ActionColumn = (data:any) => {
     }
     
     return (
-        <div className="flex justify-end text-lg">
+        <div className="flex justify-end text-lg gap-5">
            {editAccess&&
             <span
-                className={`cursor-pointer p-2  hover:${textTheme}`}>
-                <HiOutlinePencil/>
+                className={`cursor-pointer p-2  hover:${textTheme}`} onClick={()=>navigate(`/app/crm/project/MOM/Update?project_id=${proj}&mom_id=${mom_id}`)}>
+                <HiOutlinePencil />
                 
             </span>
 }
 {deleteAccess&&
-            <span className={`cursor-pointer py-2  hover:${textTheme}`}>
+            <span className={`cursor-pointer py-2  hover:text-red-600`}>
                 <MdDeleteOutline onClick={()=>openDialog()}/>   
             </span>
 }
@@ -159,9 +161,9 @@ const ActionColumn = (data:any) => {
           confirmButtonColor="red-600"
           onCancel={onDialogClose}
           onConfirm={() => onDelete()}
-          title="Delete Task"
+          title="Delete MOM"
           onRequestClose={onDialogClose}>
-            <p> Are you sure you want to delete this task? </p>            
+            <p> Are you sure you want to delete this MOM? </p>            
         </ConfirmDialog>
         </div>
     )
@@ -211,11 +213,11 @@ function ReactTable({
                 accessorKey: 'client_name',
                 cell: (props) => {
                     const row = props.row.original;
-                    const clientNames = Array.isArray(row)
+                    const clientNames = Array.isArray(row.attendees.client_name)
                         ? row.attendees.client_name
                         : [row.attendees.client_name];
-
-                    return <span>{clientNames}</span>;
+            
+                    return <span>{clientNames.join(', ')}</span>;
                 },
             },
             {
@@ -532,9 +534,9 @@ const handlePrint = () => {
                           <div>
                               <p className="text-gray-500 dark:text-gray-400 font-semibold text-xl">Attendees</p>
                               <ul className="space-y-1">
-                                  <li className="text-base"><span className="font-semibold text-lg">Client:</span> {rowData.attendees.client_name ? rowData.attendees.client_name : '-'}</li>
-                                  <li className="text-base"><span className="font-semibold text-lg">Organizer:</span> {rowData.attendees.organisor ? rowData.attendees.organisor : '-'}</li>
-                                  <li className="text-base"><span className="font-semibold text-lg">Others:</span> {rowData.attendees.attendees ? rowData.attendees.attendees : '-'}</li>
+                                  <li className="text-base"><span className="font-semibold text-lg">Client:</span> {rowData.attendees.client_name ? rowData.attendees.client_name.join(',') : '-'}</li>
+                                  <li className="text-base"><span className="font-semibold text-lg">Organizer:</span> {rowData.attendees.organisor ? rowData.attendees.organisor.join(',') : '-'}</li>
+                                  <li className="text-base"><span className="font-semibold text-lg">Others:</span> {rowData.attendees.attendees ? rowData.attendees.attendees.join(',') : '-'}</li>
                               </ul>
                           </div>
                       </div>

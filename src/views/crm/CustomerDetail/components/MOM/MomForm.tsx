@@ -60,7 +60,7 @@ const optionsSource = [
 
     return (
         <div>
-            <h5>Add MOM</h5>
+            <h3 className='mb-5'>Add MOM</h3>
             <Formik 
             initialValues={
                 {
@@ -87,9 +87,9 @@ const optionsSource = [
                 console.log(values);
                 
                 formData.append('user_id', (values.user_id || ''))
-                formData.append('client_name', values.client_name)
-                formData.append('organisor', values.organisor)
-                formData.append('attendees', values.attendees)
+                formData.append('client_name', JSON.stringify(values.client_name))
+                formData.append('organisor', JSON.stringify(values.organisor))
+                formData.append('attendees', JSON.stringify(values.attendees))
                 formData.append('meetingdate', values.meetingDate)
                 formData.append('location', values.location)
                 formData.append('remark', values.remark)
@@ -111,8 +111,8 @@ const optionsSource = [
                             Mom Created Successfully
                         </Notification>
                     )
-                    window.location.reload()
-                    navigate(-1)
+                    // window.location.reload()
+                    // navigate(-1)
                 } else {
                     toast.push(
                         <Notification closable type="danger" duration={2000}>
@@ -259,7 +259,7 @@ const optionsSource = [
                 stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
         >
               
-                        <Button type="submit" className="mr-4" variant="solid" size='sm' loading={isSubmitting}>
+                        <Button type="submit" className="mr-2" variant="solid" size='sm' loading={isSubmitting}>
                             {isSubmitting ? 'Submitting...' : 'Submit'}
                         </Button>
                         <Button type="submit" onClick={() => navigate(-1)} size='sm'>

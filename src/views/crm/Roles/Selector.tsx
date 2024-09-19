@@ -68,7 +68,7 @@ const Selector = ({ field, form }: SelectorProps) => {
                     )}
                 >
                     {icons[perm]}
-                    <span className="ml-2">{perm}</span>
+                    <span className="ml-2 capitalize">{perm}</span>
                     {field.value.includes(perm) && <HiCheck className="ml-2 text-green-700" />}
                 </Segment.Item>
             ))}

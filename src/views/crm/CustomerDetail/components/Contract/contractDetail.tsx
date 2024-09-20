@@ -576,7 +576,7 @@ const ContractDetails=(data : FileItemProps )=> {
                     quotation:[]
                 }}
                  validationSchema={Yup.object({
-                     client_name: Yup.string().required('Required'),
+                     client_name: Yup.string().required('Client name is required'),
                      email: Yup.string().email('Invalid email address').required('Required'),
                      file_id: Yup.string().required('Required'),
                  })}
@@ -586,9 +586,13 @@ const ContractDetails=(data : FileItemProps )=> {
                         setSubmitting(false);
                  }}
                  >
+                    {({errors,touched})=>{return(
                     <div className='max-h-96 overflow-y-auto '>
                     <Form className='mr-3'>
-                 <FormItem label='Client Name' asterisk>
+                 <FormItem label='Client Name' asterisk
+                 invalid={errors.client_name && touched.client_name}
+                 errorMessage={errors.client_name}
+                 >
                  <Field name="client_name" type="text" component={Input}/>
                  </FormItem>
                     <FormItem label='Client Email' asterisk>
@@ -608,7 +612,7 @@ const ContractDetails=(data : FileItemProps )=> {
                     <FormItem label='Project Name'>
                     <Field name="project_name" type="text" component={Input}/>
                     </FormItem>
-                    <FormItem label='Site Location'>
+                    <FormItem label='Site Location' asterisk>
                     <Field name="site_location" type="text" component={Input}/>
                     </FormItem>
                     <FormItem label='Quotation'>
@@ -628,7 +632,7 @@ const ContractDetails=(data : FileItemProps )=> {
                     </FormItem>
                     <Button type='submit' block variant='solid' loading={loading}> {loading?'Submitting':'Submit'} </Button>
                  </Form>  
-                 </div>
+                 </div>)}}
                  </Formik>
                  
             </Dialog>

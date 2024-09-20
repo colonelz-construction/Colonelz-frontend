@@ -123,6 +123,7 @@ const Index = () => {
   const [dialogIsOpen, setIsOpen] = useState(false)
   const [dialogIsOpen2, setIsOpen2] = useState(false)
   const [dialogIsOpen3, setIsOpen3] = useState(false)
+  const [dialogIsOpen4, setIsOpen4] = useState(false)
   const [fileId, setFileId] = useState<string>('')
 
   const openDialog = (fileId:string) => {
@@ -150,6 +151,14 @@ const openDialog3 = (file_id:string) => {
 
 const onDialogClose3 = () => {
   setIsOpen3(false)
+}
+
+const openDialog4 = () => {
+  setIsOpen4(true)
+}
+
+const onDialogClose4 = () => {
+  setIsOpen4(false)
 }
 
   useEffect(() => {
@@ -238,12 +247,7 @@ const onDialogClose3 = () => {
     }
     
   }
-  const handleShareFiles = async () => {
-
-    if (selectedFiles.length === 0 || selectedEmails.length === 0) {
-        warn('No files or email addresses selected for sharing.')
-        return
-    }
+  const ShareFiles = async () => {
   setShareLoading(true)
     const postData = {
       folder_id:folderId,
@@ -257,16 +261,6 @@ const onDialogClose3 = () => {
       user_id:localStorage.getItem('userId')
     };
 
-     
-
-      function warn(text: string) {
-          toast.push(
-              <Notification closable type="warning" duration={2000}>
-                  {text}
-              </Notification>,
-              { placement: 'top-center' },
-          )
-      }
 
 
 
@@ -298,6 +292,37 @@ const onDialogClose3 = () => {
       
       const updatedLeadData = leadData.map((file) => ({ ...file, active: false }));
       setLeadData(updatedLeadData);
+
+    }
+    const handleShareFiles = async () => {
+        if (selectedFiles.length === 0 || selectedEmails.length === 0) {
+            warn('No Email Addresses are Selected for sharing.')
+            setShareLoading(false);
+            return
+        }
+        else if (subject === "") {
+            setIsOpen4(true)
+            return
+        }
+        setShareLoading(true);
+        ShareFiles()
+
+
+
+
+        function warn(text: string) {
+            toast.push(
+                <Notification closable type="warning" duration={2000}>
+                    {text}
+                </Notification>,
+                { placement: 'top-center' },
+            )
+        }
+
+
+
+
+  
     
   };
 
@@ -631,7 +656,7 @@ const onSelectChange = (value = 0) => {
 
               }>
     <div className='max-h-96 overflow-y-auto'>
-             <FormItem label='To'>
+             <FormItem label='To' asterisk>
               <Field>
                 {({ field, form }: any) => (
           <Select
@@ -807,10 +832,41 @@ const onSelectChange = (value = 0) => {
           confirmButtonColor="red-600"
           onCancel={onDialogClose3}
           onConfirm={() => deleteFiles(fileId)}
-          title="Delete Folder"
+          title="Delete File"
           onRequestClose={onDialogClose3}>
             <p> Are you sure you want to delete this file? </p>            
         </ConfirmDialog>
+
+        <Dialog isOpen={dialogIsOpen4}
+                onClose={onDialogClose4}
+                onRequestClose={onDialogClose4}
+                closable
+            >
+                <h6 style={{ marginBottom: 10, color: '#d9534f' }}>Warning: Missing Subject</h6>
+                <p style={{ fontSize: 16, color: '#666' }}>
+                    Are you sure you want to share the files without a subject?
+                </p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>
+                    <Button
+                        onClick={() => {
+                            ShareFiles();
+                            onDialogClose4();
+                        }}
+                        variant='solid'
+                        type='submit'
+                    >
+                        Yes, Share Anyway
+                    </Button>
+                    <Button
+                        onClick={onDialogClose4}
+                        variant='solid'
+                        type='submit'
+                    >
+                        Cancel
+                    </Button>
+                </div>
+
+            </Dialog>
     </div>
   );
 };

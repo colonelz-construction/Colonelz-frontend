@@ -97,9 +97,9 @@ function DebouncedInput({
 }
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    let itemValue:any = row.getValue(columnId);
+    let itemValue: any = row.getValue(columnId);
 
-    
+
     if (columnId === 'date') {
         itemValue = formateDate(itemValue)
     }
@@ -138,18 +138,18 @@ const Index = () => {
     const [selectedFileId, setSelectedFileId] = React.useState<string | null>(
         null,
     )
-    const {roleData} = useRoleContext()
+    const { roleData } = useRoleContext()
     const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
 
     interface User {
         role: string
         username: string
     }
-    
-type Option = {
-    value: number
-    label: string
-  }
+
+    type Option = {
+        value: number
+        label: string
+    }
 
     useEffect(() => {
         const response = async () => {
@@ -180,6 +180,7 @@ type Option = {
     const [dialogIsOpen1, setIsOpen1] = useState(false)
     const [dialogIsOpen2, setIsOpen2] = useState(false)
     const [dialogIsOpen3, setIsOpen3] = useState(false)
+    const [dialogIsOpen4, setIsOpen4] = useState(false)
     const [fileId, setFileId] = useState<string>('')
 
 
@@ -213,13 +214,21 @@ type Option = {
         setIsOpen3(false)
     }
 
+    const openDialog4 = () => {
+        setIsOpen4(true)
+    }
+
+    const onDialogClose4 = () => {
+        setIsOpen4(false)
+    }
+
     useEffect(() => {
         const fetchDataAndLog = async () => {
             try {
                 const leadData = await fetchProjectData(leadId)
                 console.log(leadData)
 
-                  setLoading(false)
+                setLoading(false)
                 const folderData = leadData
                 console.log(folderData)
 
@@ -264,7 +273,7 @@ type Option = {
             const response = await apiDeleteFileManagerFiles(postData)
             console.log(response)
 
-            if (response.code===200) {
+            if (response.code === 200) {
                 toast.push(
                     <Notification closable type="success" duration={2000}>
                         Files deleted successfully
@@ -290,7 +299,7 @@ type Option = {
     }
 
     const handleShareFileForApproval = async () => {
-       
+
         if (selectedFileId === null) {
             toast.push(
                 <Notification closable type="warning" duration={2000}>
@@ -332,13 +341,9 @@ type Option = {
             )
         }
     }
-    const handleShareFiles = async () => {
-        if (selectedFiles.length === 0 || selectedEmails.length === 0) {
-            warn('No files or email addresses selected for sharing.')
-            return
-        }
-        setShareLoading(true)
 
+    const ShareFiles = async () => {
+        setShareLoading(true)
         const postData = {
             file_id: selectedFiles,
             lead_id: '',
@@ -350,8 +355,52 @@ type Option = {
             body: body,
             user_id: localStorage.getItem('userId'),
         }
+        const response = await apiGetCrmFileManagerShareFiles(postData)
+        setShareLoading(false)
+        if (response.code === 200) {
+            toast.push(
+                <Notification closable type="success" duration={2000}>
+                    Files shared successfully
+                </Notification>,
+                { placement: 'top-center' },
+            )
+        }
+        else {
+            toast.push(
+                <Notification closable type="danger" duration={2000}>
+                    {response.errorMessage}
+                </Notification>,
+                { placement: 'top-center' },
+            )
+        }
 
-        
+        setSelectedFiles([])
+        setSelectedEmails([])
+        setSubject('')
+        setBody('')
+        onDialogClose()
+        const updatedLeadData = leadData.map((file) => ({
+            ...file,
+            active: false,
+        }))
+        setLeadData(updatedLeadData)
+
+    }
+    const handleShareFiles = async () => {
+        if (selectedFiles.length === 0 || selectedEmails.length === 0) {
+            warn('No Email Addresses are Selected for sharing.')
+            setShareLoading(false);
+            return
+        }
+        else if (subject === "") {
+            setIsOpen4(true)
+            return
+        }
+        setShareLoading(true);
+        ShareFiles()
+
+
+
 
         function warn(text: string) {
             toast.push(
@@ -362,36 +411,9 @@ type Option = {
             )
         }
 
-        
-            const response = await apiGetCrmFileManagerShareFiles(postData)
-            setShareLoading(false)
-            if(response.code===200){
-                toast.push(
-                    <Notification closable type="success" duration={2000}>
-                        Files shared successfully
-                    </Notification>,
-                    { placement: 'top-center' },
-                )}
-                else{
-                    toast.push(
-                        <Notification closable type="danger" duration={2000}>
-                            {response.errorMessage}
-                        </Notification>,
-                        { placement: 'top-center' },
-                    )
-                }
 
-            setSelectedFiles([])
-            setSelectedEmails([])
-            setSubject('')
-            setBody('')
-            onDialogClose()
-            const updatedLeadData = leadData.map((file) => ({
-                ...file,
-                active: false,
-            }))
-            setLeadData(updatedLeadData)
-        
+
+
     }
     const getFileIcon = (fileName: string) => {
         const extension = fileName.split('.').pop()?.toLowerCase()
@@ -465,114 +487,121 @@ type Option = {
         }
     }
 
-    
+
 
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-const [globalFilter, setGlobalFilter] = useState('')
-const totalData = leadData.length
+    const [globalFilter, setGlobalFilter] = useState('')
+    const totalData = leadData.length
 
-const pageSizeOption = [
-    { value: 10, label: '10 / page' },
-    { value: 20, label: '20 / page' },
-    { value: 30, label: '30 / page' },
-    { value: 40, label: '40 / page' },
-    { value: 50, label: '50 / page' },
-]
+    const pageSizeOption = [
+        { value: 10, label: '10 / page' },
+        { value: 20, label: '20 / page' },
+        { value: 30, label: '30 / page' },
+        { value: 40, label: '40 / page' },
+        { value: 50, label: '50 / page' },
+    ]
 
-const columns = useMemo<ColumnDef<FileItem>[]>(
-    () => [
-        { header: 'Name', accessorKey: 'fileName',
-          cell:({row})=>{
-              const file=row.original
-              const fileName=file.fileName
-              const fileurl=file.fileUrl
-              return <Link to={fileurl} target='_blank'><div className='flex items-center gap-2'>{getFileIcon(row.original.fileName)}{fileName}</div></Link>
-          }
-         },
+    const columns = useMemo<ColumnDef<FileItem>[]>(
+        () => [
+            {
+                header: 'Name', accessorKey: 'fileName',
+                cell: ({ row }) => {
+                    const file = row.original
+                    const fileName = file.fileName
+                    const fileurl = file.fileUrl
+                    return <Link to={fileurl} target='_blank'><div className='flex items-center gap-2'>{getFileIcon(row.original.fileName)}{fileName}</div></Link>
+                }
+            },
 
-        { header: 'Type',cell:({row})=>{
-         return <div>{getFileType(row.original.fileName)}</div>
-        } },
-
-
-        { header: 'Size', accessorKey: 'fileSize',
-          cell:({row})=>{
-            return <div>{formatFileSize(row.original.fileSize)}</div>
-          }
-         },
+            {
+                header: 'Type', cell: ({ row }) => {
+                    return <div>{getFileType(row.original.fileName)}</div>
+                }
+            },
 
 
-        { header: 'Created', accessorKey: 'date',cell:({row})=>{
-          return <div>{formateDate(row.original.date)}</div>
-        } },
-        { header: 'Actions', accessorKey: 'actions',
-        cell:({row})=>{
-            const {roleData}=useRoleContext()
-            const deleteAccess = roleData?.data?.file?.delete?.includes(`${localStorage.getItem('role')}`)
-          return <div className='flex items-center gap-2'>
-            {deleteAccess &&
-              <MdDeleteOutline className='text-xl cursor-pointer hover:text-red-500' onClick={()=>openDialog3(row.original.fileId)} />}
-                  <HiShare className='text-xl cursor-pointer'  onClick={() => openDialog(row.original.fileId)}/> 
-          </div>
-        }
-         },
-    ],
-    []
-)
+            {
+                header: 'Size', accessorKey: 'fileSize',
+                cell: ({ row }) => {
+                    return <div>{formatFileSize(row.original.fileSize)}</div>
+                }
+            },
 
-const table = useReactTable({
-    data:leadData,
-    columns,
-    filterFns: {
-        fuzzy: fuzzyFilter,
-    },
-    state: {
-        columnFilters,
-        globalFilter,
-    },
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    globalFilterFn: fuzzyFilter,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
-    debugHeaders: true,
-    debugColumns: false,
-})
-const onPaginationChange = (page: number) => {
-  table.setPageIndex(page - 1)
-}
 
-const onSelectChange = (value = 0) => {
-  table.setPageSize(Number(value))
-}
+            {
+                header: 'Created', accessorKey: 'date', cell: ({ row }) => {
+                    return <div>{formateDate(row.original.date)}</div>
+                }
+            },
+            {
+                header: 'Actions', accessorKey: 'actions',
+                cell: ({ row }) => {
+                    const { roleData } = useRoleContext()
+                    const deleteAccess = roleData?.data?.file?.delete?.includes(`${localStorage.getItem('role')}`)
+                    return <div className='flex items-center gap-2'>
+                        {deleteAccess &&
+                            <MdDeleteOutline className='text-xl cursor-pointer hover:text-red-500' onClick={() => openDialog3(row.original.fileId)} />}
+                        <HiShare className='text-xl cursor-pointer' onClick={() => openDialog(row.original.fileId)} />
+                    </div>
+                }
+            },
+        ],
+        []
+    )
 
-   const role=localStorage.getItem('role');
+    const table = useReactTable({
+        data: leadData,
+        columns,
+        filterFns: {
+            fuzzy: fuzzyFilter,
+        },
+        state: {
+            columnFilters,
+            globalFilter,
+        },
+        onColumnFiltersChange: setColumnFilters,
+        onGlobalFilterChange: setGlobalFilter,
+        globalFilterFn: fuzzyFilter,
+        getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getFacetedRowModel: getFacetedRowModel(),
+        getFacetedUniqueValues: getFacetedUniqueValues(),
+        getFacetedMinMaxValues: getFacetedMinMaxValues(),
+        debugHeaders: true,
+        debugColumns: false,
+    })
+    const onPaginationChange = (page: number) => {
+        table.setPageIndex(page - 1)
+    }
+
+    const onSelectChange = (value = 0) => {
+        table.setPageSize(Number(value))
+    }
+
+    const role = localStorage.getItem('role');
 
     return (
         <div>
             <div className="flex justify-between">
                 <h3 className="mb-5 capitalize">Project-{ProjectName}</h3>
                 {uploadAccess &&
-                <Button
-                    className=""
-                    size="sm"
-                    variant="solid"
-                    onClick={() => openDialog2()}
-                >
-                    Upload Files
-                </Button>}
+                    <Button
+                        className=""
+                        size="sm"
+                        variant="solid"
+                        onClick={() => openDialog2()}
+                    >
+                        Upload Files
+                    </Button>}
             </div>
-        
-             
-             
-                <div className="w-full">
-                    <div className="flex-1 p-4">
-                        <div className='flex justify-between'>
+
+
+
+            <div className="w-full">
+                <div className="flex-1 p-4">
+                    <div className='flex justify-between'>
                         <div className="flex items-center mb-4">
                             <nav className="flex">
                                 <ol className="flex items-center space-x-2">
@@ -617,101 +646,101 @@ const onSelectChange = (value = 0) => {
                             </nav>
                         </div>
                         <DebouncedInput
-                value={globalFilter ?? ''}
-                className="p-2 font-lg shadow border border-block"
-                placeholder="Search..."
-                onChange={(value) => setGlobalFilter(String(value))}
-            />
-</div>
-                        <Table>
-                <THead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <Tr key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <Th
-                                        key={header.id}
-                                        colSpan={header.colSpan}
-                                    >
-                                        {header.isPlaceholder || header.id==='actions' ? null : (
-                                            <div
-                                                {...{
-                                                    className:
-                                                        header.column.getCanSort()
-                                                            ? 'cursor-pointer select-none'
-                                                            : '',
-                                                    onClick:
-                                                        header.column.getToggleSortingHandler(),
-                                                }}
+                            value={globalFilter ?? ''}
+                            className="p-2 font-lg shadow border border-block"
+                            placeholder="Search..."
+                            onChange={(value) => setGlobalFilter(String(value))}
+                        />
+                    </div>
+                    <Table>
+                        <THead>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <Tr key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => {
+                                        return (
+                                            <Th
+                                                key={header.id}
+                                                colSpan={header.colSpan}
                                             >
-                                                {flexRender(
-                                                    header.column.columnDef
-                                                        .header,
-                                                    header.getContext()
+                                                {header.isPlaceholder || header.id === 'actions' ? null : (
+                                                    <div
+                                                        {...{
+                                                            className:
+                                                                header.column.getCanSort()
+                                                                    ? 'cursor-pointer select-none'
+                                                                    : '',
+                                                            onClick:
+                                                                header.column.getToggleSortingHandler(),
+                                                        }}
+                                                    >
+                                                        {flexRender(
+                                                            header.column.columnDef
+                                                                .header,
+                                                            header.getContext()
+                                                        )}
+                                                        {
+                                                            <Sorter
+                                                                sort={header.column.getIsSorted()}
+                                                            />
+                                                        }
+                                                    </div>
                                                 )}
-                                                {
-                                                    <Sorter
-                                                        sort={header.column.getIsSorted()}
-                                                    />
-                                                }
-                                            </div>
-                                        )}
-                                    </Th>
-                                )
-                            })}
-                        </Tr>
-                    ))}
-                </THead>
-                {loading?<TableRowSkeleton
-                      avatarInColumns= {[0]}
-                      columns={columns.length}
-                      avatarProps={{ width: 14, height: 14 }}
-                  />:leadData.length===0?<Td colSpan={columns.length}><NoData/></Td>:
-                <TBody>
-                    {table.getRowModel().rows.map((row) => {
-                        return (
-                            <Tr key={row.id}>
-                                {row.getVisibleCells().map((cell) => {
+                                            </Th>
+                                        )
+                                    })}
+                                </Tr>
+                            ))}
+                        </THead>
+                        {loading ? <TableRowSkeleton
+                            avatarInColumns={[0]}
+                            columns={columns.length}
+                            avatarProps={{ width: 14, height: 14 }}
+                        /> : leadData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
+                            <TBody>
+                                {table.getRowModel().rows.map((row) => {
                                     return (
-                                        <Td key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </Td>
+                                        <Tr key={row.id}>
+                                            {row.getVisibleCells().map((cell) => {
+                                                return (
+                                                    <Td key={cell.id}>
+                                                        {flexRender(
+                                                            cell.column.columnDef.cell,
+                                                            cell.getContext()
+                                                        )}
+                                                    </Td>
+                                                )
+                                            })}
+                                        </Tr>
                                     )
                                 })}
-                            </Tr>
-                        )
-                    })}
-                </TBody>}
-            </Table>
+                            </TBody>}
+                    </Table>
 
-            <div className="flex items-center justify-between mt-4">
-                <Pagination
-                    pageSize={table.getState().pagination.pageSize}
-                    currentPage={table.getState().pagination.pageIndex + 1}
-                    total={table.getFilteredRowModel().rows.length}
-                    onChange={onPaginationChange}
-                />
-                <div style={{ minWidth: 130 }}>
-                    <Select<Option>
-                        size="sm"
-                        isSearchable={false}
-                        value={pageSizeOption.filter(
-                            (option) =>
-                                option.value ===
-                                table.getState().pagination.pageSize
-                        )}
-                        options={pageSizeOption}
-                        onChange={(option) => onSelectChange(option?.value)}
-                    />
-                </div>
-            </div>
+                    <div className="flex items-center justify-between mt-4">
+                        <Pagination
+                            pageSize={table.getState().pagination.pageSize}
+                            currentPage={table.getState().pagination.pageIndex + 1}
+                            total={table.getFilteredRowModel().rows.length}
+                            onChange={onPaginationChange}
+                        />
+                        <div style={{ minWidth: 130 }}>
+                            <Select<Option>
+                                size="sm"
+                                isSearchable={false}
+                                value={pageSizeOption.filter(
+                                    (option) =>
+                                        option.value ===
+                                        table.getState().pagination.pageSize
+                                )}
+                                options={pageSizeOption}
+                                onChange={(option) => onSelectChange(option?.value)}
+                            />
+                        </div>
                     </div>
                 </div>
-            
-            
+            </div>
+
+
             <StickyFooter
                 className="-mx-8 px-8 flex items-center justify-between py-4 mt-7"
                 stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
@@ -729,7 +758,7 @@ const onSelectChange = (value = 0) => {
                     >
                         Back
                     </Button>
-                    {(folderName?.toUpperCase() === 'QUOTATION' ) ? (
+                    {(folderName?.toUpperCase() === 'QUOTATION') ? (
                         <Button
                             size="sm"
                             className="ltr:mr-3 rtl:ml-3"
@@ -753,107 +782,108 @@ const onSelectChange = (value = 0) => {
             >
                 <h3 className="mb-5">Share Files</h3>
                 <Formik initialValues={{ lead_id: leadId, folder_name: folderName, file_id: '', email: '', cc: '', bcc: '', subject: '', body: '' }}
-              onSubmit={async(values) => {
-                console.log(values);
-                
-              }
+                    onSubmit={async (values) => {
+                        console.log(values);
 
-              }>
-    <div className='max-h-96 overflow-y-auto'>
-             <FormItem label='To'>
-              <Field>
-                {({ field, form }: any) => (
-          <Select
-          className='mt-1'
-    isMulti
-    value={selectedEmails.map((email) => ({ label: email, value: email }))}
-    componentAs={CreatableSelect}
-    placeholder="Add email addresses..."
-    onChange={(newValues) => {
-      const emails = newValues ? newValues.map((option) => option.value) : [];
-      setSelectedEmails(emails);
-    }}
-    onCreateOption={(inputValue) => {
-      const newEmails = [...selectedEmails, inputValue];
-      setSelectedEmails(newEmails);
-    }}
-  />)}
-  </Field></FormItem>
-    
-  <FormItem label='Cc'>
-              <Field>
-                {({ field, form }: any) => (
-          <Select
-          className='mt-1'
-    isMulti
-    value={selectedEmailsCc.map((email) => ({ label: email, value: email }))}
-    componentAs={CreatableSelect}
-    placeholder="Add email addresses..."
-    onChange={(newValues) => {
-      const emails = newValues ? newValues.map((option) => option.value) : [];
-      setSelectedEmailsCc(emails);
-    }}
-    onCreateOption={(inputValue) => {
-      const newEmails = [...selectedEmailsCc, inputValue];
-      setSelectedEmailsCc(newEmails);
-    }}
-  />)}
-  </Field></FormItem>
-    
-  <FormItem label='Bcc'>
-              <Field>
-                {({ field, form }: any) => (
-          <Select
-          className='mt-1'
-    isMulti
-    value={selectedEmailsBcc.map((email) => ({ label: email, value: email }))}
-    componentAs={CreatableSelect}
-    placeholder="Add email addresses..."
-    onChange={(newValues) => {
-      const emails = newValues ? newValues.map((option) => option.value) : [];
-      setSelectedEmailsBcc(emails);
-    }}
-    onCreateOption={(inputValue) => {
-      const newEmails = [...selectedEmailsBcc, inputValue];
-      setSelectedEmailsBcc(newEmails);
-    }}
-  />
-)}
-  </Field></FormItem>
+                    }
+
+                    }>
+                    <div className='max-h-96 overflow-y-auto'>
+                        <FormItem label='To' asterisk>
+                            <Field>
+                                {({ field, form }: any) => (
+                                    <Select
+                                        className='mt-1'
+                                        isMulti
+                                        value={selectedEmails.map((email) => ({ label: email, value: email }))}
+                                        componentAs={CreatableSelect}
+                                        placeholder="Add email addresses..."
+                                        onChange={(newValues) => {
+                                            const emails = newValues ? newValues.map((option) => option.value) : [];
+                                            setSelectedEmails(emails);
+                                        }}
+                                        onCreateOption={(inputValue) => {
+                                            const newEmails = [...selectedEmails, inputValue];
+                                            setSelectedEmails(newEmails);
+                                        }}
+                                    />)}
+                            </Field></FormItem>
+
+                        <FormItem label='Cc'>
+                            <Field>
+                                {({ field, form }: any) => (
+                                    <Select
+                                        className='mt-1'
+                                        isMulti
+                                        value={selectedEmailsCc.map((email) => ({ label: email, value: email }))}
+                                        componentAs={CreatableSelect}
+                                        placeholder="Add email addresses..."
+                                        onChange={(newValues) => {
+                                            const emails = newValues ? newValues.map((option) => option.value) : [];
+                                            setSelectedEmailsCc(emails);
+                                        }}
+                                        onCreateOption={(inputValue) => {
+                                            const newEmails = [...selectedEmailsCc, inputValue];
+                                            setSelectedEmailsCc(newEmails);
+                                        }}
+                                    />)}
+                            </Field></FormItem>
+
+                        <FormItem label='Bcc'>
+                            <Field>
+                                {({ field, form }: any) => (
+                                    <Select
+                                        className='mt-1'
+                                        isMulti
+                                        value={selectedEmailsBcc.map((email) => ({ label: email, value: email }))}
+                                        componentAs={CreatableSelect}
+                                        placeholder="Add email addresses..."
+                                        onChange={(newValues) => {
+                                            const emails = newValues ? newValues.map((option) => option.value) : [];
+                                            setSelectedEmailsBcc(emails);
+                                        }}
+                                        onCreateOption={(inputValue) => {
+                                            const newEmails = [...selectedEmailsBcc, inputValue];
+                                            setSelectedEmailsBcc(newEmails);
+                                        }}
+                                    />
+                                )}
+                            </Field></FormItem>
 
 
-<div className=''>
-<FormItem label='Subject'>
-              <Field>
-                {({ field, form }: any) => (
-          <Input
-          required
-            type='text'
-            className='mt-1 p-2 w-full border rounded-md'
-            value={subject}
-            placeholder='Enter subject...'
-            onChange={handleSubjectChange}
-          />
-        )}
-  </Field></FormItem>
-        </div>
-        <div className=''>
-          <FormItem label='Body'>
-              <Field>
-                {({ field, form }: any) => (
-             <RichTextEditor value={body} onChange={setBody} />
-        )}
-        </Field></FormItem>
-        </div>
-  
-         <div className='flex justify-end'>
-         <Button size="sm" variant="solid" type="submit" className='mt-5 ' onClick={handleShareFiles} loading={shareLoading} block>
-            {shareLoading ? 'Sharing...' : 'Share'}
-          </Button>
-          </div>
-          </div>
-          </Formik>
-               
+                        <div className=''>
+                            <FormItem label='Subject'>
+                                <Field>
+                                    {({ field, form }: any) => (
+                                        <Input
+                                            required
+                                            type='text'
+                                            className='mt-1 p-2 w-full border rounded-md'
+                                            value={subject}
+                                            placeholder='Enter subject...'
+                                            onChange={handleSubjectChange}
+
+                                        />
+                                    )}
+                                </Field></FormItem>
+                        </div>
+                        <div className=''>
+                            <FormItem label='Body'>
+                                <Field>
+                                    {({ field, form }: any) => (
+                                        <RichTextEditor value={body} onChange={setBody} />
+                                    )}
+                                </Field></FormItem>
+                        </div>
+
+                        <div className='flex justify-end'>
+                            <Button size="sm" variant="solid" type="submit" className='mt-5 ' onClick={handleShareFiles} loading={shareLoading} block>
+                                {shareLoading ? 'Sharing...' : 'Share'}
+                            </Button>
+                        </div>
+                    </div>
+                </Formik>
+
             </Dialog>
 
             {/* ShareFiles For Approval */}
@@ -924,9 +954,9 @@ const onSelectChange = (value = 0) => {
                                     (file) => file.fileId === selectedFileId,
                                 )
                                     ? {
-                                          value: selectedFileId,
-                                          label: selectedFileId,
-                                      }
+                                        value: selectedFileId,
+                                        label: selectedFileId,
+                                    }
                                     : null
                             }
                         />
@@ -944,7 +974,7 @@ const onSelectChange = (value = 0) => {
 
                         onClick={handleShareFileForApproval}
                     >
-                        {approvalLoading? 'Sharing...':'Share'}
+                        {approvalLoading ? 'Sharing...' : 'Share'}
                     </Button>
                 </div>
             </Dialog>
@@ -963,7 +993,7 @@ const onSelectChange = (value = 0) => {
                         folder_name: folderName,
                         files: [],
                     }}
-                    onSubmit={async (values,{setSubmitting}) => {
+                    onSubmit={async (values, { setSubmitting }) => {
                         if (values.files.length === 0) {
                             toast.push(
                                 <Notification
@@ -1023,30 +1053,30 @@ const onSelectChange = (value = 0) => {
                     }}
                 >
                     {({ isSubmitting }) => (
-                    <Form
-                        className=" overflow-y-auto max-h-[400px] mt-4"
-                        style={{ scrollbarWidth: 'none' }}
-                    >
-                        <FormItem label="Files" className="mt-4">
-                            <Field name="files">
-                                {({ field, form }: any) => (
-                                    <Upload
-                                    draggable
-                                    multiple
-                                        onChange={(
-                                            files: File[],
-                                            fileList: File[],
-                                        ) => {
-                                            form.setFieldValue('files', files)
-                                        }}
-                                    />
-                                )}
-                            </Field>
-                        </FormItem>
-                        <Button variant="solid" type="submit" loading={isSubmitting} block>
-                            {isSubmitting ? 'Uploading...' : 'Upload'}
-                        </Button>
-                    </Form>)}
+                        <Form
+                            className=" overflow-y-auto max-h-[400px] mt-4"
+                            style={{ scrollbarWidth: 'none' }}
+                        >
+                            <FormItem label="Files" className="mt-4">
+                                <Field name="files">
+                                    {({ field, form }: any) => (
+                                        <Upload
+                                            draggable
+                                            multiple
+                                            onChange={(
+                                                files: File[],
+                                                fileList: File[],
+                                            ) => {
+                                                form.setFieldValue('files', files)
+                                            }}
+                                        />
+                                    )}
+                                </Field>
+                            </FormItem>
+                            <Button variant="solid" type="submit" loading={isSubmitting} block>
+                                {isSubmitting ? 'Uploading...' : 'Upload'}
+                            </Button>
+                        </Form>)}
                 </Formik>
             </Dialog>
 
@@ -1057,11 +1087,42 @@ const onSelectChange = (value = 0) => {
                 confirmButtonColor="red-600"
                 onCancel={onDialogClose3}
                 onConfirm={() => deleteFiles(fileId)}
-                title="Delete Folder"
+                title="Delete File"
                 onRequestClose={onDialogClose3}
             >
                 <p> Are you sure you want to delete this file? </p>
             </ConfirmDialog>
+
+            <Dialog isOpen={dialogIsOpen4}
+                onClose={onDialogClose4}
+                onRequestClose={onDialogClose4}
+                closable
+            >
+                <h6 style={{ marginBottom: 10, color: '#d9534f' }}>Warning: Missing Subject</h6>
+                <p style={{ fontSize: 16, color: '#666' }}>
+                    Are you sure you want to share the files without a subject?
+                </p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>
+                    <Button
+                        onClick={() => {
+                            ShareFiles();
+                            onDialogClose4();
+                        }}
+                        variant='solid'
+                        type='submit'
+                    >
+                        Yes, Share Anyway
+                    </Button>
+                    <Button
+                        onClick={onDialogClose4}
+                        variant='solid'
+                        type='submit'
+                    >
+                        Cancel
+                    </Button>
+                </div>
+
+            </Dialog>
         </div>
     )
 }

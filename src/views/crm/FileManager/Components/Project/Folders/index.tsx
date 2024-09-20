@@ -1115,8 +1115,8 @@ const Index = () => {
                     </Button>
                     <Button
                         onClick={onDialogClose4}
-                        variant='solid'
-                        type='submit'
+
+                        type="button"
                     >
                         Cancel
                     </Button>

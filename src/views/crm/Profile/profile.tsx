@@ -63,9 +63,12 @@ const Profile = ({
         formData.append('userId', values.userId);
         formData.append('file', values.avatar); 
         formData.append('user_name', usernameData); 
+
+        // console.log("usernameData", usernameData)
+        // console.log("data.username", data?.username)
         
         const response = await addProfilePhoto(formData); 
-        console.log(response)
+        // console.log(response)
 
         setAvatarUrl(data?.avatar);
         toast.push(<Notification title={'Profile updated'} type="success" />, {

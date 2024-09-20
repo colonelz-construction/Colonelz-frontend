@@ -28,7 +28,7 @@ const _UserDropdown = ({ className }: CommonProps) => {
     const dropdownItemList: DropdownList[] = [
         {
             label:"My Profile",
-            path:"/app/crm/profile",
+            path:"/app/crm/profile?type=profile",
             icon:<AiOutlineUser/>,
             authority:[
                 `${localStorage.getItem('role')}`

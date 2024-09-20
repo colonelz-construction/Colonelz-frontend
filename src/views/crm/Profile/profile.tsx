@@ -27,6 +27,7 @@ export type ProfileFormModel = {
 export type ProfileUpdate = {
     userId: string
     avatar: string
+    username: string
 }
 
 export type ProfileProps = {
@@ -39,6 +40,8 @@ const validationSchema = Yup.object().shape({
 const Profile = ({
   data,
 }: ProfileProps) => {
+
+    const [usernameData, setUserNameData] = useState<any>(data?.username);
     console.log(data);
     const [avatarUrl, setAvatarUrl] = useState<string | undefined>(data?.avatar);
     const onSetFormFile = (
@@ -59,14 +62,16 @@ const Profile = ({
         const formData = new FormData();
         formData.append('userId', values.userId);
         formData.append('file', values.avatar); 
+        formData.append('user_name', usernameData); 
         
         const response = await addProfilePhoto(formData); 
+        console.log(response)
 
         setAvatarUrl(data?.avatar);
         toast.push(<Notification title={'Profile updated'} type="success" />, {
             placement: 'top-center',
         });
-        window.location.reload();
+        // window.location.reload();
         setSubmitting(false);
     }
 
@@ -106,7 +111,7 @@ const Profile = ({
     {...validatorProps}
 >
     <Field name="avatar">
-        {({ field, form }: FieldProps) => {
+        {({ field, form  }: FieldProps) => {
             const avatarProps = avatarUrl
                 ? { src: avatarUrl }
                 : data?.avatar
@@ -152,7 +157,10 @@ const Profile = ({
                             <FormItem
                                 label="Username"
                             >
-                                <Input placeholder={`${data?.username}`} disabled/>
+                                <Input value={usernameData} placeholder={`${data?.username}`} onChange={(e) => {
+                                    setUserNameData(e.target.value)
+                                    console.log(usernameData)
+                                }} />
                             </FormItem>
                             <FormItem
                                 label="Email"

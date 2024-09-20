@@ -71,7 +71,7 @@ const Profile = ({
         toast.push(<Notification title={'Profile updated'} type="success" />, {
             placement: 'top-center',
         });
-        // window.location.reload();
+        window.location.reload();
         setSubmitting(false);
     }
 

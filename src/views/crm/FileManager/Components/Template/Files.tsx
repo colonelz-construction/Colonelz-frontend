@@ -231,7 +231,7 @@ const Index = () => {
         toast.push(
           <Notification closable type="success" duration={2000}>
             Files deleted successfully
-          </Notification>, { placement: 'top-center' }
+          </Notification>, { placement: 'top-end' }
         )
         window.location.reload()
       }
@@ -239,7 +239,7 @@ const Index = () => {
         toast.push(
           <Notification closable type="danger" duration={2000}>
             {response.errorMessage}
-          </Notification>, { placement: 'top-center' }
+          </Notification>, { placement: 'top-end' }
         )
       }
 
@@ -272,14 +272,14 @@ const Index = () => {
       toast.push(
         <Notification closable type="success" duration={2000}>
           Files shared successfully
-        </Notification>, { placement: 'top-center' }
+        </Notification>, { placement: 'top-end' }
       )
     }
     else {
       toast.push(
         <Notification closable type="danger" duration={2000}>
           {response.errorMessage}
-        </Notification>, { placement: 'top-center' }
+        </Notification>, { placement: 'top-end' }
       )
     }
     setSelectedFiles([]);
@@ -796,7 +796,7 @@ const Index = () => {
                 toast.push(
                   <Notification closable type="success" duration={2000}>
                     Files uploaded successfully
-                  </Notification>, { placement: 'top-center' }
+                  </Notification>, { placement: 'top-end' }
                 )
                 window.location.reload()
               }
@@ -804,7 +804,7 @@ const Index = () => {
                 toast.push(
                   <Notification closable type="danger" duration={2000}>
                     {response.errorMessage}
-                  </Notification>, { placement: 'top-center' }
+                  </Notification>, { placement: 'top-end' }
                 )
               }
             }
@@ -845,36 +845,26 @@ const Index = () => {
         <p> Are you sure you want to delete this file? </p>
       </ConfirmDialog>
 
-      <Dialog isOpen={dialogIsOpen4}
+      <ConfirmDialog
+        isOpen={dialogIsOpen4}
+        type='warning'
         onClose={onDialogClose4}
+        confirmButtonColor='yellow-600'
+        onCancel={onDialogClose4}
         onRequestClose={onDialogClose4}
+        title="Missing Subject"
         closable
+        onConfirm={() => {
+          ShareFiles();
+          onDialogClose4();
+        }}
       >
-        <h6 style={{ marginBottom: 10, color: '#d9534f' }}>Warning: Missing Subject</h6>
-        <p style={{ fontSize: 16, color: '#666' }}>
+        <p>
           Are you sure you want to share the files without a subject?
         </p>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>
-          <Button
-            onClick={() => {
-              ShareFiles();
-              onDialogClose4();
-            }}
-            variant='solid'
-            type='submit'
-          >
-            Yes, Share Anyway
-          </Button>
-          <Button
-            onClick={onDialogClose4}
 
-            type="button"
-          >
-            Cancel
-          </Button>
-        </div>
 
-      </Dialog>
+      </ConfirmDialog>
     </div>
   );
 };

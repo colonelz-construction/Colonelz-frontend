@@ -113,6 +113,7 @@ const EditUserRole = ({userId } : any) => {
 
     return (
         <div className="w-full">
+            
       
         <Formik
             enableReinitialize
@@ -134,7 +135,8 @@ const EditUserRole = ({userId } : any) => {
             {({ values, touched, errors, isSubmitting, resetForm }) => {
                 const validatorProps = { touched, errors }
                 return (
-                    <Form className='w-full sm:w-3/5 lg:w-4/5'>
+                    <Form className='w-full sm:w-3/5 lg:w-4/5 lg:ml-6'>
+                    <h3 className=' my-3'>Edit User Role</h3>
                         <FormContainer>                             
                            
                             <FormItem

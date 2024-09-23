@@ -252,7 +252,7 @@ const EditRoles = () => {
                                 <Button
                                     size='sm'
                                     type="button"
-                                    onClick={() => navigate('/app/crm/profile')}
+                                    onClick={() => navigate(`/app/crm/profile?type=roles`)}
                                 >
                                     Back
                                 </Button>

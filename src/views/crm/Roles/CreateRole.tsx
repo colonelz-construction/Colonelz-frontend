@@ -33,7 +33,7 @@ export const permissionsMap: { [key: string]: Permission[] } = {
     mom: ['create', 'read', 'delete', 'update'],
     contract: ['create', 'read', 'update'],
     quotation: ['read', 'update'],
-    user: ['create', 'read', 'delete'],
+    user: ['create', 'read', 'update', 'delete'],
     userArchive: ['read', 'restore', 'delete'],
     companyData: ['read']
 };

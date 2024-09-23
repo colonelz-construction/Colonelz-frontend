@@ -116,6 +116,18 @@ return ApiService.fetchData<any>({
 
 }
 
+export async function apiEditUserRole(data: any) {
+
+    console.log("apiEditUserRole",data)
+    return ApiService.fetchData<any>({
+        url: 'admin/update/users/role',
+        method: 'put',
+        data
+    }).then(
+        (response)=>{return response.data})
+    
+}
+
 export async function apiDeleteRole(id:any) {
     return ApiService.fetchData<any>({
         url: `admin/delete/role?id=${id}`,

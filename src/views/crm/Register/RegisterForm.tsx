@@ -178,7 +178,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                             <Button
                                         size='md'
                                         type="button"
-                                        onClick={() => navigate('/app/crm/profile')}
+                                        onClick={() => navigate('/app/crm/profile?type=users')}
                                     >
                                         Back
                                     </Button>

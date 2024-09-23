@@ -11,12 +11,30 @@ import Roles from './Roles'
 import { useRoleContext } from '../Roles/RolesContext'
 import { AuthorityCheck } from '@/components/shared'
 import ArchivedUsers from '../users/ArchivedUsers'
+import { useNavigate } from 'react-router-dom'
 
 const Index = () => {
     const userRole=localStorage.getItem('role') || ''
     const {roleData}=useRoleContext()
     const data = useContext(UserDetailsContext);
     console.log(data);
+    const navigate = useNavigate();
+
+    interface QueryParams {
+      type:string
+    
+    }
+    const queryParams = new URLSearchParams(location.search);
+
+    const allQueryParams: QueryParams = {
+      type: queryParams.get('type') || '',
+    };
+
+    const handleTabChange = (selectedTab:any) => {
+      const currentUrlParams = new URLSearchParams(location.search);
+      currentUrlParams.set('type', selectedTab);
+      navigate(`${location.pathname}?${currentUrlParams.toString()}`);
+  };
     
     const userAccess=roleData?.data?.user?.read?roleData?.data?.user?.read.includes(userRole):false
     const roleAccess=roleData?.data?.role?.read?roleData?.data?.role?.read.includes(userRole):false
@@ -26,7 +44,7 @@ const Index = () => {
     
   return (<div className='px-4'>
     <h3 className='mb-5'>My Profile</h3>
-    <Tabs defaultValue="profile">
+    <Tabs defaultValue={allQueryParams.type} onChange={handleTabChange}>
     <TabList>
         <TabNav value="profile">Profile</TabNav>
         <TabNav value="pass">Password</TabNav>

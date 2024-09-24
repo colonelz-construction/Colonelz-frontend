@@ -120,14 +120,15 @@ const Users = () => {
     const [loading, setLoading] = useState(true)
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [userId, setUserId] = useState('')
+    const [userData, setUserData] = useState()
 
     const [editRoledialogIsOpen, setEditRoleIsOpen] = useState(false)
   
     console.log(data)
 
-    const openEditRoleDialog = (userId : any) => {
+    const openEditRoleDialog = (Data : any) => {
         setEditRoleIsOpen(true)
-        setUserId(userId)
+        setUserData(Data)
     }
 
     const onEditRoleDialogClose = () => {
@@ -202,7 +203,7 @@ const Users = () => {
                                             }
                                         >
                                             
-                                                <span className="cursor-pointer" onClick={() => openEditRoleDialog(row.original.UserId)}>
+                                                <span className="cursor-pointer" onClick={() => openEditRoleDialog(row.original)}>
                                              
                                                     <BiPencil />
                                                 </span>
@@ -400,7 +401,7 @@ const Users = () => {
                 onRequestClose={onEditRoleDialogClose}
                 className=""
             >
-                {<EditUserRole userId={userId}/>}
+                {<EditUserRole Data={userData}/>}
             </Dialog>
         </>
     )

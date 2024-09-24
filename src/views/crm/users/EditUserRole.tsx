@@ -39,10 +39,7 @@ const validationSchema = Yup.object().shape({
     avatar: Yup.string(),
 })
 
-const EditUserRole = ({userId } : any) => {
-
-    // const query = useQuery();
-    // const userId : any = query.get('userId');
+const EditUserRole = ({Data } : any) => {
     const {rolelist}=useRoleContext()
     
     console.log(rolelist)
@@ -53,32 +50,13 @@ const EditUserRole = ({userId } : any) => {
 
     console.log(rolesOptions)
 
-
-    const [loading,setLoading]=useState(true)
-
     const [userData, setUserData] = useState<any>();
     console.log(userData)
-    console.log(userId)
+    console.log(Data.userId)
 
 
 
-    useEffect(() => {
-        const fetchData = async () => {
-          const response = await apiGetUsers(); 
-        //   const data: any =  response
-
-          if(response && response.data) {
-              const roleData = response.data.find((r: any) => r.UserId === userId);
-              setUserData(roleData)
-          }
-          
-          setLoading(false)
-
-    };
-       
-    
-        fetchData();
-    }, []);
+ 
 
     // const [usernameData, setUserNameData] = useState<any>(data?.username);
     // console.log(data);
@@ -90,9 +68,8 @@ const EditUserRole = ({userId } : any) => {
         const formData = new FormData();
 
         console.log(values.role)
-        console.log(userId)
         formData.append('role', values.role);
-        formData.append('userId', userId);
+        formData.append('userId', Data.userId);
 
     
 
@@ -118,7 +95,7 @@ const EditUserRole = ({userId } : any) => {
         <Formik
             enableReinitialize
             initialValues={{
-                role: userData?.role
+                role: Data.role,
             } as any
             }
             
@@ -142,12 +119,12 @@ const EditUserRole = ({userId } : any) => {
                             <FormItem
                                 label="Username"
                             >
-                                <Input placeholder={`${userData?.username}`} disabled/>
+                                <Input placeholder={`${Data.username}`} disabled/>
                             </FormItem>
                             <FormItem
                                 label="Email"
                             >
-                                <Input placeholder={`${userData?.email}`} disabled/>
+                                <Input placeholder={`${Data.email}`} disabled/>
                             </FormItem>
                             <FormItem
                                 label="Role"

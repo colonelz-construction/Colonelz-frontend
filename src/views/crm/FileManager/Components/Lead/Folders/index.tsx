@@ -286,10 +286,6 @@ const Index = () => {
       user_id: localStorage.getItem('userId')
     };
 
-
-
-
-
     const response = await apiGetCrmFileManagerShareFiles(postData);
     if (response.code === 200) {
       toast.push(
@@ -306,6 +302,7 @@ const Index = () => {
       )
     }
     setShareLoading(false)
+    onDialogClose()
     const responseData = await response.json();
     console.log('Files shared successfully:', responseData);
     setSelectedFiles([]);
@@ -314,7 +311,6 @@ const Index = () => {
     setSelectedEmailsBcc([]);
     setSubject('')
     setBody('')
-    onDialogClose()
 
     const updatedLeadData = leadData.map((file) => ({ ...file, active: false }));
     setLeadData(updatedLeadData);
@@ -330,7 +326,6 @@ const Index = () => {
       setIsOpen4(true)
       return
     }
-    setShareLoading(true);
     ShareFiles()
 
 

@@ -15,7 +15,7 @@ export type AppConfig = {
 
 const appConfig: AppConfig = {
     apiPrefix: `${env}v1/api/`,
-    authenticatedEntryPath: (role === 'Site Supervisor' || role === 'Jr. Executive HR & Marketing') ? '/app/crm/fileManager' : '/app/crm/dashboard',
+    authenticatedEntryPath:'/app/crm/dashboard',
     unAuthenticatedEntryPath: '/sign-in',
     tourPath: '/app/account/kyc-form',
     locale: 'en',

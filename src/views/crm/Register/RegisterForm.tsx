@@ -34,7 +34,7 @@ const validationSchema = Yup.object().shape({
 })
 
 
-const SignUpForm = (props: SignUpFormProps) => {
+const   SignUpForm = (props: SignUpFormProps) => {
     const { disableSubmit = false, className, signInUrl = '/sign-in' } = props
     const id=localStorage.getItem('userId')
     const { signUp } = useAuth()

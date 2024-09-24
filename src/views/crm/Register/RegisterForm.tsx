@@ -9,6 +9,8 @@ import useAuth from '@/utils/hooks/useAuth'
 import type { CommonProps } from '@/@types/common'
 import { Notification, Select, toast,Button } from '@/components/ui'
 import { useRoleContext } from '../Roles/RolesContext'
+import { useNavigate } from 'react-router-dom';
+
 
 interface SignUpFormProps extends CommonProps {
     disableSubmit?: boolean
@@ -32,11 +34,12 @@ const validationSchema = Yup.object().shape({
 })
 
 
-const SignUpForm = (props: SignUpFormProps) => {
+const   SignUpForm = (props: SignUpFormProps) => {
     const { disableSubmit = false, className, signInUrl = '/sign-in' } = props
     const id=localStorage.getItem('userId')
     const { signUp } = useAuth()
     const {rolelist}=useRoleContext()
+    const navigate = useNavigate();
     
     
 
@@ -51,6 +54,9 @@ const SignUpForm = (props: SignUpFormProps) => {
         setSubmitting(true)
         const result = await signUp({ id,user_name, role, email })
         if (result.code===200) {
+            values.user_name = ''
+            values.email = ''
+            values.role = ''
           toast.push(
             <Notification closable type="success" duration={2000}>
                 User Registered Successfully
@@ -92,6 +98,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                 onSubmit={(values, { setSubmitting }) => {
                     if (!disableSubmit) {
                         onSignUp(values, setSubmitting)
+                      
                     } else {
                         setSubmitting(false)
                     }
@@ -152,6 +159,8 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     )}
                                 </Field>
                                 </FormItem>
+                          <div className='gap-4 flex items-center'>
+
                           
                           
                             <Button
@@ -167,6 +176,15 @@ const SignUpForm = (props: SignUpFormProps) => {
                                     ? 'Creating Account...'
                                     : 'Register'}
                             </Button>
+                            <Button
+                                        size='md'
+                                        type="button"
+                                        onClick={() => navigate('/app/crm/profile?type=users')}
+                                    >
+                                        Back
+                                    </Button>
+
+                                    </div>
                  
                     </Form>
                 )}

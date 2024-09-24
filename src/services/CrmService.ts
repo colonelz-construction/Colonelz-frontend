@@ -31,9 +31,9 @@ const userId=localStorage.getItem('userId');
  
  
  
-export async function apiGetNotification<T>(userId: string | null) {
+export async function apiGetNotification<T>(userId: string | null,page:number) {
     return ApiService.fetchData<NotificationResponse>({
-        url: `admin/get/notification?userId=${userId}`,
+        url: `admin/get/notification?userId=${userId}&page=${page}&limit=20`,
         method: 'get',
     }).then(
         (response)=>{
@@ -116,9 +116,30 @@ return ApiService.fetchData<any>({
 
 }
 
+export async function apiEditUserRole(data: any) {
+
+    console.log("apiEditUserRole",data)
+    return ApiService.fetchData<any>({
+        url: 'admin/update/users/role',
+        method: 'put',
+        data
+    }).then(
+        (response)=>{return response.data})
+    
+}
+
 export async function apiDeleteRole(id:any) {
     return ApiService.fetchData<any>({
         url: `admin/delete/role?id=${id}`,
+        method: 'delete',
+        data: id
+    }).then(
+        (response)=>{return response.data})
+    
+}
+export async function apiDeleteInactiveLead(id:any) {
+    return ApiService.fetchData<any>({
+        url: `admin/delete/inactive/lead?lead_id=${id}`,
         method: 'delete',
         data: id
     }).then(
@@ -284,6 +305,33 @@ export async function apiGetMomData<T>() {
         return response.data
     })
 }
+export async function apiGetSingleMomData<T>() {
+    return ApiService.fetchData<MomResponse>({
+        url: `admin/getsingle/mom`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiGetMomUpdate<T>(data:any,project_id:string,mom_id:string) {
+
+    return ApiService.fetchData<any>({
+        url: `admin/update/mom?project_id=${project_id}&mom_id=${mom_id}`,
+        method: 'put',
+        data: data
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiGetMomDelete<T>(data:any) {
+    return ApiService.fetchData<any>({
+        url: `admin/delete/mom`,
+        method: 'delete',
+        data: data
+    }).then((response) => {
+        return response.data
+    })
+}
  
  
 export async function apiCreateMom(formData: any) {
@@ -419,6 +467,14 @@ return ApiService.fetchData<any>({
 export async function apiGetCrmProjectsMom<T>(projectId:string) {
     return ApiService.fetchData<ApiResponse>({
         url: `admin/getall/mom/?project_id=${projectId}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiGetCrmProjectsSingleMom<T>(projectId:string,momId:string) {
+    return ApiService.fetchData<ApiResponse>({
+        url: `admin/getall/mom/?project_id=${projectId}&mom_id=${momId}`,
         method: 'get',
     }).then((response) => {
         return response.data

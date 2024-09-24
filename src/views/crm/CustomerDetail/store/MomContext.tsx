@@ -32,10 +32,9 @@ export interface MomDataType {
 }
 
 interface Attendees {
-  client_name: string | string[];
-  organisor: string;
-  designer: string;
-  attendees: string;
+  client_name: string[];
+  organisor: string[];
+  attendees: string[];
 }
 
 interface File {

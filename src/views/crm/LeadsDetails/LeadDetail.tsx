@@ -4,10 +4,11 @@ import Container from '@/components/shared/Container'
 import reducer, { getCustomer, useAppDispatch } from './store'
 import { injectReducer } from '@/store'
 import useQuery from '@/utils/hooks/useQuery'
+import { useNavigate } from 'react-router-dom';
 import LeadForm from './components/LeadForm'
-import { Button, Card, Dialog, Dropdown, Skeleton, Steps, Tabs } from '@/components/ui'
+import { Button, Card, Dialog, Dropdown, Notification, Skeleton, Steps, Tabs, toast } from '@/components/ui'
 import CustomerProfile from './components/LeadProfile'
-import { apiGetCrmLeadsDetails } from '@/services/CrmService'
+import { apiDeleteInactiveLead, apiGetCrmLeadsDetails } from '@/services/CrmService'
 import TabList from '@/components/ui/Tabs/TabList'
 import TabNav from '@/components/ui/Tabs/TabNav'
 import TabContent from '@/components/ui/Tabs/TabContent'
@@ -17,7 +18,7 @@ import FollowDetails from './components/Follow-UpDetails'
 import EditLead from './components/EditLead'
 import LeadActivity from './components/LeadActivity'
 import { Link } from 'react-router-dom'
-import { AuthorityCheck } from '@/components/shared'
+import { AuthorityCheck, ConfirmDialog } from '@/components/shared'
 import { useRoleContext } from '../Roles/RolesContext'
 import { Lead } from '../LeadList/store/LeadContext'
 
@@ -29,9 +30,11 @@ export type LeadDetailsResponse = {
 injectReducer('crmCustomerDetails', reducer)
 
 const CustomerDetail = () => {
+    const navigate = useNavigate();
     const dispatch = useAppDispatch()
 
     const query = useQuery()
+    const lead_id = query.get('id')
 
     useEffect(() => {
         fetchData()
@@ -49,6 +52,7 @@ const CustomerDetail = () => {
     const [loading,setLoading]=useState(true)
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [dialogIsOpen1, setIsOpen1] = useState(false)
+    const [dialogIsOpen2, setIsOpen2] = useState(false)
 
     const openDialog1 = () => {
         setIsOpen1(true)
@@ -67,6 +71,16 @@ const CustomerDetail = () => {
         
         setIsOpen(false)
     }
+    const openDialog2 = () => {
+        setIsOpen2(true)
+    }
+  
+    const onDialogClose2 = () => {
+        
+        setIsOpen2(false)
+    }
+
+    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -83,8 +97,39 @@ const CustomerDetail = () => {
     }, [myParam]);
     
     const lead = details?.data?.[0];
+    console.log(lead)
     const {roleData}=useRoleContext()
+    console.log(roleData)
     const contractAccess = roleData?.data?.contract?.read?.includes(`${localStorage.getItem('role')}`)
+    const leadDeleteAccess = roleData?.data?.lead?.delete?.includes(`${localStorage.getItem('role')}`)
+
+    const handleDeleteInactiveLead = async () => {
+
+        try {
+
+            if(lead?.lead_status == 'Inactive') {
+
+                const res = await apiDeleteInactiveLead(lead_id);
+                console.log(res)
+                toast.push(
+                    <Notification closable type="success" duration={2000}>
+                        Lead deleted successfully
+                    </Notification>, { placement: 'top-end' }
+                    )
+                    navigate('/app/leads');
+                    
+                    window.location.reload()
+            }
+            
+          } catch (error) {
+            toast.push(
+              <Notification closable type="danger" duration={2000}>
+                Error deleting Lead
+              </Notification>, { placement: 'top-end' }
+            )
+          }
+
+    }
     
     const Toggle =
    
@@ -109,6 +154,13 @@ const CustomerDetail = () => {
                     >
                 <Dropdown.Item eventKey="b"><Link to={`/app/crm/contract?lead_id=${myParam}`}>Create Contract</Link></Dropdown.Item>
                 </AuthorityCheck>
+                {lead?.lead_status == "Inactive" && leadDeleteAccess && <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={roleData?.data?.lead?.delete??[]}
+                    >
+                <Dropdown.Item eventKey="d" onClick={()=>openDialog2()}><div>Delete Lead</div></Dropdown.Item>
+
+                </AuthorityCheck>}
             </Dropdown>
         </div>
         </div>
@@ -199,6 +251,19 @@ const CustomerDetail = () => {
     onClose={onDialogClose}
     onRequestClose={onDialogClose}
 ><EditLead details={details}/></Dialog>
+
+
+<ConfirmDialog
+        isOpen={dialogIsOpen2}
+        type="danger"
+        onClose={onDialogClose2}
+        confirmButtonColor="red-600"
+        onCancel={onDialogClose2}
+        onConfirm={handleDeleteInactiveLead}
+        title="Delete Lead"
+        onRequestClose={onDialogClose2}>
+        <p> Are you sure you want to delete this lead? </p>
+      </ConfirmDialog>
 
 
           </>

@@ -8,7 +8,4 @@ import clientRoute from './clientRoute'
 export const publicRoutes: Routes = [...authRoute,...clientRoute]
 
 export const protectedRoutes: Routes = [
-    ...appsRoute,
-   
-
-]
+    ...appsRoute,]

@@ -1,7 +1,6 @@
 import reducer from './store'
 import { injectReducer } from '@/store'
 import AdaptableCard from '@/components/shared/AdaptableCard'
-import OrderDeleteConfirmation from './components/OrderDeleteConfirmation'
 import Filtering from './components/DataTable'
 
 injectReducer('salesOrderList', reducer)

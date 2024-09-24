@@ -28,7 +28,7 @@ const _UserDropdown = ({ className }: CommonProps) => {
     const dropdownItemList: DropdownList[] = [
         {
             label:"My Profile",
-            path:"/app/crm/profile",
+            path:"/app/crm/profile?type=profile",
             icon:<AiOutlineUser/>,
             authority:[
                 `${localStorage.getItem('role')}`
@@ -41,6 +41,12 @@ const _UserDropdown = ({ className }: CommonProps) => {
         icon:<AiOutlineUserAdd/>,
         authority:roleData?.data?.addMember?.create
     
+        },
+        {
+        label:"Create User",
+        path:"/app/crm/register",
+        icon:<AiOutlineUserAdd/>,
+        authority:roleData?.data?.user?.create    
         },
         {
         label:"Add User to Lead",

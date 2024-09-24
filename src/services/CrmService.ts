@@ -31,9 +31,9 @@ const userId=localStorage.getItem('userId');
  
  
  
-export async function apiGetNotification<T>(userId: string | null) {
+export async function apiGetNotification<T>(userId: string | null,page:number) {
     return ApiService.fetchData<NotificationResponse>({
-        url: `admin/get/notification?userId=${userId}&page=1&limit=100`,
+        url: `admin/get/notification?userId=${userId}&page=${page}&limit=20`,
         method: 'get',
     }).then(
         (response)=>{

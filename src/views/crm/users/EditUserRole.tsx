@@ -112,7 +112,7 @@ const EditUserRole = ({Data } : any) => {
             {({ values, touched, errors, isSubmitting, resetForm }) => {
                 const validatorProps = { touched, errors }
                 return (
-                    <Form className='w-full sm:w-3/5 lg:w-4/5 lg:ml-6'>
+                    <Form className=''>
                     <h3 className=' my-3'>Edit User Role</h3>
                         <FormContainer>                             
                            
@@ -168,6 +168,7 @@ const EditUserRole = ({Data } : any) => {
                                     variant="solid"
                                     loading={isSubmitting}
                                     type="submit"
+                                    block
                                 >
                                     {isSubmitting ? 'Updating' : 'Update'}
                                 </Button>

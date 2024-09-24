@@ -111,8 +111,8 @@ const optionsSource = [
                             Mom Created Successfully
                         </Notification>
                     )
-                    // window.location.reload()
-                    // navigate(-1)
+                    window.location.reload()
+                    navigate(-1)
                 } else {
                     toast.push(
                         <Notification closable type="danger" duration={2000}>

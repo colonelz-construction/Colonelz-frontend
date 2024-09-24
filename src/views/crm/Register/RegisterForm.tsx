@@ -54,6 +54,9 @@ const   SignUpForm = (props: SignUpFormProps) => {
         setSubmitting(true)
         const result = await signUp({ id,user_name, role, email })
         if (result.code===200) {
+            values.user_name = ''
+            values.email = ''
+            values.role = ''
           toast.push(
             <Notification closable type="success" duration={2000}>
                 User Registered Successfully
@@ -95,9 +98,7 @@ const   SignUpForm = (props: SignUpFormProps) => {
                 onSubmit={(values, { setSubmitting }) => {
                     if (!disableSubmit) {
                         onSignUp(values, setSubmitting)
-                        values.user_name = '';
-                        values.role = '';
-                        values.email = '';
+                      
                     } else {
                         setSubmitting(false)
                     }

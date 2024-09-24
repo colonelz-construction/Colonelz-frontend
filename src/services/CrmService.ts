@@ -137,6 +137,15 @@ export async function apiDeleteRole(id:any) {
         (response)=>{return response.data})
     
 }
+export async function apiDeleteInactiveLead(id:any) {
+    return ApiService.fetchData<any>({
+        url: `admin/delete/inactive/lead?lead_id=${id}`,
+        method: 'delete',
+        data: id
+    }).then(
+        (response)=>{return response.data})
+    
+}
  
  
  

@@ -74,15 +74,26 @@ const EditUserRole = ({Data } : any) => {
     
 
         console.log(formData)
-        
-        const response = await apiEditUserRole(formData); 
-        console.log(response)
-
-        toast.push(<Notification title={'Role updated'} type="success" />, {
-            placement: 'top-center',
-        });
-        window.location.reload();
-        setSubmitting(false);
+        try {
+            const response = await apiEditUserRole(formData); 
+            console.log(response)
+            if(response.code===200){
+            toast.push(<Notification title={'Role updated'} type="success" />, {
+                
+            });}
+            
+            window.location.reload();
+            setSubmitting(false);
+        }
+        catch (error) {
+            console.log(error)
+            toast.push(<Notification  type="danger" >
+                Internal Server Error
+            </Notification>, {
+                
+            });
+            setSubmitting(false);
+        }
     }
 
 

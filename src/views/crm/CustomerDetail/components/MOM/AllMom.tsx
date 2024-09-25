@@ -5,6 +5,7 @@ import { apiGetCrmProjectsMom } from '@/services/CrmService';
 import { MomDataType, useMomContext } from '../../store/MomContext';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import parse, { domToReact, HTMLReactParserOptions } from 'html-react-parser';
+import { useNavigate } from 'react-router-dom';
 
 
 interface Attendees {
@@ -31,6 +32,7 @@ const App = () => {
   const [highlightedText, setHighlightedText] = useState<string>('');
   const [searchInput, setSearchInput] = useState<string>('');
   const { leadData, client } = useMomContext();
+  const navigate = useNavigate()
 
   const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const term = event.target.value;
@@ -232,6 +234,9 @@ const App = () => {
           ))) : (
           <div style={{ textAlign: 'center' }}>No Mom Data</div>
         )}
+        <Button type='button' onClick={() => navigate(-1)} size='sm'>
+                Back
+              </Button>
       </div>
     </>
   )

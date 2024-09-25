@@ -100,7 +100,7 @@ function IndeterminateCheckbox({
 
 const Quotations=(data : FileItemProps )=> {
     const [rowSelection, setRowSelection] = useState({})
-    const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]); 
+    // const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]); 
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [remark, setRemark] = useState("");
     const location=useLocation()
@@ -485,10 +485,10 @@ const Quotations=(data : FileItemProps )=> {
                  }}
                  >
                     <Form>
-                 <FormItem label='Client Name'>
+                 <FormItem label='Client Name' asterisk>
                  <Field name="client_name" type="text" component={Input}/>
                  </FormItem>
-                    <FormItem label='Client Email'>
+                    <FormItem label='Client Email' asterisk>
                     <Field name="client_email" type="text" component={Input}/>
                     </FormItem>
                     <FormItem label='File'>

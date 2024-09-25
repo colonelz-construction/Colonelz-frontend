@@ -30,6 +30,10 @@ const EditRoles = () => {
     const id = query.get('id');
     const navigate = useNavigate();
     const [checkType, setCheckType] = useState(obj);
+    const [newName, setNewName] = useState(role);
+    console.log(newName)
+
+
     const [initialValues, setInitialValues] = useState<FormValues>(() =>
         accessTypes.reduce((acc, type) => {
             acc[type] = [];
@@ -140,7 +144,7 @@ const EditRoles = () => {
         console.log("role", access)
 
         const payload = {
-            role,
+            role: newName,
             access
         };
 
@@ -153,6 +157,8 @@ const EditRoles = () => {
                     {response.message}
                 </Notification>
             );
+            navigate("/app/crm/profile?type=roles");
+            window.location.reload();
         } else {
             toast.push(
                 <Notification type='danger' duration={2000} closable>
@@ -160,6 +166,8 @@ const EditRoles = () => {
                 </Notification>
             );
         }
+        
+
     };
 
    
@@ -190,8 +198,10 @@ const EditRoles = () => {
                                     <Input
                                         name='role'
                                         placeholder='Role'
-                                        value={role || ''}
-                                        disabled
+                                        value={newName || ''}
+                                        onChange={(e) => {
+                                            setNewName(e.target.value)
+                                        }}
                                     />
                                     
                                 </FormItem>

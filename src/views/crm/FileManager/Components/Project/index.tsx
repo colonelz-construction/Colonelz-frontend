@@ -104,8 +104,7 @@ const Index = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const projectId = queryParams.get('project_id');
-  const projectName = queryParams.get('project_name');
-  const role=localStorage.getItem('role')
+  const projectName = queryParams.get('project_name')
   
 const {roleData} = useContext(RoleContext);
 const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
@@ -198,13 +197,15 @@ const columns = useMemo<ColumnDef<FolderItem>[]>(
     () => [
         { header: 'Name', accessorKey: 'folder_name'
         , cell: ({row}) => {
+          const folderData=row.original;
+          const openFolder = () => {
+              navigate(`/app/crm/fileManager/project/folder/${row.original.folder_name}`, { state: { folderData,projectId,projectName } });
+            };
             return(
                 <div>
                 <div className="flex items-center gap-2">
                   <FaFolder/>
-                  <a className="font-medium cursor-pointer" onClick={()=> navigate(
-                              `/app/crm/fileManager/project/folder?project_id=${projectId}&project_name=${projectName}&folder_name=${row.original.folder_name}`,
-                          )}>
+                  <a className="font-medium cursor-pointer" onClick={()=> openFolder()}>
                     {row.original.folder_name}
                   </a>
                 </div>

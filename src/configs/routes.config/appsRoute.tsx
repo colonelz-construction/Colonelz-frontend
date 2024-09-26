@@ -83,7 +83,7 @@ const appsRoute: Routes = [
     },
     {
         key: 'appsCrm.fileManager',
-        path: `${APP_PREFIX_PATH}/crm/fileManager/leads/folder`,
+        path: `${APP_PREFIX_PATH}/crm/fileManager/leads/folder/:folderName`,
         component: lazy(
             () =>
                 import('@/views/crm/FileManager/Components/Lead/Folders/index'),
@@ -114,7 +114,7 @@ const appsRoute: Routes = [
     },
     {
         key: 'appsCrm.fileManager',
-        path: `${APP_PREFIX_PATH}/crm/fileManager/project/folder`,
+        path: `${APP_PREFIX_PATH}/crm/fileManager/project/folder/:folderName`,
         component: lazy(
             () =>
                 import(

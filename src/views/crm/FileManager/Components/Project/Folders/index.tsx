@@ -127,19 +127,16 @@ const Index = () => {
     const [subject, setSubject] = useState('')
     const [body, setBody] = useState('')
     const location = useLocation()
-    const queryParams = new URLSearchParams(location.search)
-    const leadId = queryParams.get('project_id')
-    const ProjectName = queryParams.get('project_name')
-    const folderName = queryParams.get('folder_name') // Assuming folder_name is in the query params
     const navigate = useNavigate()
     const [usernames, setUsernames] = useState<string[]>([])
     const [loading, setLoading] = useState(true)
     const [shareLoading, setShareLoading] = useState(false)
-    const [selectedFileId, setSelectedFileId] = React.useState<string | null>(
-        null,
-    )
+    const [selectedFileId, setSelectedFileId] = React.useState<string | null>(null,)
     const { roleData } = useRoleContext()
     const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
+    const { folderData,projectId,projectName } = location.state || {}
+    const folderName = folderData.folder_name
+    console.log(folderData);
 
     interface User {
         role: string
@@ -222,27 +219,12 @@ const Index = () => {
 
     useEffect(() => {
         const fetchDataAndLog = async () => {
-            try {
-                const leadData = await fetchProjectData(leadId)
-                
-
-                setLoading(false)
-                const folderData = leadData
-
-                const selectedFolder = folderData.find(
-                    (folder: any) => folder.folder_name === folderName,
-                )
-
-                if (selectedFolder) {
-                    setLeadData(selectedFolder.files)
-                }
-            } catch (error) {
-                console.error('Error fetching lead data', error)
-            }
+           
+                    setLeadData(folderData.files)
         }
 
         fetchDataAndLog()
-    }, [leadId, folderName])
+    }, [projectId, folderName])
     
 
     const deleteFiles = async (fileId: string) => {
@@ -263,7 +245,7 @@ const Index = () => {
         const postData = {
             file_id: selectedFiles,
             folder_name: folderName,
-            project_id: leadId,
+            project_id: projectId,
         }
         try {
             const response = await apiDeleteFileManagerFiles(postData)
@@ -313,7 +295,7 @@ const Index = () => {
             type: 'Internal',
             file_id: selectedFileId,
             folder_name: folderName,
-            project_id: leadId,
+            project_id: projectId,
             user_id: localStorage.getItem('userId'),
         }
 
@@ -343,7 +325,7 @@ const Index = () => {
         const postData = {
             file_id: selectedFiles,
             lead_id: '',
-            project_id: leadId,
+            project_id: projectId,
             email: selectedEmails,
             cc: selectedEmailsCc,
             bcc: selectedEmailsBcc,
@@ -581,7 +563,7 @@ const Index = () => {
     return (
         <div>
             <div className="flex justify-between">
-                <h3 className="mb-5 capitalize">Project-{ProjectName}</h3>
+                <h3 className="mb-5 capitalize">Project-{projectName}</h3>
                 {uploadAccess &&
                     <Button
                         className=""
@@ -625,10 +607,10 @@ const Index = () => {
                                     </li>
                                     <li>
                                         <Link
-                                            to={`/app/crm/fileManager/project?project_id=${leadId}&project_name=${ProjectName}`}
+                                            to={`/app/crm/fileManager/project?project_id=${projectId}&project_name=${projectName}`}
                                             className="text-blue-600 dark:text-blue-400 hover:underline"
                                         >
-                                            {ProjectName}
+                                            {projectName}
                                         </Link>
                                     </li>
                                     <li>
@@ -687,11 +669,7 @@ const Index = () => {
                                 </Tr>
                             ))}
                         </THead>
-                        {loading ? <TableRowSkeleton
-                            avatarInColumns={[0]}
-                            columns={columns.length}
-                            avatarProps={{ width: 14, height: 14 }}
-                        /> : leadData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
+                        {leadData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
                             <TBody>
                                 {table.getRowModel().rows.map((row) => {
                                     return (
@@ -748,7 +726,7 @@ const Index = () => {
                         type="button"
                         onClick={() => {
                             navigate(
-                                `/app/crm/fileManager/project?project_id=${leadId}&project_name=${ProjectName}`,
+                                `/app/crm/fileManager/project?project_id=${projectId}&project_name=${projectName}`,
                             )
                         }}
                     >
@@ -777,7 +755,7 @@ const Index = () => {
                 onRequestClose={onDialogClose}
             >
                 <h3 className="mb-5">Share Files</h3>
-                <Formik initialValues={{ lead_id: leadId, folder_name: folderName, file_id: '', email: '', cc: '', bcc: '', subject: '', body: '' }}
+                <Formik initialValues={{ lead_id: projectId, folder_name: folderName, file_id: '', email: '', cc: '', bcc: '', subject: '', body: '' }}
                     onSubmit={async (values) => {
                         ;
 
@@ -985,7 +963,7 @@ const Index = () => {
                 <h3>Upload Files</h3>
                 <Formik
                     initialValues={{
-                        project_id: leadId,
+                        project_id: projectId,
                         folder_name: folderName,
                         files: [],
                     }}

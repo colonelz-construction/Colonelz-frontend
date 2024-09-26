@@ -8,7 +8,6 @@ import { CiFileOn, CiImageOn } from 'react-icons/ci';
 import { apiDeleteFileManagerFiles, apiGetAllUsersList, apiGetCrmFileManagerCreateLeadFolder, apiGetCrmFileManagerLeads, apiGetCrmFileManagerShareContractFile, apiGetCrmFileManagerShareFiles } from '@/services/CrmService';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
-import { apiGetUsers } from '@/services/CrmService';
 import { HiShare } from 'react-icons/hi';
 
 
@@ -27,7 +26,6 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
-import { FaFile } from 'react-icons/fa';
 import NoData from '@/views/pages/NoData';
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton';
 import { MdDeleteOutline } from 'react-icons/md';
@@ -121,9 +119,6 @@ const Index = () => {
   const [body, setBody] = useState('');
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const leadId = queryParams.get('lead_id');
-  const leadName = queryParams.get('lead_name');
-  const folderName = queryParams.get('folder_name');
 
   const { roleData } = useRoleContext();
   const fileUploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
@@ -140,7 +135,6 @@ const Index = () => {
 
     fetchDataAndLog();
   }, []);
-  const adminUsers = users.filter(user => user.role === 'ADMIN');
 
   const navigate = useNavigate()
 
@@ -158,9 +152,13 @@ const Index = () => {
   const [dialogIsOpen3, setIsOpen3] = useState(false)
   const [dialogIsOpen4, setIsOpen4] = useState(false)
   const [fileId, setFileId] = useState<string>('')
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [formloading, setFormLoading] = useState(false)
   const [shareloading, setShareLoading] = useState(false)
+
+  const { folderData,leadId,leadName } = location.state || {}
+  const folderName = folderData.folder_name
+  console.log(folderData);
 
 
   const openDialog = (fileId: string) => {
@@ -199,10 +197,6 @@ const Index = () => {
     setIsOpen3(false)
   }
 
-  const openDialog4 = () => {
-    setIsOpen4(true)
-  }
-
   const onDialogClose4 = () => {
     setIsOpen4(false)
   }
@@ -211,28 +205,17 @@ const Index = () => {
 
   useEffect(() => {
     const fetchDataAndLog = async () => {
-      try {
-        const leadData = await apiGetCrmFileManagerLeads(leadId);
-        
-        setLoading(false)
-        const folderData = leadData?.data
-
-        const selectedFolder = folderData.find((folder: any) => folder.folder_name === folderName);
-
-        if (selectedFolder) {
-          setLeadData(selectedFolder.files);
-
-        }
-      } catch (error) {
-        console.error('Error fetching lead data', error);
-      }
+          setLeadData(folderData.files);
     };
 
     fetchDataAndLog();
-  }, [leadId, folderName]);
+  }, [leadId, folderData.folder_name]);
 
   ;
 
+ 
+  
+  
   const deleteFiles = async (fileId: string) => {
     selectedFiles.push(fileId)
     function warn(text: string) {
@@ -249,7 +232,7 @@ const Index = () => {
 
     const postData = {
       file_id: selectedFiles,
-      folder_name: folderName,
+      folder_name: folderData.folder_name,
       lead_id: leadId,
     };
     try {
@@ -300,7 +283,6 @@ const Index = () => {
     }
     setShareLoading(false)
     onDialogClose()
-    const responseData = await response.json();
     setSelectedFiles([]);
     setSelectedEmails([]);
     setSelectedEmailsCc([]);
@@ -308,7 +290,7 @@ const Index = () => {
     setSubject('')
     setBody('')
 
-    const updatedLeadData = leadData.map((file) => ({ ...file, active: false }));
+    const updatedLeadData = folderData.files.map((file:any) => ({ ...file, active: false }));
     setLeadData(updatedLeadData);
 
   }
@@ -403,7 +385,6 @@ const Index = () => {
 
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState('')
-  const totalData = leadData.length
 
   const pageSizeOption = [
     { value: 10, label: '10 / page' },
@@ -463,9 +444,10 @@ const Index = () => {
     []
   )
   const role = localStorage.getItem('role')
+console.log(folderData.files);
 
   const table = useReactTable({
-    data: leadData,
+    data: folderData.files,
     columns,
     filterFns: {
       fuzzy: fuzzyFilter,
@@ -884,7 +866,6 @@ const Index = () => {
                 formData.append('files', values.files[i]);
               }
               const response = await apiGetCrmFileManagerCreateLeadFolder(formData)
-              // const responseData=await response.json()
               setFormLoading(false)
               setLoading(false)
               

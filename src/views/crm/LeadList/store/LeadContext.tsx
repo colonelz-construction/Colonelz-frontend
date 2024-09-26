@@ -65,7 +65,6 @@ export const LeadProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await apiGetCrmLeads();
-      console.log(response.data.leads);
       setApiData(response.data.leads);
     };
 

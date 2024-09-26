@@ -160,7 +160,6 @@ const Index = () => {
                 .filter((user: User) => (user.role === 'Senior Architect') || (user.role === 'ADMIN'))
                 .map((user: User) => user.username)
             if (usernames) {
-                console.log(usernames)
 
                 setUsernames(usernames)
             }
@@ -187,7 +186,6 @@ const Index = () => {
     const openDialog = (fileId: string) => {
         setIsOpen(true)
         setSelectedFiles([fileId])
-        console.log(fileId)
     }
     const onDialogClose = () => {
         setIsOpen(false)
@@ -226,11 +224,10 @@ const Index = () => {
         const fetchDataAndLog = async () => {
             try {
                 const leadData = await fetchProjectData(leadId)
-                console.log(leadData)
+                
 
                 setLoading(false)
                 const folderData = leadData
-                console.log(folderData)
 
                 const selectedFolder = folderData.find(
                     (folder: any) => folder.folder_name === folderName,
@@ -238,7 +235,6 @@ const Index = () => {
 
                 if (selectedFolder) {
                     setLeadData(selectedFolder.files)
-                    console.log(selectedFolder.files)
                 }
             } catch (error) {
                 console.error('Error fetching lead data', error)
@@ -247,7 +243,7 @@ const Index = () => {
 
         fetchDataAndLog()
     }, [leadId, folderName])
-    console.log(leadData)
+    
 
     const deleteFiles = async (fileId: string) => {
         selectedFiles.push(fileId)
@@ -271,7 +267,7 @@ const Index = () => {
         }
         try {
             const response = await apiDeleteFileManagerFiles(postData)
-            console.log(response)
+            
 
             if (response.code === 200) {
                 toast.push(
@@ -783,7 +779,7 @@ const Index = () => {
                 <h3 className="mb-5">Share Files</h3>
                 <Formik initialValues={{ lead_id: leadId, folder_name: folderName, file_id: '', email: '', cc: '', bcc: '', subject: '', body: '' }}
                     onSubmit={async (values) => {
-                        console.log(values);
+                        ;
 
                     }
 
@@ -1006,7 +1002,7 @@ const Index = () => {
                                 { placement: 'top-center' },
                             )
                         } else {
-                            console.log(values)
+                            
                             let formData = new FormData()
                             formData.append(
                                 'project_id',
@@ -1023,7 +1019,7 @@ const Index = () => {
                                 await apiGetCrmFileManagerCreateProjectFolder(
                                     formData,
                                 )
-                            console.log(response)
+                            
 
                             if (response.code === 200) {
                                 toast.push(

@@ -59,7 +59,7 @@ const YourMainComponent: React.FC = () => {
       const fetchData = async () => {
         try {
           const data = await apiGetCrmSingleProjectQuotation(projectId);
-          console.log(data)
+          
           setMainQuotationData(data);
         } catch (error) {
           console.error('Error fetching data:', error);

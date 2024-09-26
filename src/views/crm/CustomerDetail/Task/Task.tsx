@@ -194,7 +194,6 @@ const Filtering = ({task,users}:Data) => {
                 )
             }
         }
-        console.log(userData);
         
         return (
             <div className="flex justify-end text-lg gap-5">

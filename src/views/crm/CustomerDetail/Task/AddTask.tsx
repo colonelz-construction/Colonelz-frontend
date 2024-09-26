@@ -24,7 +24,6 @@ type Task = {
 const AddTask = ({project,userData}:any) => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
-    console.log(userData);
     
     
 const openDialog = () => {

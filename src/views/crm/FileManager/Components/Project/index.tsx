@@ -118,7 +118,6 @@ const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getI
   };
 
   const onDialogClose = (e: MouseEvent) => {
-    console.log('onDialogClose', e);
     setIsOpen(false);
   };
 
@@ -140,7 +139,6 @@ const onDialogClose2 = () => {
       try {
         setIsLoading(true);
         const projectData = await fetchProjectData(projectId);
-        console.log(projectData);
         setProjectData(projectData);
       } catch (error) {
         console.error('Error fetching lead data', error);
@@ -271,7 +269,6 @@ const onSelectChange = (value = 0) => {
 
 // const filteredProjectData = useMemo(() => {
 //   const role=localStorage.getItem('role')
-//   console.log(roleData,role);
   
 //   if (!roleData?.data?.quotation?.read?.includes(`${role}`)) {
 //     return projectData.filter(item => 

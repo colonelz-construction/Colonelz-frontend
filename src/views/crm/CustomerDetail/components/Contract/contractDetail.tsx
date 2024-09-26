@@ -150,7 +150,7 @@ const ContractDetails=(data : FileItemProps )=> {
     const {roleData}=useRoleContext()
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
-    console.log(data)
+    
     
     
 
@@ -324,10 +324,6 @@ const ContractDetails=(data : FileItemProps )=> {
                         setIsOpen(false)
                     }
                 
-                    const onDialogOk = (e: MouseEvent) => {
-                        console.log('onDialogOk', e)
-                        setIsOpen(false)
-                    }
                     return(<> 
                     {admin_status==='rejected' &&        
                       <div><Button size='sm' variant='solid' onClick={()=>openDialog()}>Remark</Button></div>}
@@ -383,7 +379,6 @@ const ContractDetails=(data : FileItemProps )=> {
     const onSelectChange = (value = 0) => {
         table.setPageSize(Number(value))
     }
-  console.log(data.data);
   
     interface FormValues {
         client_name: string;
@@ -427,7 +422,7 @@ const ContractDetails=(data : FileItemProps )=> {
         };
         try{
           const response=await apiGetCrmProjectShareQuotation(postData);
-          console.log(response)
+          
         //   const responseJson=await response.json()
           if (response.ok) {
             toast.push(
@@ -484,7 +479,7 @@ const ContractDetails=(data : FileItemProps )=> {
                 </Notification>
             )
         }
-        console.log(response);
+        
         
       };
      
@@ -581,7 +576,7 @@ const ContractDetails=(data : FileItemProps )=> {
                      file_id: Yup.string().required('Required'),
                  })}
                  onSubmit={(values, { setSubmitting }) => {
-                    console.log(values);
+                    ;
                         handleSubmit(values);
                         setSubmitting(false);
                  }}

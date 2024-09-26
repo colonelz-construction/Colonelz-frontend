@@ -127,7 +127,7 @@ const Quotations=(data : FileItemProps )=> {
           };
         try{
             const response=await apiGetCrmProjectShareQuotationApproval(postData);
-            console.log(response)
+            
             if(response.code===200){
                 toast.push(
                     <Notification closable type='success' duration={2000}>
@@ -227,7 +227,7 @@ const Quotations=(data : FileItemProps )=> {
                                                 initialValues={{ project_id:projectId , file_id: fileId, status: 'rejected', remark: '' }}
                                                 validationSchema={Yup.object({ remark: Yup.string().required('Required') })}
                                                 onSubmit={async (values, { setSubmitting }) => {
-                                                    console.log(values);
+                                                    ;
                                                     
                                                     const response = await apiGetCrmProjectShareQuotationApproval(values);
                                                     if(response.code===200){
@@ -290,7 +290,6 @@ const Quotations=(data : FileItemProps )=> {
                     }
                 
                     const onDialogOk = (e: MouseEvent) => {
-                        console.log('onDialogOk', e)
                         setIsOpen(false)
                     }
                     return(<> 
@@ -342,7 +341,6 @@ const Quotations=(data : FileItemProps )=> {
     const onSelectChange = (value = 0) => {
         table.setPageSize(Number(value))
     }
-  console.log(data.data);
   
     interface FormValues {
         client_name: string;
@@ -395,7 +393,7 @@ const Quotations=(data : FileItemProps )=> {
                 </Notification>
             )
         }
-        console.log(response);
+        
       };
      const approvedFiles = data.data?.filter(file => file.admin_status === 'approved').map(file => ({ value: file.itemId, label: file.file_name }));
 

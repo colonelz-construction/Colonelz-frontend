@@ -1,4 +1,3 @@
-
 import { useMemo, useState, useEffect } from 'react'
 import Table from '@/components/ui/Table'
 import Input from '@/components/ui/Input'
@@ -17,13 +16,13 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
-import { HiOutlineEye } from 'react-icons/hi'
 import { useNavigate } from 'react-router-dom'
-import useThemeClass from '@/utils/hooks/useThemeClass'
-import { Button, Select } from '@/components/ui'
+import {  Select } from '@/components/ui'
 import { ProjectMomItem } from '../store'
 import { apiGetMomData } from '@/services/CrmService'
 import formateDate from '@/store/dateformate'
+import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
+import NoData from '@/views/pages/NoData'
 
 
 export type MomResponse = {
@@ -44,9 +43,6 @@ type Data = {
     project_name: string;
 
 }
-
-
-
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
     onChange: (value: string | number) => void
@@ -54,9 +50,6 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
 }
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
-const userDetailData = await apiGetMomData();
-const ordersData=userDetailData.data.MomData
-const totalData=ordersData.length
 
 
 function DebouncedInput({
@@ -78,7 +71,6 @@ function DebouncedInput({
 
         return () => clearTimeout(timeout)
     }, [value])
-   const navigate=useNavigate()
     return (
         <div className="flex justify-between ">
 
@@ -128,26 +120,6 @@ const pageSizeOption = [
 const Filtering = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
-    const ActionColumn = ({ row }: { row: ProjectMomItem }) => {
-        const navigate = useNavigate()
-        const { textTheme } = useThemeClass()
-        const onEdit = () => {
-            navigate(`/app/crm/project-details?project_id=${row.project_id}&id=65c32e19e0f36d8e1f30955c&type=mom`)
-        }
-        return (
-            <div className="flex justify-end text-lg">
-                <span
-                    className={`cursor-pointer p-2 hover:${textTheme}`}
-                    onClick={onEdit}
-                >
-                    <HiOutlineEye />
-                </span>
-            </div>
-        )
-    }
-  
-
-
     const columns = useMemo<ColumnDef<ProjectMomItem>[]>(
         () => [
             {
@@ -196,14 +168,20 @@ const Filtering = () => {
         ],
         []
     )
-
-    const [data,setData] = useState(() => ordersData)
+    const [ordersData, setOrdersData] = useState<Data[]>([])
+    const [loading, setLoading] = useState(true)
+    useEffect(() => {
+        apiGetMomData().then((response) => {
+            if (response.code === 200) {
+                setOrdersData(response.data.MomData)
+                setLoading(false)
+            }
+        })
+    }, [])
     const navigate = useNavigate()
-console.log(ordersData);
-
 
     const table = useReactTable({
-        data,
+        data:ordersData,
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -286,6 +264,8 @@ console.log(ordersData);
                         </Tr>
                     ))}
                 </THead>
+                {loading ?<TableRowSkeleton columns={columns.length} /> :
+                ordersData.length === 0 ? <Td colSpan={columns.length}><NoData/></Td>:
                 <TBody>
                     {table.getRowModel().rows.map((row) => {  
                         return (
@@ -303,7 +283,7 @@ console.log(ordersData);
                             </Tr>
                         )
                     })}
-                </TBody>
+                </TBody>}
             </Table>
             <div className="flex items-center justify-between mt-4">
                 <Pagination

@@ -90,9 +90,9 @@ function closeAfter2000ms(data:string,type:any) {
 
   try {
     const response = await apiGetCrmFileManagerCreateLeadFolder(postData);
-    console.log(response)
+    
 
-    console.log('Response Data:', response);
+    
 
     if (response.code===200) {
       closeAfter2000ms('File uploaded successfully.','success');

@@ -42,24 +42,21 @@ const validationSchema = Yup.object().shape({
 const EditUserRole = ({Data } : any) => {
     const {rolelist}=useRoleContext()
     
-    console.log(rolelist)
+    
     const rolesOptions = rolelist?.map((role) => ({
         label: role,
         value: role,
     }))
 
-    console.log(rolesOptions)
 
     const [userData, setUserData] = useState<any>();
-    console.log(userData)
-    console.log(Data.userId)
 
 
 
  
 
     // const [usernameData, setUserNameData] = useState<any>(data?.username);
-    // console.log(data);
+    // 
 
     const onFormSubmit = async (
         values: any,
@@ -67,16 +64,11 @@ const EditUserRole = ({Data } : any) => {
     ) => {
         const formData = new FormData();
 
-        console.log(values.role)
         formData.append('role', values.role);
         formData.append('userId', Data.userId);
-
-    
-
-        console.log(formData)
         try {
             const response = await apiEditUserRole(formData); 
-            console.log(response)
+            
             if(response.code===200){
             toast.push(<Notification title={'Role updated'} type="success" />, {
                 
@@ -86,7 +78,6 @@ const EditUserRole = ({Data } : any) => {
             setSubmitting(false);
         }
         catch (error) {
-            console.log(error)
             toast.push(<Notification  type="danger" >
                 Internal Server Error
             </Notification>, {
@@ -112,7 +103,7 @@ const EditUserRole = ({Data } : any) => {
             
             validationSchema={validationSchema}
             onSubmit={(values, { setSubmitting }) => {
-                console.log(values);
+                ;
                 
                 setSubmitting(true)
                 setTimeout(() => {
@@ -155,7 +146,6 @@ const EditUserRole = ({Data } : any) => {
                                             )}
                                             onChange={(option) =>
                                             {
-                                                console.log(option)
                                                 form.setFieldValue(
                                                     field.name,
                                                     option?.value

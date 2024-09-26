@@ -129,7 +129,6 @@ const Index = () => {
   const openDialog = (fileId: string) => {
     setIsOpen(true)
     setSelectedFiles([fileId])
-    console.log(fileId);
 
   }
 
@@ -165,7 +164,7 @@ const Index = () => {
     const fetchDataAndLog = async () => {
       try {
         const templateData = await getTemplateData();
-        console.log(templateData);
+        ;
         const filteredFolders = templateData.filter((folder) => {
           if (folder.files[0]?.sub_folder_name_second) {
 
@@ -185,7 +184,7 @@ const Index = () => {
           console.warn('No matching folder found.');
         }
 
-        console.log(leadData);
+        ;
 
       } catch (error) {
         console.error('Error fetching lead data', error);
@@ -225,7 +224,7 @@ const Index = () => {
     };
     try {
       const response = await apiDeleteFileManagerFiles(postData);
-      console.log(response);
+      
 
       if (response.code === 200) {
         toast.push(
@@ -655,7 +654,7 @@ const Index = () => {
         <h3 className='mb-5'>Share Files</h3>
         <Formik initialValues={{ lead_id: '', folder_name: folderName, file_id: '', email: '', cc: '', bcc: '', subject: '', body: '' }}
           onSubmit={async (values) => {
-            console.log(values);
+            ;
 
           }
 
@@ -778,7 +777,7 @@ const Index = () => {
               )
             }
             else {
-              console.log(values);
+              ;
               setSubmitting(true)
               let formData = new FormData();
               formData.append('type', values.type || '');
@@ -790,7 +789,7 @@ const Index = () => {
               }
               const response = await apiGetCrmFileManagerCreateTemplateFolder(formData)
               setSubmitting(false)
-              console.log(response);
+              
 
               if (response.code === 200) {
                 toast.push(

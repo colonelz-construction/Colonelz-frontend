@@ -32,7 +32,6 @@ const Timeline = () => {
         TaskData();
   
     }, [])
-   console.log(taskData);
    
    const colorMap: { [key: string]: string } = {
     A: 'red',
@@ -74,7 +73,6 @@ const event = taskData?.map((task: any) => ({
     title: task.task_name,
     eventColor: getColorForTask(task.task_name)
 }));
-console.log(event);
 
    return( <div><CalendarView
     editable

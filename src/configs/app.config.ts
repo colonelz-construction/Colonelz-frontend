@@ -22,6 +22,5 @@ const appConfig: AppConfig = {
     enableMock: false
 };
 
-console.log(appConfig);
 
 export default appConfig;

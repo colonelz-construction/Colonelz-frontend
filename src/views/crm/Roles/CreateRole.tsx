@@ -121,7 +121,6 @@ const EditRoles = () => {
             if (!checkType[type]) {
                 setCheckType({...checkType, [type]: true})              
                 const permissions = permissionsMap[type] || permissionsMap.default;
-                console.log(permissions)
                 setFieldValue(type, permissions);
              
             } else {
@@ -138,7 +137,7 @@ const EditRoles = () => {
                 validationSchema={validationSchema}
                 enableReinitialize
                 onSubmit={async (values, { setSubmitting }) => {
-                    console.log(values);
+                    ;
 
                     setSubmitting(true);
                     const access = Object.keys(values).reduce((acc, key) => {
@@ -188,7 +187,6 @@ const EditRoles = () => {
 
                     useEffect(() => {
                         let flag = Object.values(checkType).every(value => value === true);
-                        console.log("flag", flag)
                         setSelectAll(flag)
                         
                     }, [values]);

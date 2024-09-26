@@ -95,7 +95,7 @@ const Commercial = () => {
     useEffect(() => {
       const fetchDataAndLog = async () => {
           const data = await apiGetCrmFileManagerCompanyData(); 
-          console.log(data);
+          
           
           setIsLoading(false)
           const templateData=data.data.templateData
@@ -103,7 +103,7 @@ const Commercial = () => {
             { folder_name: 'commercial', sub_folder_name_first: 'designing',folder:"Design" },
             { folder_name: 'commercial', sub_folder_name_first: 'executing',folder:"Design and Execution"},
           ];
-      console.log(templateData);
+      ;
       
           const results = [];
             for (const pair of folderSubFolderPairs) {
@@ -123,8 +123,6 @@ const Commercial = () => {
                 results.push({name:pair.folder,sub_folder:pair.sub_folder_name_first,count:count,date:date,type:'Folder'});
 
             }
-            
-            console.log(results);
           setData(results);
       };
       

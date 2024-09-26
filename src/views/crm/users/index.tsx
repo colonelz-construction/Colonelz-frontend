@@ -124,7 +124,7 @@ const Users = () => {
 
     const [editRoledialogIsOpen, setEditRoleIsOpen] = useState(false)
   
-    console.log(data)
+    
 
     const openEditRoleDialog = (Data : any) => {
         setEditRoleIsOpen(true)
@@ -156,8 +156,8 @@ const Users = () => {
 
     const deleteuser = async (UserId: string) => {
         const response = await apiDeleteUsers(UserId)
-        console.log(response)
-        console.log(data)
+        
+        
 
         if (response.code === 200) {
             toast.push(
@@ -264,8 +264,6 @@ const Users = () => {
         table.setPageSize(Number(value))
     }
 
-    const totalData = data.length
-    console.log(data.length)
 
     return (
         <>

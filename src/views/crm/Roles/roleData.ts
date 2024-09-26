@@ -40,7 +40,6 @@ type RoleAccessPermissions = {
   }
   fetchRoleAccessData()
     .then((roleAccessData) => {
-      console.log("Fetched role access data:", roleAccessData);
     })
     .catch((error) => {
       console.error("Error fetching role access data:", error);

@@ -98,14 +98,14 @@ const Residential = () => {
         
           const data = await apiGetCrmFileManagerCompanyData()
           const templateData=data.data.templateData
-          console.log(templateData);
+          ;
           
           setLoading(false)
           const folderSubFolderPairs:folderpairs[] = [
             { folder_name: 'residential', sub_folder_name_first: 'designing',folder:"Design" },
             { folder_name: 'residential', sub_folder_name_first: 'executing',folder:"Design and Execution"},
           ];
-      console.log(templateData);
+      ;
       
           const results = [];
             for (const pair of folderSubFolderPairs) {
@@ -126,7 +126,6 @@ const Residential = () => {
 
             }
             
-            console.log(results);
           setData(results);
       };
       

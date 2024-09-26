@@ -4,9 +4,7 @@ import ForgotPasswordForm from "./verify"
 
 
 const Register = () => {
-    const [verified,setVerified] = useState(false)
     const [userData,setUserData] = useState({} as any)
-    console.log(userData,verified);
     return (
         <>
             <div className="mb-8">

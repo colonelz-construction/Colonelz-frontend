@@ -36,7 +36,7 @@ const AddSubTask = ({data,users}:Data) => {
     const queryParams=new URLSearchParams(location.search)
     const project_id=queryParams.get('project_id')
     const task_id=queryParams.get('task')
-    console.log(data);
+    
     
     
 const openDialog = () => {
@@ -111,7 +111,6 @@ const priorityOptions = [
                      onSubmit={async(values, actions) => {
                         setLoading(true)
                             const response = await apiGetCrmProjectsAddSubTask(values)
-                            console.log('response', response);
                             if(response.code===200){
                                 setLoading(false)
                                 toast.push(

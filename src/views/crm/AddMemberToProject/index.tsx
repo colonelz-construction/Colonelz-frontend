@@ -62,9 +62,8 @@ interface Projects {
   project_name: string;
 }
 const response = await apiGetUsers();
-console.log(response)
+
 const projects = await apiGetCrmProjects();
-console.log(projects)
 const id=localStorage.getItem('userId');
 const token=localStorage.getItem('auth');
 const Index = () => {
@@ -76,8 +75,8 @@ const Index = () => {
   const [loading,setLoading]=useState(false)
   const {rolelist}=useRoleContext();
 
-  console.log(rolelist)
-  console.log(rolelist)
+  
+  
   const Options = rolelist.filter((role)=>role!=='ADMIN'&& role!=='Senior Architect').map((role) => ({ value: role, label: role }));
 
   useEffect(() => {
@@ -100,7 +99,7 @@ const Index = () => {
   const handleSubmit = async (values: FormValues) => {
     setLoading(true)
     const response=await apiAddMember(values);
-    console.log(response);
+    
     
     setLoading(false)
     if(response?.code===200){

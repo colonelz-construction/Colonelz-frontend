@@ -29,7 +29,7 @@ function useAuth() {
     ) => {
 
             const resp =await apiSignIn(values)
-            console.log(resp);
+            
             if (resp.code===200) {
                 const { token } = resp.data
                 tok=resp.data.token

@@ -160,12 +160,10 @@ const Roles = () => {
         }
     }
 const handleClose = () => {
-    console.log('Close')
     setOpen(false)
 }
 
 const handleConfirm = (id: string) => {
-    console.log('Confirm')
     setOpen(false)
 }
 
@@ -175,7 +173,7 @@ const handleConfirm = (id: string) => {
 
 const deleteRole = async (id: string) => {
     const response = await apiDeleteRole(id)
-    console.log(response)
+    
     if (response.code === 200) {
         toast.push(
             <Notification type='success' duration={2000} closable>
@@ -262,7 +260,7 @@ useEffect(() => {
         const response = await apiGetRoleDetails()
 
         if (response) {
-            console.log(response.data)
+            
             setData(response.data)
             setLoading(false)
 

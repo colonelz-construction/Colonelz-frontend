@@ -59,7 +59,6 @@ const StatisticIcon = ({ type }: { type?: string }) => {
 
 const StatisticCard = ({ data = {} }: { data: Partial<Statistic> }) => {
     const {loading}=useProjectContext()
-    console.log(loading);
     
     return (
         <Card>

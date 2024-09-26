@@ -15,9 +15,9 @@ const TimelineAvatar = ({ children, ...rest }: TimelineAvatarProps) => {
     )
 }
 const Activity = ({ Data} : CustomerProfileProps) => {
-    console.log(Data);
+    
     const [activityData, setActivityData] = useState<ProjectUpdate[]>([]);
-    console.log(Data);
+    
     
     
 

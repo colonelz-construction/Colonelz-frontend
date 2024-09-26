@@ -38,7 +38,6 @@ const EditSubTask = ({Data,users}:SubtaskData) => {
     const location=useLocation();
     const queryParams=new URLSearchParams(location.search);
     const project_id=queryParams.get('project_id')
-    console.log(users);
     
   
 const openDialog = () => {
@@ -124,7 +123,6 @@ const priorityOptions = [
                      onSubmit={async(values, actions) => {
                          setLoading(true)
                          const response = await apiGetCrmProjectsSubTaskUpdate(values)
-                         console.log('response', response);
                          setLoading(false)
                          if(response.code===200){
                                 toast.push(

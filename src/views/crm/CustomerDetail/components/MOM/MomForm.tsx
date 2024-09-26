@@ -84,7 +84,7 @@ const optionsSource = [
             }
             onSubmit={async(values,{setSubmitting}) => {
                 const formData = new FormData()
-                console.log(values);
+                ;
                 
                 formData.append('user_id', (values.user_id || ''))
                 formData.append('client_name', JSON.stringify(values.client_name))
@@ -101,7 +101,7 @@ const optionsSource = [
                 setSubmitting(true)
                 try{
                 const response = await apiCreateMom(formData)
-                console.log(response);
+                
                 
            
                 if (response.code === 200) {

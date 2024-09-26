@@ -14,14 +14,13 @@ import {
     flexRender,
 } from '@tanstack/react-table'
 import { rankItem } from '@tanstack/match-sorter-utils'
-import { useAppSelector, type Project } from '../store'
+import {  type Project } from '../store'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
-import { HiOutlineEye, HiOutlineUserAdd, HiOutlineUserGroup, HiOutlineUsers } from 'react-icons/hi'
+import {  HiOutlineUserAdd, HiOutlineUserGroup, HiOutlineUsers } from 'react-icons/hi'
 import { useNavigate } from 'react-router-dom'
-import useThemeClass from '@/utils/hooks/useThemeClass'
 import classNames from 'classnames'
-import {  Dropdown, Select, Tooltip } from '@/components/ui'
+import {   Select } from '@/components/ui'
 import { StatisticCard } from './CustomerStatistic'
 import { BiSolidBellRing } from 'react-icons/bi'
 import { useProjectContext } from '../store/ProjectContext'
@@ -112,27 +111,7 @@ const Filtering = () => {
     const [globalFilter, setGlobalFilter] = useState('')
     const userId=localStorage.getItem('userId')
     const {projects,apiData,loading}=useProjectContext();
-    const projectsData=projects
-    const totalData=projectsData.length
-    
     const navigate=useNavigate()
-    const ActionColumn = ({ row }: { row: Project }) => {
-        const navigate = useNavigate()
-        const { textTheme } = useThemeClass()
-        const onEdit = () => {
-            navigate(`/app/crm/project-details?project_id=${row.project_id}&client_name=${row.client[0].client_name}&project_type=${row.project_type}&id=&type=details`)
-        }
-        return (
-            <div className="flex justify-end text-lg">
-                <span
-                    className={`cursor-pointer p-2 hover:${textTheme}`}
-                    onClick={onEdit}
-                >
-                    <HiOutlineEye />
-                </span>
-            </div>
-        )
-    }
 
     const columns = useMemo<ColumnDef<Project>[]>(() => [
         {
@@ -312,7 +291,7 @@ const Filtering = () => {
     label="Total Project"
     value={apiData?.total_Project ?? 0}
     loading={loading}
-    onClick={() => handleStatusChange('Total Projects')} // Add correct function here
+    onClick={() => handleStatusChange('Total Projects')} 
 />
 <StatisticCard
     icon={<HiOutlineUsers />}
@@ -320,7 +299,7 @@ const Filtering = () => {
     label="Active Projects"
     value={apiData?.active_Project ?? 0}
     loading={loading}
-    onClick={() => handleStatusChange('Active Projects')} // Same here
+    onClick={() => handleStatusChange('Active Projects')} 
 />
 <StatisticCard
     icon={<HiOutlineUserAdd />}

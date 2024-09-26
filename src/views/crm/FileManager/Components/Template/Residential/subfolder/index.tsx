@@ -20,7 +20,7 @@ const Index = () => {
     const fetchDataAndLog = async () => {
       try {
         const templateData = await getTemplateData() || [];
-        console.log(templateData);
+        ;
         setTemplateData(templateData);
       } catch (error) {
         console.error('Error fetching lead data', error);
@@ -29,7 +29,7 @@ const Index = () => {
 
     fetchDataAndLog();
   }, []);
-  console.log(templateData);
+  ;
   
   const navigate = useNavigate();
 
@@ -40,7 +40,6 @@ const Index = () => {
   };
 
   const onDialogClose = (e: MouseEvent) => {
-    console.log('onDialogClose', e);
     setIsOpen(false);
   };
 

@@ -39,7 +39,6 @@ export async function OrgainisationVerify(data:any) {
 
 
         const responseData = await response.json();
-        console.log('Received response from server:', responseData);
         return responseData;
 }
 export async function orgVerifyOtp(data:any) {
@@ -53,7 +52,6 @@ export async function orgVerifyOtp(data:any) {
 
 
         const responseData = await response.json();
-        console.log('Received response from server:', responseData);
         return responseData;
 }
 export async function registerandSignin(data:any) {
@@ -67,7 +65,6 @@ export async function registerandSignin(data:any) {
 
 
         const responseData = await response.json();
-        console.log('Received response from server:', responseData);
         return responseData;
 }
 

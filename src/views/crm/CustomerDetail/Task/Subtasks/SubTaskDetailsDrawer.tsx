@@ -77,7 +77,7 @@ const SubTaskDetails = (Data:Data) => {
     const location=useLocation()
     const queryParam=new URLSearchParams(location.search);
     const projectId=queryParam.get('project_id') || '';
-    console.log(Data);
+    
     
     
 
@@ -153,7 +153,7 @@ const SubTaskDetails = (Data:Data) => {
                 const response = await apiGetCrmProjectsSingleSubTaskDataTimer(projectId, Data.data.task_id, Data.data.sub_task_id);
                 if (response) {
                     const { time, isrunning, total_time, current } = response.data;
-                    console.log(response.data);
+                    
                     time.length===0 ?
                     setTimerData({
                       time: 0,
@@ -231,7 +231,6 @@ const SubTaskDetails = (Data:Data) => {
             current: now.toString(),
             total_time: updatedData.totalTime.toString(), 
           };
-          console.log(submitData);
           Submit(submitData);
       
           return updatedData;

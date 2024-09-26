@@ -31,7 +31,6 @@ const EditRoles = () => {
     const navigate = useNavigate();
     const [checkType, setCheckType] = useState(obj);
     const [newName, setNewName] = useState(role);
-    console.log(newName)
 
 
     const [initialValues, setInitialValues] = useState<FormValues>(() =>
@@ -45,18 +44,16 @@ const EditRoles = () => {
         const fetchData = async () => {
             if (id) {
                 const response = await apiGetRoleDetails();
-                console.log(response.data)
+                
                 if (response && response.data) {
                     const roleData = response.data.find((r: any) => r._id === id);
-                console.log(roleData)
 
                     if (roleData && roleData.access) {
                         const newInitialValues = accessTypes.reduce((acc, type) => {
-                            console.log(type)
+                           
                             acc[type] = roleData.access[type] || [];
                             return acc;
                         }, {} as FormValues);
-                        console.log(newInitialValues)
                         setInitialValues(newInitialValues);
                     } else {
                         const emptyInitialValues = accessTypes.reduce((acc, type) => {
@@ -85,7 +82,6 @@ const EditRoles = () => {
         
 
     }, [initialValues])
-    console.log(checkType)
 
     const handleSelectAll = (setFieldValue: any, value: boolean) => {
         if (value) {
@@ -112,15 +108,11 @@ const EditRoles = () => {
     };
 
     const handleSelectType = (setFieldValue: any, type: AccessType, value: boolean, selectAll:boolean) => {
-        // console.log(type)
-        // console.log("type", checkType[type])
-        // console.log("selectall", selectAll)
-        // console.log("value", value)
+      
 
             if (!checkType[type]) {
                 setCheckType({...checkType, [type]: true})              
                 const permissions = permissionsMap[type] || permissionsMap.default;
-                console.log(permissions)
                 setFieldValue(type, permissions);
              
             } else {
@@ -130,7 +122,6 @@ const EditRoles = () => {
     };
 
     const handleSubmit = async (values: FormValues) => {
-        console.log('values', values);
         
         const access = Object.keys(values).reduce((acc, key) => {
             const permissions = values[key as AccessType];
@@ -140,8 +131,6 @@ const EditRoles = () => {
             return acc;
         }, {} as { [key in AccessType]?: AccessPermissions });
 
-        console.log("role", role)
-        console.log("role", access)
 
         const payload = {
             role: newName,
@@ -149,7 +138,7 @@ const EditRoles = () => {
         };
 
         const response = await apiEditRoles(payload, id);
-        console.log(response);
+        
         
         if (response.code === 200) {
             toast.push(

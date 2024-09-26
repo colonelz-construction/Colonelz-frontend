@@ -53,7 +53,7 @@ interface Projects {
 }
 const response = await apiGetUsers();
 const leads = await apiGetCrmLeads();
-console.log(leads)
+
 const id=localStorage.getItem('userId');
 const token=localStorage.getItem('auth');
 const Index = () => {
@@ -71,7 +71,7 @@ const Index = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       setUsers(response.data);
-      console.log(leads);
+      
       
       setSelectedProject(leads.data.leads);
     };

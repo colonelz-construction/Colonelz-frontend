@@ -147,7 +147,6 @@ const PaginationTable = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const { roleData } = useRoleContext()
-    console.log('RoleData:', roleData);
     
       const [deleteData,setDeleteData]=useState<ArchiveData>()
       const [restoreData,setRestoreData]=useState<Restore>()
@@ -196,11 +195,10 @@ const PaginationTable = () => {
          sub_folder_name_second:deleteData.sub_folder_name_second,
          delete_type:deleteData.delete_type,
         };
-        console.log(postData);
         
         try {
           const response = await apiGetCrmFileManagerDeleteArchiveFiles(postData);
-          console.log(response)
+          
 
           toast.push(
             <Notification closable type="success" duration={2000}>
@@ -230,7 +228,6 @@ const PaginationTable = () => {
             sub_folder_name_second:restoreData?.sub_folder_name_second,
             restore_type:restoreData?.file_id?'file':'folder'
            }
-           console.log('postData',postData);
            
         try {
            const respone= await apiGetCrmFileManagerArchiveRestore(postData);
@@ -258,9 +255,6 @@ const PaginationTable = () => {
             )
           }
       }
-
-      
-      console.log(roleData);
       
     const columns = useMemo<ColumnDef<DataItem>[]>(
         () => [
@@ -396,8 +390,6 @@ const PaginationTable = () => {
             const response = await apiGetCrmFileManagerArchive(userId)
                 setLoading(false)
             setFilesData(response.data)
-            console.log(response);
-            console.log(filesData)
         }
         fetchData()
     }

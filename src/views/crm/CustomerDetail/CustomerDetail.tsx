@@ -97,7 +97,6 @@ const CustomerDetail = () => {
                 const Report = await apiGetCrmSingleProjectReport(allQueryParams.project_id);
                 const list=await apiGetUsersList(allQueryParams.project_id)                
                 const data = response
-                console.log(data);
                 setActivity(data.data)
                 setProjectData(data.data)
                 setLoading(false);
@@ -116,7 +115,7 @@ const CustomerDetail = () => {
       const fetchDataAndLog = async () => {
         try {
           const leadData = await apiGetCrmSingleProjectQuotation(allQueryParams.project_id);
-          console.log(leadData)
+          
           setFileData(leadData.data);
         } catch (error) {
           console.error('Error fetching lead data', error);

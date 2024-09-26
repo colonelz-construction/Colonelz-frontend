@@ -16,7 +16,6 @@ interface Data{
 }
 const CrmDashboard = () => {
     const {apiData,loading}=useProjectContext()
-    console.log(apiData);
     
 
     const data=[

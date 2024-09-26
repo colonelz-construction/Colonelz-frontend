@@ -78,12 +78,10 @@ const YourFormComponent: React.FC<Data> = (data) => {
     formData.files.forEach((file) =>
     postData.append('files', file),
 )
-
-    console.log('Post Data:', postData);
     
       const response = await apiGetCrmFileManagerCreateProjectFolder(postData);
       setSubmit(false);
-      console.log('Response Data:', response);
+      
   
       if (response.code===200) {
         toast.push(

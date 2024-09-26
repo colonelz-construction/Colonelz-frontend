@@ -52,7 +52,7 @@ const LeadForm = () => {
   
   onSubmit={async(values:any,{setSubmitting}) => {
     setSubmitting(true)
-    console.log(values);
+    ;
     
     const response=await apiGetCrmLeadsUpdates(values)
     if(response.code===200){

@@ -166,7 +166,6 @@ const Index = () => {
   const openDialog = (fileId: string) => {
     setIsOpen(true)
     setSelectedFiles([fileId])
-    console.log(fileId);
   }
   const onDialogClose = () => {
     setIsOpen(false)
@@ -214,16 +213,14 @@ const Index = () => {
     const fetchDataAndLog = async () => {
       try {
         const leadData = await apiGetCrmFileManagerLeads(leadId);
-        console.log(leadData)
+        
         setLoading(false)
         const folderData = leadData?.data
-        console.log(folderData);
 
         const selectedFolder = folderData.find((folder: any) => folder.folder_name === folderName);
 
         if (selectedFolder) {
           setLeadData(selectedFolder.files);
-          console.log(selectedFolder.files);
 
         }
       } catch (error) {
@@ -234,7 +231,7 @@ const Index = () => {
     fetchDataAndLog();
   }, [leadId, folderName]);
 
-  console.log(leadData);
+  ;
 
   const deleteFiles = async (fileId: string) => {
     selectedFiles.push(fileId)
@@ -304,7 +301,6 @@ const Index = () => {
     setShareLoading(false)
     onDialogClose()
     const responseData = await response.json();
-    console.log('Files shared successfully:', responseData);
     setSelectedFiles([]);
     setSelectedEmails([]);
     setSelectedEmailsCc([]);
@@ -698,7 +694,7 @@ const Index = () => {
             formData.append('type', values.type)
 
             const response = await apiGetCrmFileManagerShareContractFile(formData)
-            console.log(response);
+            
 
             if (response.code === 200) {
               toast.push(
@@ -753,7 +749,7 @@ const Index = () => {
 
         <Formik initialValues={{ lead_id: leadId, folder_name: folderName, file_id: '', email: '', cc: '', bcc: '', subject: '', body: '' }}
           onSubmit={(values, { setSubmitting }) => {
-            console.log(values);
+            ;
           }
           }>
 
@@ -880,7 +876,7 @@ const Index = () => {
               )
             }
             else {
-              console.log(values);
+              ;
               let formData = new FormData();
               formData.append('lead_id', values.lead_id || '');
               formData.append('folder_name', values.folder_name || '');
@@ -891,7 +887,7 @@ const Index = () => {
               // const responseData=await response.json()
               setFormLoading(false)
               setLoading(false)
-              console.log(response);
+              
 
               if (response.code === 200) {
                 toast.push(

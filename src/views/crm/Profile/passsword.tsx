@@ -78,7 +78,6 @@ const Password = ({ data }: { data?: LoginHistory[] }) => {
         }
     
         setSubmitting(false);
-        console.log('values', values);
     }
 
     return (

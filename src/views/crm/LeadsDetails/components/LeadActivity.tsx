@@ -36,7 +36,6 @@ const TimelineAvatar = ({ children, ...rest }: TimelineAvatarProps) => {
 }
 
 const LeadActivity = ({details}:any) => {
-    console.log(details);
     
   return (
     <>

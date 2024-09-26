@@ -99,7 +99,6 @@ export async function apiCreateRole<
         data,
     }).then(
         (response)=>{
-            console.log(response.data);
             return response.data
            
         }
@@ -118,7 +117,6 @@ return ApiService.fetchData<any>({
 
 export async function apiEditUserRole(data: any) {
 
-    console.log("apiEditUserRole",data)
     return ApiService.fetchData<any>({
         url: 'admin/update/users/role',
         method: 'put',
@@ -156,7 +154,7 @@ export async function addProfilePhoto(data: any) {
         data,
     }).then(
         (response)=>{
-            console.log(response.data);
+            
             return response.data
            
         }
@@ -170,7 +168,7 @@ export async function addcontractinfileManager(Data: any) {
         data: Data,
     }).then(
         (response)=>{
-            console.log(response.data);
+            
             return response.data
            
         }
@@ -186,7 +184,7 @@ export async function EditPassword<
         data,
     }).then(
         (response)=>{
-            console.log(response.data);
+            
             return response.data
            
         }
@@ -237,7 +235,7 @@ export async function apiRestoreDeletedUsers(UserId: any) {
         data: {user_id:UserId},
     }).then(
         (response)=>{
-            console.log(response.data);
+            
             return response.data
         }
     )
@@ -260,7 +258,7 @@ export async function addMemberToProject(Data: any) { //Not in use
         data: Data,
     }).then(
         (response)=>{
-            console.log(response.data);
+            
             return response.data
         }
     )
@@ -341,7 +339,7 @@ export async function apiCreateMom(formData: any) {
         data: formData,
     }).then(
         (response)=>{
-            console.log(response.data);
+            
             return response.data
         }
     )
@@ -355,7 +353,7 @@ export async function apishareMom(formData: any) {  //Not in use
         data: formData,
     }).then(
         (response)=>{
-            console.log(response.data);
+            
             return response.data
         }
     )
@@ -366,7 +364,7 @@ export async function apiGetCrmProjects<T>() {
         url: `admin/getall/project/?id=${userId}`,
         method: 'get',
     }).then((response) => {
-        console.log(response.data)
+        
         return response.data
     })
 }
@@ -378,7 +376,7 @@ export async function apiGetCrmProjectMakeContract(formData: any) {  //Not in us
         data: formData,
     }).then(
         (response)=>{
-            console.log(response.data);
+            
             return response.data
         }
     )
@@ -389,7 +387,7 @@ export async function apiGetCrmSingleProjectQuotation<T>(projectId:string) {
         url: `admin/get/quotationdata/?project_id=${projectId}`,
         method: 'get',
     }).then((response) => {
-        console.log(response.data)
+        
         return response.data
     })
 }
@@ -401,7 +399,7 @@ export async function apiGetCrmProjectShareQuotation(formData: any) {
         data: formData,
     }).then(
         (response)=>{
-            console.log(response.data);
+            
             return response.data
         }
     )
@@ -414,7 +412,7 @@ export async function apiGetCrmProjectShareContractApproval(formData: any) {
         data: formData,
     }).then(
         (response)=>{
-            console.log(response.data);
+            
             return response.data
         }
     )
@@ -428,7 +426,7 @@ export async function apiGetCrmProjectShareQuotationApproval(formData: any) {
         data: formData,
     }).then(
         (response)=>{
-            console.log(response.data);
+            
             return response.data
         }
     )
@@ -488,7 +486,7 @@ export async function apiGetCrmProjectsAddTask(Data: any) {
         data: Data,
     }).then(
         (response)=>{
-            console.log(response.data);
+            
             return response.data
         }
     )
@@ -500,7 +498,7 @@ export async function apiGetCrmProjectsTaskData<T>(projectId:string) {
         url: `admin/get/all/task?user_id=${userId}&project_id=${projectId}`,
         method: 'get',
     }).then((response) => {
-        console.log(response.data)
+        
         return response.data
     })
 }
@@ -510,7 +508,7 @@ export async function apiGetCrmProjectsSingleTaskData<T>(projectId:string |null,
         url: `admin/get/single/task?user_id=${userId}&project_id=${projectId}&task_id=${taskId}`,
         method: 'get',
     }).then((response) => {
-        console.log(response.data)
+        
         return response.data
     })
 }
@@ -552,7 +550,7 @@ export async function apiGetCrmProjectsAddSubTask(Data: any) {
         data: Data,
     }).then(
         (response)=>{
-            console.log(response.data);
+            
             return response.data
         }
     )
@@ -570,7 +568,6 @@ export async function apiGetCrmProjectsSingleSubTaskDetails(projectId:string,tas
     });
  
     const data = await response.json();
-    console.log('Received response from server:', data);
     return data;
 }
 
@@ -620,7 +617,7 @@ export async function apiGetCrmFileManager<T>() {
         url: `admin/getfile/`,
         method: 'get',
     }).then((response) => {
-        console.log(response)
+        
         return response.data
     })
 }
@@ -630,7 +627,7 @@ export async function apiGetCrmFileManagerCompanyData<T>() {
         url: `admin/get/companydata`,
         method: 'get',
     }).then((response) => {
-        console.log(response)
+        
         return response.data
     })
 }
@@ -640,7 +637,7 @@ export async function apiGetCrmFileManagerArchive<T>(userId:string | null) {
         url: `admin/get/archive?user_id=${userId}`,
         method: 'get',
     }).then((response) => {
-        console.log(response)
+        
         return response.data
     })
 }
@@ -652,7 +649,7 @@ export async function apiGetCrmFileManagerArchiveRestore(Formdata: any) {
         data: Formdata,
     }).then(
         (response)=>{
-            console.log(response.data);
+            
             return response.data
         }
     )
@@ -673,7 +670,7 @@ export async function apiGetCrmFileManagerProjects<T>(projectId:string | null) {
         url: `admin/project/getfile/?project_id=${projectId}`,
         method: 'get',
     }).then((response) => {
-        console.log(response)
+        
         return response.data
     })
 }
@@ -685,7 +682,7 @@ export async function apiGetCrmFileManagerCreateLeadFolder(Formdata: any) {
         data: Formdata,
     }).then(
         (response)=>{
-            console.log(response.data);
+            
             return response.data
         }
     )
@@ -734,7 +731,7 @@ export async function apiGetCrmFileManagerLeads<T>(leadId:string | null) {
         url: `admin/lead/getfile/?lead_id=${leadId}`,
         method: 'get',
     }).then((response) => {
-        console.log(response)
+        
         return response.data
     })
 }
@@ -744,7 +741,7 @@ export async function apiGetCrmContractDetails<T>(leadId:string | null) {
         url: `admin/get/contractdata?lead_id=${leadId}`,
         method: 'get',
     }).then((response) => {
-        console.log(response)
+        
         return response.data
     })
 }
@@ -777,7 +774,7 @@ export async function apiGetCrmLeads<T>() {
         url: `admin/getall/lead/`,
         method: 'get',
     }).then((response) => {
-        console.log(response)
+        
         return response.data
     })
 }
@@ -787,7 +784,7 @@ export async function apiGetCrmLeadsDetails<T>(leadId:string | null) {
         url: `admin/getsingle/lead/?lead_id=${leadId}`,
         method: 'get',
     }).then((response) => {
-        console.log(response)
+        
         return response.data
     })
 }

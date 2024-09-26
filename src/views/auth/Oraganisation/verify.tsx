@@ -45,7 +45,7 @@ const ForgotPasswordForm = (props: ForgotPasswordFormProps) => {
     ) => {
         setSubmitting(true)
             const resp = await orgVerifyOtp(values)
-            console.log(resp);
+            
             
             if (resp.code === 200) {
                 setSubmitting(false)

@@ -120,7 +120,7 @@ const Index = () => {
         fetchData();
     }, [leadId]);
 
-    console.log(leadData);
+    ;
     
 
     const [dialogIsOpen2, setIsOpen2] = useState(false)
@@ -180,12 +180,11 @@ const Index = () => {
          setIsOpen(true)
      }
  
-     const onDialogClose = (e: MouseEvent) => {
-         console.log('onDialogClose', e)
+     const onDialogClose = (e: MouseEvent) => {a
          setIsOpen(false)
      }
      const theme=useTheme
-     console.log(leadData);
+     ;
 
 
 
@@ -281,7 +280,6 @@ const filteredProjectData = useMemo(() => {
   }
   return leadData;
 }, [leadData, role]);
-console.log(filteredProjectData);
 
 
 const table = useReactTable({

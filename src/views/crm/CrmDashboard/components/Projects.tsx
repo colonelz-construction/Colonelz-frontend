@@ -49,7 +49,6 @@ const Project = ({ className }: LeadsProps) => {
 
     const projects = useProjectContext();
     const { loading } = useProjectContext();
-    console.log(loading);
 
     const memoizedProjects = useMemo(() => projects.projects, [projects.projects]);
 

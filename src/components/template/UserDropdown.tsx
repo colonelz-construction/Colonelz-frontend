@@ -102,10 +102,11 @@ const _UserDropdown = ({ className }: CommonProps) => {
                 
                         return (
                             <AuthorityCheck
+                            key={item.label}
                             userAuthority={[`${localStorage.getItem('role')}`]}
                             authority={item.authority??[]}
                             >
-                        <div key={item.label}>
+                        <div>
                             <Dropdown.Item
                             key={item.label}
                             eventKey={item.label}

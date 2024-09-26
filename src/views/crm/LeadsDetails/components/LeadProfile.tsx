@@ -56,7 +56,6 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
     const [project, setProject] = useState<AddProject>()
     const {roleData} = useRoleContext()
     const createProjectAccess = roleData?.data?.project?.create?.includes(`${localStorage.getItem('role')}`)
-    console.log(data);
     
 
     const onDialogClose = () => {
@@ -88,7 +87,6 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
     }
 
     const addProject=async()=>{
-        console.log(project);
         
             const response=await apiLeadsAnotherProject(project)
             if(response.code===200){

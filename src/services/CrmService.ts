@@ -788,6 +788,15 @@ export async function apiGetCrmLeadsDetails<T>(leadId:string | null) {
         return response.data
     })
 }
+export async function apiGetCrmProjectActivity<T>(project_id:any) {
+    return ApiService.fetchData<any>({
+        url: `admin/get/project/activity?project_id=${project_id}`,
+        method: 'get',
+    }).then((response) => {
+        
+        return response.data
+    })
+}
  
 export async function apiLeadsAnotherProject(data: any) {
     return ApiService.fetchData<any>({

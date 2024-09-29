@@ -61,9 +61,7 @@ interface Projects {
   project_id: string;
   project_name: string;
 }
-const response = await apiGetUsers();
 
-const projects = await apiGetCrmProjects();
 const id=localStorage.getItem('userId');
 const token=localStorage.getItem('auth');
 const Index = () => {
@@ -81,6 +79,9 @@ const Index = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
+      const response = await apiGetUsers();
+
+      const projects = await apiGetCrmProjects();
       setUsers(response.data);
       setSelectedProject(projects.data.projects);
     };
@@ -88,12 +89,20 @@ const Index = () => {
     fetchUsers();
   },[]);
   useEffect(() => {
-    setFilteredUsers(
-      users.filter((user) => user.role === selectedRole)
-    );
-    setFilteredProjects(
-      projects.data.projects
-    );
+
+    const func = async () => {
+      const projects = await apiGetCrmProjects();
+      setFilteredUsers(
+        users.filter((user) => user.role === selectedRole)
+      );
+      setFilteredProjects(
+        projects.data.projects
+      );
+
+    }
+
+    func()
+    
   }, [selectedRole, users]);
 
   const handleSubmit = async (values: FormValues) => {

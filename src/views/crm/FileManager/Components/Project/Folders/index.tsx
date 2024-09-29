@@ -212,9 +212,27 @@ const Index = () => {
     }
 
     useEffect(() => {
+
         const fetchDataAndLog = async () => {
-           
-                    setLeadData(folderData.files)
+            try {
+                const leadData = await fetchProjectData(leadId)
+                console.log(leadData)
+
+                //   setLoading(false)
+                const folderData = leadData
+                console.log(folderData)
+
+                const selectedFolder = folderData.find(
+                    (folder: any) => folder.folder_name === folderName,
+                )
+
+                if (selectedFolder) {
+                    setLeadData(selectedFolder.files)
+                    console.log(selectedFolder.files)
+                }
+            } catch (error) {
+                console.error('Error fetching lead data', error)
+            }
         }
 
         fetchDataAndLog()

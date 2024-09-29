@@ -51,8 +51,8 @@ interface Projects {
   lead_id: string;
   name: string;
 }
-const response = await apiGetUsers();
-const leads = await apiGetCrmLeads();
+
+
 
 const id=localStorage.getItem('userId');
 const token=localStorage.getItem('auth');
@@ -70,6 +70,8 @@ const Index = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
+      const response = await apiGetUsers();
+      const leads = await apiGetCrmLeads();
       setUsers(response.data);
       
       
@@ -78,13 +80,23 @@ const Index = () => {
 
     fetchUsers();
   },[]);
+  
   useEffect(() => {
-    setFilteredUsers(
-      users.filter((user) => user.role === selectedRole)
-    );
-    setFilteredLeads(
-      leads.data.leads
-    );
+
+    const func = async () => {
+
+      const leads = await apiGetCrmLeads();
+      setFilteredUsers(
+        users.filter((user) => user.role === selectedRole)
+      );
+      setFilteredLeads(
+        leads.data.leads
+      );
+      
+    }
+
+    func();
+    
   }, [selectedRole, users]);
 
   

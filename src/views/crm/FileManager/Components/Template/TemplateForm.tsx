@@ -38,20 +38,21 @@ const YourFormComponent: React.FC = () => {
     const fetchDataAndLog = async () => {
       try {
         const templateData = await getTemplateData();
-        ;
+        console.log(templateData);
         const filteredFolders = templateData.filter((folder) => {
           return (
             folder.files[0]?.folder_name === type &&
             folder.files[0]?.sub_folder_name_first === folderName
           );
         });
+  console.log(filteredFolders);
   
         if (filteredFolders.length > 0) {
           setLeadData(filteredFolders.map((folder) => folder.files[0]));
         } else {
           console.warn('No matching folder found.');
         }
-        ;
+        console.log(leadData);
         
       } catch (error) {
         console.error('Error fetching lead data', error);
@@ -145,6 +146,7 @@ const YourFormComponent: React.FC = () => {
 const uniqueFolderNames = Array.from(
     new Set(leadData.map((folderItem) => folderItem.sub_folder_name_second.trim())),
 )
+console.log(uniqueFolderNames);
 
 const clientOptions: Option[] = uniqueFolderNames.map((folderName) => ({
     value: folderName,

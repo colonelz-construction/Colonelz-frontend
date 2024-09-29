@@ -388,10 +388,10 @@ const Users = () => {
                 confirmButtonColor="red-600"
                 onCancel={onDialogClose}
                 onConfirm={() => deleteuser(userId)}
-                title="Delete Archived User"
+                title="Delete User"
                 onRequestClose={onDialogClose}
             >
-                <p> Are you sure you want to delete this user permanantly? </p>
+                <p> Are you sure you want to delete this user? </p>
             </ConfirmDialog>
             <Dialog
                 isOpen={editRoledialogIsOpen}

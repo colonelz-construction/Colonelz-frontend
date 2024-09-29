@@ -11,6 +11,7 @@ export const LeadDataProvider = ({ children }: { children: React.ReactNode }) =>
     const queryParams = new URLSearchParams(location.search);
     const leadId = queryParams.get('lead_id');
     const token = localStorage.getItem('auth');
+    console.log(leadId,token);
     
   useEffect(() => {
     const fetchLeadData = async () => {

@@ -1,12 +1,18 @@
-import  { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FolderItem,fetchLeadData} from './data';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Dialog, Notification, Pagination, Select, Tooltip, toast } from '@/components/ui';
+import { Button, Card, Dialog, Dropdown, Notification, Pagination, Select, Skeleton, Tooltip, toast } from '@/components/ui';
 import type { MouseEvent } from 'react'
 import YourFormComponent from './LeadForm';
-import { FaFolder } from 'react-icons/fa';
+import { FaFolder, FaRegFolder } from 'react-icons/fa';
+import { useTheme } from '@emotion/react';
 import { AuthorityCheck, ConfirmDialog, StickyFooter } from '@/components/shared';
-import { apiDeleteFileManagerFolders } from '@/services/CrmService';
+import { apiDeleteFileManagerFolders, apiGetCrmFileManagerLeads } from '@/services/CrmService';
+import Indexe from './Folders';
+import { BsThreeDotsVertical } from 'react-icons/bs';
+import { HiTrash } from 'react-icons/hi';
+import { format, isValid, parse, parseISO } from 'date-fns';
+import { CgDanger } from 'react-icons/cg';
 
 
 import { useMemo} from 'react'
@@ -114,7 +120,7 @@ const Index = () => {
         fetchData();
     }, [leadId]);
 
-    ;
+    console.log(leadData);
     
 
     const [dialogIsOpen2, setIsOpen2] = useState(false)
@@ -175,28 +181,29 @@ const Index = () => {
      }
  
      const onDialogClose = (e: MouseEvent) => {
+         console.log('onDialogClose', e)
          setIsOpen(false)
      }
+     const theme=useTheme
+     console.log(leadData);
+
 
 
 const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 const [globalFilter, setGlobalFilter] = useState('')
 
 
-
 const columns = useMemo<ColumnDef<FolderItem>[]>(
     () => [
         { header: 'Name', accessorKey: 'folder_name'
         , cell: ({row}) => {
-            const folderData=row.original;
-            const openFolder = () => {
-                navigate(`/app/crm/fileManager/leads/folder/${row.original.folder_name}`, { state: { folderData,leadId,leadName } });
-              };
             return(
                 <div>
                 <div className="flex items-center gap-2">
                   <FaFolder/>
-                  <a className="font-medium cursor-pointer" onClick={()=> openFolder()}>
+                  <a className="font-medium cursor-pointer" onClick={()=> navigate(
+                              `/app/crm/fileManager/leads/folder?lead_id=${leadId}&lead_name=${leadName}&folder_name=${row.original.folder_name}`,
+                          )}>
                     {row.original.folder_name}
                   </a>
                 </div>
@@ -242,6 +249,9 @@ const columns = useMemo<ColumnDef<FolderItem>[]>(
     ],
     []
 )
+
+const totalData = leadData.length
+
 const pageSizeOption = [
     { value: 10, label: '10 / page' },
     { value: 20, label: '20 / page' },
@@ -271,6 +281,7 @@ const filteredProjectData = useMemo(() => {
   }
   return leadData;
 }, [leadData, role]);
+console.log(filteredProjectData);
 
 
 const table = useReactTable({

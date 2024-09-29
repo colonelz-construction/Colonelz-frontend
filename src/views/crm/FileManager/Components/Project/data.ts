@@ -43,7 +43,7 @@ export interface ApiResponse {
   export const fetchProjectData = async (projectId: string | null  ): Promise<FolderItem[]> => {
     try {
       const response = await apiGetCrmFileManagerProjects(projectId);
-      
+      console.log(response)
       const data=response
       return data.data;
     } catch (error) {

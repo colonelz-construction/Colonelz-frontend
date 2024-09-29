@@ -37,7 +37,7 @@ export const fetchData = async (): Promise<ApiResponse> => {
 
 export const getLeadData = async (): Promise<LeadDataItem[]> => {
   const data = await fetchData();
-  
+  console.log(data)
   return data.data.leadData;
 };
 
@@ -47,6 +47,6 @@ export const getProjectData = async (): Promise<ProjectDataItem[]> => {
 };
 export const getTemplateData = async (): Promise<TemplateDataItem[]> => {
   const data = await apiGetCrmFileManagerCompanyData();
-  
+  console.log(data);
   return data.data.templateData;
 };

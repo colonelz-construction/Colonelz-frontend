@@ -100,6 +100,9 @@ const pageSizeOption = [
     { value: 50, label: '50 / page' },
 ]
 
+console.log(getLeadData);
+const temp = await getLeadData();
+console.log(temp)
 
 const Filtering = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])

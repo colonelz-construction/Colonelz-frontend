@@ -1,4 +1,4 @@
-
+// for Individual Lead
 import { useEffect, useState } from 'react'
 import Container from '@/components/shared/Container'
 import reducer, { getCustomer, useAppDispatch } from './store'

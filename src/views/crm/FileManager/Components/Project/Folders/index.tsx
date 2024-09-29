@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { FileItem, fetchProjectData } from '../data'
 import {
@@ -125,6 +126,10 @@ const Index = () => {
     const [subject, setSubject] = useState('')
     const [body, setBody] = useState('')
     const location = useLocation()
+    const queryParams = new URLSearchParams(location.search)
+    const leadId = queryParams.get('project_id')
+    const ProjectName = queryParams.get('project_name')
+    const folderName = queryParams.get('folder_name') // Assuming folder_name is in the query params
     const navigate = useNavigate()
     const [usernames, setUsernames] = useState<string[]>([])
     const [shareLoading, setShareLoading] = useState(false)
@@ -132,7 +137,7 @@ const Index = () => {
     const { roleData } = useRoleContext()
     const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
     const { folderData,projectId,projectName } = location.state || {}
-    const folderName = folderData.folder_name
+    // const folderName = folderData.folder_name
 
     interface User {
         role: string
@@ -153,6 +158,7 @@ const Index = () => {
                 .filter((user: User) => (user.role === 'Senior Architect') || (user.role === 'ADMIN'))
                 .map((user: User) => user.username)
             if (usernames) {
+
                 setUsernames(usernames)
             }
         }
@@ -174,6 +180,7 @@ const Index = () => {
     const openDialog = (fileId: string) => {
         setIsOpen(true)
         setSelectedFiles([fileId])
+        console.log(fileId)
     }
     const onDialogClose = () => {
         setIsOpen(false)
@@ -206,12 +213,13 @@ const Index = () => {
 
     useEffect(() => {
         const fetchDataAndLog = async () => {
+           
                     setLeadData(folderData.files)
         }
 
         fetchDataAndLog()
-    }, [projectId, folderName])
-    
+    }, [leadId, folderName])
+    console.log(leadData)
 
     const deleteFiles = async (fileId: string) => {
         selectedFiles.push(fileId)
@@ -231,11 +239,11 @@ const Index = () => {
         const postData = {
             file_id: selectedFiles,
             folder_name: folderName,
-            project_id: projectId,
+            project_id: leadId,
         }
         try {
             const response = await apiDeleteFileManagerFiles(postData)
-            
+            console.log(response)
 
             if (response.code === 200) {
                 toast.push(
@@ -281,7 +289,7 @@ const Index = () => {
             type: 'Internal',
             file_id: selectedFileId,
             folder_name: folderName,
-            project_id: projectId,
+            project_id: leadId,
             user_id: localStorage.getItem('userId'),
         }
 
@@ -311,7 +319,7 @@ const Index = () => {
         const postData = {
             file_id: selectedFiles,
             lead_id: '',
-            project_id: projectId,
+            project_id: leadId,
             email: selectedEmails,
             cc: selectedEmailsCc,
             bcc: selectedEmailsBcc,
@@ -549,7 +557,7 @@ const Index = () => {
     return (
         <div>
             <div className="flex justify-between">
-                <h3 className="mb-5 capitalize">Project-{projectName}</h3>
+                <h3 className="mb-5 capitalize">Project-{ProjectName}</h3>
                 {uploadAccess &&
                     <Button
                         className=""
@@ -593,10 +601,10 @@ const Index = () => {
                                     </li>
                                     <li>
                                         <Link
-                                            to={`/app/crm/fileManager/project?project_id=${projectId}&project_name=${projectName}`}
+                                            to={`/app/crm/fileManager/project?project_id=${leadId}&project_name=${ProjectName}`}
                                             className="text-blue-600 dark:text-blue-400 hover:underline"
                                         >
-                                            {projectName}
+                                            {ProjectName}
                                         </Link>
                                     </li>
                                     <li>
@@ -655,7 +663,8 @@ const Index = () => {
                                 </Tr>
                             ))}
                         </THead>
-                        {leadData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
+                        {
+                        leadData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
                             <TBody>
                                 {table.getRowModel().rows.map((row) => {
                                     return (
@@ -712,7 +721,7 @@ const Index = () => {
                         type="button"
                         onClick={() => {
                             navigate(
-                                `/app/crm/fileManager/project?project_id=${projectId}&project_name=${projectName}`,
+                                `/app/crm/fileManager/project?project_id=${leadId}&project_name=${ProjectName}`,
                             )
                         }}
                     >
@@ -741,9 +750,9 @@ const Index = () => {
                 onRequestClose={onDialogClose}
             >
                 <h3 className="mb-5">Share Files</h3>
-                <Formik initialValues={{ lead_id: projectId, folder_name: folderName, file_id: '', email: '', cc: '', bcc: '', subject: '', body: '' }}
+                <Formik initialValues={{ lead_id: leadId, folder_name: folderName, file_id: '', email: '', cc: '', bcc: '', subject: '', body: '' }}
                     onSubmit={async (values) => {
-                        ;
+                        console.log(values);
 
                     }
 
@@ -949,7 +958,7 @@ const Index = () => {
                 <h3>Upload Files</h3>
                 <Formik
                     initialValues={{
-                        project_id: projectId,
+                        project_id: leadId,
                         folder_name: folderName,
                         files: [],
                     }}
@@ -966,7 +975,7 @@ const Index = () => {
                                 { placement: 'top-center' },
                             )
                         } else {
-                            
+                            console.log(values)
                             let formData = new FormData()
                             formData.append(
                                 'project_id',
@@ -983,7 +992,7 @@ const Index = () => {
                                 await apiGetCrmFileManagerCreateProjectFolder(
                                     formData,
                                 )
-                            
+                            console.log(response)
 
                             if (response.code === 200) {
                                 toast.push(

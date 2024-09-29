@@ -114,7 +114,7 @@ const Index = () => {
         const fetchDataAndLog = async () => {
             try {
                 const templateData = (await getTemplateData()) || []
-                ;
+                console.log(templateData);
                 
                 setLoading(false)
                 setTemplateData(
@@ -144,6 +144,7 @@ const Index = () => {
     }
 
     const onDialogClose = (e: MouseEvent) => {
+        console.log('onDialogClose', e)
         setIsOpen(false)
     }
 
@@ -179,6 +180,7 @@ const Index = () => {
             sub_folder_name_first: folderName,
             sub_folder_name_second: folder_name,
         }
+        console.log(postData)
 
         try {
             await apiDeleteFileManagerFolders(postData)
@@ -273,7 +275,7 @@ const Index = () => {
         ],
         [],
     )
-    ;
+    console.log(templateData);
     
     const table = useReactTable({
         data: templateData,

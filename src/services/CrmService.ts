@@ -797,6 +797,15 @@ export async function apiGetCrmProjectActivity<T>(project_id:any, page:any) {
         return response.data
     })
 }
+export async function apiGetCrmLeadActivity<T>(lead_id:any, page:any) {
+    return ApiService.fetchData<any>({
+        url: `admin/get/lead/activity?lead_id=${lead_id}&page=${page}&limit=5`,
+        method: 'get',
+    }).then((response) => {
+        
+        return response.data
+    })
+}
  
 export async function apiLeadsAnotherProject(data: any) {
     return ApiService.fetchData<any>({

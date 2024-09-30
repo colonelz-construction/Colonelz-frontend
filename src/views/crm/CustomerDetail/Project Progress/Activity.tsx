@@ -41,12 +41,12 @@ const Activity = ({ Data} : CustomerProfileProps) => {
     
 
     //at first the activity is not on reverse but after reload it appears in reverse, using useEffect fixs the problem.
-    // useEffect(() => {
-    //     const data = Data?.project_updated_by
-    //     console.log(data)
-    //     setActivityData(data)
+    useEffect(() => {
+        const data = Data?.project_updated_by
+        console.log(data)
+        setActivityData(data)
 
-    // }, [])
+    }, [])
     
   return (
     <Card className=''>

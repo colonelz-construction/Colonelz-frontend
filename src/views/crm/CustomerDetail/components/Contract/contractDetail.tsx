@@ -15,7 +15,7 @@ import type { CheckboxProps } from '@/components/ui/Checkbox'
 import type { ColumnDef, ColumnFiltersState } from '@tanstack/react-table'
 import { Button, Dialog, FormItem, Input, Notification, Select, Upload, toast } from '@/components/ui'
 import Pagination from '@/components/ui/Pagination'
-import { Formik, Field, Form} from 'formik';
+import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 import { apiGetCrmFileManagerShareContractFile, apiGetCrmProjectShareContractApproval, apiGetCrmProjectShareQuotation, apiGetCrmProjectShareQuotationApproval } from '@/services/CrmService'
 import { use } from 'i18next'
@@ -24,13 +24,13 @@ import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import { rankItem } from '@tanstack/match-sorter-utils'
 
 type FormData = {
-  user_name: string;
-  file_id: string;
-  folder_name: string;
-  project_id: string;
-  client_name: string;
-  client_email: string;
-  type: string;
+    user_name: string;
+    file_id: string;
+    folder_name: string;
+    project_id: string;
+    client_name: string;
+    client_email: string;
+    type: string;
 };
 
 
@@ -69,14 +69,14 @@ function DebouncedInput({
         }, debounce)
 
         return () => clearTimeout(timeout)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value])
 
     return (
         <div className="flex justify-end">
             <div className="flex items-center mb-4">
                 <Input
-                size='sm'
+                    size='sm'
                     {...props}
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
@@ -99,19 +99,19 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed
 }
 export type FileItemProps = {
-    data:FileItem[]
+    data: FileItem[]
 }
 export type FileItem = {
-   admin_status:string,
-   client_status:string,   
-   file_name:string,
-   files:Files[],
-   itemId:string,
-   remark:string,
-   _id: string
+    admin_status: string,
+    client_status: string,
+    file_name: string,
+    files: Files[],
+    itemId: string,
+    remark: string,
+    _id: string
 }
 type Files = {
-    fileUrl:string,
+    fileUrl: string,
     date: string;
     fileId: string;
     fileName: string;
@@ -137,44 +137,44 @@ function IndeterminateCheckbox({
 }
 
 
-const ContractDetails=(data : FileItemProps )=> {
+const ContractDetails = (data: FileItemProps) => {
     const [rowSelection, setRowSelection] = useState({})
-    const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]); 
+    const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [remark, setRemark] = useState("");
-    const location=useLocation()
-    const queryParams=new URLSearchParams(location.search)
-    const leadId=queryParams.get('id')
-    const [approvalLoading,setApprovalLoading]=useState(false)
-    const {roleData}=useRoleContext()
+    const location = useLocation()
+    const queryParams = new URLSearchParams(location.search)
+    const leadId = queryParams.get('id')
+    const [approvalLoading, setApprovalLoading] = useState(false)
+    const { roleData } = useRoleContext()
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
-    
-    
-    
+
+
+
 
     const openDialog = () => {
         setIsOpen(true)
     }
 
     const onDialogClose = () => {
-    
+
         setIsOpen(false)
     }
 
-    const Approval=async(fileID:string,status:string)=>{
+    const Approval = async (fileID: string, status: string) => {
         setApprovalLoading(true);
         const postData = {
-            lead_id:leadId ,
+            lead_id: leadId,
             file_id: fileID,
             status: status,
             remark: remark,
-          };
-        try{
-            const response=await apiGetCrmProjectShareContractApproval(postData);
+        };
+        try {
+            const response = await apiGetCrmProjectShareContractApproval(postData);
             setApprovalLoading(false);
-            if(response.code===200){
+            if (response.code === 200) {
                 toast.push(
                     <Notification closable type='success' duration={2000}>
                         {response.message}
@@ -183,7 +183,7 @@ const ContractDetails=(data : FileItemProps )=> {
                 window.location.reload();
             }
         }
-        catch(error){
+        catch (error) {
             setApprovalLoading(false);
             toast.push(
                 <Notification closable type='danger' duration={2000}>
@@ -192,160 +192,160 @@ const ContractDetails=(data : FileItemProps )=> {
             )
         }
     }
-    
+
     const role = localStorage.getItem('role');
     const columns =
-        useMemo <ColumnDef <FileItem >[] >
-        (() => {
-            return [
-                {
-                    header: 'File Name',
-                    accessorKey: 'file_name',
-                    cell:({row})=>{
-                        const fileName=row.original.file_name;
-                        return(
-                            <a href={`${row.original.files[0].fileUrl}`} className=' cursor-pointer' target='_blank'>
-                        <div>{fileName.length > 20 ? `${fileName.substring(0, 20)}...` : fileName}</div></a>)
-                    }
-                },
-               
-               {
-                    header: 'Admin Status',
-                    accessorKey: 'admin_status',
-                    cell:({row})=>{
-                        const fileId=row.original.itemId;
-                        const status=row.original.admin_status;
-                        const [dialogIsOpen, setIsOpen] = useState(false)
-                       
-
-                        const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-                            setRemark(event.target.value);
-                        };
-
-                        const openDialog1 = (fileId:string) => {
-                            setIsOpen(true)
+        useMemo<ColumnDef<FileItem>[]>
+            (() => {
+                return [
+                    {
+                        header: 'File Name',
+                        accessorKey: 'file_name',
+                        cell: ({ row }) => {
+                            const fileName = row.original.file_name;
+                            return (
+                                <a href={`${row.original.files[0].fileUrl}`} className=' cursor-pointer' target='_blank'>
+                                    <div>{fileName.length > 20 ? `${fileName.substring(0, 20)}...` : fileName}</div></a>)
                         }
-                    
-                        const onDialogClose1 = () => {
-                            setIsOpen(false)
-                        }
-                    
-                        return(
-                            status==='approved'?(
-                                <div>Approved</div>
-                            ):status==='rejected'?(
-                                <div>Rejected</div>
-                            ):status==='pending'?
-                            (
-                                !roleData.data.contract?.update?.includes(`${role}`) ? (
-                                    <div>Pending</div>
-                                ) : (
-                                    <div className='flex gap-1'>
-                                        <Button variant='solid' size='sm' onClick={()=>Approval(fileId,'approved')}>{approvalLoading?"Approving...":'Approve'}</Button>
-                                        <Button variant='solid' color='red-600' size='sm' onClick={()=>openDialog1(fileId)}>Reject</Button>
-                                        <Dialog
-                                            isOpen={dialogIsOpen}
-                                            onClose={onDialogClose1}
-                                            onRequestClose={onDialogClose1}
-                                        >
-                                            <h3 className='mb-4'> Reject Remarks</h3>
-                                            <Formik
-                                                initialValues={{ lead_id:leadId , file_id: fileId, status: 'rejected', remark: '' }}
-                                                validationSchema={Yup.object({ remark: Yup.string().required('Required') })}
-                                                onSubmit={async (values, { setSubmitting }) => {
-                                                    setSubmitting(true);
-                                                    const response = await apiGetCrmProjectShareContractApproval(values);
-                                                    setSubmitting(false);
-                                                    if(response.code===200){
-                                                        toast.push(
-                                                            <Notification closable type='success' duration={2000}>
-                                                                {response.message}
-                                                            </Notification>
-                                                        )
-                                                        window.location.reload();
-                                                    }
-                                                    else{
-                                                        toast.push(
-                                                            <Notification closable type='danger' duration={2000}>
-                                                                {response.errorMessage}
-                                                            </Notification>
-                                                        )
-                                                    }
-                                                    
-                                                    setSubmitting(false);
-                                                }}
-                                            >
-                                                {({ handleSubmit,isSubmitting }) => (
-                                                <Form>
-                                                    <FormItem label="Remark">
-                                                        <Field name="remark"    >
-                                                            {({ field, form }: any) => (
-                                                                <Input
-                                                                    textArea
-                                                                    {...field}
-                                                                    onChange={ 
-                                                                        (e: React.ChangeEvent<HTMLInputElement>) => {
-                                                                            handleInputChange(e);
-                                                                            form.setFieldValue(field.name, e.target.value);
-                                                                        }
-                                                                    }
-                                                                />
-                                                            )}
-                                                        </Field>
-                                                    </FormItem>
-                                                    <div className='flex justify-end'>
-                                                        <Button type="submit" variant='solid' loading={isSubmitting}>{isSubmitting?'Submitting':'Submit'}</Button>
-                                                    </div>
-                                                </Form>)}
-                                            </Formik>
-                                        </Dialog>
-                                    </div>
-                                )
-                            ):(
-                                <div>Not Sent</div>
+                    },
+
+                    {
+                        header: 'Admin Status',
+                        accessorKey: 'admin_status',
+                        cell: ({ row }) => {
+                            const fileId = row.original.itemId;
+                            const status = row.original.admin_status;
+                            const [dialogIsOpen, setIsOpen] = useState(false)
+
+
+                            const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+                                setRemark(event.target.value);
+                            };
+
+                            const openDialog1 = (fileId: string) => {
+                                setIsOpen(true)
+                            }
+
+                            const onDialogClose1 = () => {
+                                setIsOpen(false)
+                            }
+
+                            return (
+                                status === 'approved' ? (
+                                    <div>Approved</div>
+                                ) : status === 'rejected' ? (
+                                    <div>Rejected</div>
+                                ) : status === 'pending' ?
+                                    (
+                                        !roleData.data.contract?.update?.includes(`${role}`) ? (
+                                            <div>Pending</div>
+                                        ) : (
+                                            <div className='flex gap-1'>
+                                                <Button variant='solid' size='sm' onClick={() => Approval(fileId, 'approved')}>{approvalLoading ? "Approving..." : 'Approve'}</Button>
+                                                <Button variant='solid' color='red-600' size='sm' onClick={() => openDialog1(fileId)}>Reject</Button>
+                                                <Dialog
+                                                    isOpen={dialogIsOpen}
+                                                    onClose={onDialogClose1}
+                                                    onRequestClose={onDialogClose1}
+                                                >
+                                                    <h3 className='mb-4'> Reject Remarks</h3>
+                                                    <Formik
+                                                        initialValues={{ lead_id: leadId, file_id: fileId, status: 'rejected', remark: '' }}
+                                                        validationSchema={Yup.object({ remark: Yup.string().required('Required') })}
+                                                        onSubmit={async (values, { setSubmitting }) => {
+                                                            setSubmitting(true);
+                                                            const response = await apiGetCrmProjectShareContractApproval(values);
+                                                            setSubmitting(false);
+                                                            if (response.code === 200) {
+                                                                toast.push(
+                                                                    <Notification closable type='success' duration={2000}>
+                                                                        {response.message}
+                                                                    </Notification>
+                                                                )
+                                                                window.location.reload();
+                                                            }
+                                                            else {
+                                                                toast.push(
+                                                                    <Notification closable type='danger' duration={2000}>
+                                                                        {response.errorMessage}
+                                                                    </Notification>
+                                                                )
+                                                            }
+
+                                                            setSubmitting(false);
+                                                        }}
+                                                    >
+                                                        {({ handleSubmit, isSubmitting }) => (
+                                                            <Form>
+                                                                <FormItem label="Remark">
+                                                                    <Field name="remark"    >
+                                                                        {({ field, form }: any) => (
+                                                                            <Input
+                                                                                textArea
+                                                                                {...field}
+                                                                                onChange={
+                                                                                    (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                                                        handleInputChange(e);
+                                                                                        form.setFieldValue(field.name, e.target.value);
+                                                                                    }
+                                                                                }
+                                                                            />
+                                                                        )}
+                                                                    </Field>
+                                                                </FormItem>
+                                                                <div className='flex justify-end'>
+                                                                    <Button type="submit" variant='solid' loading={isSubmitting}>{isSubmitting ? 'Submitting' : 'Submit'}</Button>
+                                                                </div>
+                                                            </Form>)}
+                                                    </Formik>
+                                                </Dialog>
+                                            </div>
+                                        )
+                                    ) : (
+                                        <div>Not Sent</div>
+                                    )
                             )
-                        )
+                        }
                     }
-               }
-                ,
-                ...(role !== 'designer' ? [{
-                header: 'Remark',
-                accessorKey: 'remark',
-                cell:({row}:any)=>{
-                    const Remark=row.original.remark;
-                    const admin_status=row.original.admin_status;
-                    const [dialogIsOpen, setIsOpen] = useState(false)
+                    ,
+                    ...(role !== 'designer' ? [{
+                        header: 'Remark',
+                        accessorKey: 'remark',
+                        cell: ({ row }: any) => {
+                            const Remark = row.original.remark;
+                            const admin_status = row.original.admin_status;
+                            const [dialogIsOpen, setIsOpen] = useState(false)
 
-                    const openDialog = () => {
-                        setIsOpen(true)
-                    }
-                
-                    const onDialogClose = () => {
-                        setIsOpen(false)
-                    }
-                
-                    return(<> 
-                    {admin_status==='rejected' &&        
-                      <div><Button size='sm' variant='solid' onClick={()=>openDialog()}>Remark</Button></div>}
-                      <Dialog
-                isOpen={dialogIsOpen}
-                onClose={onDialogClose}
-                onRequestClose={onDialogClose}
-            >
-         <h3 className='mb-4'>Remarks</h3>
-         <p style={{overflowWrap:"break-word"}}>{Remark}</p>
-                      </Dialog>
-                      </>
+                            const openDialog = () => {
+                                setIsOpen(true)
+                            }
 
-                    )
-              }
-            }] : [])
-            ]
-        },
-        [])
+                            const onDialogClose = () => {
+                                setIsOpen(false)
+                            }
+
+                            return (<>
+                                {admin_status === 'rejected' &&
+                                    <div><Button size='sm' variant='solid' onClick={() => openDialog()}>Remark</Button></div>}
+                                <Dialog
+                                    isOpen={dialogIsOpen}
+                                    onClose={onDialogClose}
+                                    onRequestClose={onDialogClose}
+                                >
+                                    <h3 className='mb-4'>Remarks</h3>
+                                    <p style={{ overflowWrap: "break-word" }}>{Remark}</p>
+                                </Dialog>
+                            </>
+
+                            )
+                        }
+                    }] : [])
+                ]
+            },
+                [])
 
     const table = useReactTable({
-        data:data?.data || [],
+        data: data?.data || [],
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -355,7 +355,7 @@ const ContractDetails=(data : FileItemProps )=> {
             columnFilters,
             globalFilter,
         },
-        enableRowSelection: true, 
+        enableRowSelection: true,
         onColumnFiltersChange: setColumnFilters,
         onRowSelectionChange: setRowSelection,
         onGlobalFilterChange: setGlobalFilter,
@@ -379,92 +379,92 @@ const ContractDetails=(data : FileItemProps )=> {
     const onSelectChange = (value = 0) => {
         table.setPageSize(Number(value))
     }
-  
+
     interface FormValues {
         client_name: string;
         email: string;
         file_id: string;
-        type:string
-        lead_id:string 
-        folder_name:string
-        project_name:string
-        site_location:string
-        quotation:File[]
-        user_id:string
+        type: string
+        lead_id: string
+        folder_name: string
+        project_name: string
+        site_location: string
+        quotation: File[]
+        user_id: string
 
     }
     type Option = {
         value: number
         label: string
     }
-    
+
     interface SelectFieldProps {
         options: Option[];
         field: any;
         form: any;
     }
     const handleShareFileForApproval = async () => {
-        if(selectedFileIds.length===0){
-          toast.push(
-            <Notification closable type="warning" duration={2000}>
-              Please select a file to share
-            </Notification>,{placement:'top-center'}
-          )
-          return;
-        }
-      
-    
-        const postData = {
-          type: 'Internal',
-          file_id: selectedFileIds[0], 
-          folder_name: 'Quotation',
-          lead_id: leadId,
-        };
-        try{
-          const response=await apiGetCrmProjectShareQuotation(postData);
-          
-        //   const responseJson=await response.json()
-          if (response.ok) {
+        if (selectedFileIds.length === 0) {
             toast.push(
-              <Notification closable type="success" duration={2000}>
-                File shared successfully
-              </Notification>,{placement:'top-center'}
+                <Notification closable type="warning" duration={2000}>
+                    Please select a file to share
+                </Notification>, { placement: 'top-center' }
             )
-          }
+            return;
         }
-        catch(error){
-          console.error('Error sharing files:', error);
-        }
-     }
 
-     const SelectField: React.FC<any> = ({ options, field, form }) => (
+
+        const postData = {
+            type: 'Internal',
+            file_id: selectedFileIds[0],
+            folder_name: 'Quotation',
+            lead_id: leadId,
+        };
+        try {
+            const response = await apiGetCrmProjectShareQuotation(postData);
+
+            //   const responseJson=await response.json()
+            if (response.ok) {
+                toast.push(
+                    <Notification closable type="success" duration={2000}>
+                        File shared successfully
+                    </Notification>, { placement: 'top-center' }
+                )
+            }
+        }
+        catch (error) {
+            console.error('Error sharing files:', error);
+        }
+    }
+
+    const SelectField: React.FC<any> = ({ options, field, form }) => (
         <Select
             options={options}
             name={field.name}
-            value={options ? options.find((option:any) => option.value === field.value) : ''}
+            value={options ? options.find((option: any) => option.value === field.value) : ''}
             onChange={(option) => form.setFieldValue(field.name, option ? option.value : '')}
         />
     );
-    const handleSubmit = async (values:any) => {
-        const formData=new FormData();
-        formData.append('client_name',values.client_name);
-        formData.append('email',values.email);
-        formData.append('file_id',values.file_id);
-        formData.append('type',values.type);
-        formData.append('lead_id',values.lead_id);
-        formData.append('folder_name',values.folder_name);
-        formData.append('project_name',values.project_name);
-        formData.append('site_location',values.site_location);
-        formData.append('user_id',localStorage.getItem('userId') as string);
-        
+    const handleSubmit = async (values: any) => {
+        const formData = new FormData();
+        formData.append('client_name', values.client_name);
+        formData.append('email', values.email);
+        formData.append('file_id', values.file_id);
+        formData.append('type', values.type);
+        formData.append('lead_id', values.lead_id);
+        formData.append('folder_name', values.folder_name);
+        formData.append('project_name', values.project_name);
+        formData.append('site_location', values.site_location);
+        formData.append('user_id', localStorage.getItem('userId') as string);
+
         setLoading(true);
-        values.quotation.forEach((file:File)=>{
-            formData.append('quotation',file);
+        values.quotation.forEach((file: File) => {
+            formData.append('quotation', file);
         })
-        const response=await apiGetCrmFileManagerShareContractFile(formData);
+        const response = await apiGetCrmFileManagerShareContractFile(formData);
         // const responseData=  await response.json();
         setLoading(false);
-        if(response.code===200){
+        if (response.code === 200) {
             toast.push(
                 <Notification closable type='success' duration={2000}>
                     {response.message}
@@ -472,18 +472,18 @@ const ContractDetails=(data : FileItemProps )=> {
             )
             window.location.reload();
         }
-        else{
+        else {
             toast.push(
                 <Notification closable type='danger' duration={2000}>
                     {response.errorMessage}
                 </Notification>
             )
         }
-        
-        
-      };
-     
-    const navigate=useNavigate()
+
+
+    };
+
+    const navigate = useNavigate()
     const approvedFiles = data.data.filter(file => file.admin_status === 'approved').map(file => ({ value: file.itemId, label: file.file_name }));
     return (
         <div>
@@ -495,145 +495,173 @@ const ContractDetails=(data : FileItemProps )=> {
                     onChange={(value) => setGlobalFilter(String(value))}
                 />
                 <div className=' flex mb-4 gap-3'>
-                    <Button variant='solid' size='sm' onClick={()=>openDialog()} >Share to Client</Button>
+                    <Button variant='solid' size='sm' onClick={() => openDialog()} >Share to Client</Button>
                 </div>
             </div>
-    {table.getRowModel().rows.length > 0 ? (
-        <div>
-    <Table>
-        <THead>
-            {table.getHeaderGroups().map((headerGroup) => (
-                <Tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                        <Th key={header.id} colSpan={header.colSpan}>
-                            {flexRender(header.column.columnDef.header, header.getContext())}
-                        </Th>
-                    ))}
-                </Tr>
-            ))}
-        </THead>
-        <TBody>
-            {table.getRowModel().rows.map((row) => (
-                <Tr key={row.id}>
-                    {row.getVisibleCells().map((cell) => (
-                        <Td key={cell.id}>
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </Td>
-                    ))}
-                </Tr>
-            ))}
-        </TBody>
-    </Table>
-       <div className="flex items-center justify-between mt-4">
-       <Pagination
-           pageSize={table.getState().pagination.pageSize}
-           currentPage={table.getState().pagination.pageIndex + 1}
-           total={table.getFilteredRowModel().rows.length}
-           onChange={onPaginationChange}
-       />
-       <div style={{ minWidth: 130 }}>
-           <Select<Option>
-               size="sm"
-               isSearchable={false}
-               value={pageSizeOption.filter(
-                   (option) =>
-                       option.value ===
-                       table.getState().pagination.pageSize
-               )}
-               options={pageSizeOption}
-               onChange={(option) => onSelectChange(option?.value)}
-           />
-       </div>
-   </div>
-   </div>
-) : (
-    <div style={{ textAlign: 'center' }}>No Contracts for approval</div>
-)}
+            {table.getRowModel().rows.length > 0 ? (
+                <div>
+                    <Table>
+                        <THead>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <Tr key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => (
+                                        <Th key={header.id} colSpan={header.colSpan}>
+                                            {flexRender(header.column.columnDef.header, header.getContext())}
+                                        </Th>
+                                    ))}
+                                </Tr>
+                            ))}
+                        </THead>
+                        <TBody>
+                            {table.getRowModel().rows.map((row) => (
+                                <Tr key={row.id}>
+                                    {row.getVisibleCells().map((cell) => (
+                                        <Td key={cell.id}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </Td>
+                                    ))}
+                                </Tr>
+                            ))}
+                        </TBody>
+                    </Table>
+                    <div className="flex items-center justify-between mt-4">
+                        <Pagination
+                            pageSize={table.getState().pagination.pageSize}
+                            currentPage={table.getState().pagination.pageIndex + 1}
+                            total={table.getFilteredRowModel().rows.length}
+                            onChange={onPaginationChange}
+                        />
+                        <div style={{ minWidth: 130 }}>
+                            <Select<Option>
+                                size="sm"
+                                isSearchable={false}
+                                value={pageSizeOption.filter(
+                                    (option) =>
+                                        option.value ===
+                                        table.getState().pagination.pageSize
+                                )}
+                                options={pageSizeOption}
+                                onChange={(option) => onSelectChange(option?.value)}
+                            />
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <div style={{ textAlign: 'center' }}>No Contracts for approval</div>
+            )}
 
-          
-<Dialog
+
+            <Dialog
                 isOpen={dialogIsOpen}
-                onClose={onDialogClose}
-                onRequestClose={onDialogClose}
-                className={`pb-3`}>
-                  <h3 className='mb-4'>Share To Client</h3>
-                 <Formik
-                 initialValues={{
-                     client_name: '',
-                    email: '',
-                    file_id: '',
-                    type:'Client',
-                    lead_id:leadId,
-                    folder_name:'contract',
-                    project_name:'',
-                    site_location:'',
-                    user_id:localStorage.getItem('userId'),
-                    quotation:[]
+                onClose={() => {
+                    setLoading(false);
+                    onDialogClose();
                 }}
-                 validationSchema={Yup.object({
-                     client_name: Yup.string().required('Client name is required'),
-                     email: Yup.string().email('Invalid email address').required('Required'),
-                     file_id: Yup.string().required('Required'),
-                 })}
-                 onSubmit={(values, { setSubmitting }) => {
-                    ;
+                onRequestClose={() => {
+                    setLoading(false);
+                    onDialogClose();
+                }}
+                className={`pb-3`}>
+                <h3 className='mb-4'>Share To Client</h3>
+                <Formik
+                    initialValues={{
+                        client_name: '',
+                        email: '',
+                        file_id: '',
+                        type: 'Client',
+                        lead_id: leadId,
+                        folder_name: 'contract',
+                        project_name: '',
+                        site_location: '',
+                        user_id: localStorage.getItem('userId'),
+                        quotation: []
+                    }}
+                    validationSchema={Yup.object({
+                        client_name: Yup.string().required('Client name is required'),
+                        email: Yup.string().email('Invalid email address').required('Client email is equired'),
+                        file_id: Yup.string().required('Select atleast one file to upload.'),
+                        project_name: Yup.string().required('Project name is required'),
+                        site_location: Yup.string().required('Site location is Required.'),
+                        quotation: Yup.array().min(1, 'At least one quotation is required')
+                    })}
+                    onSubmit={(values, { setSubmitting }) => {
+                        ;
                         handleSubmit(values);
                         setSubmitting(false);
-                 }}
-                 >
-                    {({errors,touched})=>{return(
-                    <div className='max-h-96 overflow-y-auto '>
-                    <Form className='mr-3'>
-                 <FormItem label='Client Name' asterisk
-                 invalid={errors.client_name && touched.client_name}
-                 errorMessage={errors.client_name}
-                 >
-                 <Field name="client_name" type="text" component={Input}/>
-                 </FormItem>
-                    <FormItem label='Client Email' asterisk>
-                    <Field name="email" type="text" component={Input}/>
-                    </FormItem>
-                    <FormItem label='File' asterisk>
-                    <Field name="file_id" >
-                        {({ field, form }: any) => (
-                            <SelectField
-                                options={approvedFiles}
-                                field={field}
-                                form={form}
-                            />
-                        )}
-                    </Field>
-                    </FormItem>
-                    <FormItem label='Project Name'>
-                    <Field name="project_name" type="text" component={Input}/>
-                    </FormItem>
-                    <FormItem label='Site Location' asterisk>
-                    <Field name="site_location" type="text" component={Input}/>
-                    </FormItem>
-                    <FormItem label='Quotation'>
-                    <Field name="quotation" type="text">
-  {({ field, form }: any) => (
-    
-    <Upload
-    accept='.pdf'
-    draggable
-      onChange={(files) => {
-        form.setFieldValue('quotation', files);
-      }}
-    />
+                    }}
+                >
+                    {({ errors, touched }) => {
+                        return (
+                            <div className='max-h-96 overflow-y-auto '>
+                                <Form className='mr-3'>
+                                    <FormItem label='Client Name' asterisk
+                                        invalid={errors.client_name && touched.client_name}
+                                        errorMessage={errors.client_name}
+                                    >
+                                        <Field name="client_name" type="text" component={Input} />
+                                    </FormItem>
+                                    <FormItem label='Client Email' asterisk
 
-  )}
-</Field>
-                    </FormItem>
-                    <Button type='submit' block variant='solid' loading={loading}> {loading?'Submitting':'Submit'} </Button>
-                 </Form>  
-                 </div>)}}
-                 </Formik>
-                 
+                                        invalid={errors.email && touched.email}
+                                        errorMessage={errors.email}
+                                    >
+                                        <Field name="email" type="text" component={Input} />
+                                    </FormItem>
+                                    <FormItem label='File' asterisk
+
+                                        invalid={errors.file_id && touched.file_id}
+                                        errorMessage={errors.file_id}
+                                    >
+                                        <Field name="file_id" >
+                                            {({ field, form }: any) => (
+                                                <SelectField
+                                                    options={approvedFiles}
+                                                    field={field}
+                                                    form={form}
+                                                />
+                                            )}
+                                        </Field>
+                                    </FormItem>
+                                    <FormItem label='Project Name' asterisk
+
+                                        invalid={errors.project_name && touched.project_name}
+                                        errorMessage={errors.project_name}
+                                    >
+                                        <Field name="project_name" type="text" component={Input} />
+                                    </FormItem>
+                                    <FormItem label='Site Location' asterisk
+
+                                        invalid={errors.site_location && touched.site_location}
+                                        errorMessage={errors.site_location}
+                                    >
+                                        <Field name="site_location" type="text" component={Input} />
+                                    </FormItem>
+                                    <FormItem label='Quotation' asterisk
+                                    >
+                                        <Field name="quotation" type="text">
+                                            {({ field, form }: any) => (
+
+                                                <Upload
+                                                    accept='.pdf'
+                                                    draggable
+                                                    onChange={(files) => {
+                                                        form.setFieldValue('quotation', files);
+                                                    }}
+                                                />
+
+                                            )}
+                                        </Field>
+                                    </FormItem>
+                                    <Button type='submit' block variant='solid' loading={loading}> {loading ? 'Submitting' : 'Submit'} </Button>
+                                </Form>
+                            </div>)
+                    }}
+                </Formik>
+
             </Dialog>
-                
-                    
-        
+
+
+
         </div>
     )
 }

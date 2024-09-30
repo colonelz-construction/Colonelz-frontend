@@ -714,6 +714,7 @@ const Index = () => {
                 </Notification>, { placement: 'top-end' }
               )
             }
+            onDialogClose1();
           }}
         >
           {({ handleChange, handleBlur, values, isSubmitting }) => (
@@ -942,9 +943,9 @@ const Index = () => {
         <p> Are you sure you want to delete this file? </p>
       </ConfirmDialog>
 
-      <ConfirmDialog 
-      isOpen={dialogIsOpen4}
-      type='warning'
+      <ConfirmDialog
+        isOpen={dialogIsOpen4}
+        type='warning'
         onClose={onDialogClose4}
         confirmButtonColor='yellow-600'
         onCancel={onDialogClose4}
@@ -959,7 +960,7 @@ const Index = () => {
         <p>
           Are you sure you want to share the files without a subject?
         </p>
-        
+
 
       </ConfirmDialog>
     </div>

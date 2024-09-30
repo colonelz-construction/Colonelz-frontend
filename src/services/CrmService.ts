@@ -788,9 +788,9 @@ export async function apiGetCrmLeadsDetails<T>(leadId:string | null) {
         return response.data
     })
 }
-export async function apiGetCrmProjectActivity<T>(project_id:any) {
+export async function apiGetCrmProjectActivity<T>(project_id:any, page:any) {
     return ApiService.fetchData<any>({
-        url: `admin/get/project/activity?project_id=${project_id}`,
+        url: `admin/get/project/activity?project_id=${project_id}&page=${page}&limit=5`,
         method: 'get',
     }).then((response) => {
         

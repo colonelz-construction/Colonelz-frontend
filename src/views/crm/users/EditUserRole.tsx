@@ -64,17 +64,20 @@ const EditUserRole = ({Data } : any) => {
     ) => {
         const formData = new FormData();
 
+        console.log(values.role)
+
         formData.append('role', values.role);
-        formData.append('userId', Data.userId);
+        formData.append('userId', Data.UserId);
         try {
             const response = await apiEditUserRole(formData); 
+            console.log(response)
             
             if(response.code===200){
             toast.push(<Notification title={'Role updated'} type="success" />, {
                 
             });}
             
-            window.location.reload();
+            // window.location.reload();
             setSubmitting(false);
         }
         catch (error) {
@@ -146,6 +149,7 @@ const EditUserRole = ({Data } : any) => {
                                             )}
                                             onChange={(option) =>
                                             {
+                                                console.log(option)
                                                 form.setFieldValue(
                                                     field.name,
                                                     option?.value

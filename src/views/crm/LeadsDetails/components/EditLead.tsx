@@ -24,7 +24,6 @@ const EditLead = ({ details }: any) => {
   const queryParams = new URLSearchParams(location.search);
   const LeadId = queryParams.get('id') || '';
   const data = details.data[0];
-  console.log(data.name);
 
   const statusOptions = [
     { value: 'No Response', label: 'No Response' },
@@ -63,7 +62,7 @@ const EditLead = ({ details }: any) => {
         })}
         onSubmit={async (values: any, { setSubmitting }) => {
           setSubmitting(true);
-          console.log(values);
+          ;
           values.date=`${values.date}`; 
 
           const response = await apiGetCrmEditLead(values);

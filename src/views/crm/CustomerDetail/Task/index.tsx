@@ -10,10 +10,6 @@ type Data={
 
 
 const Index = ({task,users}:Data) => {
-  console.log(users);
-  
-  
-  
   return (
     <div><Task task={task} users={users} /></div>
   )

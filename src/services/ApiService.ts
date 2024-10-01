@@ -8,13 +8,11 @@ const ApiService = {
         return new Promise<AxiosResponse<Response>>((resolve, reject) => {
             BaseService(param)
                 .then((response: AxiosResponse<Response>) => {
-                    console.log(response);
                     resolve(response)
                 })
                 .catch((errors: AxiosError<Response>) => {
                    if(errors.response){
                     resolve(errors.response)
-                    console.log(errors.response);
                     
                    }
                     reject(errors)

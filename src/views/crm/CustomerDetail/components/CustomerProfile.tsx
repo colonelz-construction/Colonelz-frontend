@@ -98,9 +98,10 @@ interface ProjectUpdateData {
   });
   
     const projectStatusOptions = [
-      { value: 'completed', label: 'Completed' },
       { value: 'designing', label: 'Designing' },
+      { value: 'Design & Executing', label: 'Design & Executing' },
       { value: 'executing', label: 'Executing' },
+      { value: 'completed', label: 'Completed' },
   ]
   
     return (
@@ -118,11 +119,11 @@ interface ProjectUpdateData {
         validationSchema={validationSchema}
         onSubmit={
           async(values,{setSubmitting})=>{
-            console.log(values);
+            ;
             
             try {
               const response = await apiGetCrmSingleProjectEdit(values);
-              console.log(response)
+              
               setSubmitting(false);
               if (response?.errorMessage) {
                 toast.push(
@@ -259,7 +260,7 @@ interface ProjectUpdateData {
 const CustomerProfile = ({ data,report }: CustomerProfileProps) => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const {roleData} = useRoleContext()
-    console.log(data)
+    
 
     const openDialog = () => {
         setIsOpen(true)

@@ -23,7 +23,6 @@ const TaskDetails = () => {
     const queryParams=new URLSearchParams(location.search);
     const task_id=queryParams.get('task') 
     const project_id=queryParams.get('project_id') || ''
-    console.log(task_id,project_id);
     const [users,setUsers]=useState<any>() 
     
     const tempTasks = {
@@ -59,16 +58,11 @@ const TaskDetails = () => {
         fetchData();
     }
     , [project_id,task_id])
-    console.log(task_id);
-    
-
-    console.log(taskData);
     const header = (
         <div className="flex items-center justify-between mt-2">
             <h5 className="pl-5">Task-{taskData?.task_name}</h5>
         </div>
     )
-    console.log(users);
     
     const cardFooter = (
         loading? <div className='flex justify-center'><Skeleton width={400}/></div>:

@@ -55,9 +55,7 @@ const Report = ({report}:any) => {
     fetchData();
   }, [projectId]);
 
-  console.log({
-    data: data.map((item) => item.percentage),
-  });
+ 
 
   return (
     <Card className='lg:w-3/5'>

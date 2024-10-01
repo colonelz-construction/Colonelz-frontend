@@ -72,7 +72,7 @@ const   SignUpForm = (props: SignUpFormProps) => {
 
         setSubmitting(false)
     }
-    console.log(rolelist);
+    ;
 
     const rolesOptions = rolelist?.map((role) => ({
         label: role,

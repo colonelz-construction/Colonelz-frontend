@@ -82,7 +82,6 @@ const YourFormComponent = () => {
           location: Yup.string().required('Location is required'),
         })}
         onSubmit={async (values, { setSubmitting }) => {
-          console.log('values', values);
           const payload = {
             client_name: values.client_name.map((option:any) => option.value), 
             organisor: values.organisor.map((option:any) => option.value),     
@@ -100,8 +99,6 @@ const YourFormComponent = () => {
           formData.append('remark', payload.remark)
           formData.append('project_id', payload.project_id)
           formData.append('mom_id', allQueryParams.mom_id)
-          console.log('payload', payload);
-          console.log('payload', formData);
           
 
           try {

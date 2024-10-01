@@ -74,53 +74,84 @@ const App = () => {
     }
   }, [location.search]);
 
-  const filteredMomData = data? data.filter((item) => {
-      const searchIn = (str: string | any): boolean => {
-        if (str === undefined) {
-          return false;
-        }
-        return str?.toLowerCase().includes(searchTerm.toLowerCase());
-      };
-
-      return (
-        searchIn(item.mom_id) ||
-        searchIn(item.meetingdate) ||
-        searchIn(item.location) ||
-        (Array.isArray(item.attendees.client_name) && searchIn(item.attendees.client_name.join(', '))) ||
-        searchIn(item.remark) ||
-        searchIn(item.important_note) ||
-        (item.attendees && Object.entries(item.attendees).some(([key, value]) => searchIn(value)))
-      );
-    })
-    : [];
-
-  const highlightText = (text: string, isDate: boolean = false): JSX.Element => {
-    if (!highlightedText.trim()) {
-      return <>{text}</>;
-    }
-
-    const regex = new RegExp(`(${highlightedText})`, 'gi');
-    const parts = text ? text.split(regex) : [];
-
+  const filteredMomData = data ? data.filter((item) => {
+    const searchIn = (str: string | any): boolean => {
+      if (typeof str !== 'string') {
+        return false;
+      }
+      return str.toLowerCase().includes(searchTerm.toLowerCase());
+    };
+  
     return (
-      <>
-        {parts.map((part, index) =>
-          regex.test(part) ? (
-            <span
-              key={index}
-              className=" bg-[#FFFF00] bg-opacity-100 text-black rounded-md"
-            >
-              {isDate && regex.test(part) && text
-                ? new Date(part).toISOString().split('T')[0]
-                : part}
-            </span>
-          ) : (
-            <span key={index}>{part}</span>
-          ),
-        )}
-      </>
-    )
-  };
+      searchIn(item.mom_id) ||
+      searchIn(item.meetingdate) ||
+      searchIn(item.location) ||
+      (Array.isArray(item.attendees?.client_name) && searchIn(item.attendees.client_name.join(', '))) ||
+      searchIn(item.remark) ||
+      searchIn(item.important_note) ||
+      (item.attendees && Object.entries(item.attendees).some(([key, value]) => searchIn(value)))
+    );
+  }) : [];
+  
+
+    const highlightText = (text: string | string[], isDate: boolean = false): JSX.Element => {
+      if (typeof highlightedText !== 'string' || !highlightedText.trim()) {
+        return <>{Array.isArray(text) ? text.join(', ') : text}</>;
+      }
+    
+      const regex = new RegExp(`(${highlightedText})`, 'gi');
+      if (Array.isArray(text)) {
+        return (
+          <>
+            {text.map((t, idx) => {
+              const parts = t.split(regex);
+              return (
+                <span key={idx}>
+                  {parts.map((part, index) =>
+                    regex.test(part) ? (
+                      <span
+                        key={index}
+                        className="bg-[#FFFF00] bg-opacity-100 text-black rounded-md"
+                      >
+                        {isDate && regex.test(part) && t
+                          ? new Date(part).toISOString().split('T')[0]
+                          : part}
+                      </span>
+                    ) : (
+                      <span key={index}>{part}</span>
+                    ),
+                  )}
+                  {idx < text.length - 1 && ', '}
+                </span>
+              );
+            })}
+          </>
+        );
+      }
+  
+      const parts = text ? text.split(regex) : [];
+    
+      return (
+        <>
+          {parts.map((part, index) =>
+            regex.test(part) ? (
+              <span
+                key={index}
+                className="bg-[#FFFF00] bg-opacity-100 text-black rounded-md"
+              >
+                {isDate && regex.test(part) && text
+                  ? new Date(part).toISOString().split('T')[0]
+                  : part}
+              </span>
+            ) : (
+              <span key={index}>{part}</span>
+            ),
+          )}
+        </>
+      );
+    };
+    
+    
 
   const highlightHtmlText = (html: string) => {
     const options: HTMLReactParserOptions = {

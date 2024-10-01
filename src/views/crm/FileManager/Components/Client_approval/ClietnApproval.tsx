@@ -46,7 +46,6 @@ const ClientApproval = (props: QuotationApproval) => {
         try {
             values.status=status
             setStatus(status)
-            console.log(values,status);
             const resp = await QuotationApproval(values )
             
             if (resp.code===200) {

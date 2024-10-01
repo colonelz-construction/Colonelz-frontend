@@ -95,7 +95,6 @@ const ActionColumn = ({ row,users }: { row: SubTask,users:string[]}) => {
     
     const onDelete = async () => {
         const response = await apiGetCrmProjectsSubTaskDelete(data)
-        console.log('response',response)
         
         if(response.code===200){
             toast.push(
@@ -200,20 +199,17 @@ const Subtasks = ({task,users}:any) => {
     const queryParams = new URLSearchParams(location.search);
     const projectId=queryParams.get('project_id') || '';
     const [taskData,setTaskData]=useState<SubTask[]>([])
-    console.log(projectId,task);
     
   
     useEffect(() => {
         const TaskData=async()=>{
             const response = await apiGetCrmProjectsSubTaskData(projectId,task);
-            console.log('response',response);
 
             setTaskData(response.data)
         }
         TaskData();
   
     }, [])
-    console.log('taskData',taskData);
     const formateDate = (dateString:string) => {
         const date = new Date(dateString);
         const day=date.getDate().toString().padStart(2, '0');

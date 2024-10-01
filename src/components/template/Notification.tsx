@@ -23,7 +23,6 @@ interface Notification {
 }
 
 const userId = localStorage.getItem('userId');
-console.log(userId);
 
 const Notification1 = () => {
   const [notificationData, setNotificationData] = useState<Notification[] | []>([]);

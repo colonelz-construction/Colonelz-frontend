@@ -54,7 +54,6 @@ const RegisterForm = (props: SignInFormProps) => {
         setSubmitting(true)
 
         const result = await OrgainisationVerify(values)
-        console.log('signinform', result);
         
         if (result?.code === 200) {
             setSubmitting(false)

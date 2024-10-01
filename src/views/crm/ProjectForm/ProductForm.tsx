@@ -144,9 +144,6 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
       values.contract.forEach((file, index) => {
         formData.append('contract', file);
       });
-
-       console.log('Form Data:', formData);
-       console.log('Values:', values);
        
        
         const response =await apiGetCrmCreateLeadToProject(formData);

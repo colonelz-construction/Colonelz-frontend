@@ -37,9 +37,8 @@ const ForgotPasswordForm = (props: ForgotPasswordFormProps) => {
         setSubmitting: (isSubmitting: boolean) => void
     ) => {
         setSubmitting(true)
-        console.log(values);
-            const resp = await apiForgotPassword(values)
-            console.log(resp);
+        ;
+            const resp:any = await apiForgotPassword(values)
             
             if (resp.code === 200) {
                 setSubmitting(false)

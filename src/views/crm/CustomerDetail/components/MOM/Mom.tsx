@@ -178,7 +178,7 @@ function ReactTable({
     const [globalFilter, setGlobalFilter] = useState('');
     const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
 
-    console.log(data);
+    
     
 
     const columns = useMemo<ColumnDef<MomDataType>[]>(

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { FileItem, fetchProjectData } from '../data'
 import {
@@ -48,8 +49,6 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
-import { FaFile } from 'react-icons/fa';
-import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton';
 import { MdDeleteOutline } from 'react-icons/md';
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import formateDate from '@/store/dateformate'
@@ -133,13 +132,12 @@ const Index = () => {
     const folderName = queryParams.get('folder_name') // Assuming folder_name is in the query params
     const navigate = useNavigate()
     const [usernames, setUsernames] = useState<string[]>([])
-    const [loading, setLoading] = useState(true)
     const [shareLoading, setShareLoading] = useState(false)
-    const [selectedFileId, setSelectedFileId] = React.useState<string | null>(
-        null,
-    )
+    const [selectedFileId, setSelectedFileId] = React.useState<string | null>(null,)
     const { roleData } = useRoleContext()
     const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
+    const { folderData,projectId,projectName } = location.state || {}
+    // const folderName = folderData.folder_name
 
     interface User {
         role: string
@@ -160,7 +158,6 @@ const Index = () => {
                 .filter((user: User) => (user.role === 'Senior Architect') || (user.role === 'ADMIN'))
                 .map((user: User) => user.username)
             if (usernames) {
-                console.log(usernames)
 
                 setUsernames(usernames)
             }
@@ -170,10 +167,6 @@ const Index = () => {
 
     const handleSubjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSubject(e.target.value)
-    }
-
-    const handleBodyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setBody(e.target.value)
     }
 
     const [dialogIsOpen, setIsOpen] = useState(false)
@@ -214,21 +207,18 @@ const Index = () => {
         setIsOpen3(false)
     }
 
-    const openDialog4 = () => {
-        setIsOpen4(true)
-    }
-
     const onDialogClose4 = () => {
         setIsOpen4(false)
     }
 
     useEffect(() => {
+
         const fetchDataAndLog = async () => {
             try {
                 const leadData = await fetchProjectData(leadId)
                 console.log(leadData)
 
-                setLoading(false)
+                //   setLoading(false)
                 const folderData = leadData
                 console.log(folderData)
 
@@ -691,11 +681,8 @@ const Index = () => {
                                 </Tr>
                             ))}
                         </THead>
-                        {loading ? <TableRowSkeleton
-                            avatarInColumns={[0]}
-                            columns={columns.length}
-                            avatarProps={{ width: 14, height: 14 }}
-                        /> : leadData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
+                        {
+                        leadData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
                             <TBody>
                                 {table.getRowModel().rows.map((row) => {
                                     return (

@@ -39,27 +39,24 @@ const validationSchema = Yup.object().shape({
     avatar: Yup.string(),
 })
 
-const EditUserRole = ({Data } : any) => {
-    const {rolelist}=useRoleContext()
-    
-    console.log(rolelist)
+const EditUserRole = ({ Data }: any) => {
+    const { rolelist } = useRoleContext()
+
+
     const rolesOptions = rolelist?.map((role) => ({
         label: role,
         value: role,
     }))
 
-    console.log(rolesOptions)
 
     const [userData, setUserData] = useState<any>();
-    console.log(userData)
-    console.log(Data.userId)
 
 
 
- 
+
 
     // const [usernameData, setUserNameData] = useState<any>(data?.username);
-    // console.log(data);
+    // 
 
     const onFormSubmit = async (
         values: any,
@@ -68,29 +65,27 @@ const EditUserRole = ({Data } : any) => {
         const formData = new FormData();
 
         console.log(values.role)
+
         formData.append('role', values.role);
-        formData.append('userId', Data.userId);
-
-    
-
-        console.log(formData)
+        formData.append('userId', Data.UserId);
         try {
-            const response = await apiEditUserRole(formData); 
+            const response = await apiEditUserRole(formData);
             console.log(response)
-            if(response.code===200){
-            toast.push(<Notification title={'Role updated'} type="success" />, {
-                
-            });}
-            
+
+            if (response.code === 200) {
+                toast.push(<Notification title={'Role updated'} type="success" />, {
+
+                });
+            }
+
             window.location.reload();
             setSubmitting(false);
         }
         catch (error) {
-            console.log(error)
-            toast.push(<Notification  type="danger" >
+            toast.push(<Notification type="danger" >
                 Internal Server Error
             </Notification>, {
-                
+
             });
             setSubmitting(false);
         }
@@ -101,94 +96,93 @@ const EditUserRole = ({Data } : any) => {
 
     return (
         <div className="w-full">
-            
-      
-        <Formik
-            enableReinitialize
-            initialValues={{
-                role: Data.role,
-            } as any
-            }
-            
-            validationSchema={validationSchema}
-            onSubmit={(values, { setSubmitting }) => {
-                console.log(values);
-                
-                setSubmitting(true)
-                setTimeout(() => {
-                    onFormSubmit(values, setSubmitting)
-                }, 1000)
-            }}
-        >
-            {({ values, touched, errors, isSubmitting, resetForm }) => {
-                const validatorProps = { touched, errors }
-                return (
-                    <Form className=''>
-                    <h3 className=' my-3'>Edit User Role</h3>
-                        <FormContainer>                             
-                           
-                            <FormItem
-                                label="Username"
-                            >
-                                <Input placeholder={`${Data.username}`} disabled/>
-                            </FormItem>
-                            <FormItem
-                                label="Email"
-                            >
-                                <Input placeholder={`${Data.email}`} disabled/>
-                            </FormItem>
-                            <FormItem
-                                label="Role"
+
+
+            <Formik
+                enableReinitialize
+                initialValues={{
+                    role: Data.role,
+                } as any
+                }
+
+                validationSchema={validationSchema}
+                onSubmit={(values, { setSubmitting }) => {
+                    ;
+
+                    setSubmitting(true)
+                    setTimeout(() => {
+                        onFormSubmit(values, setSubmitting)
+                    }, 1000)
+                }}
+            >
+                {({ values, touched, errors, isSubmitting, resetForm }) => {
+                    const validatorProps = { touched, errors }
+                    return (
+                        <Form className=''>
+                            <h3 className=' my-3'>Edit User Role</h3>
+                            <FormContainer>
+
+                                <FormItem
+                                    label="Username"
+                                >
+                                    <Input placeholder={`${Data.username}`} disabled />
+                                </FormItem>
+                                <FormItem
+                                    label="Email"
+                                >
+                                    <Input placeholder={`${Data.email}`} disabled />
+                                </FormItem>
+                                <FormItem
+                                    label="Role"
                                 // invalid={errors.role && touched.role}
                                 // errorMessage={errors.role}
                                 >
-                                      <Field name="role">
-                                    {({ field, form }: any) => (
-                                        <Select
-                                            field={field}
-                                            form={form}
-                                            options={rolesOptions}
-                                            value={rolesOptions?.filter(
-                                                (option) =>
-                                                    option.value ===
-                                                    values.role
-                                            )}
-                                            onChange={(option) =>
-                                            {
-                                                console.log(option)
-                                                form.setFieldValue(
-                                                    field.name,
-                                                    option?.value
-                                                )
+                                    <Field name="role">
+                                        {({ field, form }: any) => (
+                                            <Select
+                                                field={field}
+                                                form={form}
+                                                options={rolesOptions}
+                                                value={rolesOptions?.filter(
+                                                    (option) =>
+                                                        option.value ===
+                                                        values.role
+                                                )}
+                                                onChange={(option) => {
+                                                    console.log(option)
+                                                    form.setFieldValue(
+                                                        field.name,
+                                                        option?.value
+                                                    )
 
-                                            }
-                                                
-                                            }
-                                        />
-                                    )}
-                                </Field>
+                                                }
+
+                                                }
+                                            />
+                                        )}
+                                    </Field>
                                 </FormItem>
-                            
-                           
-                           
-                           
 
-                            <div className="mt-4 ">
-                               
-                                <Button
-                                    variant="solid"
-                                    loading={isSubmitting}
-                                    type="submit"
-                                    block
-                                >
-                                    {isSubmitting ? 'Updating' : 'Update'}
-                                </Button>
-                            </div>
-                        </FormContainer>
-                    </Form>
-                )
-            }}
-        </Formik>
+
+
+
+
+                                <div className="mt-4 ">
+
+                                    <Button
+                                        variant="solid"
+                                        loading={isSubmitting}
+                                        type="submit"
+                                        block
+                                    >
+                                        {isSubmitting ? 'Updating' : 'Update'}
+                                    </Button>
+                                </div>
+                            </FormContainer>
+                        </Form>
+                    )
+                }}
+            </Formik>
         </div>
     )
 }

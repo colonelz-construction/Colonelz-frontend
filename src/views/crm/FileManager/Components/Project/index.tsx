@@ -200,6 +200,7 @@ const columns = useMemo<ColumnDef<FolderItem>[]>(
     () => [
         { header: 'Name', accessorKey: 'folder_name'
         , cell: ({row}) => {
+          console.log(row.original)
             return(
                 <div>
                 <div className="flex items-center gap-2">

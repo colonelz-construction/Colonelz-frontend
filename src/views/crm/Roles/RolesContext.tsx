@@ -59,9 +59,9 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const fetchRoleData = async () => {
         try {
             const data = await apiGetRoleWiseDetails(); 
-            console.log(data)
+            
             const response=await apiGetRoleList();
-            console.log(response);
+            
             if(response.code===200){
                 setRoleList(response.data)
 

@@ -10,7 +10,7 @@ import TabNav from '@/components/ui/Tabs/TabNav'
 import TabContent from '@/components/ui/Tabs/TabContent'
 import { useLocation, useNavigate } from 'react-router-dom'
 import AllMom from './components/MOM/AllMom'
-import {  apiGetCrmProjectsMom, apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList } from '@/services/CrmService'
+import {  apiGetCrmProjectActivity, apiGetCrmProjectsMom, apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList } from '@/services/CrmService'
 import { FileItem } from '../FileManager/Components/Project/data'
 import Index from './Quotation'
 import { ProjectProvider } from '../Customers/store/ProjectContext'
@@ -79,6 +79,7 @@ const CustomerDetail = () => {
     const [task,setTaskData]=useState<Tasks[]>([])
     const [report,setReport]=useState<ReportResponse>()
     const [activity,setActivity]=useState<any>()
+    console.log(activity)
     const [users,setUsers]=useState<string[]>([])
     const quotationAccess = roleData?.data?.quotation?.read?.includes(`${localStorage.getItem('role')}`)
     const momAccess = roleData?.data?.mom?.read?.includes(`${localStorage.getItem('role')}`)
@@ -95,9 +96,10 @@ const CustomerDetail = () => {
             try {
                 const response = await apiGetCrmSingleProjects(allQueryParams.project_id);
                 const Report = await apiGetCrmSingleProjectReport(allQueryParams.project_id);
+                
+          
                 const list=await apiGetUsersList(allQueryParams.project_id)                
                 const data = response
-                console.log(data);
                 setActivity(data.data)
                 setProjectData(data.data)
                 setLoading(false);
@@ -116,7 +118,7 @@ const CustomerDetail = () => {
       const fetchDataAndLog = async () => {
         try {
           const leadData = await apiGetCrmSingleProjectQuotation(allQueryParams.project_id);
-          console.log(leadData)
+          
           setFileData(leadData.data);
         } catch (error) {
           console.error('Error fetching lead data', error);

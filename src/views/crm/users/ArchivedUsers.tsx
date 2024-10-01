@@ -145,11 +145,10 @@ const ArchivedUsers = () => {
     useEffect(() => {
       const fetchData = async () => {
         const response = await apiGetDeletedUsers(); 
-        console.log(response)
+        
         const data =  response
         setLoading(false)
         setData(data.data);
-        console.log(data.data);
         
         
       };
@@ -160,7 +159,7 @@ const ArchivedUsers = () => {
 
     const deleteuser=async(UserId:string)=>{
         const response=await apiPermanantlyDeleteUsers(UserId);
-        console.log(response);
+        
         
         if(response.code===200){
             toast.push(
@@ -185,8 +184,8 @@ const ArchivedUsers = () => {
         
         
         const data=await apiRestoreDeletedUsers(UserId);
-        console.log(data);
-        console.log(data);
+        
+        
         
         if(data.code===200){
             toast.push(
@@ -220,8 +219,6 @@ const ArchivedUsers = () => {
                 const role=localStorage.getItem('role') || ''
                 const restoreAccess=roleData?.data?.userArchive?.restore?roleData?.data?.userArchive?.restore.includes(role):false
                 const deleteAccess=roleData?.data?.userArchive?.delete?roleData?.data?.userArchive?.delete.includes(role):false
-
-                console.log(restoreAccess);
                 
                 return (
                     <div className="">
@@ -281,8 +278,6 @@ const ArchivedUsers = () => {
     }
 
 
-const totalData=data.length;
-console.log(data.length);
 
     return (
         <>

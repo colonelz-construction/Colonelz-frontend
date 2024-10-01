@@ -48,7 +48,7 @@ export const getProducts = createAsyncThunk(
     SLICE_NAME + '/getProducts',
     
     async (data: GetSalesProductsRequest) => {
-        console.log(data);
+        
        
         return data
     }

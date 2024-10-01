@@ -40,8 +40,8 @@ const ForgotPasswordForm = (props: ForgotPasswordFormProps) => {
         setSubmitting: (isSubmitting: boolean) => void
     ) => {
         setSubmitting(true)
-            const resp = await apiOtpVerify(values)
-            console.log(resp);
+            const resp:any = await apiOtpVerify(values)
+            
             
             if (resp.code === 200) {
                 setSubmitting(false)

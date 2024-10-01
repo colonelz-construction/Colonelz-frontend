@@ -1,4 +1,4 @@
-
+// for Individual Lead
 import { useEffect, useState } from 'react'
 import Container from '@/components/shared/Container'
 import reducer, { getCustomer, useAppDispatch } from './store'
@@ -97,9 +97,8 @@ const CustomerDetail = () => {
     }, [myParam]);
     
     const lead = details?.data?.[0];
-    console.log(lead)
     const {roleData}=useRoleContext()
-    console.log(roleData)
+    
     const contractAccess = roleData?.data?.contract?.read?.includes(`${localStorage.getItem('role')}`)
     const leadDeleteAccess = roleData?.data?.lead?.delete?.includes(`${localStorage.getItem('role')}`)
 
@@ -110,7 +109,6 @@ const CustomerDetail = () => {
             if(lead?.lead_status == 'Inactive') {
 
                 const res = await apiDeleteInactiveLead(lead_id);
-                console.log(res)
                 toast.push(
                     <Notification closable type="success" duration={2000}>
                         Lead deleted successfully

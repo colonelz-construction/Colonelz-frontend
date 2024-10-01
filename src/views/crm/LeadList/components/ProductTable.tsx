@@ -147,7 +147,6 @@ const Filtering = () => {
     const apiData = useLeadContext()
     const responseData=apiData
     const totalData = responseData?.length
-    console.log(responseData);
 
     const columns = useMemo<ColumnDef<Product>[]>(
         () => [

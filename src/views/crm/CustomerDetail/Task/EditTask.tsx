@@ -36,7 +36,6 @@ const EditTask = ({ Data,users,task }: EditTaskProps) => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [userData,setUserData]=useState<any>(null)
-    console.log('Data',Data);
     
 
     
@@ -123,7 +122,6 @@ const priorityOptions = [
                      onSubmit={async(values, actions) => {
                         setLoading(true)
                             const response = await apiGetCrmProjectsTaskUpdate(values)
-                            console.log('response', response);
                             if(response.code===200){
                                 setLoading(false)
                                 toast.push(

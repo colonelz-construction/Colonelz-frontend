@@ -41,11 +41,9 @@ const icons = {
 };
 
 const Selector = ({ field, form, setCheckType, checkType }: SelectorProps) => {
-    // console.log("field", field)
     const permissions = permissionsMap[field.name] || permissionsMap.default;
-    const { textTheme, bgTheme, borderTheme, ringTheme } = useThemeClass()
+    const {  bgTheme } = useThemeClass()
     const [isDark, setIsDark] = useDarkMode()
-    console.log("dark", isDark)
 
     const handleChange = (permission: Permission) => {
         const newValue = field.value.includes(permission)

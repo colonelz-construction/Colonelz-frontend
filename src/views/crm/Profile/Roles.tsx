@@ -1,10 +1,6 @@
-
 import { useState, useEffect, useMemo, useRef, ChangeEvent } from 'react'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-// import DataTable from '@/components/shared/DataTable'
-// import debounce from 'lodash/debounce'
-// import axios from 'axios'
 import type { ColumnDef, OnSortParam, CellContext } from '@/components/shared/DataTable'
 import { apiDeleteRole, apiGetRoleDetails } from '@/services/CrmService'
 import { BiPencil } from 'react-icons/bi'
@@ -160,12 +156,10 @@ const Roles = () => {
         }
     }
 const handleClose = () => {
-    console.log('Close')
     setOpen(false)
 }
 
 const handleConfirm = (id: string) => {
-    console.log('Confirm')
     setOpen(false)
 }
 
@@ -175,7 +169,7 @@ const handleConfirm = (id: string) => {
 
 const deleteRole = async (id: string) => {
     const response = await apiDeleteRole(id)
-    console.log(response)
+    
     if (response.code === 200) {
         toast.push(
             <Notification type='success' duration={2000} closable>
@@ -262,7 +256,7 @@ useEffect(() => {
         const response = await apiGetRoleDetails()
 
         if (response) {
-            console.log(response.data)
+            
             setData(response.data)
             setLoading(false)
 

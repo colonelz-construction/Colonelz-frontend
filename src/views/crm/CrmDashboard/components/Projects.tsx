@@ -48,9 +48,6 @@ const Project = ({ className }: LeadsProps) => {
     }
 
     const projects = useProjectContext();
-    const { loading } = useProjectContext();
-    console.log(loading);
-
     const memoizedProjects = useMemo(() => projects.projects, [projects.projects]);
 
     const [hoveredClient, setHoveredClient] = useState<number | null>(null);
@@ -137,7 +134,7 @@ const Project = ({ className }: LeadsProps) => {
                         onMouseEnter={() => handleMouseEnter(index)}
                         onMouseLeave={handleMouseLeave}
                     >
-                        {item.client[0].client_name}
+                        {item.client[0]?.client_name}
                         {hoveredClient === index && (
                             <div className="absolute bottom-0 left-20 ml-2 bg-white border border-gray-300 p-2 shadow-lg z-99999 whitespace-nowrap transition-opacity duration-200">
                                 <p>Client Name: {item.client[0].client_name}</p>

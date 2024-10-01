@@ -109,7 +109,7 @@ const Index = () => {
 
     
     const handleSubmit = async (values: FormValues) => {
-    //     console.log(values)
+    //     
     //   console.log(values.date);
     //     navigate('/app/crm/pdf')
 
@@ -122,7 +122,7 @@ const Index = () => {
     //     if(responseData.code===200){
     //     window.open(responseData.data, '_blank')
     //     console.log(responseData)
-    //     console.log(values)}
+    //     }
         // else{
         //     toast.push(
         //         <Notification closable type="danger" duration={2000}>
@@ -242,12 +242,7 @@ const FormContent = () => {
     { value: 'Others', label: 'Others' },
   ]
 
-  const [checkboxList, setCheckboxList] = useState<(string | number)[]>([])
 
-  const onCheckboxChange = (options: (string | number)[], e: SyntheticEvent) => {
-      console.log(options)
-      setCheckboxList(options)
-  }
 
     const animatedComponents = makeAnimated()
 
@@ -479,7 +474,6 @@ const FormContent = () => {
                                               onChange={(e) => {
                                                 const value = e.target.value.replace(/[^0-9]/g, '');
                                                 form.setFieldValue(field.name, value);
-                                                console.log(field.name, value);
                                               }}
                                         />
                                     )}
@@ -551,7 +545,6 @@ const FormContent = () => {
                                               onChange={(e) => {
                                                 const value = e.target.value.replace(/[^0-9]/g, '');
                                                 form.setFieldValue(field.name, value);
-                                                console.log(field.name, value);
                                               }}
                                         />
                                     )}
@@ -639,7 +632,6 @@ const FormContent = () => {
                                               onChange={(e) => {
                                                 const value = e.target.value.replace(/[^0-9]/g, '');
                                                 form.setFieldValue(field.name, value);
-                                                console.log(field.name, value);
                                               }}
                                         />
                                     )}

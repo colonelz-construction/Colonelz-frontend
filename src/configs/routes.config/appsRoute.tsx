@@ -75,8 +75,7 @@ const appsRoute: Routes = [
     {
         key: 'appsCrm.fileManager',
         path: `${APP_PREFIX_PATH}/crm/fileManager/leads`,
-        component: lazy(
-            () => import('@/views/crm/FileManager/Components/Lead/index'),
+        component: lazy(() => import('@/views/crm/FileManager/Components/Lead/index'),
         ),
 
         authority: [],

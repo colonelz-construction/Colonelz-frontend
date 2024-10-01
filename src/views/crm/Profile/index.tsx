@@ -17,7 +17,7 @@ const Index = () => {
     const userRole=localStorage.getItem('role') || ''
     const {roleData}=useRoleContext()
     const data = useContext(UserDetailsContext);
-    console.log(data);
+    
     const navigate = useNavigate();
 
     interface QueryParams {

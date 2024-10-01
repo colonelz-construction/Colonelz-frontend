@@ -1328,7 +1328,7 @@ other Govt Levy, will be charged will be charged, as per actual.
 export const useFormikValues = () => useContext(FormikValuesContext);
 const MyComponent = (data:any) => {
  
-  console.log(data);
+  
   const navigate=useNavigate()
   
   const [isLoading, setIsLoading] = useState(false);

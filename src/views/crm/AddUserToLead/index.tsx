@@ -3,7 +3,7 @@ import { Formik, Field, Form } from 'formik';
 import axios from 'axios';
 import { Button, FormItem, Input, Notification, Select, toast } from '@/components/ui';
 import { apiAddMember, apiAddMemberToLead } from '@/services/AuthService';
-import { apiGetUsers } from '@/services/CrmService';
+import { apiGetAllUsersList } from '@/services/CrmService';
 import { apiGetCrmLeads } from '@/services/CrmService';
 import { useRoleContext } from '../Roles/RolesContext';
 
@@ -70,9 +70,10 @@ const Index = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const response = await apiGetUsers();
+      const list :any=await apiGetAllUsersList()
+
       const leads = await apiGetCrmLeads();
-      setUsers(response.data);
+      setUsers(list.data);
       
       
       setSelectedProject(leads.data.leads);
@@ -80,7 +81,7 @@ const Index = () => {
 
     fetchUsers();
   },[]);
-  
+
   useEffect(() => {
 
     const func = async () => {

@@ -56,7 +56,7 @@ const EditLead = ({ details }: any) => {
           .matches(/^[0-9]*$/, 'Phone number must be numeric')
           .length(10, 'Phone number must be exactly 10 digits'),          
           location: Yup.string().required('Location is required'),
-          source: Yup.string().required('Source is required'),
+          source: Yup.string(),
           lead_manager: Yup.string().required('Lead Manager is required'),
 
         })}
@@ -138,7 +138,7 @@ const EditLead = ({ details }: any) => {
             </FormItem>
 
             <FormItem label='Source'
-            asterisk
+            
             invalid={errors.source && touched.source}
             errorMessage={errors.source}
             >

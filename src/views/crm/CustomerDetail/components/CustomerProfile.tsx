@@ -98,9 +98,10 @@ interface ProjectUpdateData {
   });
   
     const projectStatusOptions = [
-      { value: 'completed', label: 'Completed' },
       { value: 'designing', label: 'Designing' },
+      { value: 'Design & Executing', label: 'Design & Executing' },
       { value: 'executing', label: 'Executing' },
+      { value: 'completed', label: 'Completed' },
   ]
   
     return (

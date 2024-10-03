@@ -60,7 +60,7 @@ export const obj: Record<AccessType, boolean> = {
     user: false,
     userArchive: false,
     companyData: false
-    
+
 }
 
 const EditRoles = () => {
@@ -75,7 +75,7 @@ const EditRoles = () => {
         }, {} as FormValues)
     );
 
-    
+
 
     const [checkType, setCheckType] = useState(obj);
 
@@ -93,9 +93,9 @@ const EditRoles = () => {
         if (value) {
             Object.keys(checkType).forEach((key) => {
                 checkType[key as AccessType] = true;
-              });
+            });
 
-              setCheckType(checkType)
+            setCheckType(checkType)
             accessTypes.forEach((type) => {
                 const permissions = permissionsMap[type] || permissionsMap.default;
                 setFieldValue(type, permissions);
@@ -103,8 +103,8 @@ const EditRoles = () => {
         } else {
             Object.keys(checkType).forEach((key) => {
                 checkType[key as AccessType] = false;
-              });
-              setCheckType(checkType)
+            });
+            setCheckType(checkType)
             // Deselect all permissions
             accessTypes.forEach((type) => {
                 setFieldValue(type, []);
@@ -112,21 +112,21 @@ const EditRoles = () => {
         }
     };
 
-    const handleSelectType = (setFieldValue: any, type: AccessType, value: boolean, selectAll:boolean) => {
+    const handleSelectType = (setFieldValue: any, type: AccessType, value: boolean, selectAll: boolean) => {
         // console.log(type)
         // console.log("type", checkType[type])
         // console.log("selectall", selectAll)
         // console.log("value", value)
 
-            if (!checkType[type]) {
-                setCheckType({...checkType, [type]: true})              
-                const permissions = permissionsMap[type] || permissionsMap.default;
-                setFieldValue(type, permissions);
-             
-            } else {
-                setCheckType({...checkType, [type]: false})
-                setFieldValue(type, []);
-            }
+        if (!checkType[type]) {
+            setCheckType({ ...checkType, [type]: true })
+            const permissions = permissionsMap[type] || permissionsMap.default;
+            setFieldValue(type, permissions);
+
+        } else {
+            setCheckType({ ...checkType, [type]: false })
+            setFieldValue(type, []);
+        }
     };
 
     return (
@@ -176,7 +176,7 @@ const EditRoles = () => {
                 }}
             >
                 {({ isSubmitting, setFieldValue, values }) => {
-                    
+
                     // useEffect(() => {
                     //     const allSelected = accessTypes.every(type => {
                     //         const permissions = permissionsMap[type] || permissionsMap.default;
@@ -188,7 +188,7 @@ const EditRoles = () => {
                     useEffect(() => {
                         let flag = Object.values(checkType).every(value => value === true);
                         setSelectAll(flag)
-                        
+
                     }, [values]);
 
                     return (

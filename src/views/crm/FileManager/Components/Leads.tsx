@@ -20,7 +20,7 @@ import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-ta
 import type { InputHTMLAttributes } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getLeadData } from './data'
-import { Select } from '@/components/ui'    
+import { Select } from '@/components/ui'
 import { useData } from '../FileManagerContext/FIleContext'
 import { Loading } from '@/components/shared'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
@@ -41,7 +41,7 @@ function DebouncedInput({
     debounce = 500,
     ...props
 }: DebouncedInputProps) {
-    
+
     const [value, setValue] = useState(initialValue)
 
     useEffect(() => {
@@ -67,15 +67,15 @@ function DebouncedInput({
                     onChange={(e) => setValue(e.target.value)}
                 />
             </div>
-       
+
         </div>
     )
 }
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    let itemValue:any = row.getValue(columnId);
+    let itemValue: any = row.getValue(columnId);
 
-    
+
     if (columnId === 'lead_date') {
         itemValue = formateDate(itemValue);
     }
@@ -100,7 +100,7 @@ const pageSizeOption = [
     { value: 50, label: '50 / page' },
 ]
 
-console.log(getLeadData);
+// console.log(getLeadData);
 // const temp = await getLeadData();
 // console.log(temp)
 
@@ -108,11 +108,11 @@ const Filtering = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-    const navigate=useNavigate()
+    const navigate = useNavigate()
 
     const columns = useMemo<ColumnDef<LeadDataItem>[]>(
         () => [
-           
+
             {
                 header: 'Lead name',
                 accessorKey: 'lead_name',
@@ -123,56 +123,57 @@ const Filtering = () => {
                             {row.lead_name}
                         </div>
                     )
-                  }},
-                  {
-                    header: 'Lead Status',
-                    accessorKey: 'lead_status',
-                    cell: (props) => {
-                        const row = props.row.original;
-                        return (
-                            <div>
-                                {row.lead_status}
-                            </div>
-                        )
-                      }
-                  },
-                  {
-                    header: 'Email',
-                    accessorKey: 'lead_email',
-                    cell: (props) => {
-                        const row = props.row.original;
-                        return (
-                            <div>
-                                {row.lead_email}
-                            </div>
-                        )
-                      }
-                  }
-                  ,
-                  {
-                    header: 'Created Date',
-                    accessorKey: 'lead_date',
-                    cell: ({row}) => {
-                        const date = row.original.lead_date;
-                        const [year, month, day] = new Date(date).toISOString().split('T')[0].split('-');
-                return `${day}-${month}-${year}`;
-                       
-                      }
-                  }
-            
+                }
+            },
+            {
+                header: 'Lead Status',
+                accessorKey: 'lead_status',
+                cell: (props) => {
+                    const row = props.row.original;
+                    return (
+                        <div>
+                            {row.lead_status}
+                        </div>
+                    )
+                }
+            },
+            {
+                header: 'Email',
+                accessorKey: 'lead_email',
+                cell: (props) => {
+                    const row = props.row.original;
+                    return (
+                        <div>
+                            {row.lead_email}
+                        </div>
+                    )
+                }
+            }
+            ,
+            {
+                header: 'Created Date',
+                accessorKey: 'lead_date',
+                cell: ({ row }) => {
+                    const date = row.original.lead_date;
+                    const [year, month, day] = new Date(date).toISOString().split('T')[0].split('-');
+                    return `${day}-${month}-${year}`;
+
+                }
+            }
+
         ],
 
         []
     )
-    const { leadData,loading } = useData();
-    
+    const { leadData, loading } = useData();
+
 
     const totalData = leadData.length
-    
-    
-    
+
+
+
     const table = useReactTable({
-        data:leadData.reverse(),
+        data: leadData.reverse(),
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -202,7 +203,7 @@ const Filtering = () => {
     const onSelectChange = (value = 0) => {
         table.setPageSize(Number(value))
     }
-   const pagingData = {
+    const pagingData = {
         total: 0,
         pageIndex: 1,
         pageSize: 10,
@@ -213,17 +214,17 @@ const Filtering = () => {
 
     return (
         <>
-        {/* <Loading loading={ loading} type="cover"> */}
-        <div className='flex justify-between'>
-            <div></div>
-            <DebouncedInput
-                value={globalFilter ?? ''}
-                className="p-2 font-lg shadow border border-block"
-                placeholder="Search ..."
-                onChange={(value) => setGlobalFilter(String(value))}
-            />
+            {/* <Loading loading={ loading} type="cover"> */}
+            <div className='flex justify-between'>
+                <div></div>
+                <DebouncedInput
+                    value={globalFilter ?? ''}
+                    className="p-2 font-lg shadow border border-block"
+                    placeholder="Search ..."
+                    onChange={(value) => setGlobalFilter(String(value))}
+                />
             </div>
-            
+
             <Table>
                 <THead>
                     {table.getHeaderGroups().map((headerGroup) => (
@@ -263,35 +264,35 @@ const Filtering = () => {
                         </Tr>
                     ))}
                 </THead>
-                {loading  ? (
+                {loading ? (
                     <TableRowSkeleton
-                      
+
                         rows={pagingData.pageSize}
-                        avatarInColumns= {[0]}
+                        avatarInColumns={[0]}
                         columns={columns.length}
                         avatarProps={{ width: 14, height: 14 }}
                     />
-                ):leadData.length===0?<Tr><Td colSpan={columns.length}><NoData/></Td></Tr>: (
-                <TBody>
-                    {table.getRowModel().rows.map((row) => {
-                        return (
-                            <Tr key={row.id} className=' capitalize cursor-pointer' onClick={()=>navigate(`/app/crm/fileManager/leads?lead_id=${row.original.lead_id}&lead_name=${row.original.lead_name}`)}>
-                                {row.getVisibleCells().map((cell) => {
-                                    return (
-                                        <Td key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </Td>
-                                    )
-                                })}
-                            </Tr>
-                        )
-                    })}
-                </TBody>)}
+                ) : leadData.length === 0 ? <Tr><Td colSpan={columns.length}><NoData /></Td></Tr> : (
+                    <TBody>
+                        {table.getRowModel().rows.map((row) => {
+                            return (
+                                <Tr key={row.id} className=' capitalize cursor-pointer' onClick={() => navigate(`/app/crm/fileManager/leads?lead_id=${row.original.lead_id}&lead_name=${row.original.lead_name}`)}>
+                                    {row.getVisibleCells().map((cell) => {
+                                        return (
+                                            <Td key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </Td>
+                                        )
+                                    })}
+                                </Tr>
+                            )
+                        })}
+                    </TBody>)}
             </Table>
-          
+
             <div className="flex items-center justify-between mt-4">
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}

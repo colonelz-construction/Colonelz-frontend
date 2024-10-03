@@ -5,15 +5,15 @@ import { HiOutlineCloudUpload } from 'react-icons/hi';
 import { useLocation } from 'react-router-dom';
 import CreatableSelect from 'react-select/creatable';
 import { getTemplateData } from '../data';
-import {  FoldersItem } from '../type';
+import { FoldersItem } from '../type';
 import { apiGetCrmFileManagerCreateTemplateFolder } from '@/services/CrmService';
 
 interface FormData {
   sub_folder_name_first: string | null,
-  sub_folder_name_second: string ,
+  sub_folder_name_second: string,
   folder_name: string | null;
   files: File[];
-  type:string
+  type: string
 }
 
 type Option = {
@@ -33,33 +33,33 @@ const YourFormComponent: React.FC = () => {
     sub_folder_name_second: '',
     folder_name: type,
     files: [],
-    type:'template'
+    type: 'template'
   });
   useEffect(() => {
     const fetchDataAndLog = async () => {
       try {
         const templateData = await getTemplateData();
-        console.log(templateData);
+        // console.log(templateData);
         const filteredFolders = templateData.filter((folder) => {
           return (
             folder.files[0]?.folder_name === type &&
             folder.files[0]?.sub_folder_name_first === folderName
           );
         });
-  console.log(filteredFolders);
-  
+        // console.log(filteredFolders);
+
         if (filteredFolders.length > 0) {
           setLeadData(filteredFolders.map((folder) => folder.files[0]));
         } else {
           console.warn('No matching folder found.');
         }
-        console.log(leadData);
-        
+        // console.log(leadData);
+
       } catch (error) {
         console.error('Error fetching lead data', error);
       }
     };
-  
+
     fetchDataAndLog();
   }, [type, folderName]);
 
@@ -70,8 +70,8 @@ const YourFormComponent: React.FC = () => {
     const selectedValues = Array.isArray(selectedOption)
       ? selectedOption.map((option) => option.value)
       : selectedOption
-      ? [selectedOption.value]
-      : [];
+        ? [selectedOption.value]
+        : [];
 
     const trimmedValue = selectedValues.length > 0 ? selectedValues[0].trim() : '';
 
@@ -80,21 +80,21 @@ const YourFormComponent: React.FC = () => {
       [fieldName]: trimmedValue,
     });
   };
-  
+
 
   const handleFileChange = (files: File[] | null) => {
     if (files) {
-        setFormData((prevFormData) => ({
-            ...prevFormData,
-            files: Array.from(files),
-        }))
-      
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        files: Array.from(files),
+      }))
+
     }
-}
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!formData.sub_folder_name_second|| formData.files.length === 0) {
+    if (!formData.sub_folder_name_second || formData.files.length === 0) {
       toast.push(
         <Notification closable type="warning" duration={3000}>
           Please select a folder and upload at least one file.
@@ -105,27 +105,27 @@ const YourFormComponent: React.FC = () => {
     }
     setSubmit(true);
     const postData = new FormData();
-    
+
     postData.append('sub_folder_name_second', formData.sub_folder_name_second);
     postData.append('folder_name', formData.folder_name || '');
     postData.append('sub_folder_name_first', formData.sub_folder_name_first || '');
     postData.append('type', formData.type);
 
     formData.files.forEach((file) =>
-    postData.append('files', file),
-)
+      postData.append('files', file),
+    )
 
     try {
       const response = await apiGetCrmFileManagerCreateTemplateFolder(postData);
-      setSubmit(false); 
-  
+      setSubmit(false);
+
       if (response.code === 200) {
-       toast.push(
-        <Notification closable type="success" duration={2000}>
-          {response.message}
-        </Notification>,
-       )
-      
+        toast.push(
+          <Notification closable type="success" duration={2000}>
+            {response.message}
+          </Notification>,
+        )
+
         window.location.reload();
       } else {
         toast.push(
@@ -144,27 +144,27 @@ const YourFormComponent: React.FC = () => {
     }
   };
 
-const uniqueFolderNames = Array.from(
+  const uniqueFolderNames = Array.from(
     new Set(leadData.map((folderItem) => folderItem.sub_folder_name_second.trim())),
-)
-console.log(uniqueFolderNames);
+  )
+  // console.log(uniqueFolderNames);
 
-const clientOptions: Option[] = uniqueFolderNames.map((folderName) => ({
+  const clientOptions: Option[] = uniqueFolderNames.map((folderName) => ({
     value: folderName,
     label: folderName,
-}))
+  }))
 
   return (
-    <form 
-    className=' overflow-y-auto max-h-[400px]' 
-    style={{scrollbarWidth:'none'}}
-    onSubmit={handleSubmit}
-     >
-     <h3 className='mb-5'>File Upload</h3>
+    <form
+      className=' overflow-y-auto max-h-[400px]'
+      style={{ scrollbarWidth: 'none' }}
+      onSubmit={handleSubmit}
+    >
+      <h3 className='mb-5'>File Upload</h3>
       <div className='mb-5'>
         <CreatableSelect
-        name='sub_folder_name_second'
-         options={clientOptions}
+          name='sub_folder_name_second'
+          options={clientOptions}
           onChange={(selectedOption) =>
             handleSelectChange(selectedOption, 'sub_folder_name_second')
           }
@@ -172,19 +172,19 @@ const clientOptions: Option[] = uniqueFolderNames.map((folderName) => ({
       </div>
 
       <FormItem label="File">
-                            <Upload
-                                onChange={(files) => handleFileChange(files)}
-                                multiple
-                                draggable
-                            >
-                                
-                            </Upload>
-                        </FormItem>
-              <div className='flex justify-end'>
+        <Upload
+          onChange={(files) => handleFileChange(files)}
+          multiple
+          draggable
+        >
 
-      <Button type="submit" variant='solid' loading={submit} block>
-        {submit ? 'Uploading...' : 'Upload'}
-      </Button>
+        </Upload>
+      </FormItem>
+      <div className='flex justify-end'>
+
+        <Button type="submit" variant='solid' loading={submit} block>
+          {submit ? 'Uploading...' : 'Upload'}
+        </Button>
       </div>
     </form>
   );

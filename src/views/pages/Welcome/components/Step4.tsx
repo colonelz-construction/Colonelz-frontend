@@ -22,23 +22,23 @@ const roles: {
     icon: ReactNode
     disabled?: boolean
 }[] = [
-    {
-        value: '0',
-        label: 'Start project from scratch',
-        icon: <HiOutlineBookOpen />,
-    },
-    {
-        value: '1',
-        label: 'Automate time consuming tasks',
-        icon: <HiOutlineClock />,
-    },
-    {
-        value: '2',
-        label: 'Enhance current workflow',
-        icon: <HiOutlineAdjustments />,
-    },
-    { value: '3', label: 'Others', icon: <HiOutlineSparkles /> },
-]
+        {
+            value: '0',
+            label: 'Start project from scratch',
+            icon: <HiOutlineBookOpen />,
+        },
+        {
+            value: '1',
+            label: 'Automate time consuming tasks',
+            icon: <HiOutlineClock />,
+        },
+        {
+            value: '2',
+            label: 'Enhance current workflow',
+            icon: <HiOutlineAdjustments />,
+        },
+        { value: '3', label: 'Others', icon: <HiOutlineSparkles /> },
+    ]
 
 const Step4 = ({ onNext, onBack }: Step4Props) => {
     return (
@@ -50,7 +50,7 @@ const Step4 = ({ onNext, onBack }: Step4Props) => {
                         role: '',
                     }}
                     onSubmit={() => {
-                        console.log()
+                        // console.log()
                     }}
                 >
                     {({ touched, errors }) => {

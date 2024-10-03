@@ -7,7 +7,7 @@ interface DataContextValue {
   leadData: LeadDataItem[];
   projectData: ProjectDataItem[];
   templateData: TemplateDataItem[];
-  loading:boolean;
+  loading: boolean;
 }
 
 const DataContext = createContext<DataContextValue | undefined>(undefined);
@@ -21,9 +21,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const response = await apiGetCrmFileManager();
         setData(response);
-        console.log('response', response);
+        // console.log('response', response);
         setLoading(false);
-        
+
       } catch (error) {
         console.error('Error fetching data', error);
         setLoading(false);
@@ -37,7 +37,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     leadData: data?.data.leadData || [],
     projectData: data?.data.projectData || [],
     templateData: data?.data.templateData || [],
-    loading:loading,
+    loading: loading,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

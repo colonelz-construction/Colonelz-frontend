@@ -24,25 +24,25 @@ const roles: {
     icon: ReactNode
     disabled?: boolean
 }[] = [
-    {
-        value: 'softwareEngineer',
-        label: 'Software Engineer',
-        icon: <HiOutlineCode />,
-    },
-    {
-        value: 'productManager',
-        label: 'Product Manager',
-        icon: <HiOutlineCube />,
-    },
-    { value: 'designer', label: 'Designer', icon: <HiOutlinePencil /> },
-    { value: 'qaTester', label: 'QA Tester', icon: <HiOutlineShieldCheck /> },
-    {
-        value: 'skateHolder',
-        label: 'Skate Holder',
-        icon: <HiOutlineAcademicCap />,
-    },
-    { value: 'other', label: 'Others', icon: <HiOutlineSparkles /> },
-]
+        {
+            value: 'softwareEngineer',
+            label: 'Software Engineer',
+            icon: <HiOutlineCode />,
+        },
+        {
+            value: 'productManager',
+            label: 'Product Manager',
+            icon: <HiOutlineCube />,
+        },
+        { value: 'designer', label: 'Designer', icon: <HiOutlinePencil /> },
+        { value: 'qaTester', label: 'QA Tester', icon: <HiOutlineShieldCheck /> },
+        {
+            value: 'skateHolder',
+            label: 'Skate Holder',
+            icon: <HiOutlineAcademicCap />,
+        },
+        { value: 'other', label: 'Others', icon: <HiOutlineSparkles /> },
+    ]
 
 const Step3 = ({ onNext, onBack }: Step3Props) => {
     return (
@@ -54,7 +54,7 @@ const Step3 = ({ onNext, onBack }: Step3Props) => {
                         role: '',
                     }}
                     onSubmit={() => {
-                        console.log()
+                        // console.log()
                     }}
                 >
                     {({ touched, errors }) => {

@@ -23,10 +23,10 @@ const Activity = ({ Data }: CustomerProfileProps) => {
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
     const observer = useRef<IntersectionObserver | null>(null);
-    console.log(Data)
+    // console.log(Data)
 
     const [activityData, setActivityData] = useState<any[]>([]);
-    console.log(activityData)
+    // console.log(activityData)
 
     const fetchData = useCallback(async (page: number) => {
         setLoading(true); // Set loading to true when fetching data

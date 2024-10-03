@@ -136,7 +136,7 @@ const Index = () => {
     const [selectedFileId, setSelectedFileId] = React.useState<string | null>(null,)
     const { roleData } = useRoleContext()
     const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
-    const { folderData,projectId,projectName } = location.state || {}
+    const { folderData, projectId, projectName } = location.state || {}
     // const folderName = folderData.folder_name
 
     interface User {
@@ -180,7 +180,7 @@ const Index = () => {
     const openDialog = (fileId: string) => {
         setIsOpen(true)
         setSelectedFiles([fileId])
-        console.log(fileId)
+        // console.log(fileId)
     }
     const onDialogClose = () => {
         setIsOpen(false)
@@ -216,11 +216,11 @@ const Index = () => {
         const fetchDataAndLog = async () => {
             try {
                 const leadData = await fetchProjectData(leadId)
-                console.log(leadData)
+                // console.log(leadData)
 
                 //   setLoading(false)
                 const folderData = leadData
-                console.log(folderData)
+                // console.log(folderData)
 
                 const selectedFolder = folderData.find(
                     (folder: any) => folder.folder_name === folderName,
@@ -228,16 +228,16 @@ const Index = () => {
 
                 if (selectedFolder) {
                     setLeadData(selectedFolder.files)
-                    console.log(selectedFolder.files)
+                    // console.log(selectedFolder.files)
                 }
             } catch (error) {
-                console.error('Error fetching lead data', error)
+                // console.error('Error fetching lead data', error)
             }
         }
 
         fetchDataAndLog()
     }, [leadId, folderName])
-    console.log(leadData)
+    // console.log(leadData)
 
     const deleteFiles = async (fileId: string) => {
         selectedFiles.push(fileId)
@@ -261,7 +261,7 @@ const Index = () => {
         }
         try {
             const response = await apiDeleteFileManagerFiles(postData)
-            console.log(response)
+            // console.log(response)
 
             if (response.code === 200) {
                 toast.push(
@@ -280,7 +280,7 @@ const Index = () => {
                 )
             }
         } catch (error) {
-            console.error('Error deleting files:', error)
+            // console.error('Error deleting files:', error)
         }
     }
 
@@ -682,25 +682,25 @@ const Index = () => {
                             ))}
                         </THead>
                         {
-                        leadData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
-                            <TBody>
-                                {table.getRowModel().rows.map((row) => {
-                                    return (
-                                        <Tr key={row.id}>
-                                            {row.getVisibleCells().map((cell) => {
-                                                return (
-                                                    <Td key={cell.id}>
-                                                        {flexRender(
-                                                            cell.column.columnDef.cell,
-                                                            cell.getContext()
-                                                        )}
-                                                    </Td>
-                                                )
-                                            })}
-                                        </Tr>
-                                    )
-                                })}
-                            </TBody>}
+                            leadData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
+                                <TBody>
+                                    {table.getRowModel().rows.map((row) => {
+                                        return (
+                                            <Tr key={row.id}>
+                                                {row.getVisibleCells().map((cell) => {
+                                                    return (
+                                                        <Td key={cell.id}>
+                                                            {flexRender(
+                                                                cell.column.columnDef.cell,
+                                                                cell.getContext()
+                                                            )}
+                                                        </Td>
+                                                    )
+                                                })}
+                                            </Tr>
+                                        )
+                                    })}
+                                </TBody>}
                     </Table>
 
                     <div className="flex items-center justify-between mt-4">
@@ -770,7 +770,7 @@ const Index = () => {
                 <h3 className="mb-5">Share Files</h3>
                 <Formik initialValues={{ lead_id: leadId, folder_name: folderName, file_id: '', email: '', cc: '', bcc: '', subject: '', body: '' }}
                     onSubmit={async (values) => {
-                        console.log(values);
+                        // console.log(values);
 
                     }
 
@@ -993,7 +993,7 @@ const Index = () => {
                                 { placement: 'top-center' },
                             )
                         } else {
-                            console.log(values)
+                            // console.log(values)
                             let formData = new FormData()
                             formData.append(
                                 'project_id',
@@ -1010,7 +1010,7 @@ const Index = () => {
                                 await apiGetCrmFileManagerCreateProjectFolder(
                                     formData,
                                 )
-                            console.log(response)
+                            // console.log(response)
 
                             if (response.code === 200) {
                                 toast.push(
@@ -1080,26 +1080,26 @@ const Index = () => {
                 <p> Are you sure you want to delete this file? </p>
             </ConfirmDialog>
 
-            <ConfirmDialog 
-      isOpen={dialogIsOpen4}
-      type='warning'
-        onClose={onDialogClose4}
-        confirmButtonColor='yellow-600'
-        onCancel={onDialogClose4}
-        onRequestClose={onDialogClose4}
-        title="Missing Subject"
-        closable
-        onConfirm={() => {
-          ShareFiles();
-          onDialogClose4();
-        }}
-      >
-        <p>
-          Are you sure you want to share the files without a subject?
-        </p>
-        
+            <ConfirmDialog
+                isOpen={dialogIsOpen4}
+                type='warning'
+                onClose={onDialogClose4}
+                confirmButtonColor='yellow-600'
+                onCancel={onDialogClose4}
+                onRequestClose={onDialogClose4}
+                title="Missing Subject"
+                closable
+                onConfirm={() => {
+                    ShareFiles();
+                    onDialogClose4();
+                }}
+            >
+                <p>
+                    Are you sure you want to share the files without a subject?
+                </p>
 
-      </ConfirmDialog>
+
+            </ConfirmDialog>
         </div>
     )
 }

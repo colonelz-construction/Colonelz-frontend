@@ -62,46 +62,46 @@ interface Projects {
   project_name: string;
 }
 
-const id=localStorage.getItem('userId');
-const token=localStorage.getItem('auth');
+const id = localStorage.getItem('userId');
+const token = localStorage.getItem('auth');
 const Index = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  console.log(filteredUsers)
+  // console.log(filteredUsers)
   const [filteredProjects, setFilteredProjects] = useState<Projects[]>([]);
   const [selectedProject, setSelectedProject] = useState<ProjectData[]>([]);
-  const [loading,setLoading]=useState(false)
-  const {rolelist}=useRoleContext();
+  const [loading, setLoading] = useState(false)
+  const { rolelist } = useRoleContext();
   const queryParams = new URLSearchParams(location.search);
 
-  const projectId :any = queryParams.get('project_id')
+  const projectId: any = queryParams.get('project_id')
 
-  
-  
-  const Options = rolelist.filter((role)=>role!=='ADMIN'&& role!=='Senior Architect').map((role) => ({ value: role, label: role }));
+
+
+  const Options = rolelist.filter((role) => role !== 'ADMIN' && role !== 'Senior Architect').map((role) => ({ value: role, label: role }));
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const response=await apiGetAllUsersList()
+      const response = await apiGetAllUsersList()
       const projects = await apiGetCrmProjects();
       setUsers(response.data);
       setSelectedProject(projects.data.projects);
     };
 
     fetchUsers();
-  },[]);
+  }, []);
   useEffect(() => {
 
     const func = async () => {
       const projects = await apiGetCrmProjects();
-      const list=await apiGetAllUsersList()
-      const users :any= list.data
+      const list = await apiGetAllUsersList()
+      const users: any = list.data
 
-      console.log(list)
-      
+      // console.log(list)
+
       setFilteredUsers(
-        users.filter((user : any) => user.role === selectedRole)
+        users.filter((user: any) => user.role === selectedRole)
       );
       setFilteredProjects(
         projects.data.projects
@@ -110,38 +110,38 @@ const Index = () => {
     }
 
     func()
-    
+
   }, [selectedRole, users]);
 
   const handleSubmit = async (values: FormValues) => {
     setLoading(true)
-    const response=await apiAddMember(values);
-    
-    
+    const response = await apiAddMember(values);
+
+
     setLoading(false)
-    if(response?.code===200){
-     
+    if (response?.code === 200) {
+
       toast.push(
         <Notification closable type="success" duration={2000}>
-            Member Added Successfully
+          Member Added Successfully
         </Notification>
-    
-     )
-      
+
+      )
+
     }
-    else{
+    else {
       toast.push(
         <Notification closable type="danger" duration={2000}>
-            {response.errorMessage}
+          {response.errorMessage}
         </Notification>
-     )
+      )
     }
   };
 
   return (
     <Formik
       initialValues={{
-        id:id || '',
+        id: id || '',
         role: '',
         user_name: '',
         project_id: '',
@@ -167,13 +167,13 @@ const Index = () => {
             />
           </FormItem>
           <FormItem label="Project">
-          <Select
+            <Select
               options={filteredProjects.map((project) => ({ value: project.project_id, label: project.project_name }))}
               onChange={(option) => setFieldValue('project_id', option?.value || '')}
             />
           </FormItem>
 
-          <Button type="submit" variant='solid' loading={loading} block>{loading?'Submitting...':'Submit'}</Button>
+          <Button type="submit" variant='solid' loading={loading} block>{loading ? 'Submitting...' : 'Submit'}</Button>
         </Form>
       )}
     </Formik>

@@ -47,10 +47,10 @@ interface DebouncedInputProps
 }
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
-type Option={
-    value:number;
-    label:string;
-  }
+type Option = {
+    value: number;
+    label: string;
+}
 
 function DebouncedInput({
     value: initialValue,
@@ -86,9 +86,9 @@ function DebouncedInput({
     )
 }
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    let itemValue:any = row.getValue(columnId);
+    let itemValue: any = row.getValue(columnId);
 
-    
+
     if (columnId === 'updated_date') {
         itemValue = formateDate(itemValue);
     }
@@ -108,14 +108,14 @@ const Index = () => {
     const queryParams = new URLSearchParams(location.search)
     const folderName = queryParams.get('folder')
     const type = queryParams.get('type')
-    const {roleData} = useRoleContext()
+    const { roleData } = useRoleContext()
     const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
     useEffect(() => {
         const fetchDataAndLog = async () => {
             try {
                 const templateData = (await getTemplateData()) || []
-                console.log(templateData);
-                
+                // console.log(templateData);
+
                 setLoading(false)
                 setTemplateData(
                     templateData
@@ -123,7 +123,7 @@ const Index = () => {
                             (item) =>
                                 item.files[0].folder_name === type &&
                                 item.files[0].sub_folder_name_first ===
-                                    folderName,
+                                folderName,
                         )
                         .map((item) => item.files[0]),
                 )
@@ -144,7 +144,7 @@ const Index = () => {
     }
 
     const onDialogClose = (e: MouseEvent) => {
-        console.log('onDialogClose', e)
+        // console.log('onDialogClose', e)
         setIsOpen(false)
     }
 
@@ -180,7 +180,7 @@ const Index = () => {
             sub_folder_name_first: folderName,
             sub_folder_name_second: folder_name,
         }
-        console.log(postData)
+        // console.log(postData)
 
         try {
             await apiDeleteFileManagerFolders(postData)
@@ -201,7 +201,7 @@ const Index = () => {
         }
     }
 
-  
+
 
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
@@ -212,13 +212,13 @@ const Index = () => {
         { value: 40, label: '40 / page' },
         { value: 50, label: '50 / page' },
     ]
-    
+
     const onPaginationChange = (page: number) => {
-      table.setPageIndex(page - 1)
+        table.setPageIndex(page - 1)
     }
-    
+
     const onSelectChange = (value = 0) => {
-      table.setPageSize(Number(value))
+        table.setPageSize(Number(value))
     }
 
     const columns = useMemo<ColumnDef<any>[]>(
@@ -257,7 +257,7 @@ const Index = () => {
                 accessorKey: 'action',
                 id: 'actions',
                 cell: ({ row }) => {
-                    const {roleData} = useRoleContext()
+                    const { roleData } = useRoleContext()
                     const deleteAccess = roleData?.data?.file?.delete?.includes(`${localStorage.getItem('role')}`)
                     return (
                         deleteAccess &&
@@ -269,14 +269,14 @@ const Index = () => {
                         >
                             <AiOutlineDelete className=" text-xl text-center hover:text-red-500" />
                         </div>
-                )
+                    )
                 },
             },
         ],
         [],
     )
-    console.log(templateData);
-    
+    // console.log(templateData);
+
     const table = useReactTable({
         data: templateData,
         columns,
@@ -305,65 +305,65 @@ const Index = () => {
         <div>
             <div className=" mb-5 flex justify-between">
                 <h3 className="">Folder</h3>
-               {uploadAccess &&
-                <Button variant="solid" size="sm" onClick={() => openDialog()}>
-                    Upload
-                </Button>}
+                {uploadAccess &&
+                    <Button variant="solid" size="sm" onClick={() => openDialog()}>
+                        Upload
+                    </Button>}
             </div>
-            {!loading ? templateData.length === 0 ?(<NoData />): (
+            {!loading ? templateData.length === 0 ? (<NoData />) : (
                 <div className="h-screen w-full">
                     <div className="flex-1 p-4">
                         <div className='flex justify-between'>
-                        <div className="flex items-center mb-4">
-                            <nav className="flex">
-                                <ol className="flex items-center space-x-2">
-                                    <li>
-                                        <a
-                                            href="/app/crm/fileManager"
-                                            className="text-blue-600 dark:text-blue-400 hover:underline"
-                                        >
-                                            FileManager
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <span className="mx-2">/</span>
-                                    </li>
-                                    <li>
-                                        <a
-                                            href="/app/crm/fileManager"
-                                            className="text-blue-600 dark:text-blue-400 hover:underline"
-                                        >
-                                            Company Data
-                                        </a>
-                                    </li>
-                                    {type==='company data'?<></>:<>
-                                    <li>
-                                        <span className="mx-2">/</span>
-                                    </li>
-                                    <li>
-                                        <a
-                                            href={`/app/crm/fileManager/project/templates/${type}`}
-                                            className="text-blue-600 dark:text-blue-400 hover:underline capitalize"
-                                        >
-                                            {type}
-                                        </a>
-                                    </li></>}
-                                    <li>
-                                        <span className="mx-2">/</span>
-                                    </li>
+                            <div className="flex items-center mb-4">
+                                <nav className="flex">
+                                    <ol className="flex items-center space-x-2">
+                                        <li>
+                                            <a
+                                                href="/app/crm/fileManager"
+                                                className="text-blue-600 dark:text-blue-400 hover:underline"
+                                            >
+                                                FileManager
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <span className="mx-2">/</span>
+                                        </li>
+                                        <li>
+                                            <a
+                                                href="/app/crm/fileManager"
+                                                className="text-blue-600 dark:text-blue-400 hover:underline"
+                                            >
+                                                Company Data
+                                            </a>
+                                        </li>
+                                        {type === 'company data' ? <></> : <>
+                                            <li>
+                                                <span className="mx-2">/</span>
+                                            </li>
+                                            <li>
+                                                <a
+                                                    href={`/app/crm/fileManager/project/templates/${type}`}
+                                                    className="text-blue-600 dark:text-blue-400 hover:underline capitalize"
+                                                >
+                                                    {type}
+                                                </a>
+                                            </li></>}
+                                        <li>
+                                            <span className="mx-2">/</span>
+                                        </li>
 
-                                    <li className="text-gray-500 capitalize">
-                                        {folderName}
-                                    </li>
-                                </ol>
-                            </nav>
-                        </div>
-                        <DebouncedInput
-                value={globalFilter ?? ''}
-                className="p-2 font-lg shadow border border-block"
-                placeholder="Search..."
-                onChange={(value) => setGlobalFilter(String(value))}
-            /></div>
+                                        <li className="text-gray-500 capitalize">
+                                            {folderName}
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+                            <DebouncedInput
+                                value={globalFilter ?? ''}
+                                className="p-2 font-lg shadow border border-block"
+                                placeholder="Search..."
+                                onChange={(value) => setGlobalFilter(String(value))}
+                            /></div>
                         <>
                             <Table>
                                 <THead>
@@ -380,7 +380,7 @@ const Index = () => {
                                                                     header.colSpan
                                                                 }
                                                             >
-                                                              {header.isPlaceholder || header.id==='actions' ? null : (
+                                                                {header.isPlaceholder || header.id === 'actions' ? null : (
                                                                     <div
                                                                         {...{
                                                                             className:
@@ -436,31 +436,31 @@ const Index = () => {
                                 </TBody>
                             </Table>
                             <div className="flex items-center justify-between mt-4">
-                <Pagination
-                    pageSize={table.getState().pagination.pageSize}
-                    currentPage={table.getState().pagination.pageIndex + 1}
-                    total={table.getFilteredRowModel().rows.length}
-                    onChange={onPaginationChange}
-                />
-                <div style={{ minWidth: 130 }}>
-                    <Select<Option>
-                        size="sm"
-                        isSearchable={false}
-                        value={pageSizeOption.filter(
-                            (option) =>
-                                option.value ===
-                                table.getState().pagination.pageSize
-                        )}
-                        options={pageSizeOption}
-                        onChange={(option) => onSelectChange(option?.value)}
-                    />
-                </div>
-            </div>
+                                <Pagination
+                                    pageSize={table.getState().pagination.pageSize}
+                                    currentPage={table.getState().pagination.pageIndex + 1}
+                                    total={table.getFilteredRowModel().rows.length}
+                                    onChange={onPaginationChange}
+                                />
+                                <div style={{ minWidth: 130 }}>
+                                    <Select<Option>
+                                        size="sm"
+                                        isSearchable={false}
+                                        value={pageSizeOption.filter(
+                                            (option) =>
+                                                option.value ===
+                                                table.getState().pagination.pageSize
+                                        )}
+                                        options={pageSizeOption}
+                                        onChange={(option) => onSelectChange(option?.value)}
+                                    />
+                                </div>
+                            </div>
                         </>
                     </div>
                 </div>
             ) : (
-              <Skeleton height={300}/>
+                <Skeleton height={300} />
             )}
             <StickyFooter
                 className="-mx-8 px-8 flex items-center justify-between py-4 mt-7"

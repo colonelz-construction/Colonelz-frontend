@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Formik, Field, Form } from 'formik';
+import { Formik, Field, Form, useFormikContext } from 'formik';
 import axios from 'axios';
 import { Button, FormItem, Input, Notification, Select, toast } from '@/components/ui';
 import { apiAddMember } from '@/services/AuthService';
@@ -62,8 +62,11 @@ interface Projects {
   project_name: string;
 }
 
-const id = localStorage.getItem('userId');
-const token = localStorage.getItem('auth');
+
+const id=localStorage.getItem('userId');
+const token=localStorage.getItem('auth');
+
+
 const Index = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -86,26 +89,24 @@ const Index = () => {
       const response = await apiGetAllUsersList()
       const projects = await apiGetCrmProjects();
       setUsers(response.data);
-      setSelectedProject(projects.data.projects);
+      setFilteredProjects(projects.data.projects);
     };
 
     fetchUsers();
   }, []);
+ 
+
+
   useEffect(() => {
 
     const func = async () => {
-      const projects = await apiGetCrmProjects();
-      const list = await apiGetAllUsersList()
-      const users: any = list.data
 
-      // console.log(list)
+      
 
       setFilteredUsers(
         users.filter((user: any) => user.role === selectedRole)
       );
-      setFilteredProjects(
-        projects.data.projects
-      );
+  
 
     }
 

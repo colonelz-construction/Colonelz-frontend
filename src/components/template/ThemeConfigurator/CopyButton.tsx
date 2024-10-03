@@ -21,11 +21,11 @@ const CopyButton = () => {
         navigator.clipboard.writeText(JSON.stringify(config, null, 2))
 
         toast.push(
-            <Notification title="Copy Success" type="success">
+            <Notification title="Copy Success" type="success" closable duration={3000}>
                 {`Please replace themeConfig in 'src/configs/themeConfig.js'`}
             </Notification>,
             {
-                placement: 'top-center',
+                placement: 'top-end',
             }
         )
     }

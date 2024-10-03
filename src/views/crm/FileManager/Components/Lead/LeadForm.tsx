@@ -22,6 +22,7 @@ const YourFormComponent: React.FC<Data> = (leadData) => {
   const queryParams = new URLSearchParams(location.search);
   const leadId = queryParams.get('lead_id');
   const role=localStorage.getItem('role')
+  const [submit,setSubmit]=useState(false);
   
   const [formData, setFormData] = useState<FormData>({
     lead_id: leadId,
@@ -77,6 +78,8 @@ function closeAfter2000ms(data:string,type:any) {
     );
     return;
   }
+  
+  setSubmit(true);
   const postData = new FormData();
 
   if (formData.lead_id !== null) {
@@ -90,10 +93,8 @@ function closeAfter2000ms(data:string,type:any) {
 
   try {
     const response = await apiGetCrmFileManagerCreateLeadFolder(postData);
+    setSubmit(false);
     
-
-    
-
     if (response.code===200) {
       closeAfter2000ms('File uploaded successfully.','success');
       window.location.reload();
@@ -152,7 +153,7 @@ const clientOptions: Option[] = uniqueFolderNames
                         </FormItem>
               <div className='flex justify-end'>
 
-      <Button type="submit" variant='solid' block>Submit</Button>
+      <Button type="submit" variant='solid' loading={submit} block>{submit?'Submitting...':'Submit'}</Button>
       </div>
     </form>
   );

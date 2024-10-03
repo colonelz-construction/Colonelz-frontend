@@ -182,7 +182,7 @@ const Users = () => {
             { header: 'Email', accessorKey: 'email' },
 
             {
-                header: 'Action',
+                header: '',
                 id: 'action',
                 cell: ({ row }) => {
                     return (

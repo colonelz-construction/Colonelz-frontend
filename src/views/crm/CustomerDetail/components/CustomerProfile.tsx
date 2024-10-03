@@ -99,9 +99,9 @@ interface ProjectUpdateData {
   
     const projectStatusOptions = [
       { value: 'designing', label: 'Designing' },
+      { value: 'design & execution', label: 'Design & Execution'},
       { value: 'executing', label: 'Executing' },
       { value: 'completed', label: 'Completed' },
-      { value: 'design & execution', label: 'Design & Execution'},
   ]
   
     return (

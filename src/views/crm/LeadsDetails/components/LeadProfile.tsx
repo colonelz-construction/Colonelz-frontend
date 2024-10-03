@@ -140,7 +140,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
                         />
                         <CustomerInfoField
                             title="Source"
-                            value={data?.source}
+                            value={data?.source||"NA"}
                         />
                        
                         <Dialog

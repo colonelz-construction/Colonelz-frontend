@@ -58,7 +58,6 @@ const YourFormComponent: React.FC<Data> = (data) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmit(true);
     if (!formData.folder_name || formData.files.length === 0) {
       toast.push(
         <Notification closable type="warning" duration={3000}>
@@ -68,6 +67,8 @@ const YourFormComponent: React.FC<Data> = (data) => {
       );
       return;
     }
+    
+    setSubmit(true);
     const postData = new FormData();
 
     if (formData.project_id !== null) {

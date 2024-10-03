@@ -3,7 +3,7 @@ import { Formik, Field, Form } from 'formik';
 import axios from 'axios';
 import { Button, FormItem, Input, Notification, Select, toast } from '@/components/ui';
 import { apiAddMember } from '@/services/AuthService';
-import { apiGetUsers } from '@/services/CrmService';
+import { apiGetAllUsersList } from '@/services/CrmService';
 import { apiGetCrmProjects } from '@/services/CrmService';
 import { set } from 'lodash';
 import { useRoleContext } from '../Roles/RolesContext';
@@ -68,10 +68,14 @@ const Index = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  console.log(filteredUsers)
   const [filteredProjects, setFilteredProjects] = useState<Projects[]>([]);
   const [selectedProject, setSelectedProject] = useState<ProjectData[]>([]);
   const [loading,setLoading]=useState(false)
   const {rolelist}=useRoleContext();
+  const queryParams = new URLSearchParams(location.search);
+
+  const projectId :any = queryParams.get('project_id')
 
   
   
@@ -79,8 +83,7 @@ const Index = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const response = await apiGetUsers();
-
+      const response=await apiGetAllUsersList()
       const projects = await apiGetCrmProjects();
       setUsers(response.data);
       setSelectedProject(projects.data.projects);
@@ -92,8 +95,13 @@ const Index = () => {
 
     const func = async () => {
       const projects = await apiGetCrmProjects();
+      const list=await apiGetAllUsersList()
+      const users :any= list.data
+
+      console.log(list)
+      
       setFilteredUsers(
-        users.filter((user) => user.role === selectedRole)
+        users.filter((user : any) => user.role === selectedRole)
       );
       setFilteredProjects(
         projects.data.projects

@@ -94,7 +94,7 @@ const Integration = () => {
             setInstalling(false)
             onViewIntegrationClose()
             toast.push(<Notification title="App installed" type="success" />, {
-                placement: 'top-center',
+                placement: 'top-end',
             })
         }, 1000)
     }

@@ -1,3 +1,4 @@
+//companyData File Upload
 import { Button, FormItem, Notification, Upload, toast } from '@/components/ui';
 import React, { useEffect, useState } from 'react';
 import { HiOutlineCloudUpload } from 'react-icons/hi';
@@ -25,7 +26,7 @@ const YourFormComponent: React.FC = () => {
   const queryParams = new URLSearchParams(location.search);
   const folderName = queryParams.get('folder');
   const type = queryParams.get('type');
-  const [submitting, setSubmitting] = useState(false);
+  const [submit, setSubmit] = useState(false);
   const [leadData, setLeadData] = useState<FoldersItem[]>([]);
   const [formData, setFormData] = useState<FormData>({
     sub_folder_name_first: folderName,
@@ -93,7 +94,6 @@ const YourFormComponent: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitting(true);
     if (!formData.sub_folder_name_second|| formData.files.length === 0) {
       toast.push(
         <Notification closable type="warning" duration={3000}>
@@ -103,6 +103,7 @@ const YourFormComponent: React.FC = () => {
       );
       return;
     }
+    setSubmit(true);
     const postData = new FormData();
     
     postData.append('sub_folder_name_second', formData.sub_folder_name_second);
@@ -116,7 +117,7 @@ const YourFormComponent: React.FC = () => {
 
     try {
       const response = await apiGetCrmFileManagerCreateTemplateFolder(postData);
-      setSubmitting(false); 
+      setSubmit(false); 
   
       if (response.code === 200) {
        toast.push(
@@ -181,8 +182,8 @@ const clientOptions: Option[] = uniqueFolderNames.map((folderName) => ({
                         </FormItem>
               <div className='flex justify-end'>
 
-      <Button type="submit" variant='solid' loading={submitting} block>
-        {submitting ? 'Uploading...' : 'Upload'}
+      <Button type="submit" variant='solid' loading={submit} block>
+        {submit ? 'Uploading...' : 'Upload'}
       </Button>
       </div>
     </form>

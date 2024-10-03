@@ -139,8 +139,8 @@ const EditLead = ({ details }: any) => {
 
             <FormItem label='Source'
             
-            invalid={errors.source && touched.source}
-            errorMessage={errors.source}
+            // invalid={errors.source && touched.source}
+            // errorMessage={errors.source}
             >
               <Field component={Input} name='source' placeholder='Enter Source' />
             </FormItem>

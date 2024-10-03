@@ -68,11 +68,11 @@ const Password = ({ data }: { data?: LoginHistory[] }) => {
     
         const response = await EditPassword(data);
         if (response.code===200) {
-            toast.push(<Notification title={'Password updated'} type="success" />, {
-                placement: 'top-center',
+            toast.push(<Notification title={'Password updated'} type="success" closable duration={3000} />, {
+                placement: 'top-end',
             });
         } else {
-            toast.push(<Notification title={'Error updating password'} type="danger" />, {
+            toast.push(<Notification title={'Error updating password'} type="danger" closable duration={3000} />, {
                 placement: 'top-center',
             });
         }

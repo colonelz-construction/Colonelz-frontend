@@ -329,7 +329,10 @@ return (
                                                             ? 'cursor-pointer select-none'
                                                             : '',
                                                     onClick:
-                                                        header.column.getToggleSortingHandler(),
+                                                    header.column.id !==
+                                                    'action'
+                                                        ? header.column.getToggleSortingHandler()
+                                                        : undefined,
                                                 }}
                                             >
                                                 {flexRender(
@@ -337,11 +340,12 @@ return (
                                                         .header,
                                                     header.getContext()
                                                 )}
-                                                {
+                                                {header.column.id !==
+                                                    'action' && (
                                                     <Sorter
                                                         sort={header.column.getIsSorted()}
                                                     />
-                                                }
+                                                )}
                                             </div>
                                         )}
                                     </Th>

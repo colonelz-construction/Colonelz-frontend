@@ -472,7 +472,7 @@ export async function apiGetCrmProjectsMom<T>(projectId:string) {
 }
 export async function apiGetCrmProjectsSingleMom<T>(projectId:string,momId:string) {
     return ApiService.fetchData<ApiResponse>({
-        url: `admin/getall/mom/?project_id=${projectId}&mom_id=${momId}`,
+        url: `admin/getsingle/mom/?project_id=${projectId}&mom_id=${momId}`,
         method: 'get',
     }).then((response) => {
         return response.data

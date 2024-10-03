@@ -40,8 +40,8 @@ const YourFormComponent = () => {
   useEffect(() => {
     const fetchDataAndSetValues = async () => {
       try {
-        const response = await apiGetCrmProjectsSingleMom(allQueryParams.project_id, allQueryParams.mom_id)
-        const fetchedDetails = response.data.mom_data[0]
+        const response:any = await apiGetCrmProjectsSingleMom(allQueryParams.project_id, allQueryParams.mom_id)
+        const fetchedDetails = response.data[0]
         setDetails(fetchedDetails)
         const clientOptions = fetchedDetails.attendees.client_name.map((item: string) => ({
           value: item,
@@ -210,9 +210,9 @@ const YourFormComponent = () => {
                     setFieldValue('location', selectedOption?.value)
                   }
                 />
-                {errors.location && (
+                {/* {errors.location && (
                   <span className='text-red-500'>{errors.location}</span>
-                )}
+                )} */}
               </FormItem>
             </div>
 

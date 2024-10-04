@@ -48,7 +48,7 @@ const LeadActivity = ({ details }: any) => {
 
 
   const [activityData, setActivityData] = useState<any[]>([]);
-  console.log(activityData)
+  // console.log(activityData)
 
   const fetchData = useCallback(async (page: number) => {
     setLoading(true); // Set loading to true when fetching data

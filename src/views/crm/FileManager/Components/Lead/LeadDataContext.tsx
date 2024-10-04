@@ -6,13 +6,13 @@ import { useLocation } from 'react-router-dom';
 export const LeadDataContext = createContext<FolderItem[] | null>(null);
 
 export const LeadDataProvider = ({ children }: { children: React.ReactNode }) => {
-    const [leadData, setLeadData] = useState<FolderItem[] | null>(null);
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const leadId = queryParams.get('lead_id');
-    const token = localStorage.getItem('auth');
-    console.log(leadId,token);
-    
+  const [leadData, setLeadData] = useState<FolderItem[] | null>(null);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const leadId = queryParams.get('lead_id');
+  const token = localStorage.getItem('auth');
+  // console.log(leadId,token);
+
   useEffect(() => {
     const fetchLeadData = async () => {
       try {

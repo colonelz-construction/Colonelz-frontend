@@ -129,7 +129,7 @@ const Index = () => {
   const openDialog = (fileId: string) => {
     setIsOpen(true)
     setSelectedFiles([fileId])
-    console.log(fileId);
+    // console.log(fileId);
 
   }
 
@@ -165,7 +165,7 @@ const Index = () => {
     const fetchDataAndLog = async () => {
       try {
         const templateData = await getTemplateData();
-        console.log(templateData);
+        // console.log(templateData);
         const filteredFolders = templateData.filter((folder) => {
           if (folder.files[0]?.sub_folder_name_second) {
 
@@ -182,13 +182,13 @@ const Index = () => {
           setLeadData(filteredFolders[0].files[0].files);
 
         } else {
-          console.warn('No matching folder found.');
+          // console.warn('No matching folder found.');
         }
 
-        console.log(leadData);
+        // console.log(leadData);
 
       } catch (error) {
-        console.error('Error fetching lead data', error);
+        // console.error('Error fetching lead data', error);
       }
     };
 
@@ -225,7 +225,7 @@ const Index = () => {
     };
     try {
       const response = await apiDeleteFileManagerFiles(postData);
-      console.log(response);
+      // console.log(response);
 
       if (response.code === 200) {
         toast.push(
@@ -655,7 +655,7 @@ const Index = () => {
         <h3 className='mb-5'>Share Files</h3>
         <Formik initialValues={{ lead_id: '', folder_name: folderName, file_id: '', email: '', cc: '', bcc: '', subject: '', body: '' }}
           onSubmit={async (values) => {
-            console.log(values);
+            // console.log(values);
 
           }
 
@@ -778,7 +778,7 @@ const Index = () => {
               )
             }
             else {
-              console.log(values);
+              // console.log(values);
               setSubmitting(true)
               let formData = new FormData();
               formData.append('type', values.type || '');
@@ -790,7 +790,7 @@ const Index = () => {
               }
               const response = await apiGetCrmFileManagerCreateTemplateFolder(formData)
               setSubmitting(false)
-              console.log(response);
+              // console.log(response);
 
               if (response.code === 200) {
                 toast.push(

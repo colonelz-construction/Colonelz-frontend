@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 import { Lead, useLeadContext } from '../../LeadList/store/LeadContext'
 import { Skeleton, Spinner } from '@/components/ui'
+import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 
 
 
@@ -77,7 +78,12 @@ const Leads = ({ data = [], className }: any) => {
         </THead>
         <TBody>
         {apiData === null ? (
-       <Skeleton/>
+       <TableRowSkeleton
+       avatarInColumns={[0]}
+       columns={6}
+       rows={5}
+       avatarProps={{ width: 14, height: 14 }}
+   />
       ) : (
         apiData.slice(0, 5).map((item, index) => (
           <Tr key={index} onClick={()=>navigate(`/app/crm/lead/?id=${item.lead_id}`)} className=' cursor-pointer'>

@@ -216,7 +216,7 @@ const Filtering = () => {
     const [data,setData] = useState(() => projects)
     const [selectedStatus, setSelectedStatus] = useState<string | string[]>('');
     useEffect(() => {
-        let filteredData = selectedStatus.length ? projects.filter((project: Project) =>
+        let filteredData = selectedStatus?.length ? projects?.filter((project: Project) =>
             Array.isArray(selectedStatus)
                 ? selectedStatus.includes(project.project_status)
                 : project.project_status === selectedStatus
@@ -225,8 +225,10 @@ const Filtering = () => {
         setData(filteredData);
     }, [selectedStatus, projects]);
 
+    // console.log(data)
+
     const table = useReactTable({
-        data:data,
+        data:data || [],
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -321,7 +323,7 @@ const Filtering = () => {
             </div>
             <Table>
                 <THead>
-                    {table.getHeaderGroups().map((headerGroup) => (
+                    {table?.getHeaderGroups().map((headerGroup) => (
                         <Tr key={headerGroup.id}>
                             {headerGroup.headers.map((header) => {
                                 return (
@@ -359,7 +361,7 @@ const Filtering = () => {
                     ))}
                 </THead>
                 <TBody>
-                    {table.getRowModel().rows.map((row) => {
+                    {table?.getRowModel().rows.map((row) => {
                         return (
                             <Tr key={row.id} className=' capitalize cursor-pointer' onClick={()=>navigate(`/app/crm/project-details?project_id=${row.original.project_id}&id=${userId}&type=details`)}>
                                 {row.getVisibleCells().map((cell) => {

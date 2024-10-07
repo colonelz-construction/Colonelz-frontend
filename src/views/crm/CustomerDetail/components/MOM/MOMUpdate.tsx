@@ -17,6 +17,9 @@ const YourFormComponent = () => {
   const navigate = useNavigate()
   const [details, setDetails] = useState<any>({})
   const [initialValues, setInitialValues] = useState<any>({})
+  const [imgAttributes, setImgAttributes] = useState<any>({ width: '', style: '' });
+  // console.log(initialValues.remark)
+  // console.log(imgAttributes)
 
   interface QueryParams {
     project_id: string
@@ -69,6 +72,26 @@ const YourFormComponent = () => {
     fetchDataAndSetValues()
   }, [allQueryParams.project_id, allQueryParams.mom_id])
 
+  useEffect(() => {
+    // Create a temporary DOM element to parse the HTML string
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(initialValues.remark, 'text/html');
+
+    // Get the img element
+    const img = doc.querySelector('img');
+
+    if (img) {
+      // Extract attributes
+      const width = img.getAttribute('width');
+      const cursorStyle = img.style.cursor;
+
+      setImgAttributes({
+        width: width,
+        style: cursorStyle,
+      });
+    }
+  }, [initialValues.remark]);
+
   return (
     <div>
       <h3 className='mb-5'>Update MOM</h3>
@@ -99,6 +122,7 @@ const YourFormComponent = () => {
           formData.append('remark', payload.remark)
           formData.append('project_id', payload.project_id)
           formData.append('mom_id', allQueryParams.mom_id)
+          
           
 
           try {

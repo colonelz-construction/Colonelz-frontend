@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ReactQuill,{Quill} from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 import ImageResize from 'quill-image-resize-module-react'
@@ -9,6 +9,22 @@ interface RichTextEditorProps {
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
+    // console.log(value)
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(value, 'text/html');
+
+    const img = doc.querySelector('img');
+    if (img) {
+      img.setAttribute('width', '20');
+      img.setAttribute('style', 'cursor: nwse-resize;');
+    }
+
+    const updatedValue = doc.body.innerHTML;
+
+    console.log('Updated value:', updatedValue);
+
+
     const modules = {
         toolbar: [
             [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],

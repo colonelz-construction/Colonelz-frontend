@@ -16,6 +16,9 @@ interface Data{
 }
 const CrmDashboard = () => {
     const {apiData,loading}=useProjectContext()
+    // const apiData : any = []
+
+    // console.log(parseInt(apiData?.commercial))
     
 
     const data=[
@@ -55,28 +58,47 @@ const CrmDashboard = () => {
                         <Card className="lg:w-1/2">
                         <h3 className="mb-3">Project Type</h3>
                         <Chart
-            options={{
-                colors: COLORS,
-                labels: ['Commercial', 'Residential'],
-                responsive: [
-                    {
-                        breakpoint: 480,
-                        options: {
-                            chart: {
-                                width: 150,
-                                height: 100,
-                            },
-                            legend: {
-                                position: 'bottom',
-                            },
-                        },
+    options={{
+        colors: COLORS,
+        labels: ['Commercial', 'Residential'],
+        responsive: [
+            {
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 150,
+                        height: 100,
                     },
-                ],
-            }}
-            series={[parseInt(apiData?.commercial), parseInt(apiData?.residential)]}
-            height={250}
-            type="pie"
-        />
+                    legend: {
+                        position: 'bottom',
+                    },
+                },
+            },
+        ],
+        tooltip: {
+            y: {
+                // Formatter should always return a string
+                formatter: (value, { seriesIndex }) => {
+                    if (seriesIndex === 0 && isNaN(parseInt(apiData?.commercial))) {
+                        return '0'; // Show '0' for Commercial if data is invalid
+                    }
+                    if (seriesIndex === 1 && isNaN(parseInt(apiData?.residential))) {
+                        return '0'; // Show '0' for Residential if data is invalid
+                    }
+                    return value.toString(); // Show valid value as a string
+                },
+            },
+        },
+    }}
+    series={[
+        isNaN(parseInt(apiData?.commercial)) ? 50 : parseInt(apiData?.commercial),
+        isNaN(parseInt(apiData?.residential)) ? 50 : parseInt(apiData?.residential),
+    ]}
+    height={250}
+    type="pie"
+/>
+
+
                     </Card>
                     </>
         }

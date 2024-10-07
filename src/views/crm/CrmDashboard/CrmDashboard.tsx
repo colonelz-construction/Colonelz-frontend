@@ -9,19 +9,19 @@ import FileManager from "../FileManager";
 import { Card } from "@/components/ui";
 import { COLORS } from "@/constants/chart.constant";
 
-interface Data{
-    Execution_Phase:string,
-    Design_Phase:string,
-    completed:string
+interface Data {
+    Execution_Phase: string,
+    Design_Phase: string,
+    completed: string
 }
 const CrmDashboard = () => {
-    const {apiData,loading}=useProjectContext()
+    const { apiData, loading } = useProjectContext()
     // const apiData : any = []
 
     // console.log(parseInt(apiData?.commercial))
-    
 
-    const data=[
+
+    const data = [
         {
             key: 'inReview',
             label: 'Design',
@@ -35,84 +35,132 @@ const CrmDashboard = () => {
         {
             key: 'inProgress',
             label: 'Execution',
-            value:apiData?.Execution_Phase,
+            value: apiData?.Execution_Phase,
         },
-        
+
         {
             key: 'completed',
             label: 'Completed',
             value: apiData?.completed,
         },
     ]
-    const role=localStorage.getItem('role') || '';
-    const {roleData} = useRoleContext();
+    const role = localStorage.getItem('role') || '';
+    const { roleData } = useRoleContext();
     const hasProjectReadPermission = roleData?.data?.project?.read?.includes(role);
     const hasLeadReadPermission = roleData?.data?.lead?.read?.includes(role);
     return (
         <div className="flex flex-col gap-4 h-full">
-         <div className="flex justify-between flex-col lg:flex-row gap-4">
-           {hasProjectReadPermission &&<>
-                        <Card className="lg:w-1/2">
-                    <Statistic data={data} />
+            <div className="flex justify-between flex-col lg:flex-row gap-4">
+                {hasProjectReadPermission && <>
+                    <Card className="lg:w-1/2">
+                        <Statistic data={data} />
                     </Card>
-                        <Card className="lg:w-1/2">
+                    {/* <Card className="lg:w-1/2">
                         <h3 className="mb-3">Project Type</h3>
                         <Chart
-    options={{
-        colors: COLORS,
-        labels: ['Commercial', 'Residential'],
-        responsive: [
-            {
-                breakpoint: 480,
-                options: {
-                    chart: {
-                        width: 150,
-                        height: 100,
-                    },
-                    legend: {
-                        position: 'bottom',
-                    },
-                },
-            },
-        ],
-        tooltip: {
-            y: {
-                // Formatter should always return a string
-                formatter: (value, { seriesIndex }) => {
-                    if (seriesIndex === 0 && isNaN(parseInt(apiData?.commercial))) {
-                        return '0'; // Show '0' for Commercial if data is invalid
-                    }
-                    if (seriesIndex === 1 && isNaN(parseInt(apiData?.residential))) {
-                        return '0'; // Show '0' for Residential if data is invalid
-                    }
-                    return value.toString(); // Show valid value as a string
-                },
-            },
-        },
-    }}
-    series={[
-        isNaN(parseInt(apiData?.commercial)) ? 50 : parseInt(apiData?.commercial),
-        isNaN(parseInt(apiData?.residential)) ? 50 : parseInt(apiData?.residential),
-    ]}
-    height={250}
-    type="pie"
-/>
+                            options={{
+                                colors: COLORS,
+                                labels: ['Commercial', 'Residential'],
+                                responsive: [
+                                    {
+                                        breakpoint: 480,
+                                        options: {
+                                            chart: {
+                                                width: 150,
+                                                height: 100,
+                                            },
+                                            legend: {
+                                                position: 'bottom',
+                                            },
+                                        },
+                                    },
+                                ],
+                                tooltip: {
+                                    y: {
+                                        // Formatter should always return a string
+                                        formatter: (value, { seriesIndex }) => {
+                                            if (seriesIndex === 0 && isNaN(parseInt(apiData?.commercial))) {
+                                                return '0'; // Show '0' for Commercial if data is invalid
+                                            }
+                                            if (seriesIndex === 1 && isNaN(parseInt(apiData?.residential))) {
+                                                return '0'; // Show '0' for Residential if data is invalid
+                                            }
+                                            return value.toString(); // Show valid value as a string
+                                        },
+                                    },
+                                },
+                            }}
+                            series={[
+                                isNaN(parseInt(apiData?.commercial)) ? 50 : parseInt(apiData?.commercial),
+                                isNaN(parseInt(apiData?.residential)) ? 50 : parseInt(apiData?.residential),
+                            ]}
+                            height={250}
+                            type="pie"
+                        />
 
 
-                    </Card>
-                    </>
-        }
-                    </div>
-                <div className="grid grid-cols-1 xl:grid-cols-7 gap-4">
-                </div>
-                {hasProjectReadPermission &&
+                    </Card> */}
+
+<Card className="lg:w-1/2">
+    <h3 className="mb-3">Project Type</h3>
+    {isNaN(parseInt(apiData?.commercial)) && isNaN(parseInt(apiData?.residential)) ? (
+        <p>No data available</p>
+    ) : (
+        <Chart
+            options={{
+                colors: COLORS,
+                labels: ['Commercial', 'Residential'],
+                responsive: [
+                    {
+                        breakpoint: 480,
+                        options: {
+                            chart: {
+                                width: 150,
+                                height: 100,
+                            },
+                            legend: {
+                                position: 'bottom',
+                            },
+                        },
+                    },
+                ],
+                tooltip: {
+                    y: {
+                        formatter: (value, { seriesIndex }) => {
+                            if (seriesIndex === 0 && isNaN(parseInt(apiData?.commercial))) {
+                                return '0'; // Show '0' for Commercial if data is invalid
+                            }
+                            if (seriesIndex === 1 && isNaN(parseInt(apiData?.residential))) {
+                                return '0'; // Show '0' for Residential if data is invalid
+                            }
+                            return value.toString(); // Show valid value as a string
+                        },
+                    },
+                },
+            }}
+            series={[
+                isNaN(parseInt(apiData?.commercial)) ? 0 : parseInt(apiData?.commercial),
+                isNaN(parseInt(apiData?.residential)) ? 0 : parseInt(apiData?.residential),
+            ]}
+            height={250}
+            type="pie"
+        />
+    )}
+</Card>
+
+                </>
+                }
+            </div>
+            <div className="grid grid-cols-1 xl:grid-cols-7 gap-4">
+            </div>
+            {hasProjectReadPermission &&
                 <Project />
-}
-                {hasLeadReadPermission &&
-               <Leads />}
-               {(!hasProjectReadPermission && !hasLeadReadPermission) && <FileManager />}
-                
-          
+            }
+            {hasLeadReadPermission &&
+                <Leads />}
+            {(!hasProjectReadPermission && !hasLeadReadPermission) && <FileManager />}
+
+
         </div>
     )
 }

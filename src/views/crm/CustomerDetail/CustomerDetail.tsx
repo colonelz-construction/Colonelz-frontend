@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import Container from '@/components/shared/Container'
 import CustomerProfile from './components/CustomerProfile'
-import { injectReducer, setUser } from '@/store'
 import useQuery from '@/utils/hooks/useQuery'
 import MOM from './components/MOM/Mom'
 import { Skeleton, Tabs } from '@/components/ui'
@@ -9,18 +8,17 @@ import TabList from '@/components/ui/Tabs/TabList'
 import TabNav from '@/components/ui/Tabs/TabNav'
 import TabContent from '@/components/ui/Tabs/TabContent'
 import { useLocation, useNavigate } from 'react-router-dom'
-import AllMom from './components/MOM/AllMom'
-import { apiGetCrmProjectActivity, apiGetCrmProjectsMom, apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList } from '@/services/CrmService'
-import { FileItem } from '../FileManager/Components/Project/data'
+import { apiGetCrmProjectsMom, apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList, apiGetUsersListProject } from '@/services/CrmService'
 import Index from './Quotation'
-import { ProjectProvider } from '../Customers/store/ProjectContext'
 import Task from './Task/index'
 import Activity from './Project Progress/Activity'
 import Timeline from './Timeline/Timeline'
 import { AuthorityCheck } from '@/components/shared'
 import { useRoleContext } from '../Roles/RolesContext'
-import { Customer, Tasks } from './store'
+import { Customer, Data, Tasks } from './store'
 import { FileItemType } from './Quotation/Quotations'
+import Assignee from './Project Progress/Assignee'
+import { update } from 'lodash'
 
 
 export type QuotationResponseType = {
@@ -75,7 +73,7 @@ const CustomerDetail = () => {
     mom: queryParams.get('type') || '',
   };
   const [details, setDetails] = useState<any | null>(null);
-  const [projectData, setProjectData] = useState<Customer[]>([])
+  const [projectData, setProjectData] = useState<any>()
   const [task, setTaskData] = useState<Tasks[]>([])
   const [report, setReport] = useState<ReportResponse>()
   const [activity, setActivity] = useState<any>()
@@ -84,6 +82,7 @@ const CustomerDetail = () => {
   const quotationAccess = roleData?.data?.quotation?.read?.includes(`${localStorage.getItem('role')}`)
   const momAccess = roleData?.data?.mom?.read?.includes(`${localStorage.getItem('role')}`)
   const taskAccess = roleData?.data?.task?.read?.includes(`${localStorage.getItem('role')}`)
+  const projectAccess = roleData?.data?.project?.read?.includes(`${localStorage.getItem('role')}`)
 
   const handleTabChange = (selectedTab: any) => {
     const currentUrlParams = new URLSearchParams(location.search);
@@ -158,6 +157,22 @@ const CustomerDetail = () => {
     fetchDataAndLog();
   }, [allQueryParams.project_id, taskAccess]);
 
+  useEffect(() => {
+    if (!projectAccess) return;
+
+    const fetchDataAndLog = async () => {
+      try {
+        const projectResponseData = await apiGetUsersListProject(allQueryParams.project_id);
+        // console.log(projectResponseData.data)
+        setProjectData(projectResponseData.data);
+      } catch (error) {
+        console.error('Error fetching task data', error);
+      }
+    };
+
+    fetchDataAndLog();
+  }, [allQueryParams.project_id, projectAccess]);
+
 
 
   return (
@@ -189,6 +204,9 @@ const CustomerDetail = () => {
                 {taskAccess &&
                   <TabNav value="timeline">Timeline</TabNav>
                 }
+                {
+                  <TabNav value="assignee">Assignee</TabNav>
+                }
               </>
 
             </TabList>
@@ -214,6 +232,9 @@ const CustomerDetail = () => {
               </TabContent>
               <TabContent value="timeline">
                 <Timeline />
+              </TabContent>
+              <TabContent value="assignee">
+                <Assignee />
               </TabContent>
 
             </div>

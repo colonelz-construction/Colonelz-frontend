@@ -9,6 +9,7 @@ import {
     Input,
     Notification,
     Pagination,
+    ScrollBar,
     Segment,
     Select,
     Skeleton,
@@ -43,6 +44,7 @@ import { MdDeleteOutline } from 'react-icons/md';
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import formateDate from '@/store/dateformate'
 import { ConfirmDialog } from '@/components/shared'
+import { useAppSelector } from '@/store'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -107,6 +109,8 @@ const AddedUser = () => {
     const [username, setUsername] = useState<any>()
     const [loading, setLoading] = useState<any>(false)
     console.log(leadData)
+
+    const direction = useAppSelector((state) => state.theme.direction)
 
 
     const location = useLocation()
@@ -308,7 +312,7 @@ const AddedUser = () => {
     return (
         <div>
             <div className="w-full">
-                <div className="flex-1 p-4">
+                <div className="flex-1 px-4">
                     <div className='flex items-center gap-2 justify-end'>
     
                         <DebouncedInput
@@ -318,6 +322,7 @@ const AddedUser = () => {
                             onChange={(value) => setGlobalFilter(String(value))}
                         />
                     </div>
+                    <div className='h-[13rem] overflow-y-auto'>
                      <Table>
                         <THead>
                             {table.getHeaderGroups().map((headerGroup) => (
@@ -364,7 +369,10 @@ const AddedUser = () => {
                                 avatarProps={{ width: 14, height: 14 }}
                             /> :
                             (leadData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
-                                <TBody>
+                                <TBody >
+                                    
+
+                                    
                                     {table.getRowModel().rows.map((row) => {
                                         return (
                                             <Tr key={row.id}>
@@ -381,8 +389,11 @@ const AddedUser = () => {
                                             </Tr>
                                         )
                                     })}
+
+
                                 </TBody>)}
                     </Table>
+                    </div>
 
                     <div className="flex items-center justify-between mt-4">
                         <Pagination

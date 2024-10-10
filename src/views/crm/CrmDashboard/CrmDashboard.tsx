@@ -16,6 +16,11 @@ interface Data {
 }
 const CrmDashboard = () => {
     const { apiData, loading } = useProjectContext()
+    console.log(apiData)
+
+    const residentialCount = apiData?.projects?.reduce((acc:any, obj:any) => obj.project_type === "residential" ? acc + 1 : acc, 0);
+    const commercialCount = apiData?.projects?.length - residentialCount;
+    console.log(residentialCount, commercialCount)
     // const apiData : any = []
 
     // console.log(parseInt(apiData?.commercial))
@@ -25,23 +30,23 @@ const CrmDashboard = () => {
         {
             key: 'inReview',
             label: 'Design',
-            value: apiData?.Design_Phase,
+            value: apiData?.Design_Phase | 0,
         },
         {
             key: 'design & execution',
             label: 'Design & Execution',
-            value: apiData?.Design_Execution
+            value: apiData?.Design_Execution | 0
         },
         {
             key: 'inProgress',
             label: 'Execution',
-            value: apiData?.Execution_Phase,
+            value: apiData?.Execution_Phase | 0,
         },
 
         {
             key: 'completed',
             label: 'Completed',
-            value: apiData?.completed,
+            value: apiData?.completed | 0,
         },
     ]
     const role = localStorage.getItem('role') || '';
@@ -127,13 +132,13 @@ const CrmDashboard = () => {
                 tooltip: {
                     y: {
                         formatter: (value, { seriesIndex }) => {
-                            if (seriesIndex === 0 && isNaN(parseInt(apiData?.commercial))) {
-                                return '0'; // Show '0' for Commercial if data is invalid
+                            if (seriesIndex === 0) {
+                                return commercialCount.toString(); // Show '0' for Commercial if data is invalid
                             }
-                            if (seriesIndex === 1 && isNaN(parseInt(apiData?.residential))) {
-                                return '0'; // Show '0' for Residential if data is invalid
+                            if (seriesIndex === 1) {
+                                return residentialCount.toString(); // Show '0' for Residential if data is invalid
                             }
-                            return value.toString(); // Show valid value as a string
+                            return '0'.toString()
                         },
                     },
                 },

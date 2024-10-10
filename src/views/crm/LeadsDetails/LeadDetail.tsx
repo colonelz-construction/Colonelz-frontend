@@ -197,7 +197,7 @@ const CustomerDetail = () => {
 
                             {someAccess &&
                                 <TabNav value="AddedUser" >
-                                    Added User
+                                    Assignee
                                 </TabNav>}
                         </TabList>
                         <div className="p-4">

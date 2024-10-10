@@ -192,9 +192,9 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
                         </Dialog>
                     </div>
                     <div className=''>
-                    <div className='my-3'>
-                                                <p>Description</p>
-                                                <p className="text-gray-700 dark:text-gray-200 font-semibold text-wrap">
+                    <div className='flex mb-3'>
+                                                <p className=' text-gray-700 dark:text-gray-200 font-semibold'>Description:</p>
+                                                <p className="text-wrap">
                                                    <div className="remark-content" dangerouslySetInnerHTML={{ __html: data?.notes?data?.notes[0]?.content:"" }} /></p>
                                             </div>
                                        { createProjectAccess && data?.contract_Status &&<>

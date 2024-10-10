@@ -107,7 +107,6 @@ const TaskDetails = () => {
     >
         <CustomerInfoField title='Task Created On' value={formateDate(taskData.task_createdOn)}/>
         <CustomerInfoField title='Task Created By' value={taskData.task_createdBy}/>
-        <br />
         <CustomerInfoField title='Task Name' value={taskData.task_name}/>
         <CustomerInfoField title='Task Status' value={taskData.task_status}/>
         <CustomerInfoField title='Task Priority' value={taskData.task_priority}/>

@@ -108,7 +108,6 @@ const TaskDetails = (Data:Data) => {
                     <TabContent value="tab1">
                     <CustomerInfoField title="Creator" value={Data.data.task_createdBy} />
                     <CustomerInfoField title="Created On" value={formateDate(Data.data.task_createdOn)} />
-                    <div className='p-1'> </div>
                     <CustomerInfoField title="Task Name" value={(Data.data.task_name)} />
                     <CustomerInfoField title="Task Status" value={(Data.data.task_status)} />
                     <CustomerInfoField title="Task Priority" value={(Data.data.task_priority)} />

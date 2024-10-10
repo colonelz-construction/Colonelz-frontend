@@ -244,14 +244,6 @@ const AddedUser = () => {
             },
 
 
-            {
-                header: 'Email', accessorKey: 'email',
-                cell: ({ row }) => {
-                    return <div>Email</div>
-                }
-            },
-
-
             // {
             //     header: 'Created', accessorKey: 'date', cell: ({ row }) => {
             //         return <div>{formateDate(row.original.date)}</div>
@@ -281,10 +273,7 @@ const AddedUser = () => {
         state: {
             columnFilters,
             globalFilter,
-            pagination: {
-                pageSize: 5,    
-                pageIndex: 0,    
-            },
+            pagination: page
         },
         onColumnFiltersChange: setColumnFilters,
         onGlobalFilterChange: setGlobalFilter,
@@ -299,13 +288,20 @@ const AddedUser = () => {
         debugHeaders: true,
         debugColumns: false,
     })
-    const onPaginationChange = (page: number) => {
-        table.setPageIndex(page - 1)
-    }
+    // const onPaginationChange = (page: number) => {
+    //     table.setPageIndex(page - 1)
+    // }
 
-    const onSelectChange = (value = 0) => {
-        table.setPageSize(Number(value))
-    }
+    // const onSelectChange = (value = 0) => {
+    //     table.setPageSize(Number(value))
+    // }
+    const onPaginationChange = (page: number) => {
+        setPage((prev) => ({ ...prev, pageIndex: page - 1 }));
+    };
+
+    const onSelectChange = (value: any) => {
+        setPage((prev) => ({ ...prev, pageSize: value, pageIndex: 0 })); // Reset to first page when page size changes
+    };
 
     const role = localStorage.getItem('role');
 
@@ -314,6 +310,7 @@ const AddedUser = () => {
             <div className="w-full">
                 <div className="flex-1 p-4">
                     <div className='flex items-center gap-2 justify-end'>
+    
                         <DebouncedInput
                             value={globalFilter ?? ''}
                             className="p-2 font-lg shadow border border-block"

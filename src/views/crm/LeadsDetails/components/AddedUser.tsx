@@ -45,6 +45,7 @@ import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import formateDate from '@/store/dateformate'
 import { ConfirmDialog } from '@/components/shared'
 import { useAppSelector } from '@/store'
+import Assignee from '../../CustomerDetail/Project Progress/Assignee';
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -426,10 +427,10 @@ const AddedUser = () => {
                 confirmButtonColor="red-600"
                 onCancel={onDialogClose3}
                 onConfirm={() => removeUser(username)}
-                title="Remove User"
+                title="Remove Assignee"
                 onRequestClose={onDialogClose3}
             >
-                <p> Are you sure you want to remove this user? </p>
+                <p> Are you sure you want to remove this assignee? </p>
             </ConfirmDialog>
 
 

@@ -82,6 +82,24 @@ const CustomerDetail = () => {
         setIsOpen2(false)
     }
 
+    // const navigate = useNavigate();
+
+    interface QueryParams {
+      type:string
+    
+    }
+    const queryParams = new URLSearchParams(location.search);
+
+    const allQueryParams: QueryParams = {
+      type: queryParams.get('tab') || '',
+    };
+
+    const handleTabChange = (selectedTab:any) => {
+      const currentUrlParams = new URLSearchParams(location.search);
+      currentUrlParams.set('tab', selectedTab);
+      navigate(`${location.pathname}?${currentUrlParams.toString()}`);
+  };
+
 
 
     useEffect(() => {
@@ -183,7 +201,7 @@ const CustomerDetail = () => {
             <div className='flex gap-5 xl:flex-row flex-col'>
                 <CustomerProfile data={lead} />
                 <Card className='xl:w-3/5 ' >
-                    <Tabs defaultValue="Actions">
+                    <Tabs defaultValue={allQueryParams.type} onChange={handleTabChange}>
                         <TabList>
                             <TabNav value="Actions" >
                                 Follow-Ups

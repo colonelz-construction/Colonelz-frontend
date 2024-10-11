@@ -78,7 +78,7 @@ const CustomerDetail = () => {
   const [report, setReport] = useState<ReportResponse>()
   const [activity, setActivity] = useState<any>()
   // console.log(activity)
-  const [users, setUsers] = useState<string[]>([])
+  const [users, setUsers] = useState<any>([])
   const quotationAccess = roleData?.data?.quotation?.read?.includes(`${localStorage.getItem('role')}`)
   const momAccess = roleData?.data?.mom?.read?.includes(`${localStorage.getItem('role')}`)
   const taskAccess = roleData?.data?.task?.read?.includes(`${localStorage.getItem('role')}`)
@@ -97,7 +97,9 @@ const CustomerDetail = () => {
         const Report = await apiGetCrmSingleProjectReport(allQueryParams.project_id);
 
 
-        const list = await apiGetUsersList(allQueryParams.project_id)
+        const list = await apiGetUsersListProject(allQueryParams.project_id)
+
+        console.log(list)
         const data = response
         setActivity(data.data)
         setProjectData(data.data)

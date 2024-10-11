@@ -531,7 +531,7 @@ const Index = () => {
                     return <div className='flex items-center gap-2'>
                         {deleteAccess &&
                             <MdDeleteOutline className='text-xl cursor-pointer hover:text-red-500' onClick={() => openDialog3(row.original.fileId)} />}
-                        <HiShare className='text-xl cursor-pointer' onClick={() => openDialog(row.original.fileId)} />
+                        <HiShare className='text-xl cursor-pointer hover:text-blue-500' onClick={() => openDialog(row.original.fileId)} />
                     </div>
                 }
             },

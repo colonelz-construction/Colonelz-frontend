@@ -2,7 +2,7 @@ import { Button, Card, Skeleton } from '@/components/ui'
 import React, { useEffect, useState } from 'react'
 import Subtasks from '../Subtasks/Subtasks'
 import { useLocation } from 'react-router-dom'
-import { apiGetCrmProjectsSingleTaskData, apiGetUsersList } from '@/services/CrmService'
+import { apiGetCrmProjectsSingleTaskData, apiGetUsersList, apiGetUsersListProject } from '@/services/CrmService'
 import AddSubTask from '../Subtasks/AddSubtask'
 import EditTask from '../EditTask'
 import NoData from '@/views/pages/NoData'
@@ -50,7 +50,7 @@ const TaskDetails = () => {
     useEffect(() => {
         const fetchData = async () => {
             const response = await apiGetCrmProjectsSingleTaskData(project_id,task_id);
-            const list=await apiGetUsersList(project_id)
+            const list=await apiGetUsersListProject(project_id)
             setLoading(false)
             setTaskData(response.data[0]);
             setUsers(list.data)

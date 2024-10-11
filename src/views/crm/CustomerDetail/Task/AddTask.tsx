@@ -45,7 +45,11 @@ const priorityOptions = [
     { label: "In Progress", value: "In Progress" },
     { label: "Cancelled", value: "Cancelled" },
   ];
-  const userOptions = userData?.map((user:any) => ({label: user, value: user}))
+
+//   console.log(userData)
+  const userOptions = userData?.map((user:any) => ({label: user.user_name, value: user.user_name}))
+
+  console.log(userOptions)
 
   return (
         <div>

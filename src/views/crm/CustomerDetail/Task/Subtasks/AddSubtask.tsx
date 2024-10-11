@@ -60,8 +60,8 @@ const priorityOptions = [
     { label: "Cancelled", value: "Cancelled" },
   ];
   const userOptions = users?.map((user:any) => ({
-    label: user,
-    value: user
+    label: user.user_name,
+    value: user.user_name
   }));
   
 

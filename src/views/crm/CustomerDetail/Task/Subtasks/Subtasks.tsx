@@ -73,7 +73,7 @@ const pageSizeOption = [
     { value: 40, label: '40 / page' },
     { value: 50, label: '50 / page' },
 ]
-const ActionColumn = ({ row,users }: { row: SubTask,users:string[]}) => {
+const ActionColumn = ({ row,users }: { row: SubTask,users:any}) => {
     const navigate = useNavigate()
     const { textTheme } = useThemeClass()
     const location=useLocation()

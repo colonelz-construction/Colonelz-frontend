@@ -205,7 +205,11 @@ const CustomerDetail = () => {
                         </TabList>
                         <div className="p-4">
                             <TabContent value="Actions">
+
+                                <div className='h-[18rem] overflow-y-auto' style={{ scrollbarWidth: 'none' }}>
+
                                 <FollowDetails details={notes} />
+                                </div>
 
 
                             </TabContent>

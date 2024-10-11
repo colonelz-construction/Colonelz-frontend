@@ -1,5 +1,5 @@
 import { Avatar, AvatarProps, Card, Timeline } from '@/components/ui'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 
 export type CustomerProfileProps = {
@@ -37,13 +37,14 @@ const TimelineAvatar = ({ children, ...rest }: TimelineAvatarProps) => {
 }
 
 const FollowDetails = ({details}:any) => {
-    
+
+  
   return (
     <>
     <Timeline>
     {
 
-        details?.data[0].notes?.map((note:Note,index:number)=>(
+details?.map((note:Note,index:number)=>(
            <Timeline.Item 
            media={
             <TimelineAvatar className="bg-amber-500">

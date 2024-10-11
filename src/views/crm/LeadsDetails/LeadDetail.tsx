@@ -99,6 +99,9 @@ const CustomerDetail = () => {
     }, [myParam]);
 
     const lead = details?.data?.[0];
+    // console.log(details?.data[0].notes)
+    const notes = details?.data[0].notes?.reverse()
+    // console.log("reveerse", notes)
     const { roleData } = useRoleContext()
 
     const contractAccess = roleData?.data?.contract?.read?.includes(`${localStorage.getItem('role')}`)
@@ -202,7 +205,7 @@ const CustomerDetail = () => {
                         </TabList>
                         <div className="p-4">
                             <TabContent value="Actions">
-                                <FollowDetails details={details} />
+                                <FollowDetails details={notes} />
 
 
                             </TabContent>

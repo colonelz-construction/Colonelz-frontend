@@ -148,6 +148,7 @@ const CustomerDetail = () => {
     const fetchDataAndLog = async () => {
       try {
         const taskResponse = await apiGetCrmProjectsTaskData(allQueryParams.project_id);
+        console.log(taskResponse.data)
         setTaskData(taskResponse.data);
       } catch (error) {
         console.error('Error fetching task data', error);

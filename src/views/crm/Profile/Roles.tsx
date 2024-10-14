@@ -137,6 +137,7 @@ const Roles = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const { roleData } = useRoleContext()
+    const org_id = localStorage.getItem('orgId')
 
 
     const [open, setOpen] = useState(false)
@@ -253,7 +254,7 @@ const onSelectChange = (value = 0) => {
 useEffect(() => {
     const fetchData = async () => {
         setLoading(true)
-        const response = await apiGetRoleDetails()
+        const response = await apiGetRoleDetails(org_id)
 
         if (response) {
             
@@ -294,7 +295,7 @@ return (
         <div className="flex gap-3 justify-end">
             <AuthorityCheck
                 userAuthority={[`${localStorage.getItem('role')}`]}
-                authority={roleData?.data?.role?.create ?? []}
+                authority= {localStorage.getItem('role') === 'SUPERADMIN' ? ['SUPERADMIN'] : roleData?.data?.role?.create ?? []}
             >
                 <Link to={`/app/crm/roles/create`}>
                     <Button size="sm" className="ml-2" variant='solid'>

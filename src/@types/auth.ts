@@ -20,6 +20,7 @@ export type SignUpCredential = {
     user_name: string
     email: string
     role: string
+    org_id: string | null
 }
 
 export type ForgotPassword = {

@@ -121,6 +121,7 @@ const Users = () => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [userId, setUserId] = useState('')
     const [userData, setUserData] = useState()
+    const org_id = localStorage.getItem('orgId')
 
     const [editRoledialogIsOpen, setEditRoleIsOpen] = useState(false)
   
@@ -155,7 +156,7 @@ const Users = () => {
     }, [])
 
     const deleteuser = async (UserId: string) => {
-        const response = await apiDeleteUsers(UserId)
+        const response = await apiDeleteUsers(UserId, org_id)
         
         
 

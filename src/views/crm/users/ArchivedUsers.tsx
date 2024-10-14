@@ -126,6 +126,7 @@ const ArchivedUsers = () => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [dialogIsOpen1, setIsOpen1] = useState(false)
     const [userId, setUserId] = useState('')
+    const org_id = localStorage.getItem('orgId')
     
         const openDialog = (UserId:any) => {
             setIsOpen(true)  
@@ -144,7 +145,7 @@ const ArchivedUsers = () => {
 
     useEffect(() => {
       const fetchData = async () => {
-        const response = await apiGetDeletedUsers(); 
+        const response = await apiGetDeletedUsers(org_id); 
         
         const data =  response
         setLoading(false)
@@ -158,7 +159,7 @@ const ArchivedUsers = () => {
     }, []);
 
     const deleteuser=async(UserId:string)=>{
-        const response=await apiPermanantlyDeleteUsers(UserId);
+        const response=await apiPermanantlyDeleteUsers(UserId, org_id);
         
         
         if(response.code===200){

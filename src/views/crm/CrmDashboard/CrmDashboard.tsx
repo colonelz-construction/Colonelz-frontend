@@ -51,8 +51,8 @@ const CrmDashboard = () => {
     ]
     const role = localStorage.getItem('role') || '';
     const { roleData } = useRoleContext();
-    const hasProjectReadPermission = roleData?.data?.project?.read?.includes(role);
-    const hasLeadReadPermission = roleData?.data?.lead?.read?.includes(role);
+    const hasProjectReadPermission = role === 'SUPERADMIN' ? true : roleData?.data?.project?.read?.includes(role);
+    const hasLeadReadPermission = role === 'SUPERADMIN' ? true : roleData?.data?.lead?.read?.includes(role);
     return (
         <div className="flex flex-col gap-4 h-full">
             <div className="flex justify-between flex-col lg:flex-row gap-4">

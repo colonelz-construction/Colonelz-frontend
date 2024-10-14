@@ -7,6 +7,7 @@ export interface SessionState {
     token: string 
     userId: string | null
     role:string | null
+    orgId: string | null
 }
 const token=localStorage.getItem('auth');
 const initialState: SessionState = {
@@ -14,13 +15,15 @@ const initialState: SessionState = {
     token: '',
     userId:  "",
     role:'',
+    orgId: '',
 }
 
 interface SignInPayload {
     token: string;
     userId: string;
     role:string
-    refreshToken:string
+    refreshToken:string,
+    orgId: string,
 }
 
 const sessionSlice = createSlice({
@@ -35,6 +38,8 @@ const sessionSlice = createSlice({
             localStorage.setItem('auth', action.payload.token);
             localStorage.setItem('userId', action.payload.userId);
             localStorage.setItem('role', action.payload.role);
+            localStorage.setItem('orgId', action.payload.orgId);
+
 },
         signOutSuccess(state) {
             state.signedIn = false;

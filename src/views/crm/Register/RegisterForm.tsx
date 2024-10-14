@@ -37,6 +37,8 @@ const validationSchema = Yup.object().shape({
 const   SignUpForm = (props: SignUpFormProps) => {
     const { disableSubmit = false, className, signInUrl = '/sign-in' } = props
     const id=localStorage.getItem('userId')
+    const orgId=localStorage.getItem('orgId')
+
     const { signUp } = useAuth()
     const {rolelist}=useRoleContext()
     const navigate = useNavigate();
@@ -52,7 +54,7 @@ const   SignUpForm = (props: SignUpFormProps) => {
         const { id,user_name, role, email } = values
         
         setSubmitting(true)
-        const result = await signUp({ id,user_name, role, email })
+        const result = await signUp({ id,user_name, role, email, org_id: orgId })
         if (result.code===200) {
             values.user_name = ''
             values.email = ''

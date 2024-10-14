@@ -28,9 +28,9 @@ const FileManager = () => {
     return <div><Skeleton height={400}/></div>;
   }
 
-  const hasProjectReadPermission = roleData?.data?.project?.read?.includes(role);
-  const hasLeadReadPermission = roleData?.data?.lead?.read?.includes(role);
-  const hascompanyDataReadPermission = roleData?.data?.companyData?.read?.includes(role);
+  const hasProjectReadPermission = role === 'SUPERADMIN' ? true : roleData?.data?.project?.read?.includes(role);
+  const hasLeadReadPermission = role === 'SUPERADMIN' ? true :  roleData?.data?.lead?.read?.includes(role);
+  const hascompanyDataReadPermission = role === 'SUPERADMIN' ? true :  roleData?.data?.companyData?.read?.includes(role);
 
   return (
     <div>

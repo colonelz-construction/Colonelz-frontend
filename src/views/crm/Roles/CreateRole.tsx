@@ -68,6 +68,8 @@ const EditRoles = () => {
     const id = query.get('id');
     const [role, setRole] = useState<string | null>(null);
     const navigate = useNavigate();
+
+    const org_id = localStorage.getItem('orgId')
     const [initialValues, setInitialValues] = useState<FormValues>(() =>
         accessTypes.reduce((acc, type) => {
             acc[type] = [];
@@ -150,7 +152,8 @@ const EditRoles = () => {
 
                     const payload = {
                         role,
-                        access
+                        access,
+                        org_id
                     };
 
                     const response = await apiCreateRole(payload);

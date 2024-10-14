@@ -44,6 +44,7 @@ const LeadForm: React.FC = () => {
        <Formik
        initialValues={{
               userId:localStorage.getItem('userId'),
+              org_id: localStorage.getItem('orgId'),
               name: '',
               email: '',
               phone: '',
@@ -71,6 +72,9 @@ const LeadForm: React.FC = () => {
        onSubmit={
               async(values) => {
                 setLoading(true)
+
+
+                
                 const response = await apiGetCrmCreateLead(values)
                 setLoading(false)
                 if (response.code===200){

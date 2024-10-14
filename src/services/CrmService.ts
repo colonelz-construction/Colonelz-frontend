@@ -85,9 +85,9 @@ export async function apiLeadsRemoveUser(data: any) {
     });
 }
 
-export async function apiGetRoleDetails<T>() {
+export async function apiGetRoleDetails<T>(org_id:any) {
     return ApiService.fetchData<RoleResponse>({
-        url: `admin/get/role`,
+        url: `admin/get/role?org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -214,9 +214,9 @@ export async function apiGetUsers<T>() {
         })
 }
 
-export async function apiDeleteUsers(userid: any) {
+export async function apiDeleteUsers(userid: any, orgId: any) {
     return ApiService.fetchData<any>({
-        url: `admin/delete/user?userId=${userid}&id=${userId}`,
+        url: `admin/delete/user?userId=${userid}&id=${userId}&org_id=${orgId}`,
         method: 'delete',
         data: { userId: userId },
     }).then((response) => {
@@ -234,9 +234,9 @@ export async function apiRemoveUserProject(username: any, project_id: any) {
     })
 }
 
-export async function apiGetDeletedUsers<T>() {
+export async function apiGetDeletedUsers<T>(org_id:any) {
     return ApiService.fetchData<ArchiveUserResponseType>({
-        url: `admin/archive/user`,
+        url: `admin/archive/user?org_id=${org_id}`,
         method: 'get',
     })
         .then((response) => {
@@ -257,11 +257,13 @@ export async function apiRestoreDeletedUsers(UserId: any) {
     })
 }
 
-export async function apiPermanantlyDeleteUsers(userid: any) {
+export async function apiPermanantlyDeleteUsers(userid: any, orgId:any) {
     return ApiService.fetchData<any>({
         url: `admin/delete/archive/user`,
         method: 'delete',
-        data: { user_id: userid },
+        data: { user_id: userid,
+            org_id:orgId
+         },
     }).then((response) => {
         return response.data
     })
@@ -373,9 +375,9 @@ export async function apishareMom(formData: any) {
     })
 }
 
-export async function apiGetCrmProjects<T>() {
+export async function apiGetCrmProjects<T>(org_id: string  | null) {
     return ApiService.fetchData<ProjectResponse>({
-        url: `admin/getall/project/?id=${userId}`,
+        url: `admin/getall/project/?id=${userId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -432,9 +434,9 @@ export async function apiGetCrmProjectShareQuotationApproval(formData: any) {
     })
 }
 
-export async function apiGetCrmSingleProjects<T>(projectId: string) {
+export async function apiGetCrmSingleProjects<T>(projectId: string, org_id: any) {
     return ApiService.fetchData<ProjectResponseType>({
-        url: `admin/getsingle/project/?project_id=${projectId}&id=${userId}`,
+        url: `admin/getsingle/project/?project_id=${projectId}&id=${userId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -761,18 +763,18 @@ export async function apiGetCrmFileManagerShareContractFile(data: any) {
     })
 }
 
-export async function apiGetCrmLeads<T>() {
+export async function apiGetCrmLeads<T>(org_id:any) {
     return ApiService.fetchData<LeadApiResponse>({
-        url: `admin/getall/lead/`,
+        url: `admin/getall/lead?org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
     })
 }
 
-export async function apiGetCrmLeadsDetails<T>(leadId: string | null) {
+export async function apiGetCrmLeadsDetails<T>(leadId: string | null, org_id: any) {
     return ApiService.fetchData<LeadDetailsResponse>({
-        url: `admin/getsingle/lead/?lead_id=${leadId}`,
+        url: `admin/getsingle/lead/?lead_id=${leadId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data

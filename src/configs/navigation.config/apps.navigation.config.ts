@@ -21,7 +21,9 @@ import { apiGetRoleList } from '@/services/CrmService';
 const data: RoleAccessData = await getRoleAccessData();
 const rolelist=await apiGetRoleList();
 
+const role = localStorage.getItem('role')
 
+console.log(rolelist.data)
 
 
 const appsNavigationConfig: NavigationTree[] = [
@@ -33,7 +35,7 @@ const appsNavigationConfig: NavigationTree[] = [
                         translateKey: 'nav.appsCrm.dashboard',
                         icon: 'dashboard',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: rolelist.data,
+                        authority: role==='SUPERADMIN'?['SUPERADMIN']: rolelist.data,
                    subMenu: [],     
                     },
                     {
@@ -43,7 +45,7 @@ const appsNavigationConfig: NavigationTree[] = [
                         translateKey: 'nav.appsCrm.fileManager',
                         icon: 'files',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: data?.data?.file?.read?? [],
+                        authority: role==='SUPERADMIN'?['SUPERADMIN']: data?.data?.file?.read?? [],
 subMenu: [],
                     },
                     {
@@ -53,7 +55,7 @@ subMenu: [],
                         translateKey: 'nav.appsSales.productList',
                         icon: 'lead',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: data?.data?.lead?.read?? [],
+                        authority: role==='SUPERADMIN'?['SUPERADMIN']: data?.data?.lead?.read?? [],
                    subMenu: [],     
                     },
                                      
@@ -66,7 +68,7 @@ subMenu: [],
                         translateKey: '',
                         icon: 'mom',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: data?.data?.mom?.read?? [],
+                        authority: role==='SUPERADMIN'?['SUPERADMIN']: data?.data?.mom?.read?? [],
                    subMenu: [],     
                     },
                     {
@@ -76,7 +78,7 @@ subMenu: [],
                         translateKey: '',
                         icon: 'projects',
                         type: NAV_ITEM_TYPE_ITEM,
-                        authority: data?.data?.project?.read?? [],
+                        authority: role==='SUPERADMIN'?['SUPERADMIN']: data?.data?.project?.read?? [],
                    subMenu: [],     
                     },
                     

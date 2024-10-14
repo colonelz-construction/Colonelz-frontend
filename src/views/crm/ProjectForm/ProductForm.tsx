@@ -55,6 +55,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
   const [loading,setLoading]=useState(false);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
+  const org_id = localStorage.getItem('orgId')
 
   // Create an object to store and map the query parameters
   const allQueryParams: QueryParams = {
@@ -87,6 +88,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
      <Formik
      initialValues={{
       lead_id: allQueryParams.id,
+      org_id: org_id,
       client_name:allQueryParams.name,
       client_email:allQueryParams.email || '',
       client_contact:allQueryParams.phone,
@@ -104,6 +106,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
      }}
      validationSchema={Yup.object().shape({
       client_name: Yup.string().required('Client Name is required'),
+      org_id: Yup.string().required('org_id is required'),
       client_email: Yup.string().email('Invalid email').required('Email is required'),
       client_contact: Yup.string().required('Contact is required'),
       project_name: Yup.string().required('Project Name is required'),

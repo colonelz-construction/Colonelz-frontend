@@ -53,9 +53,11 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
     const myParam = queryParams.get('id') || ''
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [dialogIsOpen2, setIsOpen2] = useState(false)
+
+    const role = localStorage.getItem('role')
     const [project, setProject] = useState<AddProject>()
     const {roleData} = useRoleContext()
-    const createProjectAccess = roleData?.data?.project?.create?.includes(`${localStorage.getItem('role')}`)
+    const createProjectAccess = role === 'SUPERADMIN' ? true : roleData?.data?.project?.create?.includes(`${role}`)
     
 
     const onDialogClose = () => {

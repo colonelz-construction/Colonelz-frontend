@@ -38,7 +38,7 @@ const Template = () => {
         </div></Card>
         <AuthorityCheck
                        userAuthority={[`${localStorage.getItem('role')}`]}
-                       authority={roleData?.data?.archive?.read??[]}
+                       authority={role === 'SUPERADMIN' ? ['SUPERADMIN'] : roleData?.data?.archive?.read??[]}
                        >
         
       <Card onClick={()=>navigate('/app/crm/fileManager/archive')}>  <div className='flex gap-4'>

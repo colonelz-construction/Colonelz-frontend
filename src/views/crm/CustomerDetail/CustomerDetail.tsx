@@ -79,10 +79,12 @@ const CustomerDetail = () => {
   const [activity, setActivity] = useState<any>()
   // console.log(activity)
   const [users, setUsers] = useState<any>([])
-  const quotationAccess = roleData?.data?.quotation?.read?.includes(`${localStorage.getItem('role')}`)
-  const momAccess = roleData?.data?.mom?.read?.includes(`${localStorage.getItem('role')}`)
-  const taskAccess = roleData?.data?.task?.read?.includes(`${localStorage.getItem('role')}`)
-  const projectAccess = roleData?.data?.project?.read?.includes(`${localStorage.getItem('role')}`)
+  const quotationAccess = role === 'SUPERADMIN' ? true : roleData?.data?.quotation?.read?.includes(`${localStorage.getItem('role')}`)
+  const momAccess = role === 'SUPERADMIN' ? true : roleData?.data?.mom?.read?.includes(`${localStorage.getItem('role')}`)
+  const taskAccess = role === 'SUPERADMIN' ? true : roleData?.data?.task?.read?.includes(`${localStorage.getItem('role')}`)
+  const projectAccess = role === 'SUPERADMIN' ? true : roleData?.data?.project?.read?.includes(`${localStorage.getItem('role')}`)
+
+  const org_id = localStorage.getItem('orgId')
 
   const handleTabChange = (selectedTab: any) => {
     const currentUrlParams = new URLSearchParams(location.search);
@@ -93,7 +95,7 @@ const CustomerDetail = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiGetCrmSingleProjects(allQueryParams.project_id);
+        const response = await apiGetCrmSingleProjects(allQueryParams.project_id, org_id);
         const Report = await apiGetCrmSingleProjectReport(allQueryParams.project_id);
 
 
@@ -200,7 +202,7 @@ const CustomerDetail = () => {
                 }
                 <AuthorityCheck
                   userAuthority={[`${localStorage.getItem('role')}`]}
-                  authority={['ADMIN']}
+                  authority={['ADMIN', 'SUPERADMIN']}
                 >
                   <TabNav value="activity">Project Activity</TabNav>
                 </AuthorityCheck>

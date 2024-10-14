@@ -25,6 +25,7 @@ const _UserDropdown = ({ className }: CommonProps) => {
     const data=useContext(UserDetailsContext)
     const {roleData}=useRoleContext()
     
+    
     const dropdownItemList: DropdownList[] = [
         {
             label:"My Profile",
@@ -39,20 +40,20 @@ const _UserDropdown = ({ className }: CommonProps) => {
         label:"Add User to Project",
         path:"/app/crm/addmember",
         icon:<AiOutlineUserAdd/>,
-        authority:roleData?.data?.addMember?.create
+        authority: role==='SUPERADMIN'?['SUPERADMIN']:roleData?.data?.addMember?.create
     
         },
         {
         label:"Create User",
         path:"/app/crm/register",
         icon:<AiOutlineUserAdd/>,
-        authority:roleData?.data?.user?.create    
+        authority: role==='SUPERADMIN'?['SUPERADMIN']:roleData?.data?.user?.create    
         },
         {
         label:"Add User to Lead",
         path:"/app/crm/addUserToLead",
         icon:<AiOutlineUserAdd/>,
-        authority:roleData?.data?.addMember?.create
+        authority: role==='SUPERADMIN'?['SUPERADMIN']:roleData?.data?.addMember?.create
     
         },
         

@@ -38,6 +38,7 @@ const CustomerDetail = () => {
     const lead_id = query.get('id')
     const someAccess = true;
 
+
     useEffect(() => {
         fetchData()
     }, [])
@@ -101,11 +102,13 @@ const CustomerDetail = () => {
   };
 
 
+  const org_id = localStorage.getItem('orgId')
+
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await apiGetCrmLeadsDetails(myParam);
+                const response = await apiGetCrmLeadsDetails(myParam, org_id);
                 setLoading(false)
                 setDetails(response);
             } catch (error) {
@@ -164,20 +167,20 @@ const CustomerDetail = () => {
                     <Dropdown renderTitle={Toggle} placement='middle-end-top'>
                         <AuthorityCheck
                             userAuthority={[`${localStorage.getItem('role')}`]}
-                            authority={roleData?.data?.lead?.update ?? []}
+                            authority={ role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.update ?? []}
                         >
                             <Dropdown.Item eventKey="c" onClick={() => openDialog()}><div >Edit Lead</div></Dropdown.Item>
                             <Dropdown.Item eventKey="a" onClick={() => openDialog1()}><div >Add Follow-Up</div></Dropdown.Item>
                         </AuthorityCheck>
                         <AuthorityCheck
                             userAuthority={[`${localStorage.getItem('role')}`]}
-                            authority={roleData?.data?.contract?.create ?? []}
+                            authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.contract?.create ?? []}
                         >
                             <Dropdown.Item eventKey="b"><Link to={`/app/crm/contract?lead_id=${myParam}`}>Create Contract</Link></Dropdown.Item>
                         </AuthorityCheck>
                         {lead?.lead_status == "Inactive" && leadDeleteAccess && <AuthorityCheck
                             userAuthority={[`${localStorage.getItem('role')}`]}
-                            authority={roleData?.data?.lead?.delete ?? []}
+                            authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.delete ?? []}
                         >
                             <Dropdown.Item eventKey="d" onClick={() => openDialog2()}><div>Delete Lead</div></Dropdown.Item>
 

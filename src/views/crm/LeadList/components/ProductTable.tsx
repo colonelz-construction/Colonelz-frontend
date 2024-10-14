@@ -105,7 +105,7 @@ function DebouncedInput({
             >
                <AuthorityCheck
                 userAuthority={[`${role}`]}
-               authority={roleData?.data?.lead?.create??[]}
+               authority={role === "SUPERADMIN" ? ["SUPERADMIN"] : roleData?.data?.lead?.create??[]}
                >
                 <Button block variant="solid" size="sm" icon={<HiPlusCircle />}>
                     Add Lead

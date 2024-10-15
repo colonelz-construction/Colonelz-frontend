@@ -22,6 +22,7 @@ const Activity = ({ Data }: CustomerProfileProps) => {
     const [error, setError] = useState<any>(false)
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
+    const org_id = localStorage.getItem('orgId')
     const observer = useRef<IntersectionObserver | null>(null);
     // console.log(Data)
 
@@ -32,7 +33,7 @@ const Activity = ({ Data }: CustomerProfileProps) => {
         setLoading(true); // Set loading to true when fetching data
         setError(false); // Reset error state before fetching data
         try {
-            const act = await apiGetCrmProjectActivity(projectId, page);
+            const act = await apiGetCrmProjectActivity(projectId, page, org_id);
             const newAct = act.data.activities || [];
             setActivityData((prevData) => [...prevData, ...newAct]);
             setHasMore(newAct.length > 0);

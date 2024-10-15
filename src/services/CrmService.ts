@@ -43,6 +43,7 @@ import { LeadApiResponse } from '@/views/crm/LeadList/store/LeadContext'
 const { apiPrefix } = appConfig
 const token = localStorage.getItem('auth')
 const userId = localStorage.getItem('userId')
+const org_id = localStorage.getItem('orgId')
 
 export async function apiGetNotification<T>(
     userId: string | null,
@@ -292,7 +293,7 @@ export async function apiPutNotificationUpdate(notificationId: any, type: any) {
 
 export async function apiGetUsersList<T>(projectId: string) {
     return ApiService.fetchData<UserList>({
-        url: `admin/get/user/project?project_id=${projectId}`,
+        url: `admin/get/user/project?project_id=${projectId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -300,7 +301,7 @@ export async function apiGetUsersList<T>(projectId: string) {
 }
 export async function apiGetUsersListProject<T>(projectId: string) {
     return ApiService.fetchData<UserList>({
-        url: `/admin/get/userlist/project?project_id=${projectId}`,
+        url: `/admin/get/userlist/project?project_id=${projectId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -315,15 +316,15 @@ export async function apiGetAllUsersList<T>() {
     })
 }
 
-export async function apiGetMomData<T>() {
+export async function apiGetMomData<T>(org_id: any) {
     return ApiService.fetchData<MomResponse>({
-        url: `admin/getall/project/mom?id=${userId}`,
+        url: `admin/getall/project/mom?id=${userId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
     })
 }
-export async function apiGetSingleMomData<T>() {
+export async function apiGetSingleMomData<T>() { //not used
     return ApiService.fetchData<MomResponse>({
         url: `admin/getsingle/mom`,
         method: 'get',
@@ -331,20 +332,21 @@ export async function apiGetSingleMomData<T>() {
         return response.data
     })
 }
-export async function apiGetMomUpdate<T>(
+export async function apiGetMomUpdate<T>( //org done
     data: any,
     project_id: string,
     mom_id: string,
+    org_id: string | null
 ) {
     return ApiService.fetchData<any>({
-        url: `admin/update/mom?project_id=${project_id}&mom_id=${mom_id}`,
+        url: `admin/update/mom?project_id=${project_id}&mom_id=${mom_id}&org_id=${org_id}`,
         method: 'put',
         data: data,
     }).then((response) => {
         return response.data
     })
 }
-export async function apiGetMomDelete<T>(data: any) {
+export async function apiGetMomDelete<T>(data: any) { //done org
     return ApiService.fetchData<any>({
         url: `admin/delete/mom`,
         method: 'delete',
@@ -354,7 +356,7 @@ export async function apiGetMomDelete<T>(data: any) {
     })
 }
 
-export async function apiCreateMom(formData: any) {
+export async function apiCreateMom(formData: any) { //org done
     return ApiService.fetchData<any>({
         url: 'admin/create/mom/',
         method: 'post',
@@ -375,7 +377,7 @@ export async function apishareMom(formData: any) {
     })
 }
 
-export async function apiGetCrmProjects<T>(org_id: string  | null) {
+export async function apiGetCrmProjects<T>(org_id: string  | null) { //org done
     return ApiService.fetchData<ProjectResponse>({
         url: `admin/getall/project/?id=${userId}&org_id=${org_id}`,
         method: 'get',
@@ -395,16 +397,16 @@ export async function apiGetCrmProjectMakeContract(formData: any) {
     })
 }
 
-export async function apiGetCrmSingleProjectQuotation<T>(projectId: string) {
+export async function apiGetCrmSingleProjectQuotation<T>(projectId: string) { //org done
     return ApiService.fetchData<QuotationResponseType>({
-        url: `admin/get/quotationdata/?project_id=${projectId}`,
+        url: `admin/get/quotationdata/?project_id=${projectId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
     })
 }
 
-export async function apiGetCrmProjectShareQuotation(formData: any) {
+export async function apiGetCrmProjectShareQuotation(formData: any) { //org done
     return ApiService.fetchData<any>({
         url: 'admin/share/quotation',
         method: 'post',
@@ -424,7 +426,7 @@ export async function apiGetCrmProjectShareContractApproval(formData: any) {
     })
 }
 
-export async function apiGetCrmProjectShareQuotationApproval(formData: any) {
+export async function apiGetCrmProjectShareQuotationApproval(formData: any) { //org done
     return ApiService.fetchData<any>({
         url: 'admin/quotation/approval',
         method: 'post',
@@ -443,11 +445,12 @@ export async function apiGetCrmSingleProjects<T>(projectId: string, org_id: any)
     })
 }
 
-export async function apiGetCrmSingleProjectReport<T>(
+export async function apiGetCrmSingleProjectReport<T>( //org done
     projectId: string | null,
-) {
+    org_id: string | null,
+) { //org done
     return ApiService.fetchData<ReportResponse>({
-        url: `admin/gettask/details?project_id=${projectId}`,
+        url: `admin/gettask/details?project_id=${projectId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -464,9 +467,9 @@ export async function apiGetCrmSingleProjectEdit(formData: any) {
     })
 }
 
-export async function apiGetCrmProjectsMom<T>(projectId: string) {
+export async function apiGetCrmProjectsMom<T>(projectId: string, org_id: string | null) { //org done
     return ApiService.fetchData<ApiResponse>({
-        url: `admin/getall/mom/?project_id=${projectId}`,
+        url: `admin/getall/mom/?project_id=${projectId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -475,16 +478,17 @@ export async function apiGetCrmProjectsMom<T>(projectId: string) {
 export async function apiGetCrmProjectsSingleMom<T>(
     projectId: string,
     momId: string,
-) {
+    org_id: string | null
+) { //org done
     return ApiService.fetchData<ApiResponse>({
-        url: `admin/getsingle/mom/?project_id=${projectId}&mom_id=${momId}`,
+        url: `admin/getsingle/mom/?project_id=${projectId}&mom_id=${momId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
     })
 }
 
-export async function apiGetCrmProjectsAddTask(Data: any) {
+export async function apiGetCrmProjectsAddTask(Data: any) { //org done
     return ApiService.fetchData<any>({
         url: 'admin/create/task',
         method: 'post',
@@ -494,28 +498,29 @@ export async function apiGetCrmProjectsAddTask(Data: any) {
     })
 }
 
-export async function apiGetCrmProjectsTaskData<T>(projectId: string) {
+export async function apiGetCrmProjectsTaskData<T>(projectId: string, org_id: string | null) { //org done
     return ApiService.fetchData<TaskResponse>({
-        url: `admin/get/all/task?user_id=${userId}&project_id=${projectId}`,
+        url: `admin/get/all/task?user_id=${userId}&project_id=${projectId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
     })
 }
 
-export async function apiGetCrmProjectsSingleTaskData<T>(
+export async function apiGetCrmProjectsSingleTaskData<T>( //org done
     projectId: string | null,
     taskId: string | null,
+    org_id: string | null
 ) {
     return ApiService.fetchData<TaskDataResponse>({
-        url: `admin/get/single/task?user_id=${userId}&project_id=${projectId}&task_id=${taskId}`,
+        url: `admin/get/single/task?user_id=${userId}&project_id=${projectId}&task_id=${taskId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
     })
 }
 
-export async function apiGetCrmProjectsTaskUpdate(task: any) {
+export async function apiGetCrmProjectsTaskUpdate(task: any) { //org done
     return ApiService.fetchData<any>({
         url: `admin/update/task`,
         method: 'put',
@@ -525,7 +530,7 @@ export async function apiGetCrmProjectsTaskUpdate(task: any) {
     })
 }
 
-export async function apiGetCrmProjectsTaskDelete(Data: any) {
+export async function apiGetCrmProjectsTaskDelete(Data: any) {  //org done
     return ApiService.fetchData<any>({
         url: `admin/delete/task`,
         method: 'delete',
@@ -535,19 +540,20 @@ export async function apiGetCrmProjectsTaskDelete(Data: any) {
     })
 }
 
-export async function apiGetCrmProjectsSubTaskData<T>(
+export async function apiGetCrmProjectsSubTaskData<T>( //org done
     projectId: string,
     taskId: string,
+    org_id: string | null
 ) {
     return ApiService.fetchData<SubTaskResponse>({
-        url: `admin/get/all/subtask?user_id=${userId}&project_id=${projectId}&task_id=${taskId}`,
+        url: `admin/get/all/subtask?user_id=${userId}&project_id=${projectId}&task_id=${taskId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
     })
 }
 
-export async function apiGetCrmProjectsAddSubTask(Data: any) {
+export async function apiGetCrmProjectsAddSubTask(Data: any) { //org done
     return ApiService.fetchData<any>({
         url: 'admin/create/subtask',
         method: 'post',
@@ -558,13 +564,14 @@ export async function apiGetCrmProjectsAddSubTask(Data: any) {
 }
 
 //NOT IN USE ->
-export async function apiGetCrmProjectsSingleSubTaskDetails(
+export async function apiGetCrmProjectsSingleSubTaskDetails(  //org done
     projectId: string,
     taskId: string,
     subTaskId: string,
+    org_id : string | null
 ) {
     const response = await fetch(
-        `${apiPrefix}admin/get/single/subtask?user_id=${userId}&project_id=${projectId}&task_id=${taskId}&sub_task_id=${subTaskId}`,
+        `${apiPrefix}admin/get/single/subtask?user_id=${userId}&project_id=${projectId}&task_id=${taskId}&sub_task_id=${subTaskId}&org_id=${org_id}`,
         {
             method: 'GET',
             headers: {
@@ -578,7 +585,7 @@ export async function apiGetCrmProjectsSingleSubTaskDetails(
     return data
 }
 
-export async function apiGetCrmProjectsSubTaskUpdate(task: any) {
+export async function apiGetCrmProjectsSubTaskUpdate(task: any) { //org done
     return ApiService.fetchData<any>({
         url: `admin/update/subtask`,
         method: 'put',
@@ -588,7 +595,7 @@ export async function apiGetCrmProjectsSubTaskUpdate(task: any) {
     })
 }
 
-export async function apiGetCrmProjectsSubTaskDelete(Data: any) {
+export async function apiGetCrmProjectsSubTaskDelete(Data: any) { //org done
     return ApiService.fetchData<any>({
         url: `admin/delete/subtask`,
         method: 'delete',
@@ -598,7 +605,7 @@ export async function apiGetCrmProjectsSubTaskDelete(Data: any) {
     })
 }
 
-export async function apiGetCrmProjectsSingleSubTaskTimer(Data: any) {
+export async function apiGetCrmProjectsSingleSubTaskTimer(Data: any) { //org done
     return ApiService.fetchData<any>({
         url: `admin/update/subtask/time`,
         method: 'put',
@@ -608,13 +615,14 @@ export async function apiGetCrmProjectsSingleSubTaskTimer(Data: any) {
     })
 }
 
-export async function apiGetCrmProjectsSingleSubTaskDataTimer<T>(
+export async function apiGetCrmProjectsSingleSubTaskDataTimer<T>( //org done
     projectId: string,
     taskId: string,
     subTaskId: string,
+    org_id: string | null
 ) {
     return ApiService.fetchData<TimerResponse>({
-        url: `admin/get/subtask/time?project_id=${projectId}&task_id=${taskId}&sub_task_id=${subTaskId}`,
+        url: `admin/get/subtask/time?project_id=${projectId}&task_id=${taskId}&sub_task_id=${subTaskId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -780,9 +788,9 @@ export async function apiGetCrmLeadsDetails<T>(leadId: string | null, org_id: an
         return response.data
     })
 }
-export async function apiGetCrmProjectActivity<T>(project_id: any, page: any) {
+export async function apiGetCrmProjectActivity<T>(project_id: any, page: any, org_id : any) {
     return ApiService.fetchData<any>({
-        url: `admin/get/project/activity?project_id=${project_id}&page=${page}&limit=5`,
+        url: `admin/get/project/activity?project_id=${project_id}&org_id=${org_id}&page=${page}&limit=5`,
         method: 'get',
     }).then((response) => {
         return response.data

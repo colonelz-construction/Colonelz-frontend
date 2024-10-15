@@ -31,11 +31,12 @@ type Data = {
     project_name: string;
     mom: Mom[];
   }
+  const org_id = localStorage.getItem('orgId')
 
   export const MomData = {};
   export const fetchMomData = async () => {
     try {
-      const response = await apiGetMomData() 
+      const response = await apiGetMomData(org_id) 
       const data = response.data.MomData;
       Object.assign(MomData, data);
     } catch (error) {

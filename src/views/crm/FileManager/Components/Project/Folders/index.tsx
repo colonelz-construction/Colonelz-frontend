@@ -135,8 +135,11 @@ const Index = () => {
     const [shareLoading, setShareLoading] = useState(false)
     const [selectedFileId, setSelectedFileId] = React.useState<string | null>(null,)
     const { roleData } = useRoleContext()
-    const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
+    const role = localStorage.getItem('role')
+    const uploadAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
     const { folderData, projectId, projectName } = location.state || {}
+    const org_id = localStorage.getItem('orgId')
+
     // const folderName = folderData.folder_name
 
     interface User {
@@ -309,6 +312,7 @@ const Index = () => {
             folder_name: folderName,
             project_id: leadId,
             user_id: localStorage.getItem('userId'),
+            org_id,
         }
 
         const response = await apiGetCrmProjectShareQuotation(postData)
@@ -570,7 +574,6 @@ const Index = () => {
         table.setPageSize(Number(value))
     }
 
-    const role = localStorage.getItem('role');
 
     return (
         <div>

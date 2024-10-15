@@ -96,10 +96,10 @@ const CustomerDetail = () => {
     const fetchData = async () => {
       try {
         const response = await apiGetCrmSingleProjects(allQueryParams.project_id, org_id);
-        const Report = await apiGetCrmSingleProjectReport(allQueryParams.project_id);
+        const Report = await apiGetCrmSingleProjectReport(allQueryParams.project_id, org_id);
 
 
-        const list = await apiGetUsersListProject(allQueryParams.project_id)
+        const list = await apiGetUsersList(allQueryParams.project_id)
 
         console.log(list)
         const data = response
@@ -135,7 +135,7 @@ const CustomerDetail = () => {
 
     const fetchDataAndLog = async () => {
       try {
-        const response = await apiGetCrmProjectsMom(allQueryParams.project_id);
+        const response = await apiGetCrmProjectsMom(allQueryParams.project_id, org_id);
         setDetails(response.data);
       } catch (error) {
         console.error('Error fetching lead data', error);
@@ -151,7 +151,7 @@ const CustomerDetail = () => {
 
     const fetchDataAndLog = async () => {
       try {
-        const taskResponse = await apiGetCrmProjectsTaskData(allQueryParams.project_id);
+        const taskResponse = await apiGetCrmProjectsTaskData(allQueryParams.project_id, org_id);
         console.log(taskResponse.data)
         setTaskData(taskResponse.data);
       } catch (error) {

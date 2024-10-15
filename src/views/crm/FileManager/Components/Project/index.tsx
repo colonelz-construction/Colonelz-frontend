@@ -108,7 +108,7 @@ const Index = () => {
   const role = localStorage.getItem('role')
 
   const { roleData } = useContext(RoleContext);
-  const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
+  const uploadAccess =role === 'SUPERADMIN' ? true :  roleData?.data?.file?.create?.includes(`${role}`)
 
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -241,8 +241,8 @@ const Index = () => {
           const { roleData } = useRoleContext();
           return (
             <AuthorityCheck
-              userAuthority={[`${localStorage.getItem('role')}`]}
-              authority={roleData?.data?.file?.delete ?? []}
+              userAuthority={[`${role}`]}
+              authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.file?.delete ?? []}
             >
               <div className=' ml-3 cursor-pointer' onClick={() => openDialog2(row.original.folder_name)}>
                 <MdOutlineDelete className=' text-xl text-center hover:text-red-500' />

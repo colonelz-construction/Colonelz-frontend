@@ -123,6 +123,8 @@ const Users = () => {
     const [userData, setUserData] = useState()
     const org_id = localStorage.getItem('orgId')
 
+    const role = localStorage.getItem('role')
+
     const [editRoledialogIsOpen, setEditRoleIsOpen] = useState(false)
   
     
@@ -199,7 +201,7 @@ const Users = () => {
                                                 )}`,
                                             ]}
                                             authority={
-                                                roleData?.data?.user
+                                                role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.user
                                                     ?.update ?? []
                                             }
                                         >
@@ -213,6 +215,17 @@ const Users = () => {
                                     </Tooltip>
                                 }
                                 <Tooltip title="Delete">
+                                <AuthorityCheck
+                                            userAuthority={[
+                                                `${localStorage.getItem(
+                                                    'role',
+                                                )}`,
+                                            ]}
+                                            authority={
+                                                role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.user
+                                                    ?.delete ?? []
+                                            }
+                                        >
                                     <p
                                         className=" text-xl hover:text-red-500 cursor-pointer"
                                         onClick={() =>
@@ -221,6 +234,7 @@ const Users = () => {
                                     >
                                         <MdDeleteOutline />
                                     </p>
+                                    </AuthorityCheck>
                                 </Tooltip>
                             </span>
                         </div>
@@ -273,7 +287,7 @@ const Users = () => {
                 <div className="flex gap-3">
                     <AuthorityCheck
                         userAuthority={[`${localStorage.getItem('role')}`]}
-                        authority={roleData?.data?.user?.create ?? []}
+                        authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.user?.create ?? []}
                     >
                         <Link to={`/app/crm/register`}>
                             <Button size="sm" variant="solid">

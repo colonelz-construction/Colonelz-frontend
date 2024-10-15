@@ -34,6 +34,7 @@ const YourFormComponent = () => {
         client_name: string
     }
     const location = useLocation()
+    const org_id = localStorage.getItem('orgId')
     const queryParams = new URLSearchParams(location.search)
     const allQueryParams: QueryParams = {
         project_id: queryParams.get('project_id') || '',
@@ -65,6 +66,7 @@ const optionsSource = [
             initialValues={
                 {
                     user_id:localStorage.getItem('userId'),
+                    org_id,
                     client_name: '',
                     organisor: '',
                     attendees: '',

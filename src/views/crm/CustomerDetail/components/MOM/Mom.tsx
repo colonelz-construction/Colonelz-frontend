@@ -101,9 +101,11 @@ type Data={
 
 const ActionColumn = (data:any) => {
     const navigate = useNavigate()
+    
     const { roleData } = useRoleContext()
     const { textTheme } = useThemeClass()
     const location=useLocation()
+    const org_id = localStorage.getItem('orgId')
     const proj = new URLSearchParams(location.search).get('project_id')
     const mom_id=data.row.mom_id
     const editAccess = roleData?.data?.mom?.update?.includes(`${localStorage.getItem('role')}`)
@@ -119,7 +121,7 @@ const ActionColumn = (data:any) => {
     
     const onDelete = async () => {
         try{
-        const response = await apiGetMomDelete({project_id:proj,mom_id:mom_id})
+        const response = await apiGetMomDelete({project_id:proj,mom_id:mom_id, org_id})
         if(response.code===200){
             toast.push(
                 <Notification type='success' duration={2000} closable>MOM Deleted Successfully</Notification>
@@ -177,6 +179,7 @@ function ReactTable({
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+    const role = localStorage.getItem('role')
 
     
     
@@ -335,7 +338,7 @@ function ReactTable({
                 />
                 <AuthorityCheck
                     userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.mom?.create??[]}
+                    authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.mom?.create??[]}
                     >
                 <Button
                     className="flex justify-center items-center"
@@ -352,7 +355,7 @@ function ReactTable({
                 </AuthorityCheck>
                 <AuthorityCheck
                     userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.mom?.read??[]}
+                    authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.mom?.read??[]}
                     >
 
                 <Button

@@ -124,9 +124,10 @@ const Index = () => {
   const leadId = queryParams.get('lead_id');
   const leadName = queryParams.get('lead_name');
   const folderName = queryParams.get('folder_name');
+  const role = localStorage.getItem('role')
 
   const { roleData } = useRoleContext();
-  const fileUploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
+  const fileUploadAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.file?.create?.includes(`${role}`)
   const [users, setUsers] = useState<User[]>([]);
   useEffect(() => {
     const fetchDataAndLog = async () => {
@@ -454,8 +455,8 @@ const Index = () => {
         cell: ({ row }) => {
           return <div className='flex items-center gap-2'>
             <AuthorityCheck
-              userAuthority={[`${localStorage.getItem('role')}`]}
-              authority={roleData?.data?.file?.delete ?? []}
+              userAuthority={[`${role}`]}
+              authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.file?.delete ?? []}
             >
               <MdDeleteOutline className='text-xl cursor-pointer hover:text-red-500' onClick={() => openDialog3(row.original.fileId)} />
             </AuthorityCheck>
@@ -466,7 +467,7 @@ const Index = () => {
     ],
     []
   )
-  const role = localStorage.getItem('role')
+  // const role = localStorage.getItem('role')
 
   const table = useReactTable({
     data: leadData,

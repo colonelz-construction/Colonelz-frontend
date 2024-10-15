@@ -106,6 +106,8 @@ const Quotations = (data: FileItemProps) => {
     const location = useLocation()
     const queryParams = new URLSearchParams(location.search)
     const projectId = queryParams.get('project_id')
+    const org_id = localStorage.getItem('orgId')
+
     const [submit, setSubmit] = useState(false)
     const { roleData } = useRoleContext()
 
@@ -123,6 +125,7 @@ const Quotations = (data: FileItemProps) => {
             project_id: projectId,
             file_id: fileID,
             status: status,
+            org_id,
             remark: remark,
         };
         try {
@@ -224,7 +227,7 @@ const Quotations = (data: FileItemProps) => {
                                                 >
                                                     <h3 className='mb-4'> Reject Remarks</h3>
                                                     <Formik
-                                                        initialValues={{ project_id: projectId, file_id: fileId, status: 'rejected', remark: '' }}
+                                                        initialValues={{ project_id: projectId, org_id, file_id: fileId, status: 'rejected', remark: '' }}
                                                         validationSchema={Yup.object({ remark: Yup.string().required('Required') })}
                                                         onSubmit={async (values, { setSubmitting }) => {
                                                             ;
@@ -471,7 +474,7 @@ const Quotations = (data: FileItemProps) => {
                 <h3 className='mb-4'>Share To Client</h3>
 
                 <Formik
-                    initialValues={{ client_name: '', client_email: '', file_id: '', type: 'Client', project_id: projectId, folder_name: 'Quotation', user_id: localStorage.getItem('userId') }}
+                    initialValues={{ client_name: '', client_email: '', file_id: '', type: 'Client', project_id: projectId, folder_name: 'Quotation', user_id: localStorage.getItem('userId'), org_id }}
                     validationSchema={Yup.object({
                         client_name: Yup.string().required('Required'),
                         client_email: Yup.string().email('Invalid email address').required('Required'),

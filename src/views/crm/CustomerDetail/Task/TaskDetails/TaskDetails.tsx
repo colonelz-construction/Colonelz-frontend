@@ -22,7 +22,10 @@ const TaskDetails = () => {
     const location=useLocation();
     const queryParams=new URLSearchParams(location.search);
     const task_id=queryParams.get('task') 
+    const org_id = localStorage.getItem('orgId')
+
     const project_id=queryParams.get('project_id') || ''
+
     const [users,setUsers]=useState<any>() 
     
     const tempTasks = {
@@ -49,8 +52,8 @@ const TaskDetails = () => {
     const [loading, setLoading] = useState(true)
     useEffect(() => {
         const fetchData = async () => {
-            const response = await apiGetCrmProjectsSingleTaskData(project_id,task_id);
-            const list=await apiGetUsersListProject(project_id)
+            const response = await apiGetCrmProjectsSingleTaskData(project_id,task_id, org_id);
+            const list=await apiGetUsersList(project_id)
             setLoading(false)
             setTaskData(response.data[0]);
             setUsers(list.data)

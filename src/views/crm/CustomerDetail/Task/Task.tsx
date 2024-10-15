@@ -158,9 +158,11 @@ const Filtering = ({task,users}:Data) => {
         const navigate = useNavigate()
         const { textTheme } = useThemeClass()
         const { roleData } = useRoleContext()
+        const org_id = localStorage.getItem('orgId')
+
         const data={user_id:localStorage.getItem('userId'),
         project_id:row.project_id,
-        task_id:row.task_id}
+        task_id:row.task_id, org_id}
         const editAccess = roleData?.data?.task?.update?.includes(`${localStorage.getItem('role')}`)
         const deleteAccess = roleData?.data?.task?.delete?.includes(`${localStorage.getItem('role')}`)
         const [dialogIsOpen, setIsOpen] = useState(false)
@@ -320,7 +322,7 @@ const Filtering = ({task,users}:Data) => {
             />
              <AuthorityCheck
                     userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.task?.create??[]}
+                    authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.task?.create??[]}
                     >
                     <AddTask project={projectId} userData={userData}/>
                     </AuthorityCheck>

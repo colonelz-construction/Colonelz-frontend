@@ -150,6 +150,8 @@ const ContractDetails = (data: FileItemProps) => {
     const { roleData } = useRoleContext()
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
+    const org_id = localStorage.getItem('orgId')
+
 
 
 
@@ -419,6 +421,7 @@ const ContractDetails = (data: FileItemProps) => {
             file_id: selectedFileIds[0],
             folder_name: 'Quotation',
             lead_id: leadId,
+            org_id,
         };
         try {
             const response = await apiGetCrmProjectShareQuotation(postData);

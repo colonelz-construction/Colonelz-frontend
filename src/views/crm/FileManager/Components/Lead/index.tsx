@@ -110,7 +110,7 @@ const Index = () => {
     const leadName = queryParams.get('lead_name');
     const role = localStorage.getItem('role')
     const { roleData } = useRoleContext();
-    const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
+    const uploadAccess = role === 'SUPERADMIN' ? true : roleData?.data?.file?.create?.includes(`${role}`)
     useEffect(() => {
         const fetchData = async () => {
             const data = await fetchLeadData(leadId);
@@ -238,7 +238,7 @@ const Index = () => {
                     return (
                         <AuthorityCheck
                             userAuthority={[`${localStorage.getItem('role')}`]}
-                            authority={roleData?.data?.file?.delete ?? []}
+                            authority={ role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.file?.delete ?? []}
                         >
                             <div className=' ml-3 cursor-pointer' onClick={() => openDialog2(row.original.folder_name)}>
                                 <Tooltip title="Delete">

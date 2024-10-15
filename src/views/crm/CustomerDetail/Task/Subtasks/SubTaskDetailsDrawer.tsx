@@ -77,6 +77,8 @@ const SubTaskDetails = (Data:Data) => {
     const location=useLocation()
     const queryParam=new URLSearchParams(location.search);
     const projectId=queryParam.get('project_id') || ''; 
+    const org_id = localStorage.getItem('orgId')
+
     
     const navigate=useNavigate();
     
@@ -111,6 +113,7 @@ const SubTaskDetails = (Data:Data) => {
     type UpdateData={
         project_id:string,
         task_id:string,
+        org_id: string | null,
         sub_task_id:string
         sub_task_assignee:string,
         time:string,
@@ -118,8 +121,10 @@ const SubTaskDetails = (Data:Data) => {
         current:string,
         total_time:string,
     }
+
     const [data, setData] = useState<UpdateData>({
         project_id:projectId,
+        org_id,
         task_id:Data.data.task_id,
         sub_task_id:Data.data.sub_task_id,
         sub_task_assignee:Data.data.sub_task_assignee,
@@ -146,7 +151,7 @@ const SubTaskDetails = (Data:Data) => {
         useEffect(() => {
             const fetchData = async () => {
                 
-                const response = await apiGetCrmProjectsSingleSubTaskDataTimer(projectId, Data.data.task_id, Data.data.sub_task_id);
+                const response = await apiGetCrmProjectsSingleSubTaskDataTimer(projectId, Data.data.task_id, Data.data.sub_task_id, org_id);
                 if (response) {
                     const { time, isrunning, total_time, current } = response.data;
                     

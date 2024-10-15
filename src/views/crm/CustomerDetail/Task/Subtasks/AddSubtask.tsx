@@ -35,6 +35,8 @@ const AddSubTask = ({data,users}:Data) => {
     const location=useLocation()
     const queryParams=new URLSearchParams(location.search)
     const project_id=queryParams.get('project_id')
+    const org_id = localStorage.getItem('orgId')
+
     const task_id=queryParams.get('task')
     
     
@@ -60,8 +62,8 @@ const priorityOptions = [
     { label: "Cancelled", value: "Cancelled" },
   ];
   const userOptions = users?.map((user:any) => ({
-    label: user.user_name,
-    value: user.user_name
+    label: user,
+    value: user
   }));
   
 
@@ -75,6 +77,7 @@ const priorityOptions = [
                 <Formik 
                        initialValues={{
                         user_id: localStorage.getItem('userId') || '',
+                        org_id,
                         project_id: project_id || '',
                         task_id: task_id || '',
                         sub_task_name: "",

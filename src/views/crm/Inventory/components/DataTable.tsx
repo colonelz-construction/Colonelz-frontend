@@ -170,8 +170,9 @@ const Filtering = () => {
     )
     const [ordersData, setOrdersData] = useState<Data[]>([])
     const [loading, setLoading] = useState(true)
+    const org_id = localStorage.getItem('orgId')
     useEffect(() => {
-        apiGetMomData().then((response) => {
+        apiGetMomData(org_id).then((response) => {
             if (response.code === 200) {
                 setOrdersData(response.data.MomData)
                 setLoading(false)

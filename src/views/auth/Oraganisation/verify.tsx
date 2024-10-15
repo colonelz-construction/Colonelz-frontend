@@ -26,6 +26,13 @@ type OtpVerifyFormSchema = {
     otp: string
     userData?: any
 }
+interface SignInPayload {
+    token: string;
+    userId: string;
+    role:string
+    refreshToken:string,
+    orgId: string,
+}
 
 const validationSchema = Yup.object().shape({
     email: Yup.string().required('Please enter your email'),
@@ -49,14 +56,17 @@ const ForgotPasswordForm = (props: ForgotPasswordFormProps) => {
             
             if (resp.code === 200) {
                 setSubmitting(false)
-                Cookies.set('auth', resp.data.token)
                 const resposne=await registerandSignin(userData)
+                Cookies.set('auth', resposne.data.token)
                 if(resposne.code===200){
-                    dispatch(signInSuccess({ token:resposne.data.token, userId: resposne.data.userId,role:resp.data.role }))
+
+                    const payload : SignInPayload = { token:resposne.data.token, userId: resposne.data.userId,role:resposne.data.role, refreshToken: resposne.data.refreshToken, orgId: resposne.data.org_id } 
+                    dispatch(signInSuccess(payload))
                     navigate('/app/crm/dashboard')
                 localStorage.setItem('userId',resposne.data.id)  
                 localStorage.setItem('auth',resposne.data.token)  
                 localStorage.setItem('role',resposne.data.role)  
+                localStorage.setItem('orgId',resposne.data.orgId)  
                 window.location.href = '/app/crm/dashboard'
             }
             else{

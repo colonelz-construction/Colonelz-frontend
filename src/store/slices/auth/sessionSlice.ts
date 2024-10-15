@@ -49,6 +49,7 @@ const sessionSlice = createSlice({
             localStorage.removeItem('auth');
             localStorage.removeItem('userId');
             localStorage.removeItem('role');
+            localStorage.removeItem('orgId');
         },
     },
 });

@@ -34,7 +34,7 @@ const YourFormComponent = () => {
         client_name: string
     }
     const location = useLocation()
-    const org_id = localStorage.getItem('orgId')
+    const org_id : any = localStorage.getItem('orgId')
     const queryParams = new URLSearchParams(location.search)
     const allQueryParams: QueryParams = {
         project_id: queryParams.get('project_id') || '',
@@ -95,6 +95,7 @@ const optionsSource = [
                 formData.append('meetingdate', values.meetingDate)
                 formData.append('location', values.location)
                 formData.append('remark', values.remark)
+                formData.append('org_id', values.org_id)
                 values.files.forEach((file) => {
                     formData.append('files', file)
                 })

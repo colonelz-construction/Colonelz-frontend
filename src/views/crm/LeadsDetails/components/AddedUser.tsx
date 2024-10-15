@@ -172,7 +172,7 @@ const AddedUser = () => {
                 setLeadData(leadData?.data)
 
 
-                  setLoading(false)
+                setLoading(false)
             } catch (error) {
                 console.error('Error fetching lead data', error)
             }
@@ -184,35 +184,35 @@ const AddedUser = () => {
 
     const removeUser = async (username: string) => {
         function warn(text: string) {
-          toast.push(
-            <Notification closable type="warning" duration={2000}>
-              {text}
-            </Notification>, { placement: 'top-center' }
-          )
+            toast.push(
+                <Notification closable type="warning" duration={2000}>
+                    {text}
+                </Notification>, { placement: 'top-center' }
+            )
         }
-     
-    
+
+
         const postData = {
-          lead_id: leadId,
-          username: username
+            lead_id: leadId,
+            username: username
 
         };
         try {
-          await apiLeadsRemoveUser(postData);
-          toast.push(
-            <Notification closable type="success" duration={2000}>
-              User removed successfully
-            </Notification>, { placement: 'top-end' }
-          )
-          window.location.reload()
+            await apiLeadsRemoveUser(postData);
+            toast.push(
+                <Notification closable type="success" duration={2000}>
+                    User removed successfully
+                </Notification>, { placement: 'top-end' }
+            )
+            window.location.reload()
         } catch (error) {
-          toast.push(
-            <Notification closable type="danger" duration={2000}>
-              Error removing user
-            </Notification>, { placement: 'top-end' }
-          )
+            toast.push(
+                <Notification closable type="danger" duration={2000}>
+                    Error removing user
+                </Notification>, { placement: 'top-end' }
+            )
         }
-      }
+    }
 
 
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -237,7 +237,7 @@ const AddedUser = () => {
                 header: 'User', accessorKey: 'user_name',
                 cell: ({ row }) => {
                     const lead = row.original
-                    
+
                     return <div className='flex items-center gap-2'>{lead?.user_name}</div>
                 }
             },
@@ -315,7 +315,7 @@ const AddedUser = () => {
             <div className="w-full">
                 <div className="flex-1 px-4">
                     <div className='flex items-center gap-2 justify-end'>
-    
+
                         <DebouncedInput
                             value={globalFilter ?? ''}
                             className="p-2 font-lg shadow border border-block"
@@ -323,78 +323,80 @@ const AddedUser = () => {
                             onChange={(value) => setGlobalFilter(String(value))}
                         />
                     </div>
-                    <div className='h-[13rem] overflow-y-auto'>
-                     <Table>
-                        <THead>
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <Tr key={headerGroup.id}>
-                                    {headerGroup.headers.map((header) => {
-                                        return (
-                                            <Th
-                                                key={header.id}
-                                                colSpan={header.colSpan}
-                                            >
-                                                {header.isPlaceholder || header.id === 'actions' ? null : (
-                                                    <div
-                                                        {...{
-                                                            className:
-                                                                header.column.getCanSort()
-                                                                    ? 'cursor-pointer select-none'
-                                                                    : '',
-                                                            onClick:
-                                                                header.column.getToggleSortingHandler(),
-                                                        }}
+                    {leadData ? (
+                        <div className='h-[13rem] overflow-y-auto'>
+                            <Table>
+                                <THead>
+                                    {table.getHeaderGroups().map((headerGroup) => (
+                                        <Tr key={headerGroup.id}>
+                                            {headerGroup.headers.map((header) => {
+                                                return (
+                                                    <Th
+                                                        key={header.id}
+                                                        colSpan={header.colSpan}
                                                     >
-                                                        {flexRender(
-                                                            header.column.columnDef
-                                                                .header,
-                                                            header.getContext()
+                                                        {header.isPlaceholder || header.id === 'actions' ? null : (
+                                                            <div
+                                                                {...{
+                                                                    className:
+                                                                        header.column.getCanSort()
+                                                                            ? 'cursor-pointer select-none'
+                                                                            : '',
+                                                                    onClick:
+                                                                        header.column.getToggleSortingHandler(),
+                                                                }}
+                                                            >
+                                                                {flexRender(
+                                                                    header.column.columnDef
+                                                                        .header,
+                                                                    header.getContext()
+                                                                )}
+                                                                {
+                                                                    <Sorter
+                                                                        sort={header.column.getIsSorted()}
+                                                                    />
+                                                                }
+                                                            </div>
                                                         )}
-                                                        {
-                                                            <Sorter
-                                                                sort={header.column.getIsSorted()}
-                                                            />
-                                                        }
-                                                    </div>
-                                                )}
-                                            </Th>
-                                        )
-                                    })}
-                                </Tr>
-                            ))}
-                        </THead>
-                        { loading ? <TableRowSkeleton
-                               rows={5}
-                                avatarInColumns={[0]}
-                                columns={3}
-                                avatarProps={{ width: 14, height: 14 }}
-                            /> :
-                            (leadData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
-                                <TBody >
-                                    
-
-                                    
-                                    {table.getRowModel().rows.map((row) => {
-                                        return (
-                                            <Tr key={row.id}>
-                                                {row.getVisibleCells().map((cell) => {
-                                                    return (
-                                                        <Td key={cell.id}>
-                                                            {flexRender(
-                                                                cell.column.columnDef.cell,
-                                                                cell.getContext()
-                                                            )}
-                                                        </Td>
-                                                    )
-                                                })}
-                                            </Tr>
-                                        )
-                                    })}
+                                                    </Th>
+                                                )
+                                            })}
+                                        </Tr>
+                                    ))}
+                                </THead>
+                                {loading ? <TableRowSkeleton
+                                    rows={5}
+                                    avatarInColumns={[0]}
+                                    columns={3}
+                                    avatarProps={{ width: 14, height: 14 }}
+                                /> :
+                                    (leadData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
+                                        <TBody >
 
 
-                                </TBody>)}
-                    </Table>
-                    </div>
+
+                                            {table.getRowModel().rows.map((row) => {
+                                                return (
+                                                    <Tr key={row.id}>
+                                                        {row.getVisibleCells().map((cell) => {
+                                                            return (
+                                                                <Td key={cell.id}>
+                                                                    {flexRender(
+                                                                        cell.column.columnDef.cell,
+                                                                        cell.getContext()
+                                                                    )}
+                                                                </Td>
+                                                            )
+                                                        })}
+                                                    </Tr>
+                                                )
+                                            })}
+
+
+                                        </TBody>)}
+                            </Table>
+                        </div>
+                    ) : (<NoData />)}
 
                     <div className="flex items-center justify-between mt-4">
                         <Pagination

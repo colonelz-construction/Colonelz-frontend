@@ -162,21 +162,21 @@ const CustomerDetail = () => {
     fetchDataAndLog();
   }, [allQueryParams.project_id, taskAccess]);
 
-  useEffect(() => {
-    if (!projectAccess) return;
+  // useEffect(() => {
+  //   if (!projectAccess) return;
 
-    const fetchDataAndLog = async () => {
-      try {
-        const projectResponseData = await apiGetUsersListProject(allQueryParams.project_id);
-        // console.log(projectResponseData.data)
-        setProjectData(projectResponseData.data);
-      } catch (error) {
-        console.error('Error fetching task data', error);
-      }
-    };
+  //   const fetchDataAndLog = async () => {
+  //     try {
+  //       const projectResponseData = await apiGetUsersListProject(allQueryParams.project_id);
+  //       // console.log(projectResponseData.data)
+  //       setProjectData(projectResponseData.data);
+  //     } catch (error) {
+  //       console.error('Error fetching task data', error);
+  //     }
+  //   };
 
-    fetchDataAndLog();
-  }, [allQueryParams.project_id, projectAccess]);
+  //   fetchDataAndLog();
+  // }, [allQueryParams.project_id, projectAccess]);
 
 
 

@@ -31,6 +31,7 @@ import {
 import { useRoleContext } from '../../Roles/RolesContext'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import { ConfirmDialog } from '@/components/shared'
+import NoData from '@/views/pages/NoData'
 
 type User = {
     user_name: string
@@ -247,76 +248,79 @@ const Assignee = () => {
                 </div>
             </div>
 
-            <Table>
-                <THead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <Tr key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <Th
-                                        key={header.id}
-                                        colSpan={header.colSpan}
-                                    >
-                                        {header.isPlaceholder ? null : (
-                                            <div
-                                                {...{
-                                                    className:
-                                                        header.column.getCanSort()
-                                                            ? 'cursor-pointer select-none'
-                                                            : '',
-                                                    onClick:
-                                                        header.column.id !==
-                                                            'action'
-                                                            ? header.column.getToggleSortingHandler()
-                                                            : undefined,
-                                                }}
-                                            >
-                                                {flexRender(
-                                                    header.column.columnDef
-                                                        .header,
-                                                    header.getContext(),
-                                                )}
-                                                {header.column.id !==
-                                                    'action' && (
-                                                        <Sorter
-                                                            sort={header.column.getIsSorted()}
-                                                        />
+            {data.length > 0 ? (
+                <Table>
+                    <THead>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <Tr key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => {
+                                    return (
+                                        <Th
+                                            key={header.id}
+                                            colSpan={header.colSpan}
+                                        >
+                                            {header.isPlaceholder ? null : (
+                                                <div
+                                                    {...{
+                                                        className:
+                                                            header.column.getCanSort()
+                                                                ? 'cursor-pointer select-none'
+                                                                : '',
+                                                        onClick:
+                                                            header.column.id !==
+                                                                'action'
+                                                                ? header.column.getToggleSortingHandler()
+                                                                : undefined,
+                                                    }}
+                                                >
+                                                    {flexRender(
+                                                        header.column.columnDef
+                                                            .header,
+                                                        header.getContext(),
                                                     )}
-                                            </div>
-                                        )}
-                                    </Th>
+                                                    {header.column.id !==
+                                                        'action' && (
+                                                            <Sorter
+                                                                sort={header.column.getIsSorted()}
+                                                            />
+                                                        )}
+                                                </div>
+                                            )}
+                                        </Th>
+                                    )
+                                })}
+                            </Tr>
+                        ))}
+                    </THead>
+                    {loading ? (
+                        <TableRowSkeleton
+                            avatarInColumns={[0]}
+                            columns={columns.length}
+                            rows={10}
+                        />
+                    ) : (
+                        <TBody>
+                            {table.getRowModel().rows.map((row) => {
+                                return (
+                                    <Tr key={row.id}>
+                                        {row.getVisibleCells().map((cell) => {
+                                            return (
+                                                <Td key={cell.id}>
+                                                    {flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext(),
+                                                    )}
+                                                </Td>
+                                            )
+                                        })}
+                                    </Tr>
                                 )
                             })}
-                        </Tr>
-                    ))}
-                </THead>
-                {loading ? (
-                    <TableRowSkeleton
-                        avatarInColumns={[0]}
-                        columns={columns.length}
-                        rows={10}
-                    />
-                ) : (
-                    <TBody>
-                        {table.getRowModel().rows.map((row) => {
-                            return (
-                                <Tr key={row.id}>
-                                    {row.getVisibleCells().map((cell) => {
-                                        return (
-                                            <Td key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext(),
-                                                )}
-                                            </Td>
-                                        )
-                                    })}
-                                </Tr>
-                            )
-                        })}
-                    </TBody>
-                )}
-            </Table>
+                        </TBody>
+                    )}
+                </Table>) : (
+                <NoData />
+            )}
             <div className="flex items-center justify-between mt-4">
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}

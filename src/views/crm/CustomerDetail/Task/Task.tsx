@@ -16,7 +16,7 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
-import {  apiGetCrmProjectsTaskDelete, apiGetUsersList } from '@/services/CrmService'
+import { apiGetCrmProjectsTaskDelete, apiGetUsersList } from '@/services/CrmService'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button, Notification, Pagination, Select, Skeleton, toast } from '@/components/ui'
 import { HiOutlineEye, HiOutlinePencil, HiPlusCircle } from 'react-icons/hi'
@@ -39,10 +39,10 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
 
 const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
-type Data={
-    task:Tasks[]
-    users:string[]
-  }
+type Data = {
+    task: Tasks[]
+    users: string[]
+}
 
 
 const pageSizeOption = [
@@ -59,7 +59,7 @@ function DebouncedInput({
     ...props
 }: DebouncedInputProps) {
     const [value, setValue] = useState(initialValue)
-    
+
 
     useEffect(() => {
         setValue(initialValue)
@@ -72,40 +72,38 @@ function DebouncedInput({
 
         return () => clearTimeout(timeout)
     }, [value])
-   
-    
-    
+
+
+
 
     return (
         <div className="flex justify-between md:flex-col lg:flex-row">
             <h3></h3>
             <div className="flex items-center mb-4 gap-3">
                 <Input
-                size='sm'
+                    size='sm'
                     {...props}
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                 />
-               
+
             </div>
         </div>
     )
 }
 
-
-
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    let itemValue:any = row.getValue(columnId);
+    let itemValue: any = row.getValue(columnId);
 
-    
+
     if (columnId === 'estimated_task_start_date') {
         itemValue = formateDate(itemValue);
     }
     if (columnId === 'estimated_task_end_date') {
         itemValue = formateDate(itemValue);
     }
-   
-    
+
+
 
     const itemRank = rankItem(itemValue, value);
     addMeta({
@@ -121,168 +119,179 @@ const statusColors: { [key: string]: string } = {
     'Not Interested': 'bg-red-200 text-red-700',
 };
 
-const Filtering = ({task,users}:Data) => {
+const Filtering = ({ task, users }: Data) => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
-    const location=useLocation()
+    const location = useLocation()
     const queryParams = new URLSearchParams(location.search);
-    const projectId=queryParams.get('project_id') || '';
-    const [loading,setLoading]=useState(true)
-    const [userData,setUserData]=useState<any>(null)
+    const projectId = queryParams.get('project_id') || '';
+    const [loading, setLoading] = useState(true)
+    const [userData, setUserData] = useState<any>(null)
 
-    const role=localStorage.getItem('role')
-    const {roleData}=useRoleContext()
-    
+    const role = localStorage.getItem('role')
+    const { roleData } = useRoleContext()
+
 
     useEffect(() => {
-        const TaskData=async()=>{
+        const TaskData = async () => {
             setLoading(false)
-            
+
         }
         TaskData();
     }, [projectId])
     useEffect(() => {
-        const UserData=async()=>{
+        const UserData = async () => {
             setUserData(users)
         }
         UserData();
 
-    },[projectId])
-
-
-   
+    }, [projectId])
 
 
 
-    const ActionColumn = ({ row,users }: { row: Tasks,users:any}) => {
+
+
+
+    const ActionColumn = ({ row, users }: { row: Tasks, users: any }) => {
         const navigate = useNavigate()
         const { textTheme } = useThemeClass()
         const { roleData } = useRoleContext()
         const org_id = localStorage.getItem('orgId')
 
-        const data={user_id:localStorage.getItem('userId'),
-        project_id:row.project_id,
-        task_id:row.task_id, org_id}
+        const data = {
+            user_id: localStorage.getItem('userId'),
+            project_id: row.project_id,
+            task_id: row.task_id, org_id
+        }
         const editAccess = roleData?.data?.task?.update?.includes(`${localStorage.getItem('role')}`)
         const deleteAccess = roleData?.data?.task?.delete?.includes(`${localStorage.getItem('role')}`)
         const [dialogIsOpen, setIsOpen] = useState(false)
-    
+
         const openDialog = () => {
-            setIsOpen(true)  
+            setIsOpen(true)
         }
         const onDialogClose = () => {
             setIsOpen(false)
         }
-        
+
         const onDelete = async () => {
-            try{
-            const response = await apiGetCrmProjectsTaskDelete(data)
-            if(response.code===200){
-                toast.push(
-                    <Notification type='success' duration={2000} closable>Task Deleted Successfully</Notification>
-                )
-                window.location.reload()
+            try {
+                const response = await apiGetCrmProjectsTaskDelete(data)
+                if (response.code === 200) {
+                    toast.push(
+                        <Notification type='success' duration={2000} closable>Task Deleted Successfully</Notification>
+                    )
+                    window.location.reload()
+                }
+                else {
+                    toast.push(
+                        <Notification type='danger' duration={2000} closable>{response.errorMessage}</Notification>
+                    )
+
+                }
             }
-            else{
-                toast.push(
-                    <Notification type='danger' duration={2000} closable>{response.errorMessage}</Notification>
-                )
-            
-            }
-            }
-            catch(e){
+            catch (e) {
                 toast.push(
                     <Notification type='danger' duration={2000} closable>Internal Server Error</Notification>
                 )
             }
         }
-        
+
         return (
             <div className="flex justify-end text-lg gap-5">
-               {editAccess&&
-                <span
-                    className={`cursor-pointer p-2  hover:${textTheme}`}>
-                    <EditTask Data={row} users={users} task={false}/>
-                    
-                </span>
-    }
-    {deleteAccess&&
-                <span className={`cursor-pointer py-2  hover:${textTheme}`}>
-                    <MdDeleteOutline onClick={()=>openDialog()}/>   
-                </span>
-    }
+                {editAccess &&
+                    <span
+                        className={`cursor-pointer p-2  hover:${textTheme}`}>
+                        <EditTask Data={row} users={users} task={false} />
+
+                    </span>
+                }
+                {deleteAccess &&
+                    <span className={`cursor-pointer py-2  hover:${textTheme}`}>
+                        <MdDeleteOutline onClick={() => openDialog()} />
+                    </span>
+                }
                 <ConfirmDialog
-              isOpen={dialogIsOpen}
-              type="danger"
-              onClose={onDialogClose}
-              confirmButtonColor="red-600"
-              onCancel={onDialogClose}
-              onConfirm={() => onDelete()}
-              title="Delete Task"
-              onRequestClose={onDialogClose}>
-                <p> Are you sure you want to delete this task? </p>            
-            </ConfirmDialog>
+                    isOpen={dialogIsOpen}
+                    type="danger"
+                    onClose={onDialogClose}
+                    confirmButtonColor="red-600"
+                    onCancel={onDialogClose}
+                    onConfirm={() => onDelete()}
+                    title="Delete Task"
+                    onRequestClose={onDialogClose}>
+                    <p> Are you sure you want to delete this task? </p>
+                </ConfirmDialog>
             </div>
         )
     }
 
-  
-    
 
-    const formateDate = (dateString:string) => {
+
+
+    const formateDate = (dateString: string) => {
         const date = new Date(dateString);
-        const day=date.getDate().toString().padStart(2, '0');
-        const month=(date.getMonth() + 1).toString().padStart(2, '0');
-        const year=date.getFullYear();
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
         return `${day}-${month}-${year}`;
-        }
+    }
 
     const columns = useMemo<ColumnDef<Tasks>[]>(
         () => [
-         {
-            header:'Name',
-            accessorKey:'task_name',
-           cell:({row})=>{
-
-            return <TaskDetails data={row.original}/>
-           }
-         },
-         {
-            header:'Task Priority',
-            accessorKey:'task_priority',
-         },
-         {
-            header:'Task Status',
-            accessorKey:'task_status'
-         },
             {
-                header:'Task Start Date',
-                accessorKey:'estimated_task_start_date',
-                cell:({row})=>{
+                header: 'Name',
+                accessorKey: 'task_name',
+                cell: ({ row }) => {
+                    const navigate = useNavigate();
+                    const projectId = row.original.project_id
+                    const taskId = row.original.task_id
+                    return (
+                        <span
+                            className="cursor-pointer hover:underline"
+                            onClick={() => navigate(`/app/crm/Projects/TaskDetails?project_id=${projectId}&task=${taskId}`)}
+                        >
+                            {row.original.task_name}
+                        </span>
+                    );
+                }
+            },
+            {
+                header: 'Task Priority',
+                accessorKey: 'task_priority',
+            },
+            {
+                header: 'Task Status',
+                accessorKey: 'task_status'
+            },
+            {
+                header: 'Task Start Date',
+                accessorKey: 'estimated_task_start_date',
+                cell: ({ row }) => {
                     return <span>{formateDate(row.original.estimated_task_start_date)}</span>
                 }
             },
             {
-                header:'Task End Date',
-                accessorKey:'estimated_task_end_date',
-                cell:({row})=>{
+                header: 'Task End Date',
+                accessorKey: 'estimated_task_end_date',
+                cell: ({ row }) => {
                     return <span>{formateDate(row.original.estimated_task_end_date)}</span>
                 }
             },
             {
-                header:'Action',
+                header: 'Action',
                 id: 'action',
-                accessorKey:'action',
-                cell: ({row}) => <ActionColumn row={row.original} users={users}/>,
+                accessorKey: 'action',
+                cell: ({ row }) => <ActionColumn row={row.original} users={users} />,
             }
-           
+
         ],
         []
     )
 
 
     const table = useReactTable({
-        data:task?task:[],
+        data: task ? task : [],
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -313,81 +322,81 @@ const Filtering = ({task,users}:Data) => {
     }
     return (
         <>
-        <div className='flex gap-3 justify-end'>
-            <DebouncedInput
-                value={globalFilter ?? ''}
-                className="p-2 font-lg shadow border border-block"
-                placeholder="Search..."
-                onChange={(value) => setGlobalFilter(String(value))}
-            />
-             <AuthorityCheck
+            <div className='flex gap-3 justify-end'>
+                <DebouncedInput
+                    value={globalFilter ?? ''}
+                    className="p-2 font-lg shadow border border-block"
+                    placeholder="Search..."
+                    onChange={(value) => setGlobalFilter(String(value))}
+                />
+                <AuthorityCheck
                     userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.task?.create??[]}
-                    >
-                    <AddTask project={projectId} userData={userData}/>
-                    </AuthorityCheck>
-                    </div>
-            {!loading ? task?.length===0?(<NoData/>):(
+                    authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.task?.create ?? []}
+                >
+                    <AddTask project={projectId} userData={userData} />
+                </AuthorityCheck>
+            </div>
+            {!loading ? task?.length === 0 ? (<NoData />) : (
                 <Table>
-                <THead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <Tr key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <Th
-                                        key={header.id}
-                                        colSpan={header.colSpan}
-                                    >
-                                        {header.isPlaceholder || header.id==='action' ? null : (
-                                            <div
-                                                {...{
-                                                    className:
-                                                        header.column.getCanSort()
-                                                            ? 'cursor-pointer select-none'
-                                                            : '',
-                                                    onClick:
-                                                        header.column.getToggleSortingHandler(),
-                                                }}
-                                            >
-                                                {flexRender(
-                                                    header.column.columnDef
-                                                        .header,
-                                                    header.getContext()
-                                                )}
-                                                {
-                                                    <Sorter
-                                                        sort={header.column.getIsSorted()}
-                                                    />
-                                                }
-                                            </div>
-                                        )}
-                                    </Th>
-                                )
-                            })}
-                        </Tr>
-                    ))}
-                </THead>
-                <TBody>
-                    {table.getRowModel().rows.map((row) => {
-                        return (
-                            <Tr key={row.id} className=''>
-                                {row.getVisibleCells().map((cell) => {
+                    <THead>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <Tr key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => {
                                     return (
-                                        <Td key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
+                                        <Th
+                                            key={header.id}
+                                            colSpan={header.colSpan}
+                                        >
+                                            {header.isPlaceholder || header.id === 'action' ? null : (
+                                                <div
+                                                    {...{
+                                                        className:
+                                                            header.column.getCanSort()
+                                                                ? 'cursor-pointer select-none'
+                                                                : '',
+                                                        onClick:
+                                                            header.column.getToggleSortingHandler(),
+                                                    }}
+                                                >
+                                                    {flexRender(
+                                                        header.column.columnDef
+                                                            .header,
+                                                        header.getContext()
+                                                    )}
+                                                    {
+                                                        <Sorter
+                                                            sort={header.column.getIsSorted()}
+                                                        />
+                                                    }
+                                                </div>
                                             )}
-                                        </Td>
+                                        </Th>
                                     )
                                 })}
                             </Tr>
-                        )
-                    })}
-                </TBody>
-            </Table>
-                ):(<Skeleton height={300}/>)}
-            
+                        ))}
+                    </THead>
+                    <TBody>
+                        {table.getRowModel().rows.map((row) => {
+                            return (
+                                <Tr key={row.id} className=''>
+                                    {row.getVisibleCells().map((cell) => {
+                                        return (
+                                            <Td key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </Td>
+                                        )
+                                    })}
+                                </Tr>
+                            )
+                        })}
+                    </TBody>
+                </Table>
+            ) : (<Skeleton height={300} />)}
+
             <div className="flex items-center justify-between mt-4">
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}
@@ -410,7 +419,7 @@ const Filtering = ({task,users}:Data) => {
                 </div>
             </div>
 
-          
+
         </>
     )
 }

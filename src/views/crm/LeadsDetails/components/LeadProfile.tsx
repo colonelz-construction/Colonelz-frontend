@@ -39,7 +39,8 @@ interface Note {
 type AddProject ={
     lead_id:string
     user_id:string | null
-    type:string
+    type:string,
+    org_id : string | null
 }
 
 
@@ -53,6 +54,8 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
     const myParam = queryParams.get('id') || ''
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [dialogIsOpen2, setIsOpen2] = useState(false)
+    const org_id = localStorage.getItem('orgId')
+
 
     const role = localStorage.getItem('role')
     const [project, setProject] = useState<AddProject>()
@@ -65,7 +68,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
     }
     const openDialog2 = () => {
         setIsOpen2(true)
-        setProject({lead_id:myParam,user_id:localStorage.getItem('userId'),type:'true'})
+        setProject({lead_id:myParam,user_id:localStorage.getItem('userId'),type:'true', org_id})
     }
 
     const onDialogClose2 = () => {

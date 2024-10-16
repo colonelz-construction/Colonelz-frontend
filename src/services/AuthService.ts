@@ -68,7 +68,7 @@ export async function registerandSignin(data:any) {
         return responseData;
 }
 
-export async function QuotationApproval(data: any) {
+export async function QuotationApproval(data: any) { // org done
     return ApiService.fetchData<Response>({
         url: 'users/approval/client',
         method: 'post',

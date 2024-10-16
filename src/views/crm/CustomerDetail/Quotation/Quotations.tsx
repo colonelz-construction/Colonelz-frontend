@@ -214,7 +214,7 @@ const Quotations = (data: FileItemProps) => {
                                     <div>Rejected</div>
                                 ) : status === 'pending' ?
                                     (
-                                        !roleData.data.quotation?.update?.includes(role || '') ? (
+                                        role !== "SUPERADMIN" && !roleData.data.quotation?.update?.includes(role || '') ? (
                                             <div>Pending</div>
                                         ) : (
                                             <div className='flex gap-1'>
@@ -405,7 +405,7 @@ const Quotations = (data: FileItemProps) => {
             <div className=' flex justify-end mb-4'>
                 <AuthorityCheck
                     userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.quotation?.update ?? []}
+                    authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.quotation?.update ?? []}
                 >
                     <Button variant='solid' size='sm' onClick={() => openDialog()} >Share to Client</Button>
                 </AuthorityCheck>

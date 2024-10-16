@@ -19,6 +19,7 @@ type QuotationApprovalFormSchema = {
     file_id:string| null
     project_id:string | null
     status:string
+    org_id: string | null
     remark:string
 }
 
@@ -34,6 +35,7 @@ const ClientApproval = (props: QuotationApproval) => {
     const location=useLocation()
     const queryParams = new URLSearchParams(location.search);
     const project_id=queryParams.get('project_id')
+    const org_id=queryParams.get('org_id')
     const file_id=queryParams.get('file_id')
     const [message, setMessage] = useState(false)
     const onSendMail = async (
@@ -83,6 +85,7 @@ const ClientApproval = (props: QuotationApproval) => {
                 initialValues={{
                     file_id:file_id,
                     project_id:project_id,
+                    org_id,
                     status:'',
                     remark:''
                 }}

@@ -54,7 +54,7 @@ export const RoleContext = createContext<RoleContextType >(undefined!);
 // Provide the context
 export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [roleData, setRoleData] = useState<RoleAccessData >(undefined!);
-    const [rolelist, setRoleList] = useState<string[]>(["ADMIN"]);
+    const [rolelist, setRoleList] = useState<string[]>(["ADMIN", "SUPERADMIN"]);
 
     const fetchRoleData = async () => {
         try {

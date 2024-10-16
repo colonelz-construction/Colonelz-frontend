@@ -21,6 +21,8 @@ const YourFormComponent: React.FC<Data> = (data) => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const projectId = queryParams.get('project_id');
+  const org_id : any = localStorage.getItem('orgId')
+
   const [submit, setSubmit] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     project_id: projectId,
@@ -79,6 +81,7 @@ const YourFormComponent: React.FC<Data> = (data) => {
     formData.files.forEach((file) =>
       postData.append('files', file),
     )
+    postData.append('org_id', org_id)
 
     // console.log('Post Data:', postData);
 
@@ -113,7 +116,7 @@ const YourFormComponent: React.FC<Data> = (data) => {
 
   const clientOptions: Option[] = uniqueFolderNames
     .filter(folderName => {
-      if (role === 'ADMIN' || role === 'Senior Architect') {
+      if (role === 'ADMIN' || role === 'Senior Architect' || role === 'SUPERADMIN') {
         return true;
       } else {
         return folderName !== 'quotation' && folderName !== 'contract' && folderName !== 'procurement data';

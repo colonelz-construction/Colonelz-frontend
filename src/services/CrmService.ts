@@ -45,12 +45,12 @@ const token = localStorage.getItem('auth')
 const userId = localStorage.getItem('userId')
 const org_id = localStorage.getItem('orgId')
 
-export async function apiGetNotification<T>(
+export async function apiGetNotification<T>( // org done
     userId: string | null,
     page: number,
 ) {
     return ApiService.fetchData<NotificationResponse>({
-        url: `admin/get/notification?userId=${userId}&page=${page}&limit=20`,
+        url: `admin/get/notification?userId=${userId}&org_id=${org_id}&page=${page}&limit=20`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -66,9 +66,9 @@ export async function apiGetUserData<T>(UserId: string | null) {
     })
 }
 
-export async function apiGetCrmUsersAssociatedToLead<T>(lead_id:any) {
+export async function apiGetCrmUsersAssociatedToLead<T>(lead_id:any) { //org done
     return ApiService.fetchData<LeadApiResponse>({
-        url: `admin/get/userlist/lead?lead_id=${lead_id}`,
+        url: `admin/get/userlist/lead?lead_id=${lead_id}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -76,7 +76,7 @@ export async function apiGetCrmUsersAssociatedToLead<T>(lead_id:any) {
 }
  
  
-export async function apiLeadsRemoveUser(data: any) {
+export async function apiLeadsRemoveUser(data: any) { //org done
     return ApiService.fetchData<any>({
         url: 'admin/remove/member/lead',
         method: 'post',
@@ -86,7 +86,7 @@ export async function apiLeadsRemoveUser(data: any) {
     });
 }
 
-export async function apiGetRoleDetails<T>(org_id:any) {
+export async function apiGetRoleDetails<T>() { //org done
     return ApiService.fetchData<RoleResponse>({
         url: `admin/get/role?org_id=${org_id}`,
         method: 'get',
@@ -97,7 +97,7 @@ export async function apiGetRoleDetails<T>(org_id:any) {
 
 export async function apiGetRoleList<T>() {
     return ApiService.fetchData<RoleList>({
-        url: `admin/get/rolename`,
+        url: `admin/get/rolename?org_id=${org_id}`,
         method: 'get',
     })
         .then((response) => {
@@ -110,7 +110,7 @@ export async function apiGetRoleList<T>() {
 
 export async function apiGetRoleWiseDetails<T>() {
     return ApiService.fetchData<RoleAccessData>({
-        url: `admin/rolewise/access?role=ADMIN`,
+        url: `admin/rolewise/access?role=ADMIN&org_id=${org_id}`,
         method: 'get',
     })
         .then((response) => {
@@ -133,9 +133,9 @@ export async function apiCreateRole<U extends Record<string, unknown>>(
     })
 }
 
-export async function apiEditRoles(data: any, id: string | null) {
+export async function apiEditRoles(data: any, id: string | null) { // org done
     return ApiService.fetchData<any>({
-        url: `admin/update/role?id=${id}`,
+        url: `admin/update/role?id=${id}&org_id=${org_id}`,
         method: 'put',
         data,
     }).then((response) => {
@@ -143,7 +143,7 @@ export async function apiEditRoles(data: any, id: string | null) {
     })
 }
 
-export async function apiEditUserRole(data: any) {
+export async function apiEditUserRole(data: any) { // org done
     return ApiService.fetchData<any>({
         url: 'admin/update/users/role',
         method: 'put',
@@ -153,18 +153,18 @@ export async function apiEditUserRole(data: any) {
     })
 }
 
-export async function apiDeleteRole(id: any) {
+export async function apiDeleteRole(id: any) { // org done
     return ApiService.fetchData<any>({
-        url: `admin/delete/role?id=${id}`,
+        url: `admin/delete/role?id=${id}&org_id=${org_id}`,
         method: 'delete',
-        data: id,
+        data: {id, org_id},
     }).then((response) => {
         return response.data
     })
 }
-export async function apiDeleteInactiveLead(id: any) {
+export async function apiDeleteInactiveLead(id: any) { //org done
     return ApiService.fetchData<any>({
-        url: `admin/delete/inactive/lead?lead_id=${id}`,
+        url: `admin/delete/inactive/lead?lead_id=${id}&org_id=${org_id}`,
         method: 'delete',
         data: id,
     }).then((response) => {
@@ -172,7 +172,7 @@ export async function apiDeleteInactiveLead(id: any) {
     })
 }
 
-export async function addProfilePhoto(data: any) {
+export async function addProfilePhoto(data: any) { //org done
     return ApiService.fetchData<ProfileProps>({
         url: 'users/profileurl',
         method: 'post',
@@ -182,7 +182,7 @@ export async function addProfilePhoto(data: any) {
     })
 }
 
-export async function addcontractinfileManager(Data: any) {
+export async function addcontractinfileManager(Data: any) { //org done
     return ApiService.fetchData<any>({
         url: 'admin/view/contract',
         method: 'post',
@@ -192,7 +192,7 @@ export async function addcontractinfileManager(Data: any) {
     })
 }
 
-export async function EditPassword<U extends Record<string, unknown>>(data: U) {
+export async function EditPassword<U extends Record<string, unknown>>(data: U) { // org done
     return ApiService.fetchData<any>({
         url: 'users/change/password',
         method: 'post',
@@ -204,7 +204,7 @@ export async function EditPassword<U extends Record<string, unknown>>(data: U) {
 
 export async function apiGetUsers<T>() {
     return ApiService.fetchData<UsersResponse>({
-        url: `admin/get/alluser?id=${localStorage.getItem('userId')}`,
+        url: `admin/get/alluser?id=${localStorage.getItem('userId')}&org_id=${org_id}`,
         method: 'get',
     })
         .then((response) => {
@@ -215,27 +215,27 @@ export async function apiGetUsers<T>() {
         })
 }
 
-export async function apiDeleteUsers(userid: any, orgId: any) {
+export async function apiDeleteUsers(userid: any, orgId: any) { // org done
     return ApiService.fetchData<any>({
         url: `admin/delete/user?userId=${userid}&id=${userId}&org_id=${orgId}`,
         method: 'delete',
-        data: { userId: userId },
+        data: { userId: userId, org_id },
     }).then((response) => {
         return response.data
     })
 }
 
-export async function apiRemoveUserProject(username: any, project_id: any) {
+export async function apiRemoveUserProject(username: any, project_id: any) { // org done
     return ApiService.fetchData<any>({
         url: `/admin/remove/member/project`,
         method: 'post',
-        data: { username: username, project_id: project_id },
+        data: { username: username, project_id: project_id, org_id },
     }).then((response) => {
         return response.data
     })
 }
 
-export async function apiGetDeletedUsers<T>(org_id:any) {
+export async function apiGetDeletedUsers<T>(org_id:any) { // org done
     return ApiService.fetchData<ArchiveUserResponseType>({
         url: `admin/archive/user?org_id=${org_id}`,
         method: 'get',
@@ -248,17 +248,17 @@ export async function apiGetDeletedUsers<T>(org_id:any) {
         })
 }
 
-export async function apiRestoreDeletedUsers(UserId: any) {
+export async function apiRestoreDeletedUsers(UserId: any) { // org done
     return ApiService.fetchData<any>({
         url: 'admin/restore/user',
         method: 'post',
-        data: { user_id: UserId },
+        data: { user_id: UserId, org_id },
     }).then((response) => {
         return response.data
     })
 }
 
-export async function apiPermanantlyDeleteUsers(userid: any, orgId:any) {
+export async function apiPermanantlyDeleteUsers(userid: any, orgId:any) { // org done
     return ApiService.fetchData<any>({
         url: `admin/delete/archive/user`,
         method: 'delete',
@@ -281,11 +281,11 @@ export async function addMemberToProject(Data: any) {
     })
 }
 
-export async function apiPutNotificationUpdate(notificationId: any, type: any) {
+export async function apiPutNotificationUpdate(notificationId: any, type: any) { // org done
     return ApiService.fetchData<any>({
         url: `admin/update/notification`,
         method: 'put',
-        data: { userId: userId, type: type, notification_id: notificationId },
+        data: { userId: userId, type: type, notification_id: notificationId, org_id },
     }).then((response) => {
         return response.data
     })
@@ -299,7 +299,7 @@ export async function apiGetUsersList<T>(projectId: string) {
         return response.data
     })
 }
-export async function apiGetUsersListProject<T>(projectId: string) {
+export async function apiGetUsersListProject<T>(projectId: string) { // org done
     return ApiService.fetchData<UserList>({
         url: `/admin/get/userlist/project?project_id=${projectId}&org_id=${org_id}`,
         method: 'get',
@@ -307,16 +307,16 @@ export async function apiGetUsersListProject<T>(projectId: string) {
         return response.data
     })
 }
-export async function apiGetAllUsersList<T>() {
+export async function apiGetAllUsersList<T>() { //org done
     return ApiService.fetchData<UserListResponse>({
-        url: `admin/get/userlist?user_id=${userId}`,
+        url: `admin/get/userlist?user_id=${userId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
     })
 }
 
-export async function apiGetMomData<T>(org_id: any) {
+export async function apiGetMomData<T>(org_id: any) { //org done
     return ApiService.fetchData<MomResponse>({
         url: `admin/getall/project/mom?id=${userId}&org_id=${org_id}`,
         method: 'get',
@@ -416,7 +416,7 @@ export async function apiGetCrmProjectShareQuotation(formData: any) { //org done
     })
 }
 
-export async function apiGetCrmProjectShareContractApproval(formData: any) {
+export async function apiGetCrmProjectShareContractApproval(formData: any) {  // org done
     return ApiService.fetchData<any>({
         url: 'admin/contract/approval',
         method: 'post',
@@ -631,16 +631,16 @@ export async function apiGetCrmProjectsSingleSubTaskDataTimer<T>( //org done
 
 export async function apiGetCrmFileManager<T>() {
     return ApiService.fetchData<FileManagerResponseType>({
-        url: `admin/getfile/`,
+        url: `admin/getfile?org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
     })
 }
 
-export async function apiGetCrmFileManagerCompanyData<T>() {
+export async function apiGetCrmFileManagerCompanyData<T>() { // org done
     return ApiService.fetchData<FileManagerResponseType>({
-        url: `admin/get/companydata`,
+        url: `admin/get/companydata?org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -649,14 +649,14 @@ export async function apiGetCrmFileManagerCompanyData<T>() {
 
 export async function apiGetCrmFileManagerArchive<T>(userId: string | null) {
     return ApiService.fetchData<ArchiveResponse>({
-        url: `admin/get/archive?user_id=${userId}`,
+        url: `admin/get/archive?user_id=${userId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
     })
 }
 
-export async function apiGetCrmFileManagerArchiveRestore(Formdata: any) {
+export async function apiGetCrmFileManagerArchiveRestore(Formdata: any) { //org done
     return ApiService.fetchData<any>({
         url: 'admin/restore/file',
         method: 'post',
@@ -666,7 +666,7 @@ export async function apiGetCrmFileManagerArchiveRestore(Formdata: any) {
     })
 }
 
-export async function apiGetCrmFileManagerDeleteArchiveFiles(postData: any) {
+export async function apiGetCrmFileManagerDeleteArchiveFiles(postData: any) { //org done
     return ApiService.fetchData<any>({
         url: `admin/delete/archive`,
         method: 'delete',
@@ -676,11 +676,11 @@ export async function apiGetCrmFileManagerDeleteArchiveFiles(postData: any) {
     })
 }
 
-export async function apiGetCrmFileManagerProjects<T>(
+export async function apiGetCrmFileManagerProjects<T>( // org done
     projectId: string | null,
 ) {
     return ApiService.fetchData<Data>({
-        url: `admin/project/getfile/?project_id=${projectId}`,
+        url: `admin/project/getfile/?project_id=${projectId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -697,7 +697,7 @@ export async function apiGetCrmFileManagerCreateLeadFolder(Formdata: any) {
     })
 }
 
-export async function apiDeleteFileManagerFolders(data: any) {
+export async function apiDeleteFileManagerFolders(data: any) { //org done
     return ApiService.fetchData<any>({
         url: 'admin/delete/folder',
         method: 'delete',
@@ -706,7 +706,7 @@ export async function apiDeleteFileManagerFolders(data: any) {
         return response.data
     })
 }
-export async function apiDeleteFileManagerFiles(data: any) {
+export async function apiDeleteFileManagerFiles(data: any) { // org done
     return ApiService.fetchData<any>({
         url: 'admin/delete/file',
         method: 'delete',
@@ -736,7 +736,7 @@ export async function apiGetCrmFileManagerCreateTemplateFolder(data: any) {
 
 export async function apiGetCrmFileManagerLeads<T>(leadId: string | null) {
     return ApiService.fetchData<FileManagerLeadType>({
-        url: `admin/lead/getfile/?lead_id=${leadId}`,
+        url: `admin/lead/getfile/?lead_id=${leadId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -745,14 +745,14 @@ export async function apiGetCrmFileManagerLeads<T>(leadId: string | null) {
 
 export async function apiGetCrmContractDetails<T>(leadId: string | null) {
     return ApiService.fetchData<ContractResponseType>({
-        url: `admin/get/contractdata?lead_id=${leadId}`,
+        url: `admin/get/contractdata?lead_id=${leadId}&org_id=${org_id}`,
         method: 'get',
     }).then((response) => {
         return response.data
     })
 }
 
-export async function apiGetCrmFileManagerShareFiles(data: any) {
+export async function apiGetCrmFileManagerShareFiles(data: any) { // org done
     return ApiService.fetchData<any>({
         url: 'admin/share/file',
         method: 'post',
@@ -761,7 +761,7 @@ export async function apiGetCrmFileManagerShareFiles(data: any) {
         return response.data
     })
 }
-export async function apiGetCrmFileManagerShareContractFile(data: any) {
+export async function apiGetCrmFileManagerShareContractFile(data: any) { //org done
     return ApiService.fetchData<any>({
         url: 'admin/share/contract',
         method: 'post',
@@ -771,7 +771,7 @@ export async function apiGetCrmFileManagerShareContractFile(data: any) {
     })
 }
 
-export async function apiGetCrmLeads<T>(org_id:any) {
+export async function apiGetCrmLeads<T>() {  // org done
     return ApiService.fetchData<LeadApiResponse>({
         url: `admin/getall/lead?org_id=${org_id}`,
         method: 'get',
@@ -780,7 +780,7 @@ export async function apiGetCrmLeads<T>(org_id:any) {
     })
 }
 
-export async function apiGetCrmLeadsDetails<T>(leadId: string | null, org_id: any) {
+export async function apiGetCrmLeadsDetails<T>(leadId: string | null, org_id: any) { //org done
     return ApiService.fetchData<LeadDetailsResponse>({
         url: `admin/getsingle/lead/?lead_id=${leadId}&org_id=${org_id}`,
         method: 'get',
@@ -796,9 +796,9 @@ export async function apiGetCrmProjectActivity<T>(project_id: any, page: any, or
         return response.data
     })
 }
-export async function apiGetCrmLeadActivity<T>(lead_id: any, page: any) {
+export async function apiGetCrmLeadActivity<T>(lead_id: any, page: any) { // org done
     return ApiService.fetchData<any>({
-        url: `admin/get/lead/activity?lead_id=${lead_id}&page=${page}&limit=5`,
+        url: `admin/get/lead/activity?lead_id=${lead_id}&org_id=${org_id}&page=${page}&limit=5`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -832,7 +832,7 @@ export async function apiGetCrmCreateLeadToProject(data: any) {
         return response.data
     })
 }
-export async function apiGetCrmLeadsUpdates(data: any) {
+export async function apiGetCrmLeadsUpdates(data: any) { //org done
     return ApiService.fetchData<any>({
         url: 'admin/update/lead/',
         method: 'put',
@@ -841,7 +841,7 @@ export async function apiGetCrmLeadsUpdates(data: any) {
         return response.data
     })
 }
-export async function apiGetCrmEditLead(data: any) {
+export async function apiGetCrmEditLead(data: any) { //org done
     return ApiService.fetchData<any>({
         url: 'admin/update/lead/data/',
         method: 'put',

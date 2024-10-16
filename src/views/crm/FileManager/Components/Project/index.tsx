@@ -106,6 +106,7 @@ const Index = () => {
   const projectId = queryParams.get('project_id');
   const projectName = queryParams.get('project_name');
   const role = localStorage.getItem('role')
+  const org_id = localStorage.getItem('orgId')
 
   const { roleData } = useContext(RoleContext);
   const uploadAccess =role === 'SUPERADMIN' ? true :  roleData?.data?.file?.create?.includes(`${role}`)
@@ -171,7 +172,8 @@ const Index = () => {
       lead_id: "",
       folder_name: folder_name,
       type: "",
-      project_id: projectId
+      project_id: projectId,
+      org_id,
     };
     try {
       await apiDeleteFileManagerFolders(postData);

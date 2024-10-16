@@ -31,6 +31,8 @@ const EditRoles = () => {
     const navigate = useNavigate();
     const [checkType, setCheckType] = useState(obj);
     const [newName, setNewName] = useState(role);
+    const org_id = localStorage.getItem('orgId')
+
 
 
     const [initialValues, setInitialValues] = useState<FormValues>(() =>
@@ -134,7 +136,8 @@ const EditRoles = () => {
 
         const payload = {
             role: newName,
-            access
+            access,
+            org_id
         };
 
         const response = await apiEditRoles(payload, id);

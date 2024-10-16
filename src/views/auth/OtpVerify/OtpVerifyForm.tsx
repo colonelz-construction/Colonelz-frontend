@@ -20,7 +20,7 @@ interface ForgotPasswordFormProps extends CommonProps {
 }
 
 type OtpVerifyFormSchema = {
-    email: string
+    email: string | null
     otp: string
 }
 
@@ -57,6 +57,13 @@ const ForgotPasswordForm = (props: ForgotPasswordFormProps) => {
         
     }
 
+    const initValues : OtpVerifyFormSchema = {
+
+        email: email,
+        otp:''
+
+    }
+
     return (
         <div className={className}>
             {message && (
@@ -65,10 +72,7 @@ const ForgotPasswordForm = (props: ForgotPasswordFormProps) => {
                 </Alert>
             )}
             <Formik
-                initialValues={{
-                    email: email,
-                    otp:''
-                }}
+                initialValues={initValues}
                 validationSchema={validationSchema}
                 onSubmit={(values, { setSubmitting }) => {
                     if (!disableSubmit) {

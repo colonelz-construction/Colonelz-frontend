@@ -109,12 +109,14 @@ const Index = () => {
     const folderName = queryParams.get('folder')
     const type = queryParams.get('type')
     const { roleData } = useRoleContext()
-    const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
+    const role = localStorage.getItem('role')
+    const org_id = localStorage.getItem('orgId')
+    const uploadAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.file?.create?.includes(`${role}`)
     useEffect(() => {
         const fetchDataAndLog = async () => {
             try {
                 const templateData = (await getTemplateData()) || []
-                // console.log(templateData);
+                console.log(templateData);
 
                 setLoading(false)
                 setTemplateData(
@@ -179,6 +181,7 @@ const Index = () => {
             project_id: '',
             sub_folder_name_first: folderName,
             sub_folder_name_second: folder_name,
+            org_id
         }
         // console.log(postData)
 
@@ -258,7 +261,7 @@ const Index = () => {
                 id: 'actions',
                 cell: ({ row }) => {
                     const { roleData } = useRoleContext()
-                    const deleteAccess = roleData?.data?.file?.delete?.includes(`${localStorage.getItem('role')}`)
+                    const deleteAccess = role === 'SUPERADMIN' ? true : roleData?.data?.file?.delete?.includes(`${localStorage.getItem('role')}`)
                     return (
                         deleteAccess &&
                         <div

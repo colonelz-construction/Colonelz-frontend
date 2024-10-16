@@ -28,6 +28,8 @@ const YourFormComponent: React.FC = () => {
   const type = queryParams.get('type');
   const [submit, setSubmit] = useState(false);
   const [leadData, setLeadData] = useState<FoldersItem[]>([]);
+  const org_id : any = localStorage.getItem('orgId')
+
   const [formData, setFormData] = useState<FormData>({
     sub_folder_name_first: folderName,
     sub_folder_name_second: '',
@@ -110,6 +112,7 @@ const YourFormComponent: React.FC = () => {
     postData.append('folder_name', formData.folder_name || '');
     postData.append('sub_folder_name_first', formData.sub_folder_name_first || '');
     postData.append('type', formData.type);
+    postData.append('org_id', org_id);
 
     formData.files.forEach((file) =>
       postData.append('files', file),

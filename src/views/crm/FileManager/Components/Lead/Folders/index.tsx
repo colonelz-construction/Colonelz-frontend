@@ -125,6 +125,8 @@ const Index = () => {
   const leadName = queryParams.get('lead_name');
   const folderName = queryParams.get('folder_name');
   const role = localStorage.getItem('role')
+  const org_id : any = localStorage.getItem('orgId')
+
 
   const { roleData } = useRoleContext();
   const fileUploadAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.file?.create?.includes(`${role}`)
@@ -255,6 +257,7 @@ const Index = () => {
       file_id: selectedFiles,
       folder_name: folderName,
       lead_id: leadId,
+      org_id,
     };
     try {
       await apiDeleteFileManagerFiles(postData);
@@ -284,7 +287,8 @@ const Index = () => {
       bcc: selectedEmailsBCc,
       subject: subject,
       body: body,
-      user_id: localStorage.getItem('userId')
+      user_id: localStorage.getItem('userId'),
+      org_id,
     };
 
     const response = await apiGetCrmFileManagerShareFiles(postData);
@@ -697,6 +701,7 @@ const Index = () => {
             formData.append('file_id', values.file_id)
             // formData.append('user_name',values.user_name)
             formData.append('type', values.type)
+            formData.append('org_id', org_id)
 
             const response = await apiGetCrmFileManagerShareContractFile(formData)
             // console.log(response);
@@ -889,6 +894,8 @@ const Index = () => {
               for (let i = 0; i < values.files.length; i++) {
                 formData.append('files', values.files[i]);
               }
+
+              formData.append('org_id', org_id)
               const response = await apiGetCrmFileManagerCreateLeadFolder(formData)
               // const responseData=await response.json()
               setFormLoading(false)

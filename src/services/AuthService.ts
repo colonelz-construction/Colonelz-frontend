@@ -89,7 +89,7 @@ export async function apiSignIn(data: SignInCredential) {
 }
 
 
-export async function apiAddMember(data:any) {
+export async function apiAddMember(data:any) { // org done 
     return ApiService.fetchData<ProjectResponse>({
         url: 'admin/add/member',
         method: 'post',
@@ -99,7 +99,7 @@ export async function apiAddMember(data:any) {
     });
 }
 
-export async function apiAddMemberToLead(data:any) {
+export async function apiAddMemberToLead(data:any) {  // org done
     return ApiService.fetchData<UserResponse>({
         url: 'admin/add/member/lead',
         method: 'post',
@@ -148,7 +148,7 @@ export async function apiForgotPassword(data:ForgotPassword) {
 
 export async function apiOtpVerify(data: OtpVerify) {
     const Data={
-        email:data.email.toLowerCase(),
+        email:data?.email?.toLowerCase(),
         otp:data.otp
     }
     return ApiService.fetchData({

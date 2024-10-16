@@ -27,7 +27,7 @@ export type ForgotPassword = {
     email: string
 }
 export type OtpVerify = {
-    email: string
+    email: string | null
     otp: string
 }
 

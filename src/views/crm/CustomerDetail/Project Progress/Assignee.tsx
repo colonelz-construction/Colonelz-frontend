@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import Table from '@/components/ui/Table'
 import Input from '@/components/ui/Input'
 import { MdDeleteOutline } from 'react-icons/md'
+import { HiOutlineUserRemove } from "react-icons/hi";
 import {
     useReactTable,
     getCoreRowModel,
@@ -116,6 +117,7 @@ const Assignee = () => {
     const [userId, setUserId] = useState('')
     const [userName, setUserName] = useState('')
     const [userData, setUserData] = useState()
+    const role = localStorage.getItem('role')
     const queryParams = new URLSearchParams(location.search);
     const allQueryParams: QueryParams = {
         id: queryParams.get('id') || '',
@@ -137,7 +139,7 @@ const Assignee = () => {
         project_id: string;
     }
 
-    useEffect(() => {
+    useEffect(() => { // org done
         const fetchData = async () => {
             const response = await apiGetUsersListProject(allQueryParams.project_id)
             const data: UsersResponse = response
@@ -151,7 +153,7 @@ const Assignee = () => {
     }, [])
 
 
-    const deleteuser = async (username: string, project_id: any) => {
+    const deleteuser = async (username: string, project_id: any) => { // org done
         const response = await apiRemoveUserProject(username, project_id)
         if (response.code === 200) {
             toast.push(
@@ -177,20 +179,25 @@ const Assignee = () => {
                 header: '',
                 id: 'action',
                 cell: ({ row }) => {
+
+                    const deleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.addMember?.delete?.includes(`${role}`)
                     return (
                         <div className="">
-                            <span className="flex items-center text-lg gap-2">
-                                <Tooltip title="Delete">
+
+                            {deleteAccess && <span className="flex items-center text-lg gap-2">
+                                <Tooltip title="Remove">
                                     <p
                                         className=" text-xl hover:text-red-500 cursor-pointer"
                                         onClick={() =>
                                             openDialog(row.original.user_id, row.original.user_name)
                                         }
                                     >
-                                        <MdDeleteOutline />
+                                        <HiOutlineUserRemove />
                                     </p>
                                 </Tooltip>
-                            </span>
+                            </span>}
+
+                            
                         </div>
                     )
                 },

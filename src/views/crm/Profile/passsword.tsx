@@ -54,6 +54,8 @@ const validationSchema = Yup.object().shape({
 })
 
 const Password = ({ data }: { data?: LoginHistory[] }) => {
+
+    const org_id = localStorage.getItem('orgId')
     const onFormSubmit = async (
         values: PasswordFormModel,
         setSubmitting: (isSubmitting: boolean) => void
@@ -61,6 +63,7 @@ const Password = ({ data }: { data?: LoginHistory[] }) => {
         // Prepare data for the API
         const data = {
             userId: localStorage.getItem('userId'),
+            org_id,
             old_password: values.old_password,
             new_password: values.new_password,
             confirm_new_password: values.confirm_new_password,

@@ -23,6 +23,7 @@ const YourFormComponent: React.FC<Data> = (leadData) => {
   const leadId = queryParams.get('lead_id');
   const role=localStorage.getItem('role')
   const [submit,setSubmit]=useState(false);
+  const org_id:  any = localStorage.getItem('orgId')
   
   const [formData, setFormData] = useState<FormData>({
     lead_id: leadId,
@@ -90,6 +91,8 @@ function closeAfter2000ms(data:string,type:any) {
   formData.files.forEach((file) => {
     postData.append('files', file);
   });
+
+  postData.append('org_id', org_id)
 
   try {
     const response = await apiGetCrmFileManagerCreateLeadFolder(postData);

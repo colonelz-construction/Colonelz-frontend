@@ -144,6 +144,7 @@ const Index = () => {
     <Formik
       initialValues={{
         id: id || '',
+        org_id,
         role: '',
         user_name: '',
         project_id: '',

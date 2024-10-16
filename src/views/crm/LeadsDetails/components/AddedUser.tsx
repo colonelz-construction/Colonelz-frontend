@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { HiOutlineUserRemove } from "react-icons/hi";
 import {
     Button,
     Checkbox,
@@ -13,6 +14,7 @@ import {
     Segment,
     Select,
     Skeleton,
+    Tooltip,
     Upload,
     toast,
 } from '@/components/ui'
@@ -109,7 +111,7 @@ const AddedUser = () => {
     const [leadData, setLeadData] = useState<any>([])
     const [username, setUsername] = useState<any>()
     const [loading, setLoading] = useState<any>(false)
-    console.log(leadData)
+    const org_id = localStorage.getItem('orgId')
 
     const direction = useAppSelector((state) => state.theme.direction)
 
@@ -120,19 +122,6 @@ const AddedUser = () => {
     const folderName = queryParams.get('folder_name') // Assuming folder_name is in the query params
     const navigate = useNavigate()
     const { roleData } = useRoleContext()
-    const fetchProjectData = async (
-        projectId: string | null,
-    ): Promise<any[]> => {
-        try {
-            const response = await apiGetCrmFileManagerProjects(projectId)
-            // console.log(response)
-            const data = response
-            return data.data
-        } catch (error) {
-            console.error('Error fetching lead data', error)
-            throw error
-        }
-    }
 
     interface User {
         role: string
@@ -194,7 +183,8 @@ const AddedUser = () => {
 
         const postData = {
             lead_id: leadId,
-            username: username
+            username: username,
+            org_id,
 
         };
         try {
@@ -258,10 +248,13 @@ const AddedUser = () => {
                 header: 'Actions', accessorKey: 'actions',
                 cell: ({ row }) => {
                     const { roleData } = useRoleContext()
-                    const deleteAccess = roleData?.data?.file?.delete?.includes(`${localStorage.getItem('role')}`)
+                    console.log(roleData)
+                    const deleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.addMember?.delete?.includes(`${localStorage.getItem('role')}`)
                     return <div className='flex items-center gap-2'>
                         {deleteAccess &&
-                            <MdDeleteOutline className='text-xl cursor-pointer hover:text-red-500' onClick={() => openDialog3(row.original.user_name)} />}
+                        <Tooltip title="Remove">
+                            <HiOutlineUserRemove className='text-xl cursor-pointer hover:text-red-500' onClick={() => openDialog3(row.original.user_name)} />
+                            </Tooltip>}
                     </div>
                 }
             },

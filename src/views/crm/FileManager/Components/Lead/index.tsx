@@ -110,6 +110,8 @@ const Index = () => {
     const leadName = queryParams.get('lead_name');
     const role = localStorage.getItem('role')
     const { roleData } = useRoleContext();
+    const org_id = localStorage.getItem('orgId')
+
     const uploadAccess = role === 'SUPERADMIN' ? true : roleData?.data?.file?.create?.includes(`${role}`)
     useEffect(() => {
         const fetchData = async () => {
@@ -151,7 +153,8 @@ const Index = () => {
             lead_id: leadId,
             folder_name: folder_name,
             type: "",
-            project_id: ""
+            project_id: "",
+            org_id
         };
 
         const response = await apiDeleteFileManagerFolders(postData);

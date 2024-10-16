@@ -172,6 +172,7 @@ const ContractDetails = (data: FileItemProps) => {
             file_id: fileID,
             status: status,
             remark: remark,
+            org_id,
         };
         try {
             const response = await apiGetCrmProjectShareContractApproval(postData);
@@ -239,7 +240,7 @@ const ContractDetails = (data: FileItemProps) => {
                                     <div>Rejected</div>
                                 ) : status === 'pending' ?
                                     (
-                                        !roleData.data.contract?.update?.includes(`${role}`) ? (
+                                       (role !== 'SUPERADMIN' && !roleData.data.contract?.update?.includes(`${role}`)) ? (
                                             <div>Pending</div>
                                         ) : (
                                             <div className='flex gap-1'>
@@ -252,7 +253,7 @@ const ContractDetails = (data: FileItemProps) => {
                                                 >
                                                     <h3 className='mb-4'> Reject Remarks</h3>
                                                     <Formik
-                                                        initialValues={{ lead_id: leadId, file_id: fileId, status: 'rejected', remark: '' }}
+                                                        initialValues={{ lead_id: leadId, file_id: fileId, status: 'rejected', remark: '', org_id }}
                                                         validationSchema={Yup.object({ remark: Yup.string().required('Required') })}
                                                         onSubmit={async (values, { setSubmitting }) => {
                                                             setSubmitting(true);

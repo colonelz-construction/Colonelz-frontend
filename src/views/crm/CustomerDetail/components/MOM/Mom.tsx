@@ -106,10 +106,11 @@ const ActionColumn = (data:any) => {
     const { textTheme } = useThemeClass()
     const location=useLocation()
     const org_id = localStorage.getItem('orgId')
+    const role = localStorage.getItem('role')
     const proj = new URLSearchParams(location.search).get('project_id')
     const mom_id=data.row.mom_id
-    const editAccess = roleData?.data?.mom?.update?.includes(`${localStorage.getItem('role')}`)
-    const deleteAccess = roleData?.data?.mom?.delete?.includes(`${localStorage.getItem('role')}`)
+    const editAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.mom?.update?.includes(`${localStorage.getItem('role')}`)
+    const deleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.mom?.delete?.includes(`${localStorage.getItem('role')}`)
     const [dialogIsOpen, setIsOpen] = useState(false)
 
     const openDialog = () => {

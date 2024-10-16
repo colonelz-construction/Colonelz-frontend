@@ -153,7 +153,8 @@ const PaginationTable = () => {
     const [restoreData, setRestoreData] = useState<Restore>()
     const [dialogIsOpen2, setIsOpen2] = useState(false)
     const [dialogIsOpen3, setIsOpen3] = useState(false)
-    const [folderName, setFolderName] = useState<string>('')
+    const org_id = localStorage.getItem('orgId')
+
 
 
     const openDialog2 = (file_id: string, lead_id: string, project_id: string, type: string, folder_name: string, sub_folder_name_first: string, sub_folder_name_second: string, delete_type: string) => {
@@ -195,6 +196,7 @@ const PaginationTable = () => {
             sub_folder_name_first: deleteData.sub_folder_name_first,
             sub_folder_name_second: deleteData.sub_folder_name_second,
             delete_type: deleteData.delete_type,
+            org_id,
         };
         // console.log(postData);
 
@@ -228,7 +230,8 @@ const PaginationTable = () => {
             folder_name: restoreData?.folder_name,
             sub_folder_name_first: restoreData?.sub_folder_name_first,
             sub_folder_name_second: restoreData?.sub_folder_name_second,
-            restore_type: restoreData?.file_id ? 'file' : 'folder'
+            restore_type: restoreData?.file_id ? 'file' : 'folder',
+            org_id,
         }
         //    console.log('postData',postData);
 
@@ -336,8 +339,8 @@ const PaginationTable = () => {
                     const delete_type = row.original.files[0].folder_name ? 'folder' : 'file';
                     const role = localStorage.getItem('role') || '';
                     const { roleData } = useRoleContext();
-                    const restoreAccess = roleData?.data?.archive?.restore?.includes(role);
-                    const deleteAccess = roleData?.data?.archive?.delete?.includes(role);
+                    const restoreAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.archive?.restore?.includes(role);
+                    const deleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.archive?.delete?.includes(role);
 
 
 

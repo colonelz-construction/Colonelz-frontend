@@ -1327,6 +1327,8 @@ other Govt Levy, will be charged will be charged, as per actual.
 )};
 export const useFormikValues = () => useContext(FormikValuesContext);
 const MyComponent = (data:any) => {
+
+  const org_id : any = localStorage.getItem('orgId')
  
   
   const navigate=useNavigate()
@@ -1339,6 +1341,7 @@ const MyComponent = (data:any) => {
     formData.append('lead_id', data.data.lead_id);
     formData.append('user_id', localStorage.getItem('userId') || '');
     formData.append('file', blob, `${data.data.file_name}.pdf`);
+    formData.append('org_id', blob, org_id);
   
     const response = await addcontractinfileManager(formData);
     

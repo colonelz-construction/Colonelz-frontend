@@ -41,6 +41,8 @@ const validationSchema = Yup.object().shape({
 
 const EditUserRole = ({ Data }: any) => {
     const { rolelist } = useRoleContext()
+    const org_id : any = localStorage.getItem('orgId')
+
 
 
     const rolesOptions = rolelist?.map((role) => ({
@@ -68,6 +70,7 @@ const EditUserRole = ({ Data }: any) => {
 
         formData.append('role', values.role);
         formData.append('userId', Data.UserId);
+        formData.append('org_id', org_id);
         try {
             const response = await apiEditUserRole(formData);
             // console.log(response)

@@ -125,8 +125,8 @@ const CustomerDetail = () => {
     // console.log("reveerse", notes)
     const { roleData } = useRoleContext()
 
-    const contractAccess = roleData?.data?.contract?.read?.includes(`${localStorage.getItem('role')}`)
-    const leadDeleteAccess = roleData?.data?.lead?.delete?.includes(`${localStorage.getItem('role')}`)
+    const contractAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.contract?.read?.includes(`${role}`)
+    const leadDeleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.lead?.delete?.includes(`${role}`)
 
     const handleDeleteInactiveLead = async () => {
 
@@ -213,7 +213,7 @@ const CustomerDetail = () => {
                                 <TabNav value="Contract" >
                                     Contract
                                 </TabNav>}
-                            {['ADMIN'].includes(localStorage.getItem('role') || '') &&
+                            {['ADMIN', 'SUPERADMIN'].includes(localStorage.getItem('role') || '') &&
                                 <TabNav value="Activity" >
                                     Lead Activity
                                 </TabNav>

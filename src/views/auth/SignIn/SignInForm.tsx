@@ -10,6 +10,7 @@ import useAuth from '@/utils/hooks/useAuth'
 import { Field, Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import type { CommonProps } from '@/@types/common'
+import { Link } from 'react-router-dom'
 
 interface SignInFormProps extends CommonProps {
     disableSubmit?: boolean
@@ -133,6 +134,7 @@ const SignInForm = (props: SignInFormProps) => {
                             >
                                 {isSubmitting ? 'Signing in...' : 'Sign In'}
                             </Button>
+                            <p className='mt-2 text-sm'>Do not have Account? <Link className='text-blue-600' to={"/register"} >Register</Link></p>
                            
                         </FormContainer>
                     </Form>

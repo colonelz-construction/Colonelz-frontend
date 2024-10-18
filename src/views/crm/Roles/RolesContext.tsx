@@ -39,6 +39,7 @@ type RoleAccessPermissions = {
         roleData: RoleAccessData;
         rolelist:string[];
         fetchRoleData: () => Promise<void>;
+        loading: boolean;
     }
 
 
@@ -55,9 +56,11 @@ export const RoleContext = createContext<RoleContextType >(undefined!);
 export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [roleData, setRoleData] = useState<RoleAccessData >(undefined!);
     const [rolelist, setRoleList] = useState<string[]>(["ADMIN", "SUPERADMIN"]);
+    const [loading, setLoading] = useState<boolean>(true);
 
     const fetchRoleData = async () => {
         try {
+            setLoading(true)
             const data = await apiGetRoleWiseDetails(); 
             
             const response=await apiGetRoleList();
@@ -69,6 +72,7 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             if (data.status) {
                 setRoleData(data);
+                setLoading(false)
             }
         } catch (error) {
             console.error('Failed to fetch role data:', error);
@@ -80,7 +84,7 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     return (
-        <RoleContext.Provider value={{ roleData, fetchRoleData,rolelist }}>
+        <RoleContext.Provider value={{ roleData, fetchRoleData,rolelist, loading }}>
             {children}
         </RoleContext.Provider>
     );

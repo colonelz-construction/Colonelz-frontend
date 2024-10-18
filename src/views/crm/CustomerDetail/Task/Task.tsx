@@ -163,8 +163,8 @@ const Filtering = ({ task, users }: Data) => {
             project_id: row.project_id,
             task_id: row.task_id, org_id
         }
-        const editAccess = roleData?.data?.task?.update?.includes(`${localStorage.getItem('role')}`)
-        const deleteAccess = roleData?.data?.task?.delete?.includes(`${localStorage.getItem('role')}`)
+        const editAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.task?.update?.includes(`${localStorage.getItem('role')}`)
+        const deleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.task?.delete?.includes(`${localStorage.getItem('role')}`)
         const [dialogIsOpen, setIsOpen] = useState(false)
 
         const openDialog = () => {

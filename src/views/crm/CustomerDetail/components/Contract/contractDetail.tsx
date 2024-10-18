@@ -460,6 +460,7 @@ const ContractDetails = (data: FileItemProps) => {
         formData.append('project_name', values.project_name);
         formData.append('site_location', values.site_location);
         formData.append('user_id', localStorage.getItem('userId') as string);
+        formData.append('org_id', localStorage.getItem('orgId') as string);
 
         setLoading(true);
         values.quotation.forEach((file: File) => {

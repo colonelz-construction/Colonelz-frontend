@@ -15,7 +15,7 @@ import { useState, useEffect } from 'react';
 
 const FileManager = () => {
   const role = localStorage.getItem('role') || '';
-  const { roleData } = useRoleContext();
+  const { roleData, loading } = useRoleContext();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const FileManager = () => {
     }
   }, [roleData]);
 
-  if (isLoading) {
+  if (loading) {
     return <div><Skeleton height={400}/></div>;
   }
 

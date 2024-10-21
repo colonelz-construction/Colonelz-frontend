@@ -406,6 +406,44 @@ export async function apiGetCrmSingleProjectQuotation<T>(projectId: string) { //
     })
 }
 
+export async function apiGetBillingData(org_id: string) {
+    return ApiService.fetchData<any>({
+        url: `bill/get?org_id=${org_id}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiEditBillingData(formData: any) {
+    return ApiService.fetchData<any>({
+        url: '/bill/edit',
+        method: 'post',
+        data: formData,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetOrgData(org_id: string) {
+    return ApiService.fetchData<any>({
+        url: `org/get?org_id=${org_id}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiEditOrgData(formData: any) {
+    return ApiService.fetchData<any>({
+        url: '/org/edit',
+        method: 'post',
+        data: formData,
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmProjectShareQuotation(formData: any) { //org done
     return ApiService.fetchData<any>({
         url: 'admin/share/quotation',

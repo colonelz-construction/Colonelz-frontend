@@ -133,6 +133,7 @@ const Profile = ({
                         onChange={(event:any) => {
                         const file = event.target.files[0];
                         const url = URL.createObjectURL(file);
+                        console.log(url)
                         form.setFieldValue('avatarUrl', url);
                         form.setFieldValue(field.name, file);
                         setAvatarUrl(url);

@@ -66,6 +66,7 @@ const Primary = () => {
 
     const [details, setDetails] = useState<any>();
     const [countries, setCountries] = useState<Country[]>([]);
+    const [file, setFile] = useState<string>('');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -73,6 +74,9 @@ const Primary = () => {
                 const response = await apiGetOrgData(org_id);
 
                 setDetails(response.data);
+
+                setFile(response.data.org_logo)
+                console.log(response.data)
 
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -129,12 +133,15 @@ const Primary = () => {
         formData.append('org_website', values.org_website)
         formData.append('org_city', values.org_city)
         formData.append('org_country', values.org_country)
-        formData.append('file', values.org_logo)
+        formData.append('org_logo', values.org_logo)
         formData.append('org_address', values.org_address)
         formData.append('org_state', values.org_state)
         formData.append('org_zipcode', values.org_zipcode)
         formData.append('org_id', org_id)
         formData.append('userId', userId)
+
+        console.log(formData)
+        console.log(values)
 
 
         const response = await apiEditOrgData(formData);
@@ -171,6 +178,7 @@ const Primary = () => {
                         details={details}
                         setFieldValue={setFieldValue}
                         values={values}
+                        file={file} setFile={setFile}
                     />
                 )}
             </Formik>
@@ -178,8 +186,8 @@ const Primary = () => {
     );
 };
 
-const FormContent = ({ countries, details, setFieldValue, values }: { countries: Country[]; details: any; setFieldValue: (field: string, value: any) => void; values: FormValues }) => {
-    const [file, setFile] = useState<string | undefined>(undefined);
+const FormContent = ({ countries, details, setFieldValue, values, file, setFile }: {setFile: (field: string) => void; file: string, countries: Country[]; details: any; setFieldValue: (field: string, value: any) => void; values: FormValues }) => {
+    // const [file, setFile] = useState<string | undefined>(undefined);
     const [fileName, setFileName] = useState<string | undefined>(undefined);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [typeOptions, setTypeOptions] = useState<CurrencyOption[]>([]);
@@ -481,18 +489,29 @@ const FormContent = ({ countries, details, setFieldValue, values }: { countries:
                         <input
                             type="file"
                             accept="image/*"
-                            onChange={handleImage} // Handle change directly
+                            onChange={(event:any) => {
+                                // if (event.target.files && event.target.files.length > 0) {
+                                    const selectedFile = event.target.files[0];
+                                    console.log(selectedFile)
+                                    const fileURL = URL.createObjectURL(selectedFile);
+                                    console.log(fileURL)
+
+                                    setFile(fileURL);
+                                    setFileName(selectedFile.name);
+                                    setFieldValue("org_logo", fileURL);
+                                // }
+                            }} // Handle change directly
                             ref={fileInputRef}
                             style={{ display: 'none' }} // Hide the file input if needed
                         />
                         <Field name="org_logo">
-                            {({ field, form }) => (
+                            {({ field, form } : any) => (
                                 <Input
                                     {...field}
                                     type="text" // Show a text input if needed to display file name
                                     value={fileName} // Use your state for file name display
                                     readOnly
-                                    onClick={() => fileInputRef.current.click()} // Trigger file input on click
+                                    onClick={() => fileInputRef?.current?.click()} // Trigger file input on click
                                 />
                             )}
                         </Field>

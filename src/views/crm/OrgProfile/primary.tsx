@@ -20,6 +20,7 @@ interface State {
     geonameId: number;
     name: string;
     adminCode1: string;
+    countryCode:string;
 }
 
 interface City {
@@ -195,7 +196,7 @@ const FormContent = ({ countries, details, setFieldValue, values }: { countries:
         if (details && details.org_country) {
             const country = countries.find(c => c.name === details.org_country);
             if (country) {
-                fetchStates(country.geonameId);
+                fetchStates(country.geonameId , country.isoAlpha2);                
                 setFieldValue('org_country', country.name);
             }
         }
@@ -203,26 +204,21 @@ const FormContent = ({ countries, details, setFieldValue, values }: { countries:
 
     useEffect(() => {
         if (details && details.org_state) {
-            const selstate = states.find(c => c.name === details.org_state);
-            console.log(selstate)
-            if(selstate){
-            fetchCities(selstate.adminCode1);
-            setFieldValue('org_state', selstate.name);
-            }
+            setFieldValue('org_state',details.org_state);
         }
-    }, [details, states]);
+    }, [details]);
 
-    const fetchStates = async (countryGeonameId: number) => {
+    const fetchStates = async (countryGeonameId: number, countryIsoAlpha2:any) => {
         try {
             const response = await fetch(`http://api.geonames.org/childrenJSON?geonameId=${countryGeonameId}&username=${GEONAMES_USERNAME}`);
             const data = await response.json();
             if (Array.isArray(data.geonames)) {
                 setStates(data.geonames);
                 
-                const state = data.geonames.find((s: State) => s.adminCode1 === details.org_state);
+                const state = data.geonames.find((s: State) => s.name === details.org_state);
                 if (state) {
                     setFieldValue('org_state', state.name);
-                    fetchCities(state.adminCode1); // Fetch cities based on the state
+                    fetchCities(state.adminCode1, countryIsoAlpha2); // Fetch cities based on the state
                 }
             }
         } catch (error) {
@@ -230,11 +226,7 @@ const FormContent = ({ countries, details, setFieldValue, values }: { countries:
         }
     };
 
-    const fetchCities = async (stateCode: string) => {
-        
-        const countryIsoAlpha2 = countries.find(c => c.name === details.org_country)?.isoAlpha2;
-        console.log(countryIsoAlpha2);
-        
+    const fetchCities = async (stateCode: string, countryIsoAlpha2:any) => {
         if (countryIsoAlpha2) {
             const requestUrl = `http://api.geonames.org/searchJSON?adminCode1=${stateCode}&country=${countryIsoAlpha2}&username=${GEONAMES_USERNAME}`;
             try {
@@ -242,7 +234,6 @@ const FormContent = ({ countries, details, setFieldValue, values }: { countries:
                 const data = await response.json();
                 if (Array.isArray(data.geonames)) {
                     setCities(data.geonames);
-                    console.log(cities)
                     
                     const city = data.geonames.find((c: City) => c.name === details.org_city);
                     if (city) {
@@ -257,21 +248,23 @@ const FormContent = ({ countries, details, setFieldValue, values }: { countries:
     };
 
     const handleCountryChange = async (option: { value: number; label: string } | null) => {
+        const countryIsoAlpha2 = countries.find(c => c.name === option?.label)?.isoAlpha2;
         setFieldValue('org_country', option ? option.label : '');
         setFieldValue('org_state', ''); 
         setFieldValue('org_city', '');
         
         if (option?.value) {
-            fetchStates(option.value);
+            fetchStates(option.value, countryIsoAlpha2);
         }
     };
 
     const handleStateChange = async (option: { value: string; label: string } | null) => {
+        const countryIsoAlpha2 = states.find(c => c.name === option?.label)?.countryCode;
         setFieldValue('org_state', option ? option.label : '');
         setFieldValue('org_city', ''); 
 
         if (option?.value) {
-            fetchCities(option.value);
+            fetchCities(option.value, countryIsoAlpha2);
         }
     };
 

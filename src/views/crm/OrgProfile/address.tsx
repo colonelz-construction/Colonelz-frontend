@@ -151,16 +151,9 @@ const FormContent = ({ countries, details, setFieldValue, values }: { countries:
 
     useEffect(() => {
         if (details && details.state) {
-            // const selstate = states.find(c => c.name === details.state);
-            // if(selstate){
-            // fetchCities(selstate.adminCode1);
-            // setFieldValue('state', selstate.name);
-            // }
             setFieldValue('state',details.state);
         }
-    }, [details
-        // , states
-    ]);
+    }, [details]);
 
     const fetchStates = async (countryGeonameId: number, countryIsoAlpha2:any) => {
         try {
@@ -168,7 +161,6 @@ const FormContent = ({ countries, details, setFieldValue, values }: { countries:
             const data = await response.json();
             if (Array.isArray(data.geonames)) {
                 setStates(data.geonames);
-                console.log(states)
                 
                 const state = data.geonames.find((s: State) => s.name === details.state);
                 if (state) {

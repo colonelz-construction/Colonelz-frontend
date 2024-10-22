@@ -12,8 +12,13 @@ import { DataProvider } from './FileManagerContext/FIleContext';
 import { AuthorityCheck } from '@/components/shared';
 import { useRoleContext } from '../Roles/RolesContext';
 import { useState, useEffect } from 'react';
+import Archive from '@/views/crm/FileManager/Components/Template/Archive/Components/Index'
+// import { IoMdArchive } from "react-icons/io";
+import { MdOutlineArchive } from "react-icons/md";
+import { useNavigate } from 'react-router-dom';
 
 const FileManager = () => {
+  const navigate = useNavigate();
   const role = localStorage.getItem('role') || '';
   const { roleData, loading } = useRoleContext();
   const [isLoading, setIsLoading] = useState(true);
@@ -31,11 +36,34 @@ const FileManager = () => {
   const hasProjectReadPermission = role === 'SUPERADMIN' ? true : roleData?.data?.project?.read?.includes(role);
   const hasLeadReadPermission = role === 'SUPERADMIN' ? true :  roleData?.data?.lead?.read?.includes(role);
   const hascompanyDataReadPermission = role === 'SUPERADMIN' ? true :  roleData?.data?.companyData?.read?.includes(role);
+  const hasArchiveDataReadPermission = role === 'SUPERADMIN' ? true :  roleData?.data?.archive?.read?.includes(role);
+
+  // useEffect(() => {
+
+  // }, [])
+
+  
+
+  //   interface QueryParams {
+  //     tab:string
+    
+  //   }
+  //   const queryParams = new URLSearchParams(location.search);
+
+  //   const allQueryParams: QueryParams = {
+  //     tab: queryParams.get('tab') || '',
+  //   };
+
+  //   const handleTabChange = (selectedTab:any) => {
+  //     const currentUrlParams = new URLSearchParams(location.search);
+  //     currentUrlParams.set('tab', selectedTab);
+  //     navigate(`${location.pathname}?${currentUrlParams.toString()}`);
+  // };
 
   return (
     <div>
       <Tabs 
-        defaultValue={hasLeadReadPermission ? 'leads' : hasProjectReadPermission ? 'project' : 'company'}
+        defaultValue={"leads"} /*onChange={handleTabChange}*/
       >
         <TabList>
           {hasLeadReadPermission &&
@@ -53,6 +81,11 @@ const FileManager = () => {
               Company Data
             </TabNav>
 }
+          {hasArchiveDataReadPermission &&
+            <TabNav value="archive" icon={<MdOutlineArchive />}>
+              Archive
+            </TabNav>
+}
         </TabList>
         <div className="p-4">
           <DataProvider>
@@ -64,6 +97,9 @@ const FileManager = () => {
             </TabContent>
             <TabContent value="company">
               <Template />
+            </TabContent>
+            <TabContent value="archive">
+              <Archive />
             </TabContent>
           </DataProvider>
         </div>

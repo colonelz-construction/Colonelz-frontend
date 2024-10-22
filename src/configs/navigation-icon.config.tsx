@@ -24,6 +24,7 @@ import {
     HiOutlineVariable,
     HiOutlineCode,
 } from 'react-icons/hi'
+import { TbMessageChatbot } from "react-icons/tb";
 import { MdOutlineDashboard,MdManageAccounts } from "react-icons/md";
 import { LuWarehouse,LuFileStack } from "react-icons/lu";
 import { GoProject } from "react-icons/go";
@@ -33,6 +34,7 @@ export type NavigationIcons = Record<string, JSX.Element>
 
 const navigationIcon: NavigationIcons = {
     apps: <HiOutlineViewGridAdd />,
+    chatbot: <TbMessageChatbot />,
     project: <HiOutlineChartSquareBar />,
     crm: <HiOutlineUserGroup />,
     salesa: <HiOutlineTrendingUp />,

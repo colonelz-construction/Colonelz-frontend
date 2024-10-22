@@ -1,5 +1,4 @@
 import React, { SyntheticEvent, createContext, useEffect, useState } from 'react'
-
 import makeAnimated from 'react-select/animated'
 import { Formik, Field, Form, ErrorMessage, FieldProps, useFormikContext, FormikProps, FormikValues } from 'formik'
 import * as Yup from 'yup'
@@ -252,6 +251,7 @@ const FormContent = () => {
             <h3 className="mb-4">Contract</h3>
             <Form className="">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    
                     <FormItem label="Project Type">
                         <Field name="project_type">
                             {({ field, form }: FieldProps) => (
@@ -274,6 +274,7 @@ const FormContent = () => {
                             className=" text-red-600"
                         />
                     </FormItem>
+
                     <FormItem label="Contract Type">
                         <Field name="contract_type">
                             {({ field, form }: FieldProps) => (

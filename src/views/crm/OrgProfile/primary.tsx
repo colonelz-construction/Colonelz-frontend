@@ -133,7 +133,7 @@ const Primary = () => {
         formData.append('org_website', values.org_website)
         formData.append('org_city', values.org_city)
         formData.append('org_country', values.org_country)
-        formData.append('org_logo', values.org_logo)
+        formData.append('file', values.org_logo)
         formData.append('org_address', values.org_address)
         formData.append('org_state', values.org_state)
         formData.append('org_zipcode', values.org_zipcode)
@@ -498,7 +498,10 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
 
                                     setFile(fileURL);
                                     setFileName(selectedFile.name);
-                                    setFieldValue("org_logo", fileURL);
+
+                                    console.log(selectedFile.name)
+                                    console.log(selectedFile)
+                                    setFieldValue("org_logo", selectedFile);
                                 // }
                             }} // Handle change directly
                             ref={fileInputRef}

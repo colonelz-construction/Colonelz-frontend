@@ -166,7 +166,7 @@ const EditRoles = () => {
                             </Notification>
                         );
                         setTimeout(() => {
-                            navigate('/app/crm/profile');
+                            navigate('/app/crm/profile?type=roles');
                             window.location.reload();
                         }, 2000);
                     } else {

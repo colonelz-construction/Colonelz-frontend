@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Formik, Field, Form, ErrorMessage, FieldProps, useFormikContext } from 'formik';
+import { useEffect, useState } from 'react';
+import { Formik, Field, Form, ErrorMessage, FieldProps } from 'formik';
 import * as Yup from 'yup';
 import { Button, FormItem, Input, Notification, Select, toast } from '@/components/ui';
 import { apiGetBillingData, apiEditBillingData } from '@/services/CrmService';
@@ -36,11 +36,11 @@ interface FormValues {
 }
 
 const validationSchema = Yup.object().shape({
-    billing_shipping_address: Yup.string().required('Address is required'),
-    country: Yup.string().required('Country is required'),
-    state: Yup.string().required('State is required'),
-    city: Yup.string().required('City is required'),
-    zipcode: Yup.string().required('ZIP Code is required'),
+    // billing_shipping_address: Yup.string().required('Address is required'),
+    // country: Yup.string().required('Country is required'),
+    // state: Yup.string().required('State is required'),
+    // city: Yup.string().required('City is required'),
+    // zipcode: Yup.string().required('ZIP Code is required'),
 });
 
 const Address = () => {
@@ -234,7 +234,7 @@ const FormContent = ({ countries, details, setFieldValue, values }: { countries:
     return (
         <Form>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                <FormItem label="Billing & Shipping Address" asterisk>
+                <FormItem label="Billing & Shipping Address" >
                     <Field
                         component={Input}
                         type="text"
@@ -244,7 +244,7 @@ const FormContent = ({ countries, details, setFieldValue, values }: { countries:
                     <ErrorMessage name="billing_shipping_address" component="div" className="text-red-600" />
                 </FormItem>
 
-                <FormItem label="Country" asterisk>
+                <FormItem label="Country" >
                     <Field name="country">
                         {({ field }: FieldProps) => (
                             <Select
@@ -258,7 +258,7 @@ const FormContent = ({ countries, details, setFieldValue, values }: { countries:
                     <ErrorMessage name="country" component="div" className="text-red-600" />
                 </FormItem>
 
-                <FormItem label="State" asterisk>
+                <FormItem label="State" >
                     <Field name="state">
                         {({ field }: FieldProps) => (
                             <Select
@@ -272,7 +272,7 @@ const FormContent = ({ countries, details, setFieldValue, values }: { countries:
                     <ErrorMessage name="state" component="div" className="text-red-600" />
                 </FormItem>
 
-                <FormItem label="City" asterisk>
+                <FormItem label="City" >
                     <Field name="city">
                         {({ field }: FieldProps) => (
                             <Select
@@ -288,7 +288,7 @@ const FormContent = ({ countries, details, setFieldValue, values }: { countries:
                     <ErrorMessage name="city" component="div" className="text-red-600" />
                 </FormItem>
 
-                <FormItem label="ZIP Code" asterisk>
+                <FormItem label="ZIP Code" >
                     <Field
                         component={Input}
                         type="text"

@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { Formik, Field, Form, ErrorMessage, FieldProps, useFormikContext, FormikProps, FormikValues } from 'formik'
+import { useEffect, useState, useRef } from 'react'
+import { Formik, Field, Form, ErrorMessage, FieldProps } from 'formik'
 import * as Yup from 'yup'
-import { Button, Checkbox, DatePicker, FormItem, Input, InputGroup, Notification, Select, toast } from '@/components/ui'
+import { Button, FormItem, Input, Notification, Select, toast } from '@/components/ui'
 import { apiGetOrgData, apiEditOrgData } from '@/services/CrmService'
 
 
@@ -20,7 +20,7 @@ interface State {
     geonameId: number;
     name: string;
     adminCode1: string;
-    countryCode:string;
+    countryCode: string;
 }
 
 interface City {
@@ -52,14 +52,10 @@ interface CurrencyOption {
 
 const validationSchema = Yup.object().shape({
     // organization: Yup.string().required('Required'),
-    // // email: Yup.string().email('Invalid email').required('Email is required'),
-    // org_email: Yup.string().email('Invalid organization email').required('Organization Email is required'),
+    // // org_email: Yup.string().email('Invalid organization email').required('Organization Email is required'),
     // org_phone: Yup.number()
-    //     .required('Contact Number is required')
-    //     .lessThan(10000000000, 'Contact number must be exactly 10 digits'),
-
-
-
+    //     .required('Contact Number is required'),
+    // currency: Yup.string().required('Required'),
 })
 
 const Primary = () => {
@@ -72,12 +68,8 @@ const Primary = () => {
         const fetchData = async () => {
             try {
                 const response = await apiGetOrgData(org_id);
-
                 setDetails(response.data);
-
                 setFile(response.data.org_logo)
-                console.log(response.data)
-
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -140,10 +132,6 @@ const Primary = () => {
         formData.append('org_id', org_id)
         formData.append('userId', userId)
 
-        console.log(formData)
-        console.log(values)
-
-
         const response = await apiEditOrgData(formData);
         setSubmitting(false)
         if (response.code === 200) {
@@ -160,9 +148,7 @@ const Primary = () => {
                     {response.errorMessage}
                 </Notification>
             )
-
         }
-        console.log(response)
     }
     return (
         <>
@@ -186,25 +172,20 @@ const Primary = () => {
     );
 };
 
-const FormContent = ({ countries, details, setFieldValue, values, file, setFile }: {setFile: (field: string) => void; file: string, countries: Country[]; details: any; setFieldValue: (field: string, value: any) => void; values: FormValues }) => {
-    // const [file, setFile] = useState<string | undefined>(undefined);
+const FormContent = ({ countries, details, setFieldValue, values, file, setFile }: { setFile: (field: string) => void; file: string, countries: Country[]; details: any; setFieldValue: (field: string, value: any) => void; values: FormValues }) => {
+
     const [fileName, setFileName] = useState<string | undefined>(undefined);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [typeOptions, setTypeOptions] = useState<CurrencyOption[]>([]);
 
-    const [country1, setCountry1] = useState<any>();
     const [states, setStates] = useState<State[]>([]);
     const [cities, setCities] = useState<City[]>([]);
-    // const [selectedCountry, setSelectedCountry] = useState<string | number | null>(null);
-    // const [selectedState, setSelectedState] = useState<string>('');
-    // const [selectedCity, setSelectedCity] = useState<string>('');
-    // const [zipCode, setZipCode] = useState<string>('');
 
     useEffect(() => {
         if (details && details.org_country) {
             const country = countries.find(c => c.name === details.org_country);
             if (country) {
-                fetchStates(country.geonameId , country.isoAlpha2);                
+                fetchStates(country.geonameId, country.isoAlpha2);
                 setFieldValue('org_country', country.name);
             }
         }
@@ -212,17 +193,17 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
 
     useEffect(() => {
         if (details && details.org_state) {
-            setFieldValue('org_state',details.org_state);
+            setFieldValue('org_state', details.org_state);
         }
     }, [details]);
 
-    const fetchStates = async (countryGeonameId: number, countryIsoAlpha2:any) => {
+    const fetchStates = async (countryGeonameId: number, countryIsoAlpha2: any) => {
         try {
             const response = await fetch(`http://api.geonames.org/childrenJSON?geonameId=${countryGeonameId}&username=${GEONAMES_USERNAME}`);
             const data = await response.json();
             if (Array.isArray(data.geonames)) {
                 setStates(data.geonames);
-                
+
                 const state = data.geonames.find((s: State) => s.name === details.org_state);
                 if (state) {
                     setFieldValue('org_state', state.name);
@@ -234,7 +215,7 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
         }
     };
 
-    const fetchCities = async (stateCode: string, countryIsoAlpha2:any) => {
+    const fetchCities = async (stateCode: string, countryIsoAlpha2: any) => {
         if (countryIsoAlpha2) {
             const requestUrl = `http://api.geonames.org/searchJSON?adminCode1=${stateCode}&country=${countryIsoAlpha2}&username=${GEONAMES_USERNAME}`;
             try {
@@ -242,7 +223,7 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
                 const data = await response.json();
                 if (Array.isArray(data.geonames)) {
                     setCities(data.geonames);
-                    
+
                     const city = data.geonames.find((c: City) => c.name === details.org_city);
                     if (city) {
                         setFieldValue('org_city', city.name);
@@ -258,9 +239,9 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
     const handleCountryChange = async (option: { value: number; label: string } | null) => {
         const countryIsoAlpha2 = countries.find(c => c.name === option?.label)?.isoAlpha2;
         setFieldValue('org_country', option ? option.label : '');
-        setFieldValue('org_state', ''); 
+        setFieldValue('org_state', '');
         setFieldValue('org_city', '');
-        
+
         if (option?.value) {
             fetchStates(option.value, countryIsoAlpha2);
         }
@@ -269,7 +250,7 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
     const handleStateChange = async (option: { value: string; label: string } | null) => {
         const countryIsoAlpha2 = states.find(c => c.name === option?.label)?.countryCode;
         setFieldValue('org_state', option ? option.label : '');
-        setFieldValue('org_city', ''); 
+        setFieldValue('org_city', '');
 
         if (option?.value) {
             fetchCities(option.value, countryIsoAlpha2);
@@ -316,23 +297,6 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
 
         fetchCurrencies();
     }, []);
-    // function handleImage(e: React.ChangeEvent<HTMLInputElement>) {
-    //     if (e.target.files && e.target.files.length > 0) {
-    //         const selectedFile = e.target.files[0];
-    //         setFile(URL.createObjectURL(selectedFile));
-    //         setFileName(selectedFile.name);
-    //         setFieldValue("org_logo", fileName);
-    //     }
-    // }
-    function handleImage(e: React.ChangeEvent<HTMLInputElement>) {
-        if (e.target.files && e.target.files.length > 0) {
-            const selectedFile = e.target.files[0];
-            const fileURL = URL.createObjectURL(selectedFile);
-            setFile(fileURL);
-            setFileName(selectedFile.name);
-            setFieldValue("org_logo", selectedFile);
-        }
-    }
 
     return (
         <>
@@ -343,7 +307,6 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
                             component={Input}
                             type="text"
                             name="organization"
-                            // value={details?.organization}
                             placeholder="Organization Name"
                         />
                         <ErrorMessage
@@ -353,13 +316,12 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
                         />
                     </FormItem>
 
-                    <FormItem label="Email" asterisk >
+                    <FormItem label="Email">
                         <Field
                             component={Input}
                             type="text"
                             name="email"
                             placeholder="Email"
-                            // value={details?.email}
                             disabled
                         />
                         <ErrorMessage
@@ -369,13 +331,12 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
                         />
                     </FormItem>
 
-                    <FormItem label="Organization Email" asterisk>
+                    <FormItem label="Organization Email">
                         <Field
                             component={Input}
                             type="text"
                             name="org_email"
                             placeholder="Organization Email"
-                        // value={details?.org_email}
                         />
                         <ErrorMessage
                             name="type"
@@ -384,9 +345,8 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
                         />
                     </FormItem>
 
-                    <FormItem label="Contact Number" asterisk>
+                    <FormItem label="Contact Number">
                         <Field name='org_phone' placeholder="Contact Number" type="text"
-                        // value={details?.org_phone}
                         >
                             {({ field, form }: any) => (
                                 <Input
@@ -414,13 +374,12 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
                         />
                     </FormItem>
 
-                    <FormItem label="Website" asterisk>
+                    <FormItem label="Website">
                         <Field
                             component={Input}
                             type="text"
                             name="org_website"
                             placeholder="Website"
-                        // value={details?.org_website}
                         />
                         <ErrorMessage
                             name="type"
@@ -435,7 +394,6 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
                             type="text"
                             name="vat_tax_gst_number"
                             placeholder="Vat/Tax No/GST"
-                        // value={details?.vat_tax_gst_number}
                         />
                         <ErrorMessage
                             name="type"
@@ -444,77 +402,116 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
                         />
                     </FormItem>
 
-                    <FormItem label="Logo Preview">
-                        {file && (
-                            <div style={{
-                                width: '200px',
-                                height: '200px',
-                                borderRadius: '50%',
-                                overflow: 'hidden',
-                                border: '2px solid #ccc',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                margin: '0 auto', // Center the circle
-                            }}>
-                                <img
-                                    src={file}
-                                    alt="Preview"
-                                    style={{
-                                        width: '100%',
-                                        height: '100%',
-                                        objectFit: 'cover' // Ensures the image covers the circle
-                                    }}
-                                />
-                            </div>
-                        )}
-                    </FormItem>
-                    {/* <FormItem label="Upload Logo">
-                        <Field
-                            component={Input}
-                            type="file"
-                            name="org_logo"
-                            onChange={handleImage}
-                            accept="image/*"
-                            ref={fileInputRef}
+                    {/* <FormItem label="">
+                        <div className=' border-white dark:border-gray-800 shadow-lg transition-all duration-300 hover:blur w-48 h-48 rounded-full relative cursor-pointer'
+                            onClick={() => document.getElementById('avatarInput')?.click()}
                         >
-                        </Field>
-                        <ErrorMessage
-                            name="org_logo"
-                            component="div"
-                            className="text-red-600"
-                        />
+                            {file && (
+                                <div style={{
+                                    width: '200px',
+                                    height: '200px',
+                                    borderRadius: '50%',
+                                    overflow: 'hidden',
+                                    border: '2px solid #ccc',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    margin: '0 auto',
+                                }}>
+                                    <img
+                                        src={file}
+                                        alt="Preview"
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover'
+                                        }}
+                                    />
+                                </div>
+                            )}
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(event: any) => {
+                                    const selectedFile = event.target.files[0];
+                                    const fileURL = URL.createObjectURL(selectedFile);
+                                    setFile(fileURL);
+                                    setFileName(selectedFile.name);
+                                    setFieldValue("org_logo", selectedFile);
+                                }}
+                                ref={fileInputRef}
+                                style={{
+                                    display: 'none',
+                                }}
+                            />
+                        </div>
                     </FormItem> */}
-                    <FormItem label="Upload Logo">
+
+                    <FormItem label="Organisation Logo">
+                        <div
+                            className="border-white dark:border-gray-800 shadow-lg transition-all duration-300 w-40 h-40 rounded-full relative cursor-pointer group flex justify-center items-center mx-auto mt-2"
+                            onClick={() => document.getElementById('avatarInput')?.click()}
+                        >
+                            {file && (
+                                <div className="w-40 h-40 rounded-full overflow-hidden border-2 border-gray-300 flex justify-center items-center mx-auto">
+                                    <img
+                                        src={file}
+                                        alt="Preview"
+                                        className="w-full h-full object-cover transition-all duration-300 group-hover:blur"
+                                    />
+                                </div>
+                            )}
+                            <input
+                                type="file"
+                                id="avatarInput"
+                                accept="image/*"
+                                onChange={(event: any) => {
+                                    const selectedFile = event.target.files[0];
+                                    const fileURL = URL.createObjectURL(selectedFile);
+                                    setFile(fileURL);
+                                    setFileName(selectedFile.name);
+                                    setFieldValue('org_logo', selectedFile);
+                                }}
+                                ref={fileInputRef}
+                                style={{
+                                    display: 'none',
+                                }}
+                            />
+                            <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full">
+                                Edit
+                            </div>
+                        </div>
+                    </FormItem>
+
+                    <FormItem label="Upload Logo" className='hidden'>
                         <input
                             type="file"
                             accept="image/*"
-                            onChange={(event:any) => {
-                                // if (event.target.files && event.target.files.length > 0) {
-                                    const selectedFile = event.target.files[0];
-                                    console.log(selectedFile)
-                                    const fileURL = URL.createObjectURL(selectedFile);
-                                    console.log(fileURL)
-
-                                    setFile(fileURL);
-                                    setFileName(selectedFile.name);
-
-                                    console.log(selectedFile.name)
-                                    console.log(selectedFile)
-                                    setFieldValue("org_logo", selectedFile);
-                                // }
-                            }} // Handle change directly
+                            onChange={(event: any) => {
+                                const selectedFile = event.target.files[0];
+                                const fileURL = URL.createObjectURL(selectedFile);
+                                setFile(fileURL);
+                                setFileName(selectedFile.name);
+                                setFieldValue("org_logo", selectedFile);
+                            }}
                             ref={fileInputRef}
-                            style={{ display: 'none' }} // Hide the file input if needed
+                            style={{
+                                display: 'none',
+                            }}
                         />
                         <Field name="org_logo">
-                            {({ field, form } : any) => (
+                            {({ field, form }: any) => (
                                 <Input
                                     {...field}
-                                    type="text" // Show a text input if needed to display file name
-                                    value={fileName} // Use your state for file name display
+                                    type="text"
+                                    id="avatarInput"
+                                    value={fileName}
                                     readOnly
-                                    onClick={() => fileInputRef?.current?.click()} // Trigger file input on click
+                                    onClick={() => fileInputRef?.current?.click()}
+                                    style={{
+                                        display: 'none',
+                                    }}
+
                                 />
                             )}
                         </Field>
@@ -550,76 +547,8 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
                             className=" text-red-600"
                         />
                     </FormItem>
-                    {/* <FormItem label="Organization Address" asterisk>
-                        <Field
-                            component={Input}
-                            type="text"
-                            name="org_address"
-                            placeholder="Organization Address"
-                        // value={details?.org_address}
-                        />
-                        <ErrorMessage
-                            name="type"
-                            component="div"
-                            className=" text-red-600"
-                        />
-                    </FormItem>
-                    <FormItem label="Country" asterisk>
-                        <Field name="org_country">
-                            {({ field, form }: FieldProps) => (
-                                <Select
-                                    options={countryOptions}
-                                    onChange={handleCountryChange}
-                                    value={countryOptions.find(option => option.label === country1)
-                                        // || details?.org_country   
-                                    }
-                                    placeholder="Select Country"
-                                />
-                            )}
-                        </Field>
-                        <ErrorMessage name="org_country" component="div" className="text-red-600" />
-                    </FormItem>
 
-                    <FormItem label="State" asterisk>
-                        <Select
-                            name='org_state'
-                            options={stateOptions}
-                            onChange={handleStateChange}
-                            value={stateOptions.find(option => option.value === selectedState) || null}
-                            placeholder="Select State"
-                        />
-                        <ErrorMessage name="state" component="div" className="text-red-600" />
-                    </FormItem>
-
-                    <FormItem label="City" asterisk>
-                        <Select
-                            name='org_city'
-                            options={cityOptions}
-                            onChange={(option) => {
-                                const cityName = option?.label || '';
-                                setSelectedCity(cityName);
-                            }}
-                            value={cityOptions.find(option => option.label === selectedCity) || null}
-                            placeholder="Select City"
-                        />
-                        <ErrorMessage name="city" component="div" className="text-red-600" />
-                    </FormItem>
-
-                    <FormItem label="ZIP Code" asterisk>
-                        <Field
-                            component={Input}
-                            type="text"
-                            name="org_zipcode"
-                            placeholder="ZIP Code"
-                        // value={details?.org_zipcode}
-                        />
-                        <ErrorMessage
-                            name="type"
-                            component="div"
-                            className=" text-red-600"
-                        />
-                    </FormItem> */}
-                    <FormItem label="Organisation Address" asterisk>
+                    <FormItem label="Organisation Address">
                         <Field
                             component={Input}
                             type="text"
@@ -643,7 +572,7 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
                         <ErrorMessage name="org_country" component="div" className="text-red-600" />
                     </FormItem>
 
-                    <FormItem label="Organisation State" asterisk>
+                    <FormItem label="Organisation State">
                         <Field name="org_state">
                             {({ field }: FieldProps) => (
                                 <Select
@@ -657,7 +586,7 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
                         <ErrorMessage name="org_state" component="div" className="text-red-600" />
                     </FormItem>
 
-                    <FormItem label="Organisation City" asterisk>
+                    <FormItem label="Organisation City">
                         <Field name="org_city">
                             {({ field }: FieldProps) => (
                                 <Select

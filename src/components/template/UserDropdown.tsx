@@ -11,7 +11,7 @@ import { useContext } from 'react'
 import { UserDetailsContext } from '@/views/Context/userdetailsContext'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import { AuthorityCheck } from '../shared'
-import { FaBuilding } from "react-icons/fa";
+import { FaRegBuilding } from "react-icons/fa";
 
 type DropdownList = {
     label: string
@@ -41,7 +41,7 @@ const _UserDropdown = ({ className }: CommonProps) => {
         {
             label:"Organisation Profile",
             path:"/app/crm/org-profile?type=primary-details",
-            icon:<FaBuilding/>,
+            icon:<FaRegBuilding/>,
             authority:['SUPERADMIN']
         
             },

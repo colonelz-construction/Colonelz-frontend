@@ -19,14 +19,33 @@ const Index = () => {
                 },
                 body: JSON.stringify({ question: inputValue }),
             });
-            const data = await response.text();
-            console.log(data)
 
-            // Update messages with the chatbot response
-            setMessages((prevMessages) => [
-                ...prevMessages,
-                { text: data || "Sorry, I didn't understand that.", sender: "bot" },
-            ]);
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder();
+            let result = "";
+
+            if (reader) {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    result += decoder.decode(value, { stream: true });
+
+                    // Process complete messages as they arrive
+                    const messages = result.split("\n\n");
+                    messages.forEach((msg) => {
+                        if (msg.startsWith("data: ")) {
+                            const message = msg.slice(6).trim(); // Extract the message
+
+                            // Update the messages state progressively
+                            setMessages((prevMessages) => [
+                                ...prevMessages,
+                                { text: message, sender: "bot" },
+                            ]);
+                        }
+                    });
+                }
+            }
         } catch (error) {
             console.error("Error fetching chatbot response:", error);
             setMessages((prevMessages) => [

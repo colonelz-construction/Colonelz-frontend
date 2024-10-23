@@ -5,27 +5,25 @@ import { Button, FormItem, Input, Notification, Select, toast } from '@/componen
 import { apiGetOrgData, apiEditOrgData } from '@/services/CrmService'
 
 
-const GEONAMES_USERNAME = import.meta.env.VITE_APP_USERNAME
+const apiToken = import.meta.env.VITE_API_TOKEN;
+const userEmail = import.meta.env.VITE_USER_EMAIL;
 
 const org_id: any = localStorage.getItem('orgId')
 const userId: any = localStorage.getItem('userId')
 
 interface Country {
-    geonameId: number;
     name: string;
-    isoAlpha2: string; // For country code
+    alpha2Code: string;
 }
 
 interface State {
-    geonameId: number;
     name: string;
-    adminCode1: string;
-    countryCode: string;
+    state_name: string;
 }
 
 interface City {
-    geonameId: number;
     name: string;
+    city_name: string;
 }
 
 interface FormValues {
@@ -62,6 +60,7 @@ const Primary = () => {
 
     const [details, setDetails] = useState<any>();
     const [countries, setCountries] = useState<Country[]>([]);
+    const [authToken, setAuthToken] = useState<string | null>(null);
     const [file, setFile] = useState<string>('');
 
     useEffect(() => {
@@ -76,27 +75,50 @@ const Primary = () => {
         }
         fetchData();
     }, [])
-    console.log(details)
+
+    useEffect(() => {
+        const getAuthToken = async () => {
+            try {
+                const response = await fetch(`https://www.universal-tutorial.com/api/getaccesstoken`, {
+                    headers: {
+                        "Accept": "application/json",
+                        "api-token": apiToken,
+                        "user-email": userEmail,
+                    },
+                });
+                const data = await response.json();
+                setAuthToken(data.auth_token);
+            } catch (error) {
+                console.error('Error fetching auth token:', error);
+            }
+        };
+
+        getAuthToken();
+    }, []);
 
     useEffect(() => {
         const fetchCountries = async () => {
+            if (!authToken) return;
             try {
-                const response = await fetch(`http://api.geonames.org/countryInfoJSON?username=${GEONAMES_USERNAME}`);
+                const response = await fetch(`https://www.universal-tutorial.com/api/countries/`, {
+                    headers: {
+                        "Authorization": `Bearer ${authToken}`,
+                        "Accept": "application/json",
+                    },
+                });
                 const data = await response.json();
-                if (Array.isArray(data.geonames)) {
-                    const formattedCountries = data.geonames.map((country: any) => ({
-                        geonameId: country.geonameId,
-                        name: country.countryName,
-                        isoAlpha2: country.countryCode,
+                    const formattedCountries = data.map((country: any) => ({
+                        name: country.country_name,
+                        alpha2Code: country.country_short_name,
                     }));
                     setCountries(formattedCountries);
-                }
+               
             } catch (error) {
                 console.error('Error fetching countries:', error);
             }
         };
         fetchCountries();
-    }, []);
+    }, [authToken]);
 
     const initialValues: FormValues = {
         organization: details?.organization || '',
@@ -134,6 +156,7 @@ const Primary = () => {
 
         const response = await apiEditOrgData(formData);
         setSubmitting(false)
+
         if (response.code === 200) {
             toast.push(
                 <Notification type='success' duration={2000}>
@@ -165,6 +188,7 @@ const Primary = () => {
                         setFieldValue={setFieldValue}
                         values={values}
                         file={file} setFile={setFile}
+                        authToken={authToken}
                     />
                 )}
             </Formik>
@@ -172,7 +196,7 @@ const Primary = () => {
     );
 };
 
-const FormContent = ({ countries, details, setFieldValue, values, file, setFile }: { setFile: (field: string) => void; file: string, countries: Country[]; details: any; setFieldValue: (field: string, value: any) => void; values: FormValues }) => {
+const FormContent = ({ countries, details, setFieldValue, values,authToken, file, setFile }: { setFile: (field: string) => void; file: string, countries: Country[]; details: any; setFieldValue: (field: string, value: any) => void; values: FormValues; authToken: string | null }) => {
 
     const [fileName, setFileName] = useState<string | undefined>(undefined);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -185,7 +209,7 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
         if (details && details.org_country) {
             const country = countries.find(c => c.name === details.org_country);
             if (country) {
-                fetchStates(country.geonameId, country.isoAlpha2);
+                fetchStates(country.name);
                 setFieldValue('org_country', country.name);
             }
         }
@@ -197,78 +221,89 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
         }
     }, [details]);
 
-    const fetchStates = async (countryGeonameId: number, countryIsoAlpha2: any) => {
+    const fetchStates = async (countryName: string) => {
+        if (!authToken) return;
         try {
-            const response = await fetch(`http://api.geonames.org/childrenJSON?geonameId=${countryGeonameId}&username=${GEONAMES_USERNAME}`);
+            const response = await fetch(`https://www.universal-tutorial.com/api/states/${countryName}`, {
+                headers: {
+                    "Authorization": `Bearer ${authToken}`,
+                    "Accept": "application/json",
+                },
+            });
             const data = await response.json();
-            if (Array.isArray(data.geonames)) {
-                setStates(data.geonames);
+            const formattedStates = data.map((state: any) => ({
+                name: state.state_name,
+            }));
+            setStates(formattedStates);
 
-                const state = data.geonames.find((s: State) => s.name === details.org_state);
+                const state = data.find((s: State) => s.state_name === details.org_state);
                 if (state) {
-                    setFieldValue('org_state', state.name);
-                    fetchCities(state.adminCode1, countryIsoAlpha2); // Fetch cities based on the state
+                    setFieldValue('org_state', state.state_name);
+                    fetchCities(state.state_name); // Fetch cities based on the state
                 }
-            }
+            
         } catch (error) {
             console.error('Error fetching states:', error);
         }
     };
 
-    const fetchCities = async (stateCode: string, countryIsoAlpha2: any) => {
-        if (countryIsoAlpha2) {
-            const requestUrl = `http://api.geonames.org/searchJSON?adminCode1=${stateCode}&country=${countryIsoAlpha2}&username=${GEONAMES_USERNAME}`;
+    const fetchCities = async (stateName: string) => {
+        if (!authToken) return;
             try {
-                const response = await fetch(requestUrl);
+                const response = await fetch(`https://www.universal-tutorial.com/api/cities/${stateName}`, {
+                    headers: {
+                        "Authorization": `Bearer ${authToken}`,
+                        "Accept": "application/json",
+                    },
+                });
                 const data = await response.json();
-                if (Array.isArray(data.geonames)) {
-                    setCities(data.geonames);
+                    setCities(data);
 
-                    const city = data.geonames.find((c: City) => c.name === details.org_city);
+                    const city = data.find((c: City) => c.name === details.org_city);
                     if (city) {
                         setFieldValue('org_city', city.name);
                         setFieldValue('org_zipcode', details.org_zipcode || '');
                     }
-                }
+                    const formattedCities = data.map((city: any) => ({
+                        name: city.city_name,
+                    }));
+                    setCities(formattedCities);
             } catch (error) {
                 console.error('Error fetching cities:', error);
             }
         }
-    };
 
     const handleCountryChange = async (option: { value: number; label: string } | null) => {
-        const countryIsoAlpha2 = countries.find(c => c.name === option?.label)?.isoAlpha2;
         setFieldValue('org_country', option ? option.label : '');
         setFieldValue('org_state', '');
         setFieldValue('org_city', '');
 
-        if (option?.value) {
-            fetchStates(option.value, countryIsoAlpha2);
+        if (option) {
+            fetchStates(option.label);
         }
     };
 
     const handleStateChange = async (option: { value: string; label: string } | null) => {
-        const countryIsoAlpha2 = states.find(c => c.name === option?.label)?.countryCode;
         setFieldValue('org_state', option ? option.label : '');
         setFieldValue('org_city', '');
 
-        if (option?.value) {
-            fetchCities(option.value, countryIsoAlpha2);
+        if (option) {
+            fetchCities(option.value);
         }
     };
 
     const countryOptions = countries.map(country => ({
-        value: country.geonameId,
+        value: country.alpha2Code,
         label: country.name,
     }));
 
     const stateOptions = states.map(state => ({
-        value: state.adminCode1,
+        value: state.name,
         label: state.name,
     }));
 
     const cityOptions = cities.map(city => ({
-        value: city.geonameId,
+        value: city.name,
         label: city.name,
     }));
 
@@ -563,7 +598,7 @@ const FormContent = ({ countries, details, setFieldValue, values, file, setFile 
                             {({ field }: FieldProps) => (
                                 <Select
                                     options={countryOptions}
-                                    onChange={handleCountryChange}
+                                    onChange={()=>handleCountryChange}
                                     value={countryOptions.find(option => option.label === field.value) || null}
                                     placeholder="Select Country"
                                 />

@@ -102,7 +102,7 @@ const Address = () => {
         };
         fetchCountries();
     }, [authToken]);
-
+    
     const initialValues: FormValues = {
         billing_shipping_address: details?.billing_shipping_address || '',
         country: details?.country || '',
@@ -233,7 +233,7 @@ const FormContent = ({ countries, details, setFieldValue, values, authToken }: {
             }
     };
 
-    const handleCountryChange = async (option: { value: number; label: string } | null) => {
+    const handleCountryChange = async (option: { value: string; label: string } | null) => {
         setFieldValue('country', option ? option.label : '');
         setFieldValue('state', '');
         setFieldValue('city', '');
@@ -286,8 +286,7 @@ const FormContent = ({ countries, details, setFieldValue, values, authToken }: {
                         {({ field }: FieldProps) => (
                             <Select
                                 options={countryOptions}
-                                onChange={()=>handleCountryChange}
-                                value={countryOptions.find(option => option.label === field.value) || null}
+                                onChange={handleCountryChange}                                value={countryOptions.find(option => option.label === field.value) || null}
                                 placeholder="Select Country"
                             />
                         )}

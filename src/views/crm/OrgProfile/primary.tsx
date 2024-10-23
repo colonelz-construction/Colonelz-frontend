@@ -273,7 +273,7 @@ const FormContent = ({ countries, details, setFieldValue, values,authToken, file
             }
         }
 
-    const handleCountryChange = async (option: { value: number; label: string } | null) => {
+    const handleCountryChange = async (option: { value: string; label: string } | null) => {
         setFieldValue('org_country', option ? option.label : '');
         setFieldValue('org_state', '');
         setFieldValue('org_city', '');
@@ -598,7 +598,7 @@ const FormContent = ({ countries, details, setFieldValue, values,authToken, file
                             {({ field }: FieldProps) => (
                                 <Select
                                     options={countryOptions}
-                                    onChange={()=>handleCountryChange}
+                                    onChange={handleCountryChange}
                                     value={countryOptions.find(option => option.label === field.value) || null}
                                     placeholder="Select Country"
                                 />

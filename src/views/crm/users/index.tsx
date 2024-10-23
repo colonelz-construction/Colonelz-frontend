@@ -188,9 +188,13 @@ const Users = () => {
                 header: '',
                 id: 'action',
                 cell: ({ row }) => {
+
+                    console.log(row.original.role)
                     return (
                         <div className="">
-                            <span className="flex items-center text-lg gap-2">
+                            {row.original.role !== "SUPERADMIN" &&
+                                
+                                <span className="flex items-center text-lg gap-2">
                                 {
                                     // editAccess&&
                                     <Tooltip title="Edit">
@@ -236,7 +240,7 @@ const Users = () => {
                                     </p>
                                     </AuthorityCheck>
                                 </Tooltip>
-                            </span>
+                            </span>}
                         </div>
                     )
                 },

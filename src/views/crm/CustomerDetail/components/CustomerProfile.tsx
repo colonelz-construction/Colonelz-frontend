@@ -116,7 +116,8 @@ interface ProjectUpdateData {
           designer:data.data.designer,
           timeline_date:new Date(data.data.timeline_date),
           project_status:data.data.project_status,
-          client_email:data.data.client[0].client_email
+          client_email:data.data.client[0].client_email,
+          description: data.data.description
         }}
         validationSchema={validationSchema}
         onSubmit={
@@ -244,6 +245,20 @@ interface ProjectUpdateData {
             )}
             </Field>
             </FormItem>
+
+            <FormItem label='Desription'>
+                                <Field name='description' placeholder='description'>
+                                    {({field, form}:any)=>{
+                                        return (
+                                            <Input textArea
+                                            name='description'
+                                            value={values.description}
+                                            onChange={(e)=>form.setFieldValue('description',e.target.value)}
+                                            {...field}/>
+                                        )
+                                    }}
+                                </Field>
+                            </FormItem>
           <Button type="submit" 
            variant='solid'
              loading={isSubmitting}

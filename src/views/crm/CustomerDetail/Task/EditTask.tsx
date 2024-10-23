@@ -33,6 +33,8 @@ type Task = {
   }
 
 const EditTask = ({ Data,users,task }: EditTaskProps) => {
+
+    console.log(users)
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const org_id = localStorage.getItem('orgId')
@@ -63,8 +65,8 @@ const priorityOptions = [
   ];
   
   const userOptions = users?.map((user:any) => ({
-    label: user.user_name,
-    value: user.user_name
+    label: user,
+    value: user
   }));
 
   const formateDate = (dateString:string) => {

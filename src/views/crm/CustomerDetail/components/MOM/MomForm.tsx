@@ -95,7 +95,7 @@ const optionsSource = [
                 formData.append('meetingdate', values.meetingDate)
                 formData.append('location', values.location)
                 formData.append('remark', values.remark)
-                formData.append('org_id', values.org_id)
+                formData.append('org_id', org_id)
                 values.files.forEach((file) => {
                     formData.append('files', file)
                 })

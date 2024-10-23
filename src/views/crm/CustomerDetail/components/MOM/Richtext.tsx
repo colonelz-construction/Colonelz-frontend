@@ -22,7 +22,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
 
     const updatedValue = doc.body.innerHTML;
 
-    console.log('Updated value:', updatedValue);
+    // console.log('Updated value:', updatedValue);
 
 
     const modules = {

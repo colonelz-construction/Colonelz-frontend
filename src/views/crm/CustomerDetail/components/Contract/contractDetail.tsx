@@ -206,9 +206,38 @@ const ContractDetails = (data: FileItemProps) => {
                         accessorKey: 'file_name',
                         cell: ({ row }) => {
                             const fileName = row.original.file_name;
+                            const [isHovered, setIsHovered] = useState(false);
+                            const hoverTimeout = useRef<any>(null);
+
+                            const handleMouseEnter = () => {
+                                if (hoverTimeout.current) {
+                                    clearTimeout(hoverTimeout.current);
+                                }
+                                setIsHovered(true);
+                            };
+
+                            const handleMouseLeave = () => {
+                                hoverTimeout.current = setTimeout(() => {
+                                    setIsHovered(false);
+                                }, 200);
+                            };
                             return (
-                                <a href={`${row.original.files[0].fileUrl}`} className=' cursor-pointer' target='_blank'>
-                                    <div>{fileName.length > 20 ? `${fileName.substring(0, 20)}...` : fileName}</div></a>)
+                                <div
+                                    className='relative inline-block'
+                                    onMouseEnter={handleMouseEnter}
+                                    onMouseLeave={handleMouseLeave}
+                                >
+                                    <a href={`${row.original.files[0].fileUrl}`} className=' cursor-pointer' target='_blank'>
+                                        <div>{fileName.length > 20 ? `${fileName.substring(0, 20)}...` : fileName}</div></a>
+                                    {isHovered && (
+                                        <div className='absolute bottom-0 left-full ml-2 bg-white border border-gray-300 p-2 shadow-lg z-9999 whitespace-nowrap transition-opacity duration-200'>
+                                            <p>File Name: {fileName}</p>
+
+                                        </div>
+                                    )}
+                                </div>
+                            );
+
                         }
                     },
 
@@ -240,7 +269,7 @@ const ContractDetails = (data: FileItemProps) => {
                                     <div>Rejected</div>
                                 ) : status === 'pending' ?
                                     (
-                                       (role !== 'SUPERADMIN' && !roleData.data.contract?.update?.includes(`${role}`)) ? (
+                                        (role !== 'SUPERADMIN' && !roleData.data.contract?.update?.includes(`${role}`)) ? (
                                             <div>Pending</div>
                                         ) : (
                                             <div className='flex gap-1'>

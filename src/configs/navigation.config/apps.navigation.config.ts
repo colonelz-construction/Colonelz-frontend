@@ -87,7 +87,7 @@ const appsNavigationConfig: NavigationTree[] = [
     {
         key: 'appsCrm.ai-chatbot',
         path: `${APP_PREFIX_PATH}/crm/ai-chatbot`,
-        title: 'AI-ChatBot',
+        title: 'Ask Ada',
         translateKey: '',
         icon: 'chatbot',
         type: NAV_ITEM_TYPE_ITEM,

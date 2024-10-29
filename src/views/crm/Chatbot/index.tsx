@@ -6,6 +6,7 @@ import { IoCheckmarkDone } from "react-icons/io5";
 import { InputGroup, Skeleton } from "@/components/ui";
 import { UserDetailsContext } from '@/views/Context/userdetailsContext'
 import Input from '@/components/ui/Input'
+import ActionLink from '../../../components/shared/ActionLink';
 
 interface Message {
     text: string;
@@ -14,7 +15,12 @@ interface Message {
 
 const Index = () => {
     const [inputValue, setInputValue] = useState('');
+    const [project_id, setProject_id] = useState('');
+    // console.log(project_id)
     const [messages, setMessages] = useState<any>([]);
+    // console.log(messages)
+
+    // console.log(messages.length)
 
     const org_id = localStorage.getItem("orgId")
     const user_id = localStorage.getItem("userId")
@@ -94,6 +100,14 @@ const Index = () => {
                 return
             }
 
+            // console.log(accumulatedMessages)
+
+            const match : any= accumulatedMessages.match(/project_id:(.{11})/);
+            if(match) {
+                const result = match[1]
+                setProject_id(result)
+            }
+
             // After receiving all data, we create a single message for the bot
             if (accumulatedMessages.startsWith("data: ")) {
                 const message = accumulatedMessages.slice(6).trim();
@@ -102,6 +116,8 @@ const Index = () => {
                     { text: message, sender: "bot" },
                 ]);
             }
+
+            // console.log(messages)
 
         } catch (error) {
             console.error("Error fetching chatbot response:", error);
@@ -134,7 +150,7 @@ const Index = () => {
 
     return (
         <div className="h-full mb-4">
-            <h2 className="mb-2">Chat Bot</h2>
+            <h2 className="mb-2 text-blue-700">Ada</h2>
             <form onSubmit={handleSubmit} className="flex flex-col h-full ">
                 <div className="bg-gray-100 dark:bg-[#1F2937] messages flex-1 h-96 overflow-y-auto mb-4 border border-gray-300 rounded-lg p-2">
                     {messages.map((message: any, index: any) => (
@@ -166,10 +182,91 @@ const Index = () => {
                                 {" "}
                                 {message.sender === "user" ? message.text.split('data: ').map((line: any, lineIndex: any) => (
                                     <div key={lineIndex} className="flex justify-end"><span>{line}{lineIndex < message.text.split('\n').length - 1 && <br />}</span></div>
-                                )) : message.text.split('data: ').map((line: any, lineIndex: any) => (
-                                    <div className="flex justify-start" key={lineIndex}><span>{lineIndex + 1}{". "}{line}{lineIndex < message.text.split('\n').length - 1 && <br />}</span></div>
+                                )) : message.text.split('data: ').filter((line: any) => (!line.includes('project_id:') && !line.includes("lead_id:"))).map((line: any, lineIndex: any, lines:any) => {
+                                    // Use regex to extract project ID if present in the line
+                                    const projectIdMatch = message.text.match(/project_id:(.{11})/);
+                                    const leadIdMatch = message.text.match(/lead_id:(.{6})/);
+                                    const projectId = projectIdMatch && projectIdMatch[1];
+                                    // console.log(projectId)
+                                    const leadId = leadIdMatch && leadIdMatch[1];
+                                    // console.log(leadId)
 
-                                ))}
+                                    // console.log("line", line)
+                                    // console.log("lines", lines)
+                                    // console.log("index", lineIndex)
+                                
+                                    return (
+                                        <div className="flex flex-col" key={lineIndex}>
+                                            <div>
+                                            <span className={line.includes("How can I assist you today?") ? "hidden": ""}>•</span> {line}
+                                                {lineIndex < message.text.split('\n').length - 1 && <br />}
+                                            </div>
+                                
+                                            {projectId && projectId != '00000000000' ? lineIndex === lines.length - 1 && (
+                                                <div className="flex mt-[0.30rem]">
+                                                    <span className="mr-[0.10rem]">•</span>
+
+                                                    <div>
+                                                        <ActionLink to={`/app/crm/project-details?project_id=${projectId}&id=670d0bdf9a23e9b6436486db&type=details`}>
+                                                            {"Click here "}
+                                                        </ActionLink>
+                                                        to see more info.
+                                                    </div>
+
+
+                                                </div>
+                                                
+                                            ) : projectId &&  projectId == '00000000000' && lineIndex === lines.length - 1 && (
+                                                <div className="flex ">
+                                                    <span className="mr-[0.10rem]">•</span>
+
+                                                    <div>
+                                                        <ActionLink to={`/app/crm/projectslist`}>
+                                                        {"Click here "}
+                                                        </ActionLink>
+                                                        to see more info.
+                                                    </div>
+
+
+                                                </div>
+                                                
+                                            )}
+                                            {leadId && leadId != '111111' ? lineIndex === lines.length - 1 && (
+                                                <div className="flex ">
+                                                    <span className="mr-[0.10rem]">•</span>
+
+                                                    <div>
+                                                        <ActionLink to={`/app/crm/lead/?id=${leadId}&tab=Actions`}>
+                                                            Click here
+                                                        </ActionLink>
+                                                        to see more info.
+                                                    </div>
+
+
+                                                </div>
+                                                
+                                            ) : leadId &&  leadId == '111111' && lineIndex === lines.length - 1 && (
+                                                <div className="flex ">
+                                                    <span className="mr-[0.10rem]">•</span>
+
+                                                    <div>
+                                                        <ActionLink to={`/app/crm/leads`}>
+                                                            Click here
+                                                        </ActionLink>
+                                                        to see more info.
+                                                    </div>
+
+
+                                                </div>
+                                                
+                                            )}
+                                        </div>
+                                    );
+                                })}
+
+                                
+
+                                
 
 
 

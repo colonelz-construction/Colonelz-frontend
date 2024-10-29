@@ -50,7 +50,7 @@ export async function apiGetNotification<T>( // org done
     page: number,
 ) {
     return ApiService.fetchData<NotificationResponse>({
-        url: `admin/get/notification?userId=${userId}&org_id=${org_id}&page=${page}&limit=20`,
+        url: `admin/get/notification?userId=${userId}&org_id=${localStorage.getItem('orgId')}&page=${page}&limit=20`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -59,7 +59,7 @@ export async function apiGetNotification<T>( // org done
 
 export async function apiGetUserData<T>(UserId: string | null) {
     return ApiService.fetchData<ProfileFormModel>({
-        url: `users/getdata?userId=${userId}&org_id=${org_id}`,
+        url: `users/getdata?userId=${localStorage.getItem('userId')}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -68,7 +68,7 @@ export async function apiGetUserData<T>(UserId: string | null) {
 
 export async function apiGetCrmUsersAssociatedToLead<T>(lead_id:any) { //org done
     return ApiService.fetchData<LeadApiResponse>({
-        url: `admin/get/userlist/lead?lead_id=${lead_id}&org_id=${org_id}`,
+        url: `admin/get/userlist/lead?lead_id=${lead_id}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -88,7 +88,7 @@ export async function apiLeadsRemoveUser(data: any) { //org done
 
 export async function apiGetRoleDetails<T>() { //org done
     return ApiService.fetchData<RoleResponse>({
-        url: `admin/get/role?org_id=${org_id}`,
+        url: `admin/get/role?org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -97,7 +97,7 @@ export async function apiGetRoleDetails<T>() { //org done
 
 export async function apiGetRoleList<T>() { //org done
     return ApiService.fetchData<RoleList>({
-        url: `admin/get/rolename?org_id=${org_id}`,
+        url: `admin/get/rolename?org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     })
         .then((response) => {
@@ -110,7 +110,7 @@ export async function apiGetRoleList<T>() { //org done
 
 export async function apiGetRoleWiseDetails<T>() { // org done
     return ApiService.fetchData<RoleAccessData>({
-        url: `admin/rolewise/access?role=ADMIN&org_id=${org_id}`,
+        url: `admin/rolewise/access?role=ADMIN&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     })
         .then((response) => {
@@ -135,7 +135,7 @@ export async function apiCreateRole<U extends Record<string, unknown>>( // org d
 
 export async function apiEditRoles(data: any, id: string | null) { // org done
     return ApiService.fetchData<any>({
-        url: `admin/update/role?id=${id}&org_id=${org_id}`,
+        url: `admin/update/role?id=${id}&org_id=${localStorage.getItem('orgId')}`,
         method: 'put',
         data,
     }).then((response) => {
@@ -155,7 +155,7 @@ export async function apiEditUserRole(data: any) { // org done
 
 export async function apiDeleteRole(id: any) { // org done
     return ApiService.fetchData<any>({
-        url: `admin/delete/role?id=${id}&org_id=${org_id}`,
+        url: `admin/delete/role?id=${id}&org_id=${localStorage.getItem('orgId')}`,
         method: 'delete',
         data: {id, org_id},
     }).then((response) => {
@@ -164,7 +164,7 @@ export async function apiDeleteRole(id: any) { // org done
 }
 export async function apiDeleteInactiveLead(id: any) { //org done
     return ApiService.fetchData<any>({
-        url: `admin/delete/inactive/lead?lead_id=${id}&org_id=${org_id}`,
+        url: `admin/delete/inactive/lead?lead_id=${id}&org_id=${localStorage.getItem('orgId')}`,
         method: 'delete',
         data: id,
     }).then((response) => {
@@ -204,7 +204,7 @@ export async function EditPassword<U extends Record<string, unknown>>(data: U) {
 
 export async function apiGetUsers<T>() { // org done
     return ApiService.fetchData<UsersResponse>({
-        url: `admin/get/alluser?id=${localStorage.getItem('userId')}&org_id=${org_id}`,
+        url: `admin/get/alluser?id=${localStorage.getItem('userId')}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     })
         .then((response) => {
@@ -237,7 +237,7 @@ export async function apiRemoveUserProject(username: any, project_id: any) { // 
 
 export async function apiGetDeletedUsers<T>(org_id:any) { // org done
     return ApiService.fetchData<ArchiveUserResponseType>({
-        url: `admin/archive/user?org_id=${org_id}`,
+        url: `admin/archive/user?org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     })
         .then((response) => {
@@ -293,7 +293,7 @@ export async function apiPutNotificationUpdate(notificationId: any, type: any) {
 
 export async function apiGetUsersList<T>(projectId: string) { // org done
     return ApiService.fetchData<UserList>({
-        url: `admin/get/user/project?project_id=${projectId}&org_id=${org_id}`,
+        url: `admin/get/user/project?project_id=${projectId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -301,7 +301,7 @@ export async function apiGetUsersList<T>(projectId: string) { // org done
 }
 export async function apiGetUsersListProject<T>(projectId: string) { // org done
     return ApiService.fetchData<UserList>({
-        url: `/admin/get/userlist/project?project_id=${projectId}&org_id=${org_id}`,
+        url: `/admin/get/userlist/project?project_id=${projectId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -309,7 +309,7 @@ export async function apiGetUsersListProject<T>(projectId: string) { // org done
 }
 export async function apiGetAllUsersList<T>() { // org done
     return ApiService.fetchData<UserListResponse>({
-        url: `admin/get/userlist?user_id=${userId}&org_id=${org_id}`,
+        url: `admin/get/userlist?user_id=${userId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -318,7 +318,7 @@ export async function apiGetAllUsersList<T>() { // org done
 
 export async function apiGetMomData<T>(org_id: any) { // org done
     return ApiService.fetchData<MomResponse>({
-        url: `admin/getall/project/mom?id=${userId}&org_id=${org_id}`,
+        url: `admin/getall/project/mom?id=${userId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -339,7 +339,7 @@ export async function apiGetMomUpdate<T>( // org done
     org_id: string | null
 ) {
     return ApiService.fetchData<any>({
-        url: `admin/update/mom?project_id=${project_id}&mom_id=${mom_id}&org_id=${org_id}`,
+        url: `admin/update/mom?project_id=${project_id}&mom_id=${mom_id}&org_id=${localStorage.getItem('orgId')}`,
         method: 'put',
         data: data,
     }).then((response) => {
@@ -379,7 +379,7 @@ export async function apishareMom(formData: any) { // not in use
 
 export async function apiGetCrmProjects<T>(org_id: string  | null) { //org done
     return ApiService.fetchData<ProjectResponse>({
-        url: `admin/getall/project/?id=${userId}&org_id=${org_id}`,
+        url: `admin/getall/project/?id=${localStorage.getItem('userId')}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -399,7 +399,7 @@ export async function apiGetCrmProjectMakeContract(formData: any) { // not in us
 
 export async function apiGetCrmSingleProjectQuotation<T>(projectId: string) { //org done
     return ApiService.fetchData<QuotationResponseType>({
-        url: `admin/get/quotationdata/?project_id=${projectId}&org_id=${org_id}`,
+        url: `admin/get/quotationdata/?project_id=${projectId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -408,7 +408,7 @@ export async function apiGetCrmSingleProjectQuotation<T>(projectId: string) { //
 
 export async function apiGetBillingData(org_id: string) {
     return ApiService.fetchData<any>({
-        url: `bill/get?org_id=${org_id}`,
+        url: `bill/get?org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -425,9 +425,9 @@ export async function apiEditBillingData(formData: any) {
     })
 }
 
-export async function apiGetOrgData(org_id: string) {
+export async function apiGetOrgData() {
     return ApiService.fetchData<any>({
-        url: `org/get?org_id=${org_id}`,
+        url: `org/get?org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -476,7 +476,7 @@ export async function apiGetCrmProjectShareQuotationApproval(formData: any) { //
 
 export async function apiGetCrmSingleProjects<T>(projectId: string, org_id: any) { // org done
     return ApiService.fetchData<ProjectResponseType>({
-        url: `admin/getsingle/project/?project_id=${projectId}&id=${userId}&org_id=${org_id}`,
+        url: `admin/getsingle/project/?project_id=${projectId}&id=${userId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -488,7 +488,7 @@ export async function apiGetCrmSingleProjectReport<T>( // org done
     org_id: string | null,
 ) { //org done
     return ApiService.fetchData<ReportResponse>({
-        url: `admin/gettask/details?project_id=${projectId}&org_id=${org_id}`,
+        url: `admin/gettask/details?project_id=${projectId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -507,7 +507,7 @@ export async function apiGetCrmSingleProjectEdit(formData: any) { // org done
 
 export async function apiGetCrmProjectsMom<T>(projectId: string, org_id: string | null) { // org done
     return ApiService.fetchData<ApiResponse>({
-        url: `admin/getall/mom/?project_id=${projectId}&org_id=${org_id}`,
+        url: `admin/getall/mom/?project_id=${projectId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -519,7 +519,7 @@ export async function apiGetCrmProjectsSingleMom<T>( // org done
     org_id: string | null
 ) { //org done
     return ApiService.fetchData<ApiResponse>({
-        url: `admin/getsingle/mom/?project_id=${projectId}&mom_id=${momId}&org_id=${org_id}`,
+        url: `admin/getsingle/mom/?project_id=${projectId}&mom_id=${momId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -538,7 +538,7 @@ export async function apiGetCrmProjectsAddTask(Data: any) { //org done
 
 export async function apiGetCrmProjectsTaskData<T>(projectId: string, org_id: string | null) { // org done
     return ApiService.fetchData<TaskResponse>({
-        url: `admin/get/all/task?user_id=${userId}&project_id=${projectId}&org_id=${org_id}`,
+        url: `admin/get/all/task?user_id=${userId}&project_id=${projectId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -551,7 +551,7 @@ export async function apiGetCrmProjectsSingleTaskData<T>( // org done
     org_id: string | null
 ) {
     return ApiService.fetchData<TaskDataResponse>({
-        url: `admin/get/single/task?user_id=${userId}&project_id=${projectId}&task_id=${taskId}&org_id=${org_id}`,
+        url: `admin/get/single/task?user_id=${userId}&project_id=${projectId}&task_id=${taskId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -584,7 +584,7 @@ export async function apiGetCrmProjectsSubTaskData<T>( // org done
     org_id: string | null
 ) {
     return ApiService.fetchData<SubTaskResponse>({
-        url: `admin/get/all/subtask?user_id=${userId}&project_id=${projectId}&task_id=${taskId}&org_id=${org_id}`,
+        url: `admin/get/all/subtask?user_id=${userId}&project_id=${projectId}&task_id=${taskId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -609,7 +609,7 @@ export async function apiGetCrmProjectsSingleSubTaskDetails(  // org done
     org_id : string | null
 ) {
     const response = await fetch(
-        `${apiPrefix}admin/get/single/subtask?user_id=${userId}&project_id=${projectId}&task_id=${taskId}&sub_task_id=${subTaskId}&org_id=${org_id}`,
+        `${apiPrefix}admin/get/single/subtask?user_id=${userId}&project_id=${projectId}&task_id=${taskId}&sub_task_id=${subTaskId}&org_id=${localStorage.getItem('orgId')}`,
         {
             method: 'GET',
             headers: {
@@ -660,7 +660,7 @@ export async function apiGetCrmProjectsSingleSubTaskDataTimer<T>( // org done
     org_id: string | null
 ) {
     return ApiService.fetchData<TimerResponse>({
-        url: `admin/get/subtask/time?project_id=${projectId}&task_id=${taskId}&sub_task_id=${subTaskId}&org_id=${org_id}`,
+        url: `admin/get/subtask/time?project_id=${projectId}&task_id=${taskId}&sub_task_id=${subTaskId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -669,7 +669,7 @@ export async function apiGetCrmProjectsSingleSubTaskDataTimer<T>( // org done
 
 export async function apiGetCrmFileManager<T>() { // org done
     return ApiService.fetchData<FileManagerResponseType>({
-        url: `admin/getfile?org_id=${org_id}`,
+        url: `admin/getfile?org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -678,7 +678,7 @@ export async function apiGetCrmFileManager<T>() { // org done
 
 export async function apiGetCrmFileManagerCompanyData<T>() { // org done
     return ApiService.fetchData<FileManagerResponseType>({
-        url: `admin/get/companydata?org_id=${org_id}`,
+        url: `admin/get/companydata?org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -687,7 +687,7 @@ export async function apiGetCrmFileManagerCompanyData<T>() { // org done
 
 export async function apiGetCrmFileManagerArchive<T>(userId: string | null) { // org done
     return ApiService.fetchData<ArchiveResponse>({
-        url: `admin/get/archive?user_id=${userId}&org_id=${org_id}`,
+        url: `admin/get/archive?user_id=${userId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -718,7 +718,7 @@ export async function apiGetCrmFileManagerProjects<T>( // org done
     projectId: string | null,
 ) {
     return ApiService.fetchData<Data>({
-        url: `admin/project/getfile/?project_id=${projectId}&org_id=${org_id}`,
+        url: `admin/project/getfile/?project_id=${projectId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -774,7 +774,7 @@ export async function apiGetCrmFileManagerCreateTemplateFolder(data: any) { // o
 
 export async function apiGetCrmFileManagerLeads<T>(leadId: string | null) { // org done
     return ApiService.fetchData<FileManagerLeadType>({
-        url: `admin/lead/getfile/?lead_id=${leadId}&org_id=${org_id}`,
+        url: `admin/lead/getfile/?lead_id=${leadId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -783,7 +783,7 @@ export async function apiGetCrmFileManagerLeads<T>(leadId: string | null) { // o
 
 export async function apiGetCrmContractDetails<T>(leadId: string | null) { // org done
     return ApiService.fetchData<ContractResponseType>({
-        url: `admin/get/contractdata?lead_id=${leadId}&org_id=${org_id}`,
+        url: `admin/get/contractdata?lead_id=${leadId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -811,7 +811,7 @@ export async function apiGetCrmFileManagerShareContractFile(data: any) { //org d
 
 export async function apiGetCrmLeads<T>() {  // org done
     return ApiService.fetchData<LeadApiResponse>({
-        url: `admin/getall/lead?org_id=${org_id}`,
+        url: `admin/getall/lead?org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -820,7 +820,7 @@ export async function apiGetCrmLeads<T>() {  // org done
 
 export async function apiGetCrmLeadsDetails<T>(leadId: string | null, org_id: any) { //org done
     return ApiService.fetchData<LeadDetailsResponse>({
-        url: `admin/getsingle/lead/?lead_id=${leadId}&org_id=${org_id}`,
+        url: `admin/getsingle/lead/?lead_id=${leadId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -828,7 +828,7 @@ export async function apiGetCrmLeadsDetails<T>(leadId: string | null, org_id: an
 }
 export async function apiGetCrmProjectActivity<T>(project_id: any, page: any, org_id : any) { // org done
     return ApiService.fetchData<any>({
-        url: `admin/get/project/activity?project_id=${project_id}&org_id=${org_id}&page=${page}&limit=5`,
+        url: `admin/get/project/activity?project_id=${project_id}&org_id=${localStorage.getItem('orgId')}&page=${page}&limit=5`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -836,7 +836,7 @@ export async function apiGetCrmProjectActivity<T>(project_id: any, page: any, or
 }
 export async function apiGetCrmLeadActivity<T>(lead_id: any, page: any) { // org done
     return ApiService.fetchData<any>({
-        url: `admin/get/lead/activity?lead_id=${lead_id}&org_id=${org_id}&page=${page}&limit=5`,
+        url: `admin/get/lead/activity?lead_id=${lead_id}&org_id=${localStorage.getItem('orgId')}&page=${page}&limit=5`,
         method: 'get',
     }).then((response) => {
         return response.data

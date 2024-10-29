@@ -49,11 +49,14 @@ interface CurrencyOption {
 }
 
 const validationSchema = Yup.object().shape({
-    // organization: Yup.string().required('Required'),
-    // // org_email: Yup.string().email('Invalid organization email').required('Organization Email is required'),
+    organization: Yup.string().required('Required'),
+    // org_email: Yup.string().email('Invalid organization email').required('Organization Email is required'),
     // org_phone: Yup.number()
     //     .required('Contact Number is required'),
-    // currency: Yup.string().required('Required'),
+    currency: Yup.string().required('Required'),
+    vat_tax_gst_number: Yup.string().required('Required'),
+    org_country: Yup.string().required('Required'),
+    org_zipcode: Yup.string().required('Required'),
 })
 
 const Primary = () => {
@@ -66,7 +69,7 @@ const Primary = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await apiGetOrgData(org_id);
+                const response = await apiGetOrgData();
                 setDetails(response.data);
                 setFile(response.data.org_logo)
             } catch (error) {

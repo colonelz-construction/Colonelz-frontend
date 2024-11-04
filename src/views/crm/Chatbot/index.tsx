@@ -251,7 +251,7 @@ const Index = () => {
                                              
                                                 {/* {lineIndex < message.text.split('\n').length - 1 && <br />} */}
                                             </span>
-                                            {line[line.length - 1] === '.' && line.includes('.') && <br/>}
+                                            {!line.includes('.com') && line.includes('.') && <br/>}
                                 
                                             {line.includes('responseEnd') && projectId && projectId != '00000000000' ? lineIndex === lines.length - 1 && (
                                                 <div className="flex mt-[0.30rem]">

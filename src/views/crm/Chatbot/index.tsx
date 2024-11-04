@@ -45,6 +45,8 @@ const Index = () => {
         let textToCopy = messageRefs.current[index].innerText;
         const regex = /\bCopy\b/;
         textToCopy = textToCopy.replace(regex, '').trim();
+        const regex2 = /\bClick here to see more info\b/;
+        textToCopy = textToCopy.replace(regex2, '').trim();
 
         navigator.clipboard.writeText(textToCopy).then(() => {
             console.log('Text copied to clipboard!');
@@ -244,35 +246,35 @@ const Index = () => {
                                         <span className="" key={lineIndex}>
                                             <span>
                                             {/* <span className={line.includes("How can I assist you today?") ? "hidden": ""}>•</span> */}
-                                             {line.replace("responseEnd", "")} {" "}
+                                             {line.replace("responseEnd", "").replace("data:", "")} {" "}
 
                                              
                                                 {/* {lineIndex < message.text.split('\n').length - 1 && <br />} */}
                                             </span>
-                                            {line.includes('.') && <br/>}
+                                            {line[line.length - 1] === '.' && line.includes('.') && <br/>}
                                 
                                             {line.includes('responseEnd') && projectId && projectId != '00000000000' ? lineIndex === lines.length - 1 && (
                                                 <div className="flex mt-[0.30rem]">
-                                                    <span className="mr-[0.10rem]">•</span>
+                                                    {/* <span className="mr-[0.10rem]">•</span> */}
 
                                                     <div>
                                                         <ActionLink to={`/app/crm/project-details?project_id=${projectId}&id=670d0bdf9a23e9b6436486db&type=details`}>
                                                             {"Click here "}
                                                         </ActionLink>
-                                                        to see more info.
+                                                        to see more info
                                                     </div>
                                                     
                                                 </div>
                                                 
                                             ) : line.includes('responseEnd') &&  projectId &&  projectId == '00000000000' && lineIndex === lines.length - 1 && (
                                                 <div className="flex ">
-                                                    <span className="mr-[0.10rem]">•</span>
+                                                    {/* <span className="mr-[0.10rem]">•</span> */}
 
                                                     <div>
                                                         <ActionLink to={`/app/crm/projectslist`}>
                                                         {"Click here "}
                                                         </ActionLink>
-                                                        to see more info.
+                                                        to see more info
                                                     </div>
 
 
@@ -281,13 +283,13 @@ const Index = () => {
                                             )}
                                             {line.includes('responseEnd') && leadId && leadId != '111111' ? lineIndex === lines.length - 1 && (
                                                 <div className="flex ">
-                                                    <span className="mr-[0.10rem]">•</span>
+                                                    {/* <span className="mr-[0.10rem]">•</span> */}
 
                                                     <div>
                                                         <ActionLink to={`/app/crm/lead/?id=${leadId}&tab=Actions`}>
                                                             {"Click here "}
                                                         </ActionLink>
-                                                        to see more info.
+                                                        to see more info
                                                     </div>
 
 
@@ -295,13 +297,13 @@ const Index = () => {
                                                 
                                             ) :line.includes('responseEnd') &&  leadId &&  leadId == '111111' && lineIndex === lines.length - 1 && (
                                                 <div className="flex ">
-                                                    <span className="mr-[0.10rem]">•</span>
+                                                    {/* <span className="mr-[0.10rem]">•</span> */}
 
                                                     <div>
                                                         <ActionLink to={`/app/leads`}>
                                                         {"Click here "}
                                                         </ActionLink>
-                                                        to see more info.
+                                                        to see more info
                                                     </div>
 
 

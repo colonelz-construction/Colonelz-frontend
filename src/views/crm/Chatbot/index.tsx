@@ -16,9 +16,10 @@ interface Message {
 const Index = () => {
     const [inputValue, setInputValue] = useState('');
     const [project_id, setProject_id] = useState('');
+    const [whileLoading, setWhileLoading] = useState(false);
     // console.log(project_id)
     const [messages, setMessages] = useState<any>([]);
-    // console.log(messages)
+    console.log(messages)
 
     // console.log(messages.length)
 
@@ -60,7 +61,7 @@ const Index = () => {
     const fetchData = async (inputValue: string) => {
         try {
             setLoading(true);
-            const response = await fetch(`https://chatbot.test.initz.run/query/`, {
+            const response = await fetch(`http://127.0.0.1:8000/query/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -68,18 +69,57 @@ const Index = () => {
                 body: JSON.stringify({ question: inputValue, org_id, user_id }),
             });
 
+            // console.log(response)
+
             const reader = response.body?.getReader();
             const decoder = new TextDecoder();
             let accumulatedMessages = "";
+
+            // console.log(reader)
 
             if (reader) {
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
-
-                    accumulatedMessages += decoder.decode(value, { stream: true });
+    
+                    // Decode the chunk and append to the accumulated message
+                    const chunk = decoder.decode(value, { stream: true });
+                    accumulatedMessages += chunk;
+    
+                    // Only update the latest chunk, without re-rendering all previous words
+                    setMessages((prevMessages: any) => {
+                        // Check if the last message is from the user
+                        const lastMessage = prevMessages[prevMessages.length - 1];
+                        if (lastMessage?.sender === "user") {
+                            // If the last message is from the user, add a new bot message
+                            return [
+                                ...prevMessages,
+                                { text: chunk.trim(), sender: "bot" },
+                            ];
+                        } else {
+                            // If the last message is from the bot, append to its text
+                            const newMessageText = (lastMessage?.text || "") + chunk;
+                            return [
+                                ...prevMessages.slice(0, -1), // Remove the last entry
+                                { text: newMessageText.trim(), sender: "bot" }, // Append the new chunk
+                            ];
+                        }
+                    });
                 }
             }
+
+            setMessages((prevMessages: any) => {
+
+            const lastMessage = prevMessages[prevMessages.length - 1];
+            const newMessageText = (lastMessage?.text || "") + 'responseEnd';
+            return [
+                ...prevMessages.slice(0, -1), // Remove the last entry
+                { text: newMessageText.trim(), sender: "bot" }, // Append the new chunk
+            ];
+
+        })
+
+            // console.log(accumulatedMessages)
 
 
             if (accumulatedMessages.includes("404: Project not found.")) {
@@ -109,15 +149,16 @@ const Index = () => {
             }
 
             // After receiving all data, we create a single message for the bot
-            if (accumulatedMessages.startsWith("data: ")) {
-                const message = accumulatedMessages.slice(6).trim();
-                setMessages((prevMessages: any) => [
-                    ...prevMessages,
-                    { text: message, sender: "bot" },
-                ]);
-            }
+            // if (accumulatedMessages.startsWith("data: ")) {
+            //     const message = accumulatedMessages.slice(6).trim();
+            //     setMessages((prevMessages: any) => [
+            //         ...prevMessages,
+            //         { text: message, sender: "bot" },
+            //     ]);
+            // }
 
             // console.log(messages)
+            setWhileLoading(true)
 
         } catch (error) {
             console.error("Error fetching chatbot response:", error);
@@ -160,7 +201,7 @@ const Index = () => {
                             <div
                                 key={index}
                                 ref={(el) => (messageRefs.current[index] = el)}
-                                className={`relative flex gap-2 flex-col message p-2 rounded mb-2 ${message.sender === "user" ? "bg-blue-100" : "bg-white dark:bg-[#111827] dark:border-none  px-3 border-[0.13rem] border-blue-100 w-[70%]"
+                                className={`relative gap-2 message p-2 rounded mb-2 ${message.sender === "user" ? "bg-blue-100" : "bg-white dark:bg-[#111827] dark:border-none  px-3 border-[0.13rem] border-blue-100 w-[70%]"
                                     } group`}
 
                             >
@@ -182,27 +223,35 @@ const Index = () => {
                                 {" "}
                                 {message.sender === "user" ? message.text.split('data: ').map((line: any, lineIndex: any) => (
                                     <div key={lineIndex} className="flex justify-end"><span>{line}{lineIndex < message.text.split('\n').length - 1 && <br />}</span></div>
-                                )) : message.text.split('data: ').filter((line: any) => (!line.includes('project_id:') && !line.includes("lead_id:"))).map((line: any, lineIndex: any, lines:any) => {
+                                )) : 
+                                
+                                message.text.split('data: ').filter((line: any) => (!line.includes('project_id:') && !line.includes("lead_id:"))).map((line: any, lineIndex: any, lines:any) => {
                                     // Use regex to extract project ID if present in the line
                                     const projectIdMatch = message.text.match(/project_id:(.{11})/);
                                     const leadIdMatch = message.text.match(/lead_id:(.{6})/);
                                     const projectId = projectIdMatch && projectIdMatch[1];
                                     // console.log(projectId)
                                     const leadId = leadIdMatch && leadIdMatch[1];
+
+                                    // console.log(line)
                                     // console.log(leadId)
 
                                     // console.log("line", line)
                                     // console.log("lines", lines)
-                                    // console.log("index", lineIndex)
+                                    console.log("index", lineIndex)
                                 
                                     return (
-                                        <div className="flex flex-col" key={lineIndex}>
-                                            <div>
-                                            <span className={line.includes("How can I assist you today?") ? "hidden": ""}>•</span> {line}
-                                                {lineIndex < message.text.split('\n').length - 1 && <br />}
-                                            </div>
+                                        <span className="" key={lineIndex}>
+                                            <span>
+                                            {/* <span className={line.includes("How can I assist you today?") ? "hidden": ""}>•</span> */}
+                                             {line.replace("responseEnd", "")} {" "}
+
+                                             
+                                                {/* {lineIndex < message.text.split('\n').length - 1 && <br />} */}
+                                            </span>
+                                            {line.includes('.') && <br/>}
                                 
-                                            {projectId && projectId != '00000000000' ? lineIndex === lines.length - 1 && (
+                                            {line.includes('responseEnd') && projectId && projectId != '00000000000' ? lineIndex === lines.length - 1 && (
                                                 <div className="flex mt-[0.30rem]">
                                                     <span className="mr-[0.10rem]">•</span>
 
@@ -212,11 +261,10 @@ const Index = () => {
                                                         </ActionLink>
                                                         to see more info.
                                                     </div>
-
-
+                                                    
                                                 </div>
                                                 
-                                            ) : projectId &&  projectId == '00000000000' && lineIndex === lines.length - 1 && (
+                                            ) : line.includes('responseEnd') &&  projectId &&  projectId == '00000000000' && lineIndex === lines.length - 1 && (
                                                 <div className="flex ">
                                                     <span className="mr-[0.10rem]">•</span>
 
@@ -231,13 +279,13 @@ const Index = () => {
                                                 </div>
                                                 
                                             )}
-                                            {leadId && leadId != '111111' ? lineIndex === lines.length - 1 && (
+                                            {line.includes('responseEnd') && leadId && leadId != '111111' ? lineIndex === lines.length - 1 && (
                                                 <div className="flex ">
                                                     <span className="mr-[0.10rem]">•</span>
 
                                                     <div>
                                                         <ActionLink to={`/app/crm/lead/?id=${leadId}&tab=Actions`}>
-                                                            Click here
+                                                            {"Click here "}
                                                         </ActionLink>
                                                         to see more info.
                                                     </div>
@@ -245,13 +293,13 @@ const Index = () => {
 
                                                 </div>
                                                 
-                                            ) : leadId &&  leadId == '111111' && lineIndex === lines.length - 1 && (
+                                            ) :line.includes('responseEnd') &&  leadId &&  leadId == '111111' && lineIndex === lines.length - 1 && (
                                                 <div className="flex ">
                                                     <span className="mr-[0.10rem]">•</span>
 
                                                     <div>
-                                                        <ActionLink to={`/app/crm/leads`}>
-                                                            Click here
+                                                        <ActionLink to={`/app/leads`}>
+                                                        {"Click here "}
                                                         </ActionLink>
                                                         to see more info.
                                                     </div>
@@ -260,7 +308,7 @@ const Index = () => {
                                                 </div>
                                                 
                                             )}
-                                        </div>
+                                        </span>
                                     );
                                 })}
 
@@ -274,7 +322,7 @@ const Index = () => {
                         </div>
 
                     ))}
-                    {loading && <Skeleton width={850} height={100} />}
+                    {/* {loading && <Skeleton width={850} height={100} />} */}
                 </div>
 
                 <InputGroup className="bottom-0">

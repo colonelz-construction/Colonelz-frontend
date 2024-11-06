@@ -7,6 +7,8 @@ import { InputGroup, Skeleton } from "@/components/ui";
 import { UserDetailsContext } from '@/views/Context/userdetailsContext'
 import Input from '@/components/ui/Input'
 import ActionLink from '../../../components/shared/ActionLink';
+import { FaChevronCircleUp } from "react-icons/fa";
+import { GoDotFill } from "react-icons/go";
 
 interface Message {
     text: string;
@@ -18,8 +20,13 @@ const Index = () => {
     const [project_id, setProject_id] = useState('');
     const [whileLoading, setWhileLoading] = useState(false);
     // console.log(project_id)
+    const data = useContext<any>(UserDetailsContext)
+    const greetingMessage: any = [{
+        text: `Hello ${data && data?.username ? data?.username : "there"}! How can I assist you today?`,
+        sender: 'bot',
+    }]
     const [messages, setMessages] = useState<any>([]);
-    // console.log(messages)
+    console.log(messages)
 
     // console.log(messages.length)
 
@@ -31,15 +38,10 @@ const Index = () => {
 
 
     const messageRefs = useRef<any>([]);
-    const data = useContext<any>(UserDetailsContext)
 
-    // useEffect(() => {
-    //     const greetingMessage: Message = {
-    //         text: `Hello ${data && data?.username ? data?.username : "there"}! How can I assist you today?`,
-    //         sender: 'bot',
-    //     }
-    //     setMessages((prevMessages: any) => [...prevMessages, greetingMessage])
-    // }, [])
+   
+        // setMessages((prevMessages: any) => [...prevMessages, greetingMessage])
+    
 
     const copyToClipboard = (index: any) => {
         let textToCopy = messageRefs.current[index].innerText;
@@ -88,16 +90,7 @@ const Index = () => {
                     // Decode the chunk and append to the accumulated message
                     const chunk = decoder.decode(value, { stream: true });
 
-                    // const resChuck = chunk.replace("data: ", "");
-                    // const lastChuck = resChuck.replace("data: ", "");
-
-                    console.log(chunk)
-
-                    
-                    // console.log(result)
                     accumulatedMessages += chunk;
-                    // const parsedChunk = JSON.parse(accumulatedMessages);
-                    // console.log(parsedChunk)
     
                     // Only update the latest chunk, without re-rendering all previous words
                     setMessages((prevMessages: any) => {
@@ -112,10 +105,14 @@ const Index = () => {
                         } else {
                             // If the last message is from the bot, append to its text
                             const newMessageText = (lastMessage?.text || "") + chunk;
-                            return [
-                                ...prevMessages.slice(0, -1), // Remove the last entry
-                                { text: newMessageText.trim(), sender: "bot" }, // Append the new chunk
-                            ];
+
+                           
+                                return [
+                                    ...prevMessages.slice(0, -1), // Remove the last entry
+                                    { text: newMessageText.trim(), sender: "bot" }, // Append the new chunk
+                                ];
+
+                            
                         }
                     });
                 }
@@ -202,11 +199,19 @@ const Index = () => {
         setInputValue('');
     };
 
+    const handleClear = () => {
+        setMessages([])
+    }
+
     return (
         <div className="h-full mb-4">
+            <div className="flex justify-between">
             <h2 className="mb-2 text-blue-700">Ada</h2>
+            <Button size="sm" className="" onClick={handleClear}>Clear</Button>
+
+            </div>
             <form onSubmit={handleSubmit} className="flex flex-col h-full ">
-                <div className="bg-gray-100 dark:bg-[#1F2937] messages flex-1 h-96 overflow-y-auto mb-4 border border-gray-300 rounded-lg p-2">
+                <div className="flex flex-col bg-gray-100 dark:bg-[#1F2937] messages flex-1 h-96 overflow-y-auto mb-4 border border-gray-300 rounded-lg p-2">
                     {messages.map((message: any, index: any) => (
 
                         <div className={`flex w-full ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
@@ -214,7 +219,7 @@ const Index = () => {
                             <div
                                 key={index}
                                 ref={(el) => (messageRefs.current[index] = el)}
-                                className={`relative gap-2 message p-2 rounded mb-2 ${message.sender === "user" ? "bg-blue-100 dark:bg-[#46516b]" : "bg-white dark:bg-[#111827] dark:border-none  px-3 border-[0.13rem] border-blue-100 w-[70%]"
+                                className={`relative gap-2 message p-2 rounded ${message.sender === "user" ? "bg-blue-100 dark:bg-[#46516b]" : "bg-white dark:bg-[#111827] dark:border-none  px-3 border-[0.13rem] border-blue-100 w-[70%]"
                                     } group`}
 
                             >
@@ -245,7 +250,6 @@ const Index = () => {
                                     const projectId = projectIdMatch && projectIdMatch[1];
                                     // console.log(projectId)
                                     const leadId = leadIdMatch && leadIdMatch[1];
-                                    // const parsedChunk = JSON.parse(line.replace("responseEnd", "").replace("data:", ""));
                                     const match = line.replace("responseEnd", "").replace("data:", "").match(/{"content":"(.*?)"/);
 
                                     let lineShow = ''
@@ -255,12 +259,6 @@ const Index = () => {
                                     }
 
                                     // console.log(lineShow)
-
-                                    // console.log(parsedChunk)
-
-
-
-
                                     // console.log(line)
                                     // console.log(leadId)
 
@@ -338,35 +336,31 @@ const Index = () => {
                                             )}
                                         </span>
                                     );
-                                })}
-
-                                
-
-                                
-
-
+                                })}                             
 
                             </div>
                         </div>
 
                     ))}
-                    {/* {loading && <Skeleton width={850} height={100} />} */}
+
+
+                    {loading && <div className={`relative gap-2 message rounded p-1 mb-2 "bg-white dark:bg-[#111827] dark:border-none  px-3 border-[0.13rem] border-blue-100 w-[70%] group text-[1.7rem]`}><GoDotFill/></div>}
                 </div>
 
-                <InputGroup className="bottom-0">
+                <InputGroup className="bottom-0 border rounded-md border-[#9f9e9e]">
                     <Input
                         placeholder="Ask anything..."
                         type="text"
                         value={inputValue}
                         onChange={handleChange}
-                        className="flex-1 w-6 text-[1.1rem] p-2 rounded-l-md"
+                        className="focus:ring-0 flex-1 w-6 text-[1.1rem] p-2 rounded-l-md border-r-0"
                         autoFocus
                     />
                     <Button
-                        icon={<LuSendHorizonal className="text-[1.7rem]" />}
+                        icon={<FaChevronCircleUp className="text-[1.7rem] text-[#9f9e9e]" />}
                         type='submit'
 
-                        className="w-14"
+                        className="w-12 border-2"
                     />
                 </InputGroup>
             </form>

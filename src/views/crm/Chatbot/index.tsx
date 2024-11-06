@@ -219,7 +219,7 @@ const Index = () => {
                             <div
                                 key={index}
                                 ref={(el) => (messageRefs.current[index] = el)}
-                                className={`relative gap-2 message p-2 rounded ${message.sender === "user" ? "bg-blue-100 dark:bg-[#46516b]" : "bg-white dark:bg-[#111827] dark:border-none  px-3 border-[0.13rem] border-blue-100 w-[70%]"
+                                className={`relative gap-2 message p-2 rounded ${message.sender === "user" ? "bg-blue-100 dark:bg-[#46516b] my-2" : "bg-white dark:bg-[#111827] dark:border-none  px-3 border-[0.13rem] border-blue-100 w-[70%]"
                                     } group`}
 
                             >

@@ -19,7 +19,7 @@ const Index = () => {
     const [whileLoading, setWhileLoading] = useState(false);
     // console.log(project_id)
     const [messages, setMessages] = useState<any>([]);
-    console.log(messages)
+    // console.log(messages)
 
     // console.log(messages.length)
 
@@ -33,13 +33,13 @@ const Index = () => {
     const messageRefs = useRef<any>([]);
     const data = useContext<any>(UserDetailsContext)
 
-    useEffect(() => {
-        const greetingMessage: Message = {
-            text: `Hello ${data && data?.username ? data?.username : "there"}! How can I assist you today?`,
-            sender: 'bot',
-        }
-        setMessages((prevMessages: any) => [...prevMessages, greetingMessage])
-    }, [])
+    // useEffect(() => {
+    //     const greetingMessage: Message = {
+    //         text: `Hello ${data && data?.username ? data?.username : "there"}! How can I assist you today?`,
+    //         sender: 'bot',
+    //     }
+    //     setMessages((prevMessages: any) => [...prevMessages, greetingMessage])
+    // }, [])
 
     const copyToClipboard = (index: any) => {
         let textToCopy = messageRefs.current[index].innerText;
@@ -63,7 +63,7 @@ const Index = () => {
     const fetchData = async (inputValue: string) => {
         try {
             setLoading(true);
-            const response = await fetch(`https://chatbot.test.initz.run/query/`, {
+            const response = await fetch(`https://ai-chat-bot.test.initz.run/query/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -71,7 +71,7 @@ const Index = () => {
                 body: JSON.stringify({ question: inputValue, org_id, user_id }),
             });
 
-            // console.log(response)
+            console.log(response)
 
             const reader = response.body?.getReader();
             const decoder = new TextDecoder();
@@ -83,10 +83,21 @@ const Index = () => {
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
+
     
                     // Decode the chunk and append to the accumulated message
                     const chunk = decoder.decode(value, { stream: true });
+
+                    // const resChuck = chunk.replace("data: ", "");
+                    // const lastChuck = resChuck.replace("data: ", "");
+
+                    console.log(chunk)
+
+                    
+                    // console.log(result)
                     accumulatedMessages += chunk;
+                    // const parsedChunk = JSON.parse(accumulatedMessages);
+                    // console.log(parsedChunk)
     
                     // Only update the latest chunk, without re-rendering all previous words
                     setMessages((prevMessages: any) => {
@@ -203,7 +214,7 @@ const Index = () => {
                             <div
                                 key={index}
                                 ref={(el) => (messageRefs.current[index] = el)}
-                                className={`relative gap-2 message p-2 rounded mb-2 ${message.sender === "user" ? "bg-blue-100" : "bg-white dark:bg-[#111827] dark:border-none  px-3 border-[0.13rem] border-blue-100 w-[70%]"
+                                className={`relative gap-2 message p-2 rounded mb-2 ${message.sender === "user" ? "bg-blue-100 dark:bg-[#46516b]" : "bg-white dark:bg-[#111827] dark:border-none  px-3 border-[0.13rem] border-blue-100 w-[70%]"
                                     } group`}
 
                             >
@@ -234,24 +245,39 @@ const Index = () => {
                                     const projectId = projectIdMatch && projectIdMatch[1];
                                     // console.log(projectId)
                                     const leadId = leadIdMatch && leadIdMatch[1];
+                                    // const parsedChunk = JSON.parse(line.replace("responseEnd", "").replace("data:", ""));
+                                    const match = line.replace("responseEnd", "").replace("data:", "").match(/{"content":"(.*?)"/);
+
+                                    let lineShow = ''
+
+                                    if(match) {
+                                        lineShow = match[1].replace("\\n\\n", "").replace("\\n", "").replace(":\\n", "").replace("**", "")
+                                    }
+
+                                    // console.log(lineShow)
+
+                                    // console.log(parsedChunk)
+
+
+
 
                                     // console.log(line)
                                     // console.log(leadId)
 
                                     // console.log("line", line)
                                     // console.log("lines", lines)
-                                    console.log("index", lineIndex)
+                                    // console.log("index", lineIndex)
                                 
                                     return (
                                         <span className="" key={lineIndex}>
-                                            <span>
+                                            <span className={lineShow == '\\t' ? "ml-4" : ""}>
                                             {/* <span className={line.includes("How can I assist you today?") ? "hidden": ""}>•</span> */}
-                                             {line.replace("responseEnd", "").replace("data:", "")} {" "}
+                                             {lineShow.replace(/["*\n]/g, "").replace("\\t", "").replace("+", "")}
 
                                              
                                                 {/* {lineIndex < message.text.split('\n').length - 1 && <br />} */}
                                             </span>
-                                            {!line.includes('.com') && line.includes('.') && <br/>}
+                                            {line.includes("\\n") && <br/>}
                                 
                                             {line.includes('responseEnd') && projectId && projectId != '00000000000' ? lineIndex === lines.length - 1 && (
                                                 <div className="flex mt-[0.30rem]">

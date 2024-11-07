@@ -310,7 +310,7 @@ const Index = () => {
                                                     {/* <span className="mr-[0.10rem]">•</span> */}
 
                                                     <div>
-                                                        <ActionLink to={`/app/crm/project-details?project_id=${projectId}&id=670d0bdf9a23e9b6436486db&type=details`}>
+                                                        <ActionLink target="_blank" to={`/app/crm/project-details?project_id=${projectId}&id=670d0bdf9a23e9b6436486db&type=details`}>
                                                             {"Click here "}
                                                         </ActionLink>
                                                         to see more info
@@ -323,7 +323,7 @@ const Index = () => {
                                                     {/* <span className="mr-[0.10rem]">•</span> */}
 
                                                     <div>
-                                                        <ActionLink to={`/app/crm/projectslist`}>
+                                                        <ActionLink  target="_blank"  to={`/app/crm/projectslist`}>
                                                         {"Click here "}
                                                         </ActionLink>
                                                         to see more info
@@ -338,7 +338,7 @@ const Index = () => {
                                                     {/* <span className="mr-[0.10rem]">•</span> */}
 
                                                     <div>
-                                                        <ActionLink to={`/app/crm/lead/?id=${leadId}&tab=Actions`}>
+                                                        <ActionLink  target="_blank"  to={`/app/crm/lead/?id=${leadId}&tab=Actions`}>
                                                             {"Click here "}
                                                         </ActionLink>
                                                         to see more info
@@ -352,7 +352,7 @@ const Index = () => {
                                                     {/* <span className="mr-[0.10rem]">•</span> */}
 
                                                     <div>
-                                                        <ActionLink to={`/app/leads`}>
+                                                        <ActionLink  target="_blank"  to={`/app/leads`}>
                                                         {"Click here "}
                                                         </ActionLink>
                                                         to see more info

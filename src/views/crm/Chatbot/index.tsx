@@ -9,6 +9,7 @@ import Input from '@/components/ui/Input'
 import ActionLink from '../../../components/shared/ActionLink';
 import { FaChevronCircleUp } from "react-icons/fa";
 import { GoDotFill } from "react-icons/go";
+import ScrollableFeed from "react-scrollable-feed";
 
 interface Message {
     text: string;
@@ -161,16 +162,16 @@ const Index = () => {
             if (accumulatedMessages.includes("404: Project not found.")) {
                 setMessages((prevMessages: any) => [
                     ...prevMessages,
-                    { text: 'data: {"content":"There is no project with this name"', sender: "bot" },
+                    { text: `data: {"content":"There is no project with this name"}`, sender: "bot" },
                 ]);
 
                 return
             }
-            if (accumulatedMessages.includes("404: Lead not found.")) {
+            if (accumulatedMessages.includes("lead not found")) {
 
                 setMessages((prevMessages: any) => [
                     ...prevMessages,
-                    { text: 'data: {"content":"There is no Lead with this name"', sender: "bot" },
+                    { text: 'data: {"content":"There is no Lead with this name"}', sender: "bot" },
                 ]);
 
                 return
@@ -200,7 +201,7 @@ const Index = () => {
             console.error("Error fetching chatbot response:", error);
             setMessages((prevMessages: any) => [
                 ...prevMessages,
-                { text: 'data: {"content":"There was some problem communicating with the Ada."', sender: "bot" },
+                { text: `data: {"content":"There was some problem communicating with the Ada."}`, sender: "bot" },
             ]);
         } finally {
             setLoading(false);
@@ -238,6 +239,8 @@ const Index = () => {
             </div>
             <form onSubmit={handleSubmit} className="flex flex-col h-full ">
                 <div className="flex flex-col bg-gray-100 dark:bg-[#1F2937] messages flex-1 h-96 overflow-y-auto mb-4 border border-gray-300 rounded-lg p-2">
+                <ScrollableFeed className="h-full flex flex-col scrollbar-thumb-[#d4d1d1] scrollbar-thin scrollbar-track-transparent pr-6">
+
                     {messages.map((message: any, index: any) => (
 
                         <div className={`flex w-full ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
@@ -245,7 +248,7 @@ const Index = () => {
                             <div
                                 key={index}
                                 ref={(el) => (messageRefs.current[index] = el)}
-                                className={`relative gap-2 message p-2 rounded ${message.sender === "user" ? "bg-blue-100 dark:bg-[#46516b] my-2" : "bg-white dark:bg-[#111827] dark:border-none  px-3 border-[0.13rem] border-blue-100 w-[70%]"
+                                className={`relative gap-2 message p-2 rounded ${message.sender === "user" ? "bg-blue-100 dark:bg-[#46516b] my-2" : "bg-white dark:bg-[#111827] dark:border-none  px-3 w-[70%]"
                                     } group`}
 
                             >
@@ -276,6 +279,8 @@ const Index = () => {
                                     const projectId = projectIdMatch && projectIdMatch[1];
                                     // console.log(projectId)
                                     const leadId = leadIdMatch && leadIdMatch[1];
+
+                                    
                                     const match = line.replace("responseEnd", "").replace("data:", "").match(/"content":"(.*?)"/);
 
                                     
@@ -371,8 +376,10 @@ const Index = () => {
 
                     ))}
 
+                    {loading && <div className={`relative gap-2 message rounded p-1 mb-2 bg-white dark:bg-[#111827] dark:border-none  px-3 w-[70%] group text-[1.7rem]`}><GoDotFill/></div>}
+                    </ScrollableFeed>
 
-                    {loading && <div className={`relative gap-2 message rounded p-1 mb-2 "bg-white dark:bg-[#111827] dark:border-none  px-3 border-[0.13rem] border-blue-100 w-[70%] group text-[1.7rem]`}><GoDotFill/></div>}
+
                 </div>
 
                 <InputGroup className="bottom-0 border rounded-md border-[#9f9e9e]">

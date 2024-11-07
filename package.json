@@ -98,6 +98,7 @@
     "react-redux": "^8.0.5",
     "react-resizable": "^3.0.5",
     "react-router-dom": "^6.9.0",
+    "react-scrollable-feed": "^2.0.2",
     "react-select": "^5.7.2",
     "react-simple-maps": "^3.0.0",
     "react-spreadsheet": "^0.9.4",
@@ -109,6 +110,7 @@
     "react-to-print": "^2.15.1",
     "react-tooltip": "^5.28.0",
     "redux-persist": "^6.0.0",
+    "tailwind-scrollbar": "^3.1.0",
     "twin.macro": "^3.4.0",
     "xlsx": "^0.18.5",
     "yup": "^1.1.1"

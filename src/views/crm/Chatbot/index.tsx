@@ -19,14 +19,38 @@ const Index = () => {
     const [inputValue, setInputValue] = useState('');
     const [project_id, setProject_id] = useState('');
     const [whileLoading, setWhileLoading] = useState(false);
+    const [user, setUser] = useState<any>('')
+
+    useEffect(() => {
+
+        if(data) {
+            setUser(data?.username)
+
+        }
+
+
+    }, [])
+
     // console.log(project_id)
     const data = useContext<any>(UserDetailsContext)
     const greetingMessage: any = [{
-        text: `Hello ${data && data?.username ? data?.username : "there"}! How can I assist you today?`,
+        text: `data: {"content":"Hello ${user ? user : "there"}! How can I assist you today?"}`,
         sender: 'bot',
     }]
-    const [messages, setMessages] = useState<any>([]);
+
+
+
+    const [messages, setMessages] = useState<any>(greetingMessage);
     console.log(messages)
+
+
+    // useEffect(() => {
+    //     const greetingMessage: any = [{
+    //         text: `data: {"content":"Hello ${data && data?.username ? data?.username : "there"}! How can I assist you today?"}`,
+    //         sender: 'bot',
+    //     }]
+    //     setMessages((prevMessages: any) => [...prevMessages, greetingMessage])
+    // }, [])
 
     // console.log(messages.length)
 
@@ -90,6 +114,8 @@ const Index = () => {
                     // Decode the chunk and append to the accumulated message
                     const chunk = decoder.decode(value, { stream: true });
 
+                    console.log(chunk)
+
                     accumulatedMessages += chunk;
     
                     // Only update the latest chunk, without re-rendering all previous words
@@ -135,7 +161,7 @@ const Index = () => {
             if (accumulatedMessages.includes("404: Project not found.")) {
                 setMessages((prevMessages: any) => [
                     ...prevMessages,
-                    { text: "There is no project with this name", sender: "bot" },
+                    { text: 'data: {"content":"There is no project with this name"', sender: "bot" },
                 ]);
 
                 return
@@ -144,7 +170,7 @@ const Index = () => {
 
                 setMessages((prevMessages: any) => [
                     ...prevMessages,
-                    { text: "There is no Lead with this name", sender: "bot" },
+                    { text: 'data: {"content":"There is no Lead with this name"', sender: "bot" },
                 ]);
 
                 return
@@ -174,7 +200,7 @@ const Index = () => {
             console.error("Error fetching chatbot response:", error);
             setMessages((prevMessages: any) => [
                 ...prevMessages,
-                { text: "There was an error communicating with the chatbot.", sender: "bot" },
+                { text: 'data: {"content":"There was some problem communicating with the Ada."', sender: "bot" },
             ]);
         } finally {
             setLoading(false);
@@ -243,18 +269,20 @@ const Index = () => {
                                     <div key={lineIndex} className="flex justify-end"><span>{line}{lineIndex < message.text.split('\n').length - 1 && <br />}</span></div>
                                 )) : 
                                 
-                                message.text.split('data: ').filter((line: any) => (!line.includes('project_id:') && !line.includes("lead_id:"))).map((line: any, lineIndex: any, lines:any) => {
+                                message.text?.split('data: ').filter((line: any) => (!line.includes('project_id:') && !line.includes("lead_id:"))).map((line: any, lineIndex: any, lines:any) => {
                                     // Use regex to extract project ID if present in the line
                                     const projectIdMatch = message.text.match(/project_id:(.{11})/);
                                     const leadIdMatch = message.text.match(/lead_id:(.{6})/);
                                     const projectId = projectIdMatch && projectIdMatch[1];
                                     // console.log(projectId)
                                     const leadId = leadIdMatch && leadIdMatch[1];
-                                    const match = line.replace("responseEnd", "").replace("data:", "").match(/{"content":"(.*?)"/);
+                                    const match = line.replace("responseEnd", "").replace("data:", "").match(/"content":"(.*?)"/);
 
+                                    
                                     let lineShow = ''
-
+                                    
                                     if(match) {
+                                        console.log(match[1])
                                         lineShow = match[1].replace("\\n\\n", "").replace("\\n", "").replace(":\\n", "").replace("**", "")
                                     }
 

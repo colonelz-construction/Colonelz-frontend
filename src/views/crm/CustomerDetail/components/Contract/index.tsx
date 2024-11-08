@@ -83,12 +83,16 @@ const validationSchema = Yup.object().shape({
 })
 
 const NumberInput = (props: any) => {
+
+    const [val, setVal] = useState<any>('')
     const handleInputChange = (newValue: string) => {
       // Allow only numbers (including decimal points, if needed)
       if (/^[0-9]*$/.test(newValue)) {
+        setVal(newValue)
         return newValue;
       }
-      return '';
+
+      return val;
     };
 
     const animatedComponents = makeAnimated()

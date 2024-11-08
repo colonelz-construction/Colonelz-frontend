@@ -82,6 +82,27 @@ const validationSchema = Yup.object().shape({
     // ),
 })
 
+const NumberInput = (props: any) => {
+    const handleInputChange = (newValue: string) => {
+      // Allow only numbers (including decimal points, if needed)
+      if (/^[0-9]*$/.test(newValue)) {
+        return newValue;
+      }
+      return '';
+    };
+
+    const animatedComponents = makeAnimated()
+  
+    return (
+      <CreatableSelect
+        {...props}
+        isClearable
+        onInputChange={handleInputChange}
+        components={animatedComponents}
+      />
+    );
+  };
+
 export const FormikValuesContext = createContext(null);
 
 const FormComponent = ({ children }: any) => {
@@ -343,7 +364,7 @@ const FormContent = () => {
                                 <Select
                                     isMulti
                                     components={animatedComponents}
-                                    componentAs={CreatableSelect}
+                                    componentAs={NumberInput}
                                     onChange={(value) =>
                                         form.setFieldValue(
                                             field.name,

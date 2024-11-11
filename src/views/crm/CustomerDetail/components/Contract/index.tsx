@@ -1,5 +1,4 @@
 import React, { SyntheticEvent, createContext, useEffect, useState } from 'react'
-
 import makeAnimated from 'react-select/animated'
 import { Formik, Field, Form, ErrorMessage, FieldProps, useFormikContext, FormikProps, FormikValues } from 'formik'
 import * as Yup from 'yup'
@@ -82,6 +81,31 @@ const validationSchema = Yup.object().shape({
     //     },
     // ),
 })
+
+const NumberInput = (props: any) => {
+
+    const [val, setVal] = useState<any>('')
+    const handleInputChange = (newValue: string) => {
+      // Allow only numbers (including decimal points, if needed)
+      if (/^[0-9]*$/.test(newValue)) {
+        setVal(newValue)
+        return newValue;
+      }
+
+      return val;
+    };
+
+    const animatedComponents = makeAnimated()
+  
+    return (
+      <CreatableSelect
+        {...props}
+        isClearable
+        onInputChange={handleInputChange}
+        components={animatedComponents}
+      />
+    );
+  };
 
 export const FormikValuesContext = createContext(null);
 
@@ -252,6 +276,7 @@ const FormContent = () => {
             <h3 className="mb-4">Contract</h3>
             <Form className="">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    
                     <FormItem label="Project Type">
                         <Field name="project_type">
                             {({ field, form }: FieldProps) => (
@@ -274,6 +299,7 @@ const FormContent = () => {
                             className=" text-red-600"
                         />
                     </FormItem>
+
                     <FormItem label="Contract Type">
                         <Field name="contract_type">
                             {({ field, form }: FieldProps) => (
@@ -342,19 +368,12 @@ const FormContent = () => {
                                 <Select
                                     isMulti
                                     components={animatedComponents}
-                                    componentAs={CreatableSelect}
+                                    componentAs={NumberInput}
                                     onChange={(value) =>
                                         form.setFieldValue(
                                             field.name,
                                             value.map((v: any) => v.value),
                                         )
-                                    }
-                                    onKeyDown={(e) => {
-                                        const charCode = e.which ? e.which : e.keyCode;
-                                        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                                            e.preventDefault();
-                                        }
-                                    }
                                     }
                                     onBlur={() =>
                                         form.setFieldTouched(

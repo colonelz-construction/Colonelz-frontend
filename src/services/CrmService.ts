@@ -299,7 +299,7 @@ export async function apiGetUsersList<T>(projectId: string) { // org done
         return response.data
     })
 }
-export async function apiGetUsersListProject<T>(projectId: string) { // org done
+export async function apiGetUsersListProject<T>(projectId: string | null) { // org done
     return ApiService.fetchData<UserList>({
         url: `/admin/get/userlist/project?project_id=${projectId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',

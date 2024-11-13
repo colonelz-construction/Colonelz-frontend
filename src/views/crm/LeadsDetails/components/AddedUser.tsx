@@ -107,11 +107,15 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     return itemRank.passed;
 };
 
-const AddedUser = () => {
-    const [leadData, setLeadData] = useState<any>([])
+const AddedUser = ({leadData, openDialog3}:any) => {
+    const { roleData } = useRoleContext()
+    // const [leadData, setLeadData] = useState<any>([])
     const [username, setUsername] = useState<any>()
     const [loading, setLoading] = useState<any>(false)
     const org_id = localStorage.getItem('orgId')
+    const leadAddMemberAccess = localStorage.getItem('role') === 'SUPERADMIN' ? true :  roleData?.data?.addMember?.create?.includes(`${localStorage.getItem('role')}`)
+
+    
 
     const direction = useAppSelector((state) => state.theme.direction)
 
@@ -121,7 +125,6 @@ const AddedUser = () => {
     const leadId = queryParams.get('id')
     const folderName = queryParams.get('folder_name') // Assuming folder_name is in the query params
     const navigate = useNavigate()
-    const { roleData } = useRoleContext()
 
     interface User {
         role: string
@@ -141,34 +144,34 @@ const AddedUser = () => {
     //     response()
     // }, [])
 
-    const [dialogIsOpen3, setIsOpen3] = useState(false)
+    const [dialogIsOpen, setIsOpen] = useState(false)
 
-    const openDialog3 = (username: string) => {
-        setIsOpen3(true)
+    const openDialog = (username: string) => {
+        setIsOpen(true)
         setUsername(username)
     }
 
-    const onDialogClose3 = () => {
-        setIsOpen3(false)
+    const onDialogClose = () => {
+        setIsOpen(false)
     }
 
-    useEffect(() => {
-        setLoading(true)
+    // useEffect(() => {
+    //     setLoading(true)
 
-        const fetchDataAndLog = async () => {
-            try {
-                const leadData = await apiGetCrmUsersAssociatedToLead(leadId)
-                setLeadData(leadData?.data)
+    //     const fetchDataAndLog = async () => {
+    //         try {
+    //             const leadData = await apiGetCrmUsersAssociatedToLead(leadId)
+    //             setLeadData(leadData?.data)
 
 
-                setLoading(false)
-            } catch (error) {
-                console.error('Error fetching lead data', error)
-            }
-        }
+    //             setLoading(false)
+    //         } catch (error) {
+    //             console.error('Error fetching lead data', error)
+    //         }
+    //     }
 
-        fetchDataAndLog()
-    }, [])
+    //     fetchDataAndLog()
+    // }, [])
     // console.log(leadData)
 
     const removeUser = async (username: string) => {
@@ -253,7 +256,7 @@ const AddedUser = () => {
                     return <div className='flex items-center gap-2'>
                         {deleteAccess &&
                         <Tooltip title="Remove">
-                            <HiOutlineUserRemove className='text-xl cursor-pointer hover:text-red-500' onClick={() => openDialog3(row.original.user_name)} />
+                            <HiOutlineUserRemove className='text-xl cursor-pointer hover:text-red-500' onClick={() => openDialog(row.original.user_name)} />
                             </Tooltip>}
                     </div>
                 }
@@ -309,12 +312,23 @@ const AddedUser = () => {
                 <div className="flex-1 px-4">
                     <div className='flex items-center gap-2 justify-end'>
 
+                    <div className=' flex mb-4 gap-3'>
+
+                        { leadAddMemberAccess &&
+                            <Button variant='solid' size='sm' className='' onClick={() => openDialog3()}>
+                            Add User</Button>
+                        }
+
+                        </div>
+
                         <DebouncedInput
                             value={globalFilter ?? ''}
                             className="p-2 font-lg shadow border border-block"
                             placeholder="Search..."
                             onChange={(value) => setGlobalFilter(String(value))}
                         />
+                     
+
                     </div>
                     {leadData ? (
                         <div className='h-[13rem] overflow-y-auto'>
@@ -416,14 +430,14 @@ const AddedUser = () => {
             </div>
 
             <ConfirmDialog
-                isOpen={dialogIsOpen3}
+                isOpen={dialogIsOpen}
                 type="danger"
-                onClose={onDialogClose3}
+                onClose={onDialogClose}
                 confirmButtonColor="red-600"
-                onCancel={onDialogClose3}
+                onCancel={onDialogClose}
                 onConfirm={() => removeUser(username)}
                 title="Remove Assignee"
-                onRequestClose={onDialogClose3}
+                onRequestClose={onDialogClose}
             >
                 <p> Are you sure you want to remove this assignee? </p>
             </ConfirmDialog>

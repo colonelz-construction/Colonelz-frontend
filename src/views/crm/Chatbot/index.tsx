@@ -10,6 +10,8 @@ import { FaChevronCircleUp } from "react-icons/fa";
 import { GoDotFill } from "react-icons/go";
 import ScrollableFeed from "react-scrollable-feed";
 import { apiGetUserData } from "@/services/CrmService";
+import Markdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface Message {
     text: string;
@@ -20,6 +22,7 @@ const Index = () => {
     const [inputValue, setInputValue] = useState('');
     const [project_id, setProject_id] = useState('');
     const [whileLoading, setWhileLoading] = useState(false);
+    const [test, setTest] = useState<any>('dsf;lsnljk ssdkj dsfjk;sadjksdfj dsf d sadhfkjdsff ::j 9[23498r7-e (*)&9832uyioyfq oepid] google.com dfpjifipo 9y48934-oi-,f 90 0ewew998u-284ugfi}{}8990fioipf09werfw');
     const [user, setUser] = useState<any>('')
     useEffect(() => {
 
@@ -80,7 +83,7 @@ const Index = () => {
     const fetchData = async (inputValue: string) => {
         try {
             setLoading(true);
-            const response = await fetch(`http://127.0.0.1:8000/query/`, {
+            const response = await fetch(`https://ai-chat-bot.test.initz.run/query/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -102,6 +105,7 @@ const Index = () => {
                     const chunk = decoder.decode(value, { stream: true });
 
                     // const result = chunk.replace(/data: /g, "");
+                    // setTest(chunk);
 
                     accumulatedMessages += chunk;
 
@@ -334,6 +338,8 @@ const Index = () => {
 
                         {loading && <div className={`relative gap-2 message rounded p-1 mb-2 bg-white dark:bg-[#111827] dark:border-none  px-3 w-[70%] group text-[1.7rem]`}><GoDotFill /></div>}
                     </ScrollableFeed>
+{/* 
+                    <Markdown remarkPlugins={[remarkGfm]}>{test}</Markdown> */}
                 </div>
 
                 <InputGroup className="bottom-0 border rounded-md border-[#9f9e9e]">

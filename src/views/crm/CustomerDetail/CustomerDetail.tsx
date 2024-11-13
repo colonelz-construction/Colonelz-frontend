@@ -17,7 +17,7 @@ import { AuthorityCheck } from '@/components/shared'
 import { useRoleContext } from '../Roles/RolesContext'
 import { Customer, Data, Tasks } from './store'
 import { FileItemType } from './Quotation/Quotations'
-import Assignee from './Project Progress/Assignee'
+import Assignee, { UsersResponse } from './Project Progress/Assignee'
 import { update } from 'lodash'
 
 
@@ -74,10 +74,11 @@ const CustomerDetail = () => {
   };
   const [details, setDetails] = useState<any | null>(null);
   const [projectData, setProjectData] = useState<any>()
+  console.log(projectData)
   const [task, setTaskData] = useState<Tasks[]>([])
+  const [data, setData] = useState<any>([])
   const [report, setReport] = useState<ReportResponse>()
   const [activity, setActivity] = useState<any>()
-  // console.log(activity)
   const [users, setUsers] = useState<any>([])
   const quotationAccess = role === 'SUPERADMIN' ? true : roleData?.data?.quotation?.read?.includes(`${localStorage.getItem('role')}`)
   const momAccess = role === 'SUPERADMIN' ? true : roleData?.data?.mom?.read?.includes(`${localStorage.getItem('role')}`)
@@ -121,6 +122,12 @@ const CustomerDetail = () => {
     const fetchDataAndLog = async () => {
       try {
         const leadData = await apiGetCrmSingleProjectQuotation(allQueryParams.project_id);
+        const response = await apiGetUsersListProject(allQueryParams.project_id)
+
+        const data: UsersResponse = response
+
+        setData(data.data)
+        console.log(data)
 
         setFileData(leadData.data);
       } catch (error) {
@@ -162,24 +169,6 @@ const CustomerDetail = () => {
     fetchDataAndLog();
   }, [allQueryParams.project_id, taskAccess]);
 
-  // useEffect(() => {
-  //   if (!projectAccess) return;
-
-  //   const fetchDataAndLog = async () => {
-  //     try {
-  //       const projectResponseData = await apiGetUsersListProject(allQueryParams.project_id);
-  //       // console.log(projectResponseData.data)
-  //       setProjectData(projectResponseData.data);
-  //     } catch (error) {
-  //       console.error('Error fetching task data', error);
-  //     }
-  //   };
-
-  //   fetchDataAndLog();
-  // }, [allQueryParams.project_id, projectAccess]);
-
-
-
   return (
     <>
       <h3 className='pb-5 capitalize flex items-center'><span>Project-</span>{loading ? <Skeleton width={100} /> : projectData[0]?.project_name}</h3>
@@ -210,7 +199,7 @@ const CustomerDetail = () => {
                   <TabNav value="timeline">Timeline</TabNav>
                 }
                 {
-                  <TabNav value="assignee">Assignee</TabNav>
+                  <TabNav value="assignee">{`Assignee (${data?.length})`}</TabNav>
                 }
               </>
 
@@ -239,7 +228,7 @@ const CustomerDetail = () => {
                 <Timeline />
               </TabContent>
               <TabContent value="assignee">
-                <Assignee />
+                <Assignee data={data} />
               </TabContent>
 
             </div>

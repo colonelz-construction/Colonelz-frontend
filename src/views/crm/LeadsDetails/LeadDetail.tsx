@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import LeadForm from './components/LeadForm'
 import { Button, Card, Dialog, Dropdown, Notification, Skeleton, Steps, Tabs, toast } from '@/components/ui'
 import CustomerProfile from './components/LeadProfile'
-import { apiDeleteInactiveLead, apiGetCrmLeadsDetails } from '@/services/CrmService'
+import { apiDeleteInactiveLead, apiGetCrmLeadsDetails, apiGetCrmUsersAssociatedToLead } from '@/services/CrmService'
 import TabList from '@/components/ui/Tabs/TabList'
 import TabNav from '@/components/ui/Tabs/TabNav'
 import TabContent from '@/components/ui/Tabs/TabContent'
@@ -22,6 +22,7 @@ import { AuthorityCheck, ConfirmDialog } from '@/components/shared'
 import { useRoleContext } from '../Roles/RolesContext'
 import { Lead } from '../LeadList/store/LeadContext'
 import  AddedUser  from './components/AddedUser'
+import AddUserToLead from './components/AddUserToLead'
 
 export type LeadDetailsResponse = {
     code: number;
@@ -56,6 +57,8 @@ const CustomerDetail = () => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [dialogIsOpen1, setIsOpen1] = useState(false)
     const [dialogIsOpen2, setIsOpen2] = useState(false)
+    const [dialogIsOpen3, setIsOpen3] = useState(false)
+    const [leadData, setLeadData] = useState<any>([])
 
     const openDialog1 = () => {
         setIsOpen1(true)
@@ -81,6 +84,14 @@ const CustomerDetail = () => {
     const onDialogClose2 = () => {
 
         setIsOpen2(false)
+    }
+    const openDialog3 = () => {
+        setIsOpen3(true)
+    }
+
+    const onDialogClose3 = () => {
+
+        setIsOpen3(false)
     }
 
     // const navigate = useNavigate();
@@ -119,6 +130,25 @@ const CustomerDetail = () => {
         fetchData();
     }, [myParam]);
 
+
+    useEffect(() => {
+        // setLoading(true)
+
+        const fetchDataAndLog = async () => {
+            try {
+                const leadData = await apiGetCrmUsersAssociatedToLead(lead_id)
+                setLeadData(leadData?.data)
+
+
+                setLoading(false)
+            } catch (error) {
+                console.error('Error fetching lead data', error)
+            }
+        }
+
+        fetchDataAndLog()
+    }, [])
+
     const lead = details?.data?.[0];
     // console.log(details?.data[0].notes)
     const notes = details?.data[0].notes?.reverse()
@@ -127,6 +157,7 @@ const CustomerDetail = () => {
 
     const contractAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.contract?.read?.includes(`${role}`)
     const leadDeleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.lead?.delete?.includes(`${role}`)
+    const leadAddMemberAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.addMember?.create?.includes(`${role}`)
 
     const handleDeleteInactiveLead = async () => {
 
@@ -185,6 +216,14 @@ const CustomerDetail = () => {
                             <Dropdown.Item eventKey="d" onClick={() => openDialog2()}><div>Delete Lead</div></Dropdown.Item>
 
                         </AuthorityCheck>}
+
+                        {leadAddMemberAccess && <AuthorityCheck
+                            userAuthority={[`${localStorage.getItem('role')}`]}
+                            authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.addMember?.create ?? []}
+                        >
+                            <Dropdown.Item eventKey="e" onClick={() => openDialog3()}><div>Add User</div></Dropdown.Item>
+
+                        </AuthorityCheck>}
                     </Dropdown>
                 </div>
             </div>
@@ -220,8 +259,9 @@ const CustomerDetail = () => {
                             }
 
                             {someAccess &&
-                                <TabNav value="AddedUser" >
-                                    Assignee
+                                <TabNav value="AddedUser" className='flex gap-1'>
+                                    <span>{"Assignee "}</span> 
+                                    <span className={leadData?.length == 0 ? `text-red-500` :  ''}> {` (${leadData?.length})`}</span>
                                 </TabNav>}
                         </TabList>
                         <div className="p-4">
@@ -242,7 +282,7 @@ const CustomerDetail = () => {
                             </TabContent>
 
                             <TabContent value="AddedUser">
-                                <AddedUser />
+                                <AddedUser leadData={leadData} openDialog3={openDialog3}  />
                             </TabContent>
                         </div>
                     </Tabs>
@@ -288,6 +328,11 @@ const CustomerDetail = () => {
                 onClose={onDialogClose}
                 onRequestClose={onDialogClose}
             ><EditLead details={details} /></Dialog>
+            <Dialog
+                isOpen={dialogIsOpen3}
+                onClose={onDialogClose3}
+                onRequestClose={onDialogClose3}
+            ><AddUserToLead lead_id={lead_id} /></Dialog>
 
 
             <ConfirmDialog

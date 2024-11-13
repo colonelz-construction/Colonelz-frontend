@@ -23,6 +23,8 @@ import type {
 import type { InputHTMLAttributes } from 'react'
 import { apiGetUsersListProject, apiRemoveUserProject } from '@/services/CrmService'
 import {
+    Button,
+    Dialog,
     Notification,
     Pagination,
     Select,
@@ -33,6 +35,8 @@ import { useRoleContext } from '../../Roles/RolesContext'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import { ConfirmDialog } from '@/components/shared'
 import NoData from '@/views/pages/NoData'
+import useQuery from '@/utils/hooks/useQuery';
+import AddUserToProject from './AddUserToProject';
 
 type User = {
     user_name: string
@@ -107,16 +111,17 @@ const pageSizeOption = [
     { value: 50, label: '50 / page' },
 ]
 
-const Assignee = () => {
+const Assignee = ({data}: any) => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
-    const [data, setData] = useState<User[]>([])
     const { roleData } = useRoleContext()
     const [loading, setLoading] = useState(true)
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [userId, setUserId] = useState('')
     const [userName, setUserName] = useState('')
     const [userData, setUserData] = useState()
+    const query = useQuery()
+    const project_id = query.get('project_id')
     const role = localStorage.getItem('role')
     const queryParams = new URLSearchParams(location.search);
     const allQueryParams: QueryParams = {
@@ -138,19 +143,6 @@ const Assignee = () => {
         id: string;
         project_id: string;
     }
-
-    useEffect(() => { // org done
-        const fetchData = async () => {
-            const response = await apiGetUsersListProject(allQueryParams.project_id)
-            const data: UsersResponse = response
-
-            setLoading(false)
-            setData(data.data)
-            console.log(data)
-        }
-
-        fetchData()
-    }, [])
 
 
     const deleteuser = async (username: string, project_id: any) => { // org done
@@ -240,12 +232,34 @@ const Assignee = () => {
         table.setPageSize(Number(value))
     }
 
+    const leadAddMemberAccess = localStorage.getItem('role') === 'SUPERADMIN' ? true :  roleData?.data?.addMember?.create?.includes(`${localStorage.getItem('role')}`)
+
+    const [dialogIsOpen3, setIsOpen3] = useState(false)
+
+    const openDialog3 = () => {
+        setIsOpen3(true)
+    }
+
+    const onDialogClose3 = () => {
+        setIsOpen3(false)
+    }
+
 
     return (
         <>
             <div className="flex flex-col sm:flex-row gap-5 justify-between mb-5">
                 <h3>Assignee</h3>
                 <div className="flex gap-3">
+
+                    <div className=' flex mb-4 gap-3'>
+
+                        { leadAddMemberAccess &&
+                            <Button variant='solid' size='sm' className='' onClick={() => openDialog3()}>
+                            Add User</Button>
+                        }
+
+                    </div>
+
                     <DebouncedInput
                         value={globalFilter ?? ''}
                         className="p-2 font-lg shadow border border-block"
@@ -299,7 +313,7 @@ const Assignee = () => {
                             </Tr>
                         ))}
                     </THead>
-                    {loading ? (
+                    {false ? (
                         <TableRowSkeleton
                             avatarInColumns={[0]}
                             columns={columns.length}
@@ -349,6 +363,12 @@ const Assignee = () => {
                     />
                 </div>
             </div>
+
+            <Dialog
+                isOpen={dialogIsOpen3}
+                onClose={onDialogClose3}
+                onRequestClose={onDialogClose3}
+            ><AddUserToProject project_id={project_id} /></Dialog>
 
             <ConfirmDialog
                 isOpen={dialogIsOpen}

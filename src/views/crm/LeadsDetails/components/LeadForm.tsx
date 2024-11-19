@@ -19,6 +19,7 @@ interface FormData {
 const LeadForm = () => {
   const location=useLocation()
   const queryParams = new URLSearchParams(location.search)
+  const org_id = localStorage.getItem('orgId')
   const LeadId = queryParams.get('id') || ''
 
 
@@ -37,6 +38,7 @@ const LeadForm = () => {
     
   <Formik initialValues={{
     userId: localStorage.getItem('userId') || '',
+    org_id,
     lead_id: LeadId,
     status: '',
     date: '',

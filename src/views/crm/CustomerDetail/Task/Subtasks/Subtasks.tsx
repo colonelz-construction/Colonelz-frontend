@@ -73,16 +73,18 @@ const pageSizeOption = [
     { value: 40, label: '40 / page' },
     { value: 50, label: '50 / page' },
 ]
-const ActionColumn = ({ row,users }: { row: SubTask,users:string[]}) => {
+const ActionColumn = ({ row,users }: { row: SubTask,users:any}) => {
     const navigate = useNavigate()
     const { textTheme } = useThemeClass()
     const location=useLocation()
     const queryParams = new URLSearchParams(location.search);
     const projectId=queryParams.get('project_id') || '';
+    const org_id = localStorage.getItem('orgId')
+
     const data={user_id:localStorage.getItem('userId'),
     project_id:projectId,
     task_id:row.task_id,
-    sub_task_id:row.sub_task_id}
+    sub_task_id:row.sub_task_id, org_id}
 
     const [dialogIsOpen, setIsOpen] = useState(false)
 
@@ -193,6 +195,8 @@ const Subtasks = ({task,users}:any) => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const navigate = useNavigate()
+    const org_id = localStorage.getItem('orgId')
+
 
 
     const location=useLocation()
@@ -203,7 +207,7 @@ const Subtasks = ({task,users}:any) => {
   
     useEffect(() => {
         const TaskData=async()=>{
-            const response = await apiGetCrmProjectsSubTaskData(projectId,task);
+            const response = await apiGetCrmProjectsSubTaskData(projectId,task, org_id);
 
             setTaskData(response.data)
         }

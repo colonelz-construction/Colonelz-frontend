@@ -33,8 +33,12 @@ type Task = {
   }
 
 const EditTask = ({ Data,users,task }: EditTaskProps) => {
+
+    console.log(users)
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const org_id = localStorage.getItem('orgId')
+
     const [userData,setUserData]=useState<any>(null)
     
 
@@ -84,6 +88,7 @@ const priorityOptions = [
                 <Formik 
                        initialValues={{
                         task_id: Data.task_id,
+                        org_id,
                         user_id: localStorage.getItem('userId') || '',
                         project_id: Data.project_id,
                         task_name: Data.task_name,

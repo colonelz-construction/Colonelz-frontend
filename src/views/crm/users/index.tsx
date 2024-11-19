@@ -121,6 +121,9 @@ const Users = () => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [userId, setUserId] = useState('')
     const [userData, setUserData] = useState()
+    const org_id = localStorage.getItem('orgId')
+
+    const role = localStorage.getItem('role')
 
     const [editRoledialogIsOpen, setEditRoleIsOpen] = useState(false)
   
@@ -155,7 +158,7 @@ const Users = () => {
     }, [])
 
     const deleteuser = async (UserId: string) => {
-        const response = await apiDeleteUsers(UserId)
+        const response = await apiDeleteUsers(UserId, org_id)
         
         
 
@@ -185,9 +188,13 @@ const Users = () => {
                 header: '',
                 id: 'action',
                 cell: ({ row }) => {
+
+                    console.log(row.original.role)
                     return (
                         <div className="">
-                            <span className="flex items-center text-lg gap-2">
+                            {row.original.role !== "SUPERADMIN" &&
+                                
+                                <span className="flex items-center text-lg gap-2">
                                 {
                                     // editAccess&&
                                     <Tooltip title="Edit">
@@ -198,7 +205,7 @@ const Users = () => {
                                                 )}`,
                                             ]}
                                             authority={
-                                                roleData?.data?.user
+                                                role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.user
                                                     ?.update ?? []
                                             }
                                         >
@@ -212,6 +219,17 @@ const Users = () => {
                                     </Tooltip>
                                 }
                                 <Tooltip title="Delete">
+                                <AuthorityCheck
+                                            userAuthority={[
+                                                `${localStorage.getItem(
+                                                    'role',
+                                                )}`,
+                                            ]}
+                                            authority={
+                                                role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.user
+                                                    ?.delete ?? []
+                                            }
+                                        >
                                     <p
                                         className=" text-xl hover:text-red-500 cursor-pointer"
                                         onClick={() =>
@@ -220,8 +238,9 @@ const Users = () => {
                                     >
                                         <MdDeleteOutline />
                                     </p>
+                                    </AuthorityCheck>
                                 </Tooltip>
-                            </span>
+                            </span>}
                         </div>
                     )
                 },
@@ -272,7 +291,7 @@ const Users = () => {
                 <div className="flex gap-3">
                     <AuthorityCheck
                         userAuthority={[`${localStorage.getItem('role')}`]}
-                        authority={roleData?.data?.user?.create ?? []}
+                        authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.user?.create ?? []}
                     >
                         <Link to={`/app/crm/register`}>
                             <Button size="sm" variant="solid">

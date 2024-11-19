@@ -15,6 +15,8 @@ const Timeline = () => {
     const location=useLocation()
     const queryParams = new URLSearchParams(location.search);
     const projectId=queryParams.get('project_id') || '';
+    const org_id = localStorage.getItem('orgId')
+
     const [taskData,setTaskData]=useState<any>(null)
     function formatDate(inputDate: string): string {
         const date = new Date(inputDate);
@@ -26,7 +28,7 @@ const Timeline = () => {
   
     useEffect(() => {
         const TaskData=async()=>{
-            const response = await apiGetCrmProjectsTaskData(projectId);
+            const response = await apiGetCrmProjectsTaskData(projectId, org_id);
             setTaskData(response.data)
         }
         TaskData();

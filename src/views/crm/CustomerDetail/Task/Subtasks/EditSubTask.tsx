@@ -38,6 +38,8 @@ const EditSubTask = ({Data,users}:SubtaskData) => {
     const location=useLocation();
     const queryParams=new URLSearchParams(location.search);
     const project_id=queryParams.get('project_id')
+    const org_id = localStorage.getItem('orgId')
+
     
   
 const openDialog = () => {
@@ -63,8 +65,8 @@ const priorityOptions = [
   ];
   
   const userOptions = users?.map((user:any) => ({
-    label: user,
-    value: user
+    label: user.user_name,
+    value: user.user_name
   }));
   
   const formateDate = (dateString:string) => {
@@ -85,6 +87,7 @@ const priorityOptions = [
                 <Formik 
                        initialValues={{
                         user_id: localStorage.getItem('userId') || '',
+                        org_id,
                         project_id: project_id || '',
                         task_id: Data?.task_id,
                         sub_task_id: Data?.sub_task_id,

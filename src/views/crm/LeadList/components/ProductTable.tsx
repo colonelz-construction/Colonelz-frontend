@@ -105,7 +105,7 @@ function DebouncedInput({
             >
                <AuthorityCheck
                 userAuthority={[`${role}`]}
-               authority={roleData?.data?.lead?.create??[]}
+               authority={role === "SUPERADMIN" ? ["SUPERADMIN"] : roleData?.data?.lead?.create??[]}
                >
                 <Button block variant="solid" size="sm" icon={<HiPlusCircle />}>
                     Add Lead
@@ -153,7 +153,7 @@ const Filtering = () => {
             { header: 'Lead Name', accessorKey: 'name',
         cell: ({row}) => {
             const name=row.original.name
-            return <Link to={`/app/crm/lead/?id=${row.original.lead_id}`} className=' capitalize'>{name}</Link>
+            return <Link to={`/app/crm/lead/?id=${row.original.lead_id}&tab=follow`} className=' capitalize'>{name}</Link>
         }},
         { header: 'Lead Status', accessorKey: 'status',
             cell: ({ row }) => {
@@ -264,7 +264,7 @@ const Filtering = () => {
                 <TBody>
                     {table.getRowModel().rows.map((row) => {
                         return (
-                            <Tr key={row.id} onClick={()=>navigate(`/app/crm/lead/?id=${row.original.lead_id}`)} className=' cursor-pointer'>
+                            <Tr key={row.id} onClick={()=>navigate(`/app/crm/lead/?id=${row.original.lead_id}&tab=Actions`)} className=' cursor-pointer'>
                                 {row.getVisibleCells().map((cell) => {
                                     return (
                                         <Td key={cell.id}>

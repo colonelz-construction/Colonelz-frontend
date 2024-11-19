@@ -85,6 +85,7 @@ interface ProjectUpdateData {
   }
   const ProjectUpdate: React.FC<Data> = (data) => {
     const location=useLocation()
+    
     const searchParams = new URLSearchParams(location.search);
     const projectId = searchParams.get('project_id');
     const userId = localStorage.getItem('userId');
@@ -109,12 +110,14 @@ interface ProjectUpdateData {
         <Formik
         initialValues={{
           user_id: userId,
+          org_id: localStorage.getItem('orgId'),
           project_id: projectId,
           project_budget:data.data.project_budget,
           designer:data.data.designer,
           timeline_date:new Date(data.data.timeline_date),
           project_status:data.data.project_status,
-          client_email:data.data.client[0].client_email
+          client_email:data.data.client[0].client_email,
+          description: data.data.description
         }}
         validationSchema={validationSchema}
         onSubmit={
@@ -242,6 +245,20 @@ interface ProjectUpdateData {
             )}
             </Field>
             </FormItem>
+
+            <FormItem label='Desription'>
+                                <Field name='description' placeholder='description'>
+                                    {({field, form}:any)=>{
+                                        return (
+                                            <Input textArea
+                                            name='description'
+                                            value={values.description}
+                                            onChange={(e)=>form.setFieldValue('description',e.target.value)}
+                                            {...field}/>
+                                        )
+                                    }}
+                                </Field>
+                            </FormItem>
           <Button type="submit" 
            variant='solid'
              loading={isSubmitting}
@@ -258,6 +275,7 @@ interface ProjectUpdateData {
 
 
 const CustomerProfile = ({ data,report }: CustomerProfileProps) => {
+  const role = localStorage.getItem('role')
     const [dialogIsOpen, setIsOpen] = useState(false)
     const {roleData} = useRoleContext()
     
@@ -280,7 +298,7 @@ const CustomerProfile = ({ data,report }: CustomerProfileProps) => {
                     <div className="mt-4 flex flex-col xl:flex-row gap-2">
                     <AuthorityCheck
                     userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={roleData?.data?.project?.update??[]}
+                    authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.update??[]}
                     >
                     <Button variant="solid" onClick={() => openDialog()} size='sm' className='flex justify-center items-center gap-1'>
             <span>  <HiOutlinePencil/></span><span>  Edit</span>

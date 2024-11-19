@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import Table from '@/components/ui/Table'
 import Input from '@/components/ui/Input'
 import Pagination from '@/components/ui/Pagination'
+import { IoIosAddCircleOutline } from "react-icons/io";
 import {
     useReactTable,
     getCoreRowModel,
@@ -17,12 +18,14 @@ import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {  Select } from '@/components/ui'
+import {  Select, Tooltip } from '@/components/ui'
 import { ProjectMomItem } from '../store'
 import { apiGetMomData } from '@/services/CrmService'
 import formateDate from '@/store/dateformate'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import NoData from '@/views/pages/NoData'
+import { ActionLink, AuthorityCheck } from '@/components/shared'
+import { useRoleContext } from '../../Roles/RolesContext'
 
 
 export type MomResponse = {
@@ -120,12 +123,20 @@ const pageSizeOption = [
 const Filtering = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
+    const { roleData } = useRoleContext()
+    const role = localStorage.getItem('role')
     const columns = useMemo<ColumnDef<ProjectMomItem>[]>(
         () => [
             {
                 header: 'Project Name',
                 accessorKey: 'project_name',
-               
+                cell: (props) => {
+                    const row = props.row.original
+                    
+                    return (
+                        <span className='cursor-pointer' onClick={() => navigate(`/app/crm/project-details?project_id=${row.project_id}&id=65c32e19e0f36d8e1f30955c&type=mom`)}>{row.project_name}</span>
+                    )
+                },
             },
             {
                 header: 'Client Name',
@@ -164,14 +175,54 @@ const Filtering = () => {
                   )
               },
             },
+            {
+                header: '',
+                id: 'action',
+                cell: ({ row }) => {
+
+                    const projectId = row.original.project_id
+                    const clientName = row.original.client_name
+                    console.log(projectId)
+                    console.log(clientName)
+                    return (
+                        <div className="">
+                            
+                                
+                                <span className="flex items-center text-lg gap-2 cursor-pointer">
+                                {
+                                    // editAccess&&
+                                    <Tooltip title="Add MOM">
+                                        <AuthorityCheck
+                                            userAuthority={[
+                                                `${localStorage.getItem(
+                                                    'role',
+                                                )}`,
+                                            ]}
+                                            authority={
+                                                role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.mom?.create??[]
+                                            }
+                                        >
+                                                <IoIosAddCircleOutline onClick={() => navigate(`/app/crm/project/momform?project_id=${projectId}&client_name=${clientName}`)}/>
+                                                                    
+                                                
+                                        
+                                        </AuthorityCheck>
+                                    </Tooltip>
+                                }
+                            </span>
+                        </div>
+                    )
+                },
+            },
            
         ],
         []
     )
     const [ordersData, setOrdersData] = useState<Data[]>([])
     const [loading, setLoading] = useState(true)
+    const org_id = localStorage.getItem('orgId')
     useEffect(() => {
-        apiGetMomData().then((response) => {
+        apiGetMomData(org_id).then((response) => {
             if (response.code === 200) {
                 setOrdersData(response.data.MomData)
                 setLoading(false)
@@ -269,7 +320,7 @@ const Filtering = () => {
                 <TBody>
                     {table.getRowModel().rows.map((row) => {  
                         return (
-                            <Tr key={row.id} className=' capitalize cursor-pointer' onClick={() => navigate(`/app/crm/project-details?project_id=${row.original.project_id}&id=65c32e19e0f36d8e1f30955c&type=mom`)}>
+                            <Tr key={row.id} className=' capitalize'>
                                 {row.getVisibleCells().map((cell) => {
                                     return (
                                         <Td key={cell.id}>
@@ -305,8 +356,7 @@ const Filtering = () => {
                         onChange={(option) => onSelectChange(option?.value)}
                     />
                 </div>
-            </div>
-        
+            </div>        
         </>
     )
 }

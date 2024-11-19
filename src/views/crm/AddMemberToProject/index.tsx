@@ -77,6 +77,7 @@ const Index = () => {
   const [loading, setLoading] = useState(false)
   const { rolelist } = useRoleContext();
   const queryParams = new URLSearchParams(location.search);
+  const org_id = localStorage.getItem('orgId')
 
   const projectId: any = queryParams.get('project_id')
 
@@ -87,7 +88,7 @@ const Index = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       const response = await apiGetAllUsersList()
-      const projects = await apiGetCrmProjects();
+      const projects = await apiGetCrmProjects(org_id);
       setUsers(response.data);
       setFilteredProjects(projects.data.projects);
     };
@@ -143,6 +144,7 @@ const Index = () => {
     <Formik
       initialValues={{
         id: id || '',
+        org_id,
         role: '',
         user_name: '',
         project_id: '',

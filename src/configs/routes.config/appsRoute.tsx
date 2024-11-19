@@ -12,9 +12,23 @@ const appsRoute: Routes = [
         authority: [],
     },
     {
+        key: 'appsCrm.ai-chatbot',
+        path: `${APP_PREFIX_PATH}/crm/ai-chatbot`,
+        component: lazy(() => import('@/views/crm/Chatbot/index')),
+
+        authority: [],
+    },
+    {
         key: 'appsCrm.register',
         path: `${APP_PREFIX_PATH}/crm/profile`,
         component: lazy(() => import('@/views/crm/Profile/index')),
+
+        authority: [],
+    },
+    {
+        key: 'appsCrm.register',
+        path: `${APP_PREFIX_PATH}/crm/org-profile`,
+        component: lazy(() => import('@/views/crm/OrgProfile/index')),
 
         authority: [],
     },
@@ -191,16 +205,6 @@ const appsRoute: Routes = [
         component: lazy(
             () =>
                 import('@/views/crm/FileManager/Components/Template/Subfolder'),
-        ),
-
-        authority: [],
-        meta: {},
-    },
-    {
-        key: 'appsCrm.fileManager',
-        path: `${APP_PREFIX_PATH}/crm/fileManager/project/templates/residential/subfolder/files`,
-        component: lazy(
-            () => import('@/views/crm/FileManager/Components/Template/Files'),
         ),
 
         authority: [],

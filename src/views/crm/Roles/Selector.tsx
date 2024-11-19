@@ -20,7 +20,7 @@ const permissionsMap: { [key: string]: Permission[] } = {
     role: ['create', 'read', 'update', 'delete'],
     file:['create','read','delete'],
     archive: ['read', 'restore','delete'],
-    addMember: ['create'],
+    addMember: ['create', 'delete'],
     lead: ['create', 'read', 'update', 'delete'],
     project: ['create', 'read', 'update'],
     mom: ['create', 'read', 'update', 'delete'],

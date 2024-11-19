@@ -59,12 +59,14 @@ const LeadContext = createContext<Lead[] | null>(null);
 
 export const useLeadContext = () => useContext(LeadContext);
 
+const org_id = localStorage.getItem('orgId')
+
 export const LeadProvider = ({ children }: { children: ReactNode }) => {
   const [apiData, setApiData] = useState<Lead[] | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await apiGetCrmLeads();
+      const response = await apiGetCrmLeads(org_id);
       setApiData(response.data.leads);
     };
 

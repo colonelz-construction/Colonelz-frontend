@@ -24,6 +24,7 @@ type Task = {
 const AddTask = ({project,userData}:any) => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const org_id = localStorage.getItem('orgId')
     
     
 const openDialog = () => {
@@ -45,7 +46,11 @@ const priorityOptions = [
     { label: "In Progress", value: "In Progress" },
     { label: "Cancelled", value: "Cancelled" },
   ];
+
+//   console.log(userData)
   const userOptions = userData?.map((user:any) => ({label: user, value: user}))
+
+  console.log(userOptions)
 
   return (
         <div>
@@ -57,6 +62,7 @@ const priorityOptions = [
                 <Formik 
                        initialValues={{
                         user_id: localStorage.getItem('userId') || '',
+                        org_id,
                         project_id: project ,
                         task_name: "",
                         task_description: "",

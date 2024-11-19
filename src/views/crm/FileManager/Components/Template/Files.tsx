@@ -108,7 +108,10 @@ const Index = () => {
   const folderId = queryParams.get('folder_id');
   const [shareLoading, setShareLoading] = useState(false);
   const { roleData } = useRoleContext();
-  const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
+  const org_id : any= localStorage.getItem('orgId')
+  const role : any= localStorage.getItem('role')
+
+  const uploadAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
 
   const navigate = useNavigate()
 
@@ -222,6 +225,7 @@ const Index = () => {
       file_id: selectedFiles,
       folder_name: subfolder,
       type: 'template',
+      org_id,
     };
     try {
       const response = await apiDeleteFileManagerFiles(postData);
@@ -259,7 +263,8 @@ const Index = () => {
       bcc: selectedEmailsBcc,
       subject: subject,
       body: body,
-      user_id: localStorage.getItem('userId')
+      user_id: localStorage.getItem('userId'),
+      org_id,
     };
 
 
@@ -438,7 +443,7 @@ const Index = () => {
         id: 'actions',
         cell: ({ row }) => {
           const { roleData } = useRoleContext()
-          const deleteAccess = roleData?.data?.file?.delete?.includes(`${localStorage.getItem('role')}`)
+          const deleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.file?.delete?.includes(`${localStorage.getItem('role')}`)
           return (
             <div className=' flex justify-center gap-3'>
 
@@ -788,6 +793,7 @@ const Index = () => {
               for (let i = 0; i < values.files.length; i++) {
                 formData.append('files', values.files[i]);
               }
+              formData.append('org_id', org_id);
               const response = await apiGetCrmFileManagerCreateTemplateFolder(formData)
               setSubmitting(false)
               // console.log(response);

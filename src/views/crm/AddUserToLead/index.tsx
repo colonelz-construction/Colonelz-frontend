@@ -64,6 +64,8 @@ const Index = () => {
   const [selectedProject, setSelectedProject] = useState<DataType[]>([]);
   const [loading,setLoading]=useState(false)
   const {rolelist}=useRoleContext()
+  const org_id = localStorage.getItem('orgId')
+
   const Options = rolelist.
   filter((role)=>role!=='ADMIN'&&role!=='Senior Architect')
   .map((role:string) => ({ value: role, label: role }));
@@ -131,6 +133,7 @@ const Index = () => {
     <Formik
       initialValues={{
         id:id || '',
+        org_id,
         role: '',
         user_name: '',
         lead_id: '',

@@ -58,7 +58,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
     ]
 
     return (
-        <div className="rich-text-editor">
+        <div className="rich-text-editor flex flex-col gap-2">
+            <span className='font-semibold'>Remark</span>
             <ReactQuill
                 value={value}
                 onChange={onChange}

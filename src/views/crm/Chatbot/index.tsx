@@ -90,7 +90,7 @@ const Index = () => {
     const fetchData = async (inputValue: string) => {
         try {
             setLoading(true);
-            const response = await fetch(`https://ai-chat-bot.test.initz.run/query/`, {
+            const response = await fetch(`https://ada-chat-bot.test.initz.run/query/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

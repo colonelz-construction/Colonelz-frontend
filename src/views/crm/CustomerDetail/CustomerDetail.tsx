@@ -199,7 +199,10 @@ const CustomerDetail = () => {
                   <TabNav value="timeline">Timeline</TabNav>
                 }
                 {
-                  <TabNav value="assignee">{`Assignee (${data?.length})`}</TabNav>
+                  <TabNav value="assignee" className='flex gap-1'>
+                    <span>Assignee</span>
+                    <span className={data?.length == 0 ? "text-red-500" : ""}>{"("}{data?.length}{")"}</span>
+                  </TabNav>
                 }
               </>
 

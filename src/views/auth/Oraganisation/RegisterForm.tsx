@@ -164,7 +164,7 @@ const RegisterForm = (props: SignInFormProps) => {
                                 {isSubmitting ? 'Registering...' : 'Register'}
                             </Button>
 
-                            <p className='mt-2 text-sm'>Already have an account? <ActionLink to={'/sign-in'}>Signin</ActionLink> </p>
+                            <p className='mt-2 text-sm'>Already have an account? <ActionLink to={'/sign-in'}>Sign In</ActionLink> </p>
                            
                         </FormContainer>
                     </Form>

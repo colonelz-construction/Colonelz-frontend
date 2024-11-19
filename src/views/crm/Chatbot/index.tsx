@@ -13,6 +13,9 @@ import { apiGetUserData } from "@/services/CrmService";
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
+//@ts-ignore
+import Linkify from 'react-linkify';
+
 interface Message {
     text: string;
     sender: "user" | "bot";
@@ -22,7 +25,11 @@ const Index = () => {
     const [inputValue, setInputValue] = useState('');
     const [project_id, setProject_id] = useState('');
     const [whileLoading, setWhileLoading] = useState(false);
-    const [test, setTest] = useState<any>('dsf;lsnljk ssdkj dsfjk;sadjksdfj dsf d sadhfkjdsff ::j 9[23498r7-e (*)&9832uyioyfq oepid] google.com dfpjifipo 9y48934-oi-,f 90 0ewew998u-284ugfi}{}8990fioipf09werfw');
+    // const [url, setUrl] = useState<string>('');
+    // console.log(url)
+    // const [urlFlag, setUrlFlag] = useState<any>(false);
+    // const [urlAccumulator, setUrlAccumulator] = useState('');
+      
     const [user, setUser] = useState<any>('')
     useEffect(() => {
 
@@ -97,6 +104,8 @@ const Index = () => {
             const decoder = new TextDecoder();
             let accumulatedMessages = "";
 
+            // let flag = true;
+
             if (reader) {
                 while (true) {
                     const { done, value } = await reader.read();
@@ -104,8 +113,16 @@ const Index = () => {
                     // Decode the chunk and append to the accumulated message
                     const chunk = decoder.decode(value, { stream: true });
 
+                    console.log(chunk)
+
                     // const result = chunk.replace(/data: /g, "");
                     // setTest(chunk);
+
+                   
+                        const urlRegex = /(https?:\/\/[^\s]+)/g
+                        const urls = chunk.match(urlRegex);
+                        // console.log(urls);
+                        // flag = false
 
                     accumulatedMessages += chunk;
 
@@ -122,14 +139,19 @@ const Index = () => {
                         } else {
                             // If the last message is from the bot, append to its text
                             const newMessageText = (lastMessage?.text || "") + chunk;
+
+                            // console.log(newMessageText)
                             return [
                                 ...prevMessages.slice(0, -1), // Remove the last entry
                                 { text: newMessageText.trim(), sender: "bot" }, // Append the new chunk
                             ];
                         }
                     });
+
                 }
             }
+
+            // console.log(url)
 
             setMessages((prevMessages: any) => {
                 const lastMessage = prevMessages[prevMessages.length - 1];
@@ -249,6 +271,55 @@ const Index = () => {
                                                 lineShow = match[1].replace("\\n\\n", "").replace("\\n", "").replace(":\\n", "").replace("**", "")
                                             }
 
+                                            // if(urlFlag) {
+                                            //     console.log(lineShow)
+                                            //     setUrl(url + lineShow)
+
+                                            //     if(lineShow == ".jpg" || lineShow == 'jpg') {
+                                            //         setUrlFlag(false);
+                                            //     }
+                                            // }
+
+                                            // if(lineShow == 'https') {
+                                            //     console.log(lineShow)
+                                            //     setUrl(url + lineShow)
+                                            //     setUrlFlag(true);
+                                            // }
+
+
+                                            
+
+                                            // const urlRegex = /(https?:\/\/[^\s]+\.jpg)/;
+
+                                            // // console.log(lineShow)
+
+                                            // if (lineShow.startsWith('http')) {
+
+                                            //     console.log("yes")
+                                            //     setUrlAccumulator(lineShow);
+                                            //     return <span>{""}</span>
+                                            // }
+
+                                            // if (urlAccumulator) {
+                                            //     setUrlAccumulator((prev) => `${prev} ${lineShow}`);
+                                            //     if (urlRegex.test(urlAccumulator)) {
+                                            //       // We have a complete URL - create a link
+                                            //       const fullUrl = urlAccumulator.trim();
+                                            //       console.log(urlAccumulator)
+
+                                            //       console.log(fullUrl)
+                                            //       setUrlAccumulator(''); // Reset accumulator after forming the link
+                                            //       return (
+                                            //         <a key={index} href={fullUrl} target="_blank" rel="noopener noreferrer">
+                                            //           {fullUrl}
+                                            //         </a>
+                                            //       );
+                                            //     }
+                                            //     return <span>{""}</span> // Continue accumulating without rendering this word
+                                            //   }
+
+                                            //   console.log(urlAccumulator)
+
                                             return (
                                                 <span className="" key={lineIndex}>
                                                     <span className={lineShow == '\\t' ? "ml-4" : ""}>
@@ -333,6 +404,8 @@ const Index = () => {
                                         })}
 
                                 </div>
+
+                                
                             </div>
                         ))}
 
@@ -340,6 +413,7 @@ const Index = () => {
                     </ScrollableFeed>
 {/* 
                     <Markdown remarkPlugins={[remarkGfm]}>{test}</Markdown> */}
+                 
                 </div>
 
                 <InputGroup className="bottom-0 border rounded-md border-[#9f9e9e]">

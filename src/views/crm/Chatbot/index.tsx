@@ -13,9 +13,6 @@ import { apiGetUserData } from "@/services/CrmService";
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
-//@ts-ignore
-import Linkify from 'react-linkify';
-
 interface Message {
     text: string;
     sender: "user" | "bot";
@@ -29,6 +26,9 @@ const Index = () => {
     // console.log(url)
     // const [urlFlag, setUrlFlag] = useState<any>(false);
     // const [urlAccumulator, setUrlAccumulator] = useState('');
+    const [concatenatedString, setConcatenatedString] = useState(""); // State for the result
+    console.log(concatenatedString)
+  const [isConcatenating, setIsConcatenating] = useState(false);
       
     const [user, setUser] = useState<any>('')
     useEffect(() => {
@@ -90,7 +90,7 @@ const Index = () => {
     const fetchData = async (inputValue: string) => {
         try {
             setLoading(true);
-            const response = await fetch(`https://ada-chat-bot.test.initz.run/query/`, {
+            const response = await fetch(`https://ai-chatbot-ada.test.initz.run/query/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -98,7 +98,7 @@ const Index = () => {
                 body: JSON.stringify({ question: inputValue, org_id, user_id }),
             });
 
-            console.log(response)
+            // console.log(response)
 
             const reader = response.body?.getReader();
             const decoder = new TextDecoder();
@@ -113,7 +113,7 @@ const Index = () => {
                     // Decode the chunk and append to the accumulated message
                     const chunk = decoder.decode(value, { stream: true });
 
-                    console.log(chunk)
+                    // console.log(chunk)
 
                     // const result = chunk.replace(/data: /g, "");
                     // setTest(chunk);
@@ -271,54 +271,22 @@ const Index = () => {
                                                 lineShow = match[1].replace("\\n\\n", "").replace("\\n", "").replace(":\\n", "").replace("**", "")
                                             }
 
-                                            // if(urlFlag) {
-                                            //     console.log(lineShow)
-                                            //     setUrl(url + lineShow)
+                                            console.log(lineShow)
 
-                                            //     if(lineShow == ".jpg" || lineShow == 'jpg') {
-                                            //         setUrlFlag(false);
-                                            //     }
-                                            // }
-
-                                            // if(lineShow == 'https') {
-                                            //     console.log(lineShow)
-                                            //     setUrl(url + lineShow)
-                                            //     setUrlFlag(true);
-                                            // }
-
-
-                                            
-
-                                            // const urlRegex = /(https?:\/\/[^\s]+\.jpg)/;
-
-                                            // // console.log(lineShow)
-
-                                            // if (lineShow.startsWith('http')) {
-
-                                            //     console.log("yes")
-                                            //     setUrlAccumulator(lineShow);
-                                            //     return <span>{""}</span>
-                                            // }
-
-                                            // if (urlAccumulator) {
-                                            //     setUrlAccumulator((prev) => `${prev} ${lineShow}`);
-                                            //     if (urlRegex.test(urlAccumulator)) {
-                                            //       // We have a complete URL - create a link
-                                            //       const fullUrl = urlAccumulator.trim();
-                                            //       console.log(urlAccumulator)
-
-                                            //       console.log(fullUrl)
-                                            //       setUrlAccumulator(''); // Reset accumulator after forming the link
-                                            //       return (
-                                            //         <a key={index} href={fullUrl} target="_blank" rel="noopener noreferrer">
-                                            //           {fullUrl}
-                                            //         </a>
-                                            //       );
-                                            //     }
-                                            //     return <span>{""}</span> // Continue accumulating without rendering this word
-                                            //   }
-
-                                            //   console.log(urlAccumulator)
+                                            if (lineShow === "https") {
+                                                setIsConcatenating(true);
+                                              }
+                                          
+                                              // Concatenate the word if we are in the concatenating phase
+                                              if (isConcatenating) {
+                                                setConcatenatedString((prev) => prev + lineShow);
+                                              }
+                                          
+                                              // Stop concatenating when a word ending with "jpg" is found
+                                              if (lineShow.endsWith("txt")) {
+                                                setIsConcatenating(false);
+                                              }
+                                           
 
                                             return (
                                                 <span className="" key={lineIndex}>

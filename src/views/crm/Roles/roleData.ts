@@ -20,6 +20,7 @@ type RoleAccessPermissions = {
     | "quotation"
     | "addMember"
     | "userArchive"
+    | "leadArchive"
     | "role"
     | "companyData";
   

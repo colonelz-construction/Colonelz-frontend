@@ -10,8 +10,6 @@ import { FaChevronCircleUp } from "react-icons/fa";
 import { GoDotFill } from "react-icons/go";
 import ScrollableFeed from "react-scrollable-feed";
 import { apiGetUserData } from "@/services/CrmService";
-import Markdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 
 interface Message {
     text: string;
@@ -21,14 +19,7 @@ interface Message {
 const Index = () => {
     const [inputValue, setInputValue] = useState('');
     const [project_id, setProject_id] = useState('');
-    const [whileLoading, setWhileLoading] = useState(false);
-    // const [url, setUrl] = useState<string>('');
-    // console.log(url)
-    // const [urlFlag, setUrlFlag] = useState<any>(false);
-    // const [urlAccumulator, setUrlAccumulator] = useState('');
-    const [concatenatedString, setConcatenatedString] = useState(""); // State for the result
-    console.log(concatenatedString)
-  const [isConcatenating, setIsConcatenating] = useState(false);
+    const [fileUrl, setFileUrl] = useState<(any)>([null]);
       
     const [user, setUser] = useState<any>('')
     useEffect(() => {
@@ -50,8 +41,6 @@ const Index = () => {
     }, [])
 
     const data = useContext<any>(UserDetailsContext)
-    
-
     const [messages, setMessages] = useState<any>([]);
 
     useEffect(() => {
@@ -90,7 +79,7 @@ const Index = () => {
     const fetchData = async (inputValue: string) => {
         try {
             setLoading(true);
-            const response = await fetch(`https://ai-chatbot-ada.test.initz.run/query/`, {
+            const response = await fetch(`http://127.0.0.1:8000/query/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -98,31 +87,43 @@ const Index = () => {
                 body: JSON.stringify({ question: inputValue, org_id, user_id }),
             });
 
-            // console.log(response)
+            console.log(response)
 
             const reader = response.body?.getReader();
             const decoder = new TextDecoder();
             let accumulatedMessages = "";
-
-            // let flag = true;
 
             if (reader) {
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
                     // Decode the chunk and append to the accumulated message
-                    const chunk = decoder.decode(value, { stream: true });
+                    const chunk = decoder.decode(value, { stream: false });
 
-                    // console.log(chunk)
+                    console.log(chunk)
+                    const regex = /"content":"(.*?)"/g;
 
-                    // const result = chunk.replace(/data: /g, "");
-                    // setTest(chunk);
+                            // Use matchAll to find all matches
+                            const matches = Array.from(chunk.matchAll(regex));
 
-                   
-                        const urlRegex = /(https?:\/\/[^\s]+)/g
-                        const urls = chunk.match(urlRegex);
-                        // console.log(urls);
-                        // flag = false
+                            // Extract the first capture group (the actual content)
+                            const extractedContents = matches.map(match => match[1]);
+
+                            let isCollecting = false;
+                            let result = '';
+                            const popularExtensions = ['txt', '.txt', 'pdf', '.pdf', 'png', '.png', 'jpg', '.jpg', 'jpeg', '.jpeg', 'csv', '.csv', 'doc', '.doc', 'docx', '.docx', 'xls', '.xls', 'xlsx', '.xlsx', 'mp4', '.mp4', 'mp3', '.mp3', 'zip', '.zip', 'rar', '.rar', 'gif', '.gif'];
+
+                            // Iterate through the list
+                            extractedContents.forEach(str => {
+                                str = str.trim();
+                                if (str === ' https' || str === 'https' || str === 'http' || str === 'htt') isCollecting = true; 
+                                if (isCollecting) result += str; 
+                                if (popularExtensions.includes(str)) isCollecting = false; 
+                            });
+
+                            setFileUrl((prevUrls : any) => [...prevUrls, result ? result : null]);
+                            
+                            console.log(fileUrl)
 
                     accumulatedMessages += chunk;
 
@@ -131,7 +132,6 @@ const Index = () => {
                         // Check if the last message is from the user
                         const lastMessage = prevMessages[prevMessages.length - 1];
                         if (lastMessage?.sender === "user") {
-                            // If the last message is from the user, add a new bot message
                             return [
                                 ...prevMessages,
                                 { text: chunk.trim(), sender: "bot" },
@@ -147,11 +147,8 @@ const Index = () => {
                             ];
                         }
                     });
-
                 }
             }
-
-            // console.log(url)
 
             setMessages((prevMessages: any) => {
                 const lastMessage = prevMessages[prevMessages.length - 1];
@@ -182,7 +179,6 @@ const Index = () => {
                 const result = match[1]
                 setProject_id(result)
             }
-            setWhileLoading(true)
 
         } catch (error) {
             console.error("Error fetching chatbot response:", error);
@@ -269,24 +265,7 @@ const Index = () => {
 
                                             if (match) {
                                                 lineShow = match[1].replace("\\n\\n", "").replace("\\n", "").replace(":\\n", "").replace("**", "")
-                                            }
-
-                                            console.log(lineShow)
-
-                                            if (lineShow === "https") {
-                                                setIsConcatenating(true);
-                                              }
-                                          
-                                              // Concatenate the word if we are in the concatenating phase
-                                              if (isConcatenating) {
-                                                setConcatenatedString((prev) => prev + lineShow);
-                                              }
-                                          
-                                              // Stop concatenating when a word ending with "jpg" is found
-                                              if (lineShow.endsWith("txt")) {
-                                                setIsConcatenating(false);
-                                              }
-                                           
+                                            }                                           
 
                                             return (
                                                 <span className="" key={lineIndex}>
@@ -295,6 +274,18 @@ const Index = () => {
                                                     </span>
                                                     {line.includes("\\n") && <br />}
 
+                                                    {fileUrl[index/2] != null && lineIndex === lines.length - 1 &&
+                                                        line.includes('responseEnd') && 
+                                                        <div className="flex mt-[0.30rem]">
+                                                            <div>
+                                                            <ActionLink target="_blank" to={fileUrl[index/2]}>
+                                                                    {"Click here "}
+                                                                </ActionLink>
+                                                                to view file
+
+                                                            </div>
+                                                        </div>
+                                                    }
 
                                                     {/* For Tasks */}
                                                     {line.includes('responseEnd') && projectId && taskId && projectId != '00000000000' && taskId != '222222222' ? lineIndex === lines.length - 1 && (

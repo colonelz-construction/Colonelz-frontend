@@ -28,6 +28,7 @@ const permissionsMap: { [key: string]: Permission[] } = {
     quotation: [ 'read','update'],
     user: [ 'create','read', 'update', 'delete'],
     userArchive:['read','restore','delete'],
+    leadArchive:['read','restore','delete'],
     companyData:['read']
 
 };

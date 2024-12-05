@@ -1,0 +1,335 @@
+
+import { useMemo, useState, useEffect } from 'react'
+import Table from '@/components/ui/Table'
+import Input from '@/components/ui/Input'
+import Pagination from '@/components/ui/Pagination'
+import {
+    useReactTable,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getFacetedRowModel,
+    getFacetedUniqueValues,
+    getFacetedMinMaxValues,
+    getPaginationRowModel,
+    getSortedRowModel,
+    flexRender,
+} from '@tanstack/react-table'
+import { rankItem } from '@tanstack/match-sorter-utils'
+import { ProjectDataItem } from './type'
+import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
+import type { InputHTMLAttributes } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { getProjectData } from './data'
+import { Select } from '@/components/ui'
+import { GoProjectRoadmap } from 'react-icons/go'
+import { useData } from '../FileManagerContext/FIleContext'
+import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
+import NoData from '@/views/pages/NoData'
+import formateDate from '@/store/dateformate'
+
+interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
+    value: string | number
+    onChange: (value: string | number) => void
+    debounce?: number
+}
+
+const { Tr, Th, Td, THead, TBody, Sorter } = Table
+
+function DebouncedInput({
+    value: initialValue,
+    onChange,
+    debounce = 500,
+    ...props
+}: DebouncedInputProps) {
+    const [value, setValue] = useState(initialValue)
+
+    useEffect(() => {
+        setValue(initialValue)
+    }, [initialValue])
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            onChange(value)
+        }, debounce)
+
+        return () => clearTimeout(timeout)
+    }, [value])
+
+    return (
+        <div className="flex justify-between ">
+<div></div>
+            <div className="flex items-center mb-4">
+                <Input
+                    {...props}
+                    value={value}
+                    size='sm'
+                    onChange={(e) => setValue(e.target.value)}
+                />
+            </div>
+       
+        </div>
+    )
+}
+
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+    let itemValue:any = row.getValue(columnId);
+
+    
+    if (columnId === 'project_end_date') {
+        itemValue = formateDate(itemValue);
+    }
+
+    const itemRank = rankItem(itemValue, value);
+    addMeta({
+        itemRank,
+    });
+
+    return itemRank.passed;
+};
+type Option = {
+    value: number
+    label: string
+}
+
+const pageSizeOption = [
+    { value: 10, label: '10 / page' },
+    { value: 20, label: '20 / page' },
+    { value: 30, label: '30 / page' },
+    { value: 40, label: '40 / page' },
+    { value: 50, label: '50 / page' },
+]
+const AllTask = () => {
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+    const [globalFilter, setGlobalFilter] = useState('')
+    const navigate=useNavigate()
+
+    const columns = useMemo<ColumnDef<ProjectDataItem>[]>(
+        () => [
+           
+            {
+                header: 'Name',
+                accessorKey: 'project_name',
+                cell: (props) => {
+                    const row = props.row.original;
+                    return (
+                        // <div className=' cursor-pointer' onClick={()=>navigate(`/app/crm/fileManager/project?project_id=${row.project_id}&project_name=${row.project_name}`)}>
+                        //     {row.project_name}
+                        // </div>
+                        <div>data</div>
+                    )
+                  }},
+            {
+                header: 'Priority',
+                accessorKey: 'project_type',
+                cell: (props) => {
+                    const row = props.row.original;
+                    return (
+                        // <div className=' cursor-pointer' onClick={()=>navigate(`/app/crm/fileManager/project?project_id=${row.project_id}&project_name=${row.project_name}`)}>
+                        //     {row.project_type}
+                        // </div>
+                        <div>data</div>
+                    )
+                  }},
+            {
+                header: 'Status',
+                accessorKey: 'project_status',
+                cell: (props) => {
+                    const row = props.row.original;
+                    return (
+                        // <div className=' cursor-pointer' onClick={()=>navigate(`/app/crm/fileManager/project?project_id=${row.project_id}&project_name=${row.project_name}`)}>
+                        //     {row.project_status}
+                        // </div>
+                        <div>data</div>
+                    )
+                  }},
+            {
+                header: 'Type',
+                accessorKey: 'client_name',
+                cell: (props) => {
+                    const row = props.row.original;
+                    return (
+                        // <div className=' cursor-pointer' onClick={()=>navigate(`/app/crm/fileManager/project?project_id=${row.project_id}&project_name=${row.project_name}`)}>
+                        //     {row.client_name}
+                        // </div>
+                        <div>data</div>
+                    )
+            }},
+            {
+                header: 'Lead / Project Name',
+                accessorKey: 'client_name',
+                cell: (props) => {
+                    const row = props.row.original;
+                    return (
+                        // <div className=' cursor-pointer' onClick={()=>navigate(`/app/crm/fileManager/project?project_id=${row.project_id}&project_name=${row.project_name}`)}>
+                        //     {row.client_name}
+                        // </div>
+                        <div>data</div>
+                    )
+            }},
+            {
+                header: 'Start Date',
+                accessorKey: 'client_name',
+                cell: (props) => {
+                    const row = props.row.original;
+                    return (
+                        // <div className=' cursor-pointer' onClick={()=>navigate(`/app/crm/fileManager/project?project_id=${row.project_id}&project_name=${row.project_name}`)}>
+                        //     {row.client_name}
+                        // </div>
+                        <div>data</div>
+                    )
+            }},
+            {
+                header: 'End Date',
+                accessorKey: 'client_name',
+                cell: (props) => {
+                    const row = props.row.original;
+                    return (
+                        // <div className=' cursor-pointer' onClick={()=>navigate(`/app/crm/fileManager/project?project_id=${row.project_id}&project_name=${row.project_name}`)}>
+                        //     {row.client_name}
+                        // </div>
+                        <div>data</div>
+                    )
+            }},
+            
+        ],
+        []
+    )
+
+    const { projectData,loading } = useData();
+    const totalData=projectData.length
+    
+    const table = useReactTable({
+        data:projectData.reverse(),
+        columns,
+        filterFns: {
+            fuzzy: fuzzyFilter,
+        },
+        state: {
+            columnFilters,
+            globalFilter,
+        },
+        onColumnFiltersChange: setColumnFilters,
+        onGlobalFilterChange: setGlobalFilter,
+        globalFilterFn: fuzzyFilter,
+        getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getFacetedRowModel: getFacetedRowModel(),
+        getFacetedUniqueValues: getFacetedUniqueValues(),
+        getFacetedMinMaxValues: getFacetedMinMaxValues(),
+        debugHeaders: true,
+        debugColumns: false,
+    })
+
+    const onPaginationChange = (page: number) => {
+        table.setPageIndex(page - 1)
+    }
+
+    const onSelectChange = (value = 0) => {
+        table.setPageSize(Number(value))
+    }
+   
+
+
+
+    return (
+        <>
+            
+            <DebouncedInput
+                value={globalFilter ?? ''}
+                className="p-2 font-lg shadow border border-block"
+                placeholder="Search ..."
+                onChange={(value) => setGlobalFilter(String(value))}
+            />
+            <Table>
+                <THead>
+                    {table.getHeaderGroups().map((headerGroup) => (
+                        <Tr key={headerGroup.id}>
+                            {headerGroup.headers.map((header) => {
+                                return (
+                                    <Th
+                                        key={header.id}
+                                        colSpan={header.colSpan}
+                                    >
+                                        {header.isPlaceholder ? null : (
+                                            <div
+                                                {...{
+                                                    className:
+                                                        header.column.getCanSort()
+                                                            ? 'cursor-pointer select-none'
+                                                            : 'pointer-events-none',
+                                                    onClick:
+                                                        header.column.getToggleSortingHandler(),
+                                                }}
+                                            >
+                                                {flexRender(
+                                                    header.column.columnDef
+                                                        .header,
+                                                    header.getContext()
+                                                )}
+                                                {header.column.getCanSort() && (
+                                                    <Sorter
+                                                        sort={header.column.getIsSorted()}
+                                                    />
+                                                )}
+                                            </div>
+                                        )}
+                                    </Th>
+                                )
+                            })}
+                        </Tr>
+                    ))}
+                </THead>
+                {loading?<TableRowSkeleton
+                      avatarInColumns= {[0]}
+                      columns={columns.length}
+                      avatarProps={{ width: 14, height: 14 }}
+                  />:projectData.length===0?<Td colSpan={columns.length}><NoData/></Td>:
+                <TBody>
+                    {table.getRowModel().rows.map((row) => {
+                        return (
+                            <Tr key={row.id} className=' capitalize'>
+                                {row.getVisibleCells().map((cell) => {
+                                    return (
+                                        <Td key={cell.id}>
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
+                                        </Td>
+                                    )
+                                })}
+                            </Tr>
+                        )
+                    })}
+                </TBody>}
+            </Table>
+            <div className="flex items-center justify-between mt-4">
+                <Pagination
+                    pageSize={table.getState().pagination.pageSize}
+                    currentPage={table.getState().pagination.pageIndex + 1}
+                    total={table.getFilteredRowModel().rows.length}
+                    onChange={onPaginationChange}
+                />
+                <div style={{ minWidth: 130 }}>
+                    <Select<Option>
+                        size="sm"
+                        isSearchable={false}
+                        value={pageSizeOption.filter(
+                            (option) =>
+                                option.value ===
+                                table.getState().pagination.pageSize
+                        )}
+                        options={pageSizeOption}
+                        onChange={(option) => onSelectChange(option?.value)}
+                    />
+                </div>
+            </div>
+        
+        </>
+    )
+}
+
+export default AllTask
+

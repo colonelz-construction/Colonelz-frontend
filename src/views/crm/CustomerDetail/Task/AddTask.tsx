@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Button from '@/components/ui/Button'
 import Dialog from '@/components/ui/Dialog'
 import { Field, Form, Formik, FormikContext } from 'formik'
 import { DatePicker, FormItem, Input, Notification, Select, toast } from '@/components/ui'
-import { apiGetCrmProjectsAddTask } from '@/services/CrmService'
+import { apiGetCrmProjectsAddTask, apiGetUsersList } from '@/services/CrmService'
 import * as Yup from 'yup'
+import { AiOutlinePlus } from "react-icons/ai";
+
 
 type Task = {
     user_id: string;
@@ -21,10 +23,24 @@ type Task = {
     reporter: string;
   };
 
-const AddTask = ({project,userData}:any) => {
+const AddTask = ({project,userData, addButton}:any) => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const org_id = localStorage.getItem('orgId')
+
+    const [users, setUsers] = useState<any>([]);
+    console.log(users)
+
+    useEffect(()=> {
+
+        const fetchData = async() => {
+            const list = await apiGetUsersList(project)
+        setUsers(list.data)
+        }
+
+        fetchData()
+
+    }, [])
     
     
 const openDialog = () => {
@@ -48,13 +64,14 @@ const priorityOptions = [
   ];
 
 //   console.log(userData)
-  const userOptions = userData?.map((user:any) => ({label: user, value: user}))
+  const userOptions = users?.map((user:any) => ({label: user, value: user}))
 
   console.log(userOptions)
 
   return (
         <div>
-            <Button onClick={openDialog}  variant='solid' size='sm'>Add New Task</Button>
+            {addButton ? <Button onClick={openDialog}  variant='solid' size='sm'>Add New Task</Button> : <span onClick={openDialog} className='flex items-center gap-1 cursor-pointer'> <AiOutlinePlus/> <span>Add Task</span></span>}
+            
             <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
                 <div className="pl-4 ">
                     <h3>Add New Task</h3>
@@ -93,8 +110,8 @@ const priorityOptions = [
                         ),
                         task_status: Yup.string().required("Task Status is required"),
                         task_priority: Yup.string().required("Task Priority is required"),
-                        task_assignee: Yup.string().required("Task Assignee is required"),
-                        reporter: Yup.string().required("Reporter is required"),
+                        // task_assignee: Yup.string().required("Task Assignee is required"),
+                        // reporter: Yup.string().required("Reporter is required"),
                       })
                       }
                      onSubmit={async(values, actions) => {
@@ -121,15 +138,15 @@ const priorityOptions = [
                         {({ values, touched, errors,}) => (
                         <Form className=' p-4 max-h-96 overflow-y-auto'>
                             <div className=' grid grid-cols-2 gap-x-5'>
-                            <FormItem label='Task Name'
+                            <FormItem label='Name'
                             asterisk
                             invalid={errors.task_name && touched.task_name}
                             errorMessage={errors.task_name}>
-                                <Field name='task_name'  component={Input} placeholder='Task Name'/>
+                                <Field name='task_name'  component={Input} placeholder='Name'/>
                                
                             </FormItem>
-                            <FormItem label='Task Assignee'
-                            asterisk
+                            <FormItem label='Assignee'
+                            
                             invalid={errors.task_assignee && touched.task_assignee}
                             errorMessage={errors.task_assignee}>
                                 <Field name='task_assignee'  placeholder='Task'>
@@ -144,7 +161,7 @@ const priorityOptions = [
                             </FormItem>
 
 
-                            <FormItem label='Task Status'
+                            <FormItem label='Status'
                             asterisk
                             invalid={errors.task_status && touched.task_status}
                             errorMessage='Task Status is required'
@@ -217,7 +234,7 @@ const priorityOptions = [
                             </FormItem>
                            
                             <FormItem label='Report to'
-                            asterisk
+                            
                             invalid={errors.reporter && touched.reporter}
                             >
                                 <Field name='reporter' placeholder='Reporting to'>
@@ -236,7 +253,7 @@ const priorityOptions = [
                             invalid={errors.task_priority && touched.task_priority} 
                             errorMessage={errors.task_priority}
                             >
-                                <Field name='task_priority'  placeholder='Task Priority'>
+                                <Field name='task_priority'  placeholder='Priority'>
                                     {({field}:any)=>(
                                         <Select
                                         name='task_priority'

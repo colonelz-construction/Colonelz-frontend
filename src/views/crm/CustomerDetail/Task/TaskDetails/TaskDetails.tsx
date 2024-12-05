@@ -110,16 +110,16 @@ const TaskDetails = () => {
                         footerBorder={false}
                         headerBorder={false}
                     >
-                        <CustomerInfoField title='Task Created On' value={formateDate(taskData.task_createdOn)} />
-                        <CustomerInfoField title='Task Created By' value={taskData.task_createdBy} />
-                        <CustomerInfoField title='Task Name' value={taskData.task_name} />
-                        <CustomerInfoField title='Task Status' value={taskData.task_status} />
-                        <CustomerInfoField title='Task Priority' value={taskData.task_priority} />
-                        <CustomerInfoField title='Actual Task Start Date' value={taskData.actual_task_start_date ? formateDate(taskData.actual_task_start_date) : "-"} />
-                        <CustomerInfoField title='Actual Task End Date' value={taskData.actual_task_end_date ? formateDate(taskData.actual_task_end_date) : '-'} />
-                        <CustomerInfoField title='Estimated Task Start Date' value={formateDate(taskData.estimated_task_start_date)} />
-                        <CustomerInfoField title='Estimated Task End Date' value={formateDate(taskData.estimated_task_end_date)} />
-                        <CustomerInfoField title='Task Assignee' value={taskData.task_assignee} />
+                        <CustomerInfoField title='Created On' value={formateDate(taskData.task_createdOn)} />
+                        <CustomerInfoField title='Created By' value={taskData.task_createdBy} />
+                        <CustomerInfoField title='Name' value={taskData.task_name} />
+                        <CustomerInfoField title='Status' value={taskData.task_status} />
+                        <CustomerInfoField title='Priority' value={taskData.task_priority} />
+                        <CustomerInfoField title='Actual Start Date' value={taskData.actual_task_start_date ? formateDate(taskData.actual_task_start_date) : "-"} />
+                        <CustomerInfoField title='Actual End Date' value={taskData.actual_task_end_date ? formateDate(taskData.actual_task_end_date) : '-'} />
+                        <CustomerInfoField title='Estimated Start Date' value={formateDate(taskData.estimated_task_start_date)} />
+                        <CustomerInfoField title='Estimated End Date' value={formateDate(taskData.estimated_task_end_date)} />
+                        <CustomerInfoField title='Assignee' value={taskData.task_assignee} />
                         <CustomerInfoField title='Reporter' value={taskData.reporter} />
                         <CustomerInfoField title='Number of subtasks' value={taskData.number_of_subtasks} />
                         <div>

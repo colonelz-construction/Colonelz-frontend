@@ -63,10 +63,12 @@ const org_id = localStorage.getItem('orgId')
 
 export const LeadProvider = ({ children }: { children: ReactNode }) => {
   const [apiData, setApiData] = useState<Lead[] | null>(null);
+  // console.log(apiData)
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await apiGetCrmLeads(org_id);
+      const response = await apiGetCrmLeads();
+
       setApiData(response.data.leads);
     };
 

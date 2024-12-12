@@ -72,12 +72,17 @@ const formateDate = (dateString:string) => {
     return `${day}-${month}-${year}`;
     }
 
-const SubTaskDetails = (Data:Data) => {
+const SubTaskDetails = (Data:any) => {
     const [verticalOpen, setVerticalOpen] = useState(false)
     const location=useLocation()
     const queryParam=new URLSearchParams(location.search);
     const projectId=queryParam.get('project_id') || ''; 
     const org_id = localStorage.getItem('orgId')
+    const role:any = localStorage.getItem('role')
+
+    console.log(Data.user)
+    // console.log(Data.data.sub_task_assignee)
+
 
     
     const navigate=useNavigate();
@@ -314,8 +319,11 @@ const SubTaskDetails = (Data:Data) => {
                     <TabContent value="tab1">
                     <div className='flex  gap-4 items-center mb-5'>
 
-                      {(Data.data.sub_task_status==='Completed' || Data.data.sub_task_status==='Cancelled')?(<><Button className='!rounded-full shadow-md' variant='twoTone' size='sm'disabled ><IoPlayOutline className='font-bold'/></Button>
+                      {(Data.data.sub_task_status==='Completed' || Data.data.sub_task_status==='Cancelled') || Data.data.sub_task_status==='Pending' || ((role !== 'SUPERADMIN' && role !== 'ADMIN') && Data.data.sub_task_assignee !== Data.data.username) ?
+
+                      (<><Button className='!rounded-full shadow-md' variant='twoTone' size='sm'disabled ><IoPlayOutline className='font-bold'/></Button>
                       <Button className='!rounded-full shadow-md' variant='twoTone' size='sm'disabled ><PiSquareThin/></Button></>):
+
                     <><span  className=''  onClick={timerData.isRunning?handlePause:handleStart}>
                             {timerData.isRunning?<Button className='!rounded-full shadow-md' variant='twoTone' size='sm' ><CiPause1 className='font-bold'/></Button>:<Button className='!rounded-full shadow-md' variant='twoTone' size='sm'><IoPlayOutline className=''/></Button>}</span>
                                 <Button className='!rounded-full shadow-md' variant='twoTone' size='sm' onClick={handleReset} disabled={Data.data.sub_task_status==='Completed'?true:false}><PiSquareThin/></Button></>    }
@@ -337,7 +345,7 @@ const SubTaskDetails = (Data:Data) => {
                     <CustomerInfoField title="Description" value={Data.data.sub_task_description} />
                       <span className='text-gray-700 dark:text-gray-200 font-semibold'>Remark:</span>
                     <ul className='list-disc ml-4' >
-                    {Data.data.remark.map((remark,index)=>(
+                    {Data.data.remark.map((remark:any,index:any)=>(
                       <li key={index}>
                          <div className='flex gap-1 mb-2 pt-1'>
                 <p className="" style={{overflowWrap:"break-word"}}>

@@ -25,6 +25,7 @@ const { Tr, Th, Td, THead, TBody } = Table
 
 function Expanding() {
     // State for outer table and child table data
+    const { roleData } = useRoleContext()
     const {projects,apiData,loading}=useProjectContext();
     const role = localStorage.getItem('role')
     // const [outerData, setOuterData] = useState<any>(projectData)
@@ -35,6 +36,8 @@ function Expanding() {
     const navigate=useNavigate()
 
     const org_id = localStorage.getItem('orgId')
+
+    const createAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.task?.create?.includes(`${localStorage.getItem('role')}`)
 
 
     
@@ -60,7 +63,7 @@ function Expanding() {
     const ActionColumn = ({ row, childRow }: { row: any, childRow:any }) => {
         const navigate = useNavigate()
         const { textTheme } = useThemeClass()
-        const { roleData } = useRoleContext()
+        
         const org_id = localStorage.getItem('orgId')
 
         const data = {
@@ -214,6 +217,7 @@ function Expanding() {
                 accessorKey: 'count_task',
                 cell: (props) => {
                     const row = props.row.original;
+                    console.log(row)
                     return (
                         <div className='min-w-[100px]'>
                                {row.count_task}
@@ -292,15 +296,16 @@ function Expanding() {
             <THead>
                 {table.getHeaderGroups().map((headerGroup) => (
                     <Tr key={headerGroup.id} className='flex w-full'>
-                        {headerGroup.headers.map((header) => (
-                            <Th key={header.id} colSpan={header.colSpan}>
-                                {flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext()
-                                )}
-                            </Th>
-                        ))}
-                    </Tr>
+                    {headerGroup.headers.map((header) => {
+                        console.log(headerGroup)
+                       return (header.id !== 'expander' ? <Th key={header.id} colSpan={header.colSpan}>
+                            {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                            )}
+                        </Th> : <><Th>{}</Th></>)
+                    })}
+                </Tr>
                 ))}
             </THead>
             <TBody>
@@ -380,7 +385,7 @@ function Expanding() {
                                             )})                                          
                                             }
 
-                                            {
+                                            { createAccess &&
                                                 <Tr className=''>
                                                     <Td>
                                                         <AddTask project={row.original.project_id} user={[]} addButton={false}/>

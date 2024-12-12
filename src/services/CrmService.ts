@@ -536,6 +536,27 @@ export async function apiGetCrmProjectsAddTask(Data: any) { //org done
         return response.data
     })
 }
+
+export async function apiGetCrmOpenAddTask(Data: any) { //org done
+    return ApiService.fetchData<any>({
+        url: 'admin/create/opentask',
+        method: 'post',
+        data: Data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmMoveOpenTask(Data: any) { //org done
+    return ApiService.fetchData<any>({
+        url: 'admin/move/task',
+        method: 'post',
+        data: Data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmLeadsAddTask(Data: any) { //org done
     return ApiService.fetchData<any>({
         url: 'admin/create/leadtask',
@@ -577,6 +598,17 @@ export async function apiGetCrmProjectsSingleTaskData<T>( // org done
     })
 }
 
+export async function apiGetCrmSingleOpenTaskData<T>( // org done
+    taskId: string | null
+) {
+    return ApiService.fetchData<TaskDataResponse>({
+        url: `admin/get/single/opentask?user_id=${userId}&task_id=${taskId}&org_id=${localStorage.getItem('orgId')}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmLeadsSingleTaskData<T>( // org done
     leadId: string | null,
     taskId: string | null,
@@ -600,6 +632,16 @@ export async function apiGetCrmProjectsTaskUpdate(task: any) { // org done
     })
 }
 
+export async function apiGetCrmOpenTaskUpdate(task: any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/update/opentask`,
+        method: 'put',
+        data: task,
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmLeadsTaskUpdate(task: any) { // org done
     return ApiService.fetchData<any>({
         url: `admin/update/leadtask`,
@@ -613,6 +655,16 @@ export async function apiGetCrmLeadsTaskUpdate(task: any) { // org done
 export async function apiGetCrmProjectsTaskDelete(Data: any) {  // org done
     return ApiService.fetchData<any>({
         url: `admin/delete/task`,
+        method: 'delete',
+        data: Data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmOpenTaskDelete(Data: any) {  // org done
+    return ApiService.fetchData<any>({
+        url: `admin/delete/opentask`,
         method: 'delete',
         data: Data,
     }).then((response) => {
@@ -643,6 +695,17 @@ export async function apiGetCrmProjectsSubTaskData<T>( // org done
     })
 }
 
+export async function apiGetCrmOpenSubTaskData<T>( // org done
+    taskId: string,
+) {
+    return ApiService.fetchData<SubTaskResponse>({
+        url: `admin/get/all/opensubtask?user_id=${userId}&task_id=${taskId}&org_id=${localStorage.getItem('orgId')}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmLeadsSubTaskData<T>( // org done
     leadId: string,
     taskId: string,
@@ -659,6 +722,16 @@ export async function apiGetCrmLeadsSubTaskData<T>( // org done
 export async function apiGetCrmProjectsAddSubTask(Data: any) { // org done
     return ApiService.fetchData<any>({
         url: 'admin/create/subtask',
+        method: 'post',
+        data: Data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmOpenAddSubTask(Data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/create/opensubtask',
         method: 'post',
         data: Data,
     }).then((response) => {
@@ -708,6 +781,16 @@ export async function apiGetCrmProjectsSubTaskUpdate(task: any) { // org done
     })
 }
 
+export async function apiGetCrmOpenSubTaskUpdate(task: any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/update/opensubtask`,
+        method: 'put',
+        data: task,
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmLeadsSubTaskUpdate(task: any) { // org done
     return ApiService.fetchData<any>({
         url: `admin/update/leadsubtask`,
@@ -728,6 +811,16 @@ export async function apiGetCrmProjectsSubTaskDelete(Data: any) { // org done
     })
 }
 
+export async function apiGetCrmOpenSubTaskDelete(Data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/delete/opensubtask`,
+        method: 'delete',
+        data: Data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmLeadsSubTaskDelete(Data: any) { // org done
     return ApiService.fetchData<any>({
         url: `admin/delete/leadsubtask`,
@@ -741,6 +834,16 @@ export async function apiGetCrmLeadsSubTaskDelete(Data: any) { // org done
 export async function apiGetCrmProjectsSingleSubTaskTimer(Data: any) { // org done
     return ApiService.fetchData<any>({
         url: `admin/update/subtask/time`,
+        method: 'put',
+        data: Data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmOpenSingleSubTaskTimer(Data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/update/opensubtask/time`,
         method: 'put',
         data: Data,
     }).then((response) => {
@@ -771,6 +874,20 @@ export async function apiGetCrmProjectsSingleSubTaskDataTimer<T>( // org done
         return response.data
     })
 }
+
+export async function apiGetCrmOpenSingleSubTaskDataTimer<T>( // org done
+    
+    taskId: string,
+    subTaskId: string,
+) {
+    return ApiService.fetchData<TimerResponse>({
+        url: `admin/get/opensubtask/time?task_id=${taskId}&sub_task_id=${subTaskId}&org_id=${localStorage.getItem('orgId')}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmLeadsSingleSubTaskDataTimer<T>( // org done
     leadId: string,
     taskId: string,
@@ -779,6 +896,17 @@ export async function apiGetCrmLeadsSingleSubTaskDataTimer<T>( // org done
 ) {
     return ApiService.fetchData<TimerResponse>({
         url: `admin/get/leadsubtask/time?lead_id=${leadId}&task_id=${taskId}&sub_task_id=${subTaskId}&org_id=${localStorage.getItem('orgId')}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetAllTasksDetails<T>( // org done
+    {task_assignee, task_status, task_priority}:any
+) {
+    return ApiService.fetchData<TimerResponse>({
+        url: `admin/get/alltask/details?task_assignee=${task_assignee}&user_id=${userId}&task_status=${task_status}&task_priority=${task_priority}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data

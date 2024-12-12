@@ -26,9 +26,11 @@ import { useRoleContext } from '../../Roles/RolesContext';
 const { Tr, Th, Td, THead, TBody } = Table
 
 function Expanding() {
+
+    const { roleData } = useRoleContext();
     // State for outer table and child table data
     const apiData : any = useLeadContext()
-    const role = localStorage.getItem('role')
+    const role :any = localStorage.getItem('role')
     // const [outerData, setOuterData] = useState<any>(projectData)
     console.log(apiData)
     const [childData, setChildData] = useState<any>({})
@@ -57,6 +59,9 @@ function Expanding() {
     //     setUsers(list.data)
     // }
 
+  const hasLeadTaskDeletePermission = role === 'SUPERADMIN' ? true :  roleData?.data?.leadtask?.delete?.includes(role);
+  const hasLeadTaskCreatePermission = role === 'SUPERADMIN' ? true :  roleData?.data?.leadtask?.create?.includes(role);
+
 
 
     const ActionColumn = ({ row, childRow }: { row: any, childRow:any }) => {
@@ -70,8 +75,6 @@ function Expanding() {
             lead_id: row.lead_id,
             task_id: childRow.task_id, org_id
         }
-        const editAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.task?.update?.includes(`${localStorage.getItem('role')}`)
-        const deleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.task?.delete?.includes(`${localStorage.getItem('role')}`)
         const [dialogIsOpen, setIsOpen] = useState(false)
 
         const openDialog = () => {
@@ -113,7 +116,7 @@ function Expanding() {
 
                     </span>
                 } */}
-                {deleteAccess &&
+                {hasLeadTaskDeletePermission &&
                     <span className={`cursor-pointer py-2  hover:${textTheme}`}>
                         <MdDeleteOutline onClick={() => openDialog()} />
                     </span>
@@ -274,14 +277,15 @@ function Expanding() {
             <THead>
                 {table.getHeaderGroups().map((headerGroup) => (
                     <Tr key={headerGroup.id} className='flex w-full'>
-                        {headerGroup.headers.map((header) => (
-                            <Th key={header.id} colSpan={header.colSpan}>
+                        {headerGroup.headers.map((header) => {
+                            console.log(headerGroup)
+                           return (header.id !== 'expander' ? <Th key={header.id} colSpan={header.colSpan}>
                                 {flexRender(
                                     header.column.columnDef.header,
                                     header.getContext()
                                 )}
-                            </Th>
-                        ))}
+                            </Th> : <><Th>{}</Th></>)
+                        })}
                     </Tr>
                 ))}
             </THead>
@@ -376,7 +380,7 @@ function Expanding() {
                                             
                                             }
 
-                                            {
+                                            { hasLeadTaskCreatePermission &&
                                                 <Tr className=''>
                                                     <Td>
                                                         <AddTask leadId={row.original.lead_id} user={[]} addButton={false}/>

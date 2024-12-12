@@ -33,7 +33,7 @@ type Task = {
     projectId:any;
   }
 
-const EditTask = ({ Data,users,task, projectId }: EditTaskProps) => {
+const EditTask = ({ Data,users,task, projectId }: any) => {
 
     console.log(users)
 
@@ -162,7 +162,7 @@ const priorityOptions = [
                         
                          
                      }} >
-                        {({values, errors, touched})=>(
+                        {({values, errors, touched} :any)=>(
 
                         <Form className=' p-4 max-h-96 overflow-y-auto'>
                             <div className=' grid grid-cols-2 gap-x-5'>

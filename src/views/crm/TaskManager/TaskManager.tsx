@@ -7,14 +7,9 @@ import { GoRepoTemplate } from "react-icons/go";
 import { LuFileStack } from "react-icons/lu";
 import Leads from './Components/Leads';
 import Projects from './Components/Projects';
-import Template from './Components/Template';
 import { DataProvider } from './FileManagerContext/FIleContext'; 
-import { AuthorityCheck } from '@/components/shared';
 import { useRoleContext } from '../Roles/RolesContext';
 import { useState, useEffect } from 'react';
-import Archive from '@/views/crm/FileManager/Components/Template/Archive/Components/Index'
-// import { IoMdArchive } from "react-icons/io";
-import { MdOutlineArchive } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
 import AllTask from './Components/AllTask';
 
@@ -35,57 +30,43 @@ const TaskManager = () => {
   }
 
   const hasProjectTaskReadPermission = role === 'SUPERADMIN' ? true : roleData?.data?.task?.read?.includes(role);
-  const hasLeadTaskReadPermission = role === 'SUPERADMIN' ? true :  roleData?.data?.task?.read?.includes(role);
-  const hasAllTaskReadPermission = role === 'SUPERADMIN' ? true :  roleData?.data?.task?.read?.includes(role);
-
-  // useEffect(() => {
-
-  // }, [])
-
+  const hasLeadTaskReadPermission = role === 'SUPERADMIN' ? true :  roleData?.data?.leadtask?.read?.includes(role);
   
 
-  //   interface QueryParams {
-  //     tab:string
+    interface QueryParams {
+      tab:string
     
-  //   }
-  //   const queryParams = new URLSearchParams(location.search);
+    }
+    const queryParams = new URLSearchParams(location.search);
 
-  //   const allQueryParams: QueryParams = {
-  //     tab: queryParams.get('tab') || '',
-  //   };
+    const allQueryParams: QueryParams = {
+      tab: queryParams.get('tab') || 'leads',
+    };
 
-  //   const handleTabChange = (selectedTab:any) => {
-  //     const currentUrlParams = new URLSearchParams(location.search);
-  //     currentUrlParams.set('tab', selectedTab);
-  //     navigate(`${location.pathname}?${currentUrlParams.toString()}`);
-  // };
+    const handleTabChange = (selectedTab:any) => {
+      const currentUrlParams = new URLSearchParams(location.search);
+      currentUrlParams.set('tab', selectedTab);
+      navigate(`${location.pathname}?${currentUrlParams.toString()}`);
+  };
 
   return (
     <div>
       <Tabs 
-        defaultValue={"leads"} /*onChange={handleTabChange}*/
+        defaultValue={allQueryParams.tab} onChange={handleTabChange}
       >
         <TabList>
-          {hasLeadTaskReadPermission &&
-            <TabNav value="leads" icon={<MdManageAccounts />}>
+            <TabNav value="leads" icon={<MdManageAccounts />} className={!hasLeadTaskReadPermission ? 'hidden' : ''}>
               Leads
             </TabNav>
-          }
-          {hasProjectTaskReadPermission &&
-            <TabNav value="project" icon={<LuFileStack />}>
+
+            <TabNav value="project" icon={<LuFileStack />} className={!hasProjectTaskReadPermission ? 'hidden' : ''}>
               Projects
             </TabNav>
-          }
-          {hasAllTaskReadPermission &&
+         
             <TabNav value="all" icon={<GoRepoTemplate />}>
               All Tasks
             </TabNav>
-}
-          {/* {hasArchiveDataReadPermission &&
-            <TabNav value="archive" icon={<MdOutlineArchive />}>
-              Archive
-            </TabNav>
-} */}
+
         </TabList>
         <div className="p-4">
           <DataProvider>
@@ -97,11 +78,8 @@ const TaskManager = () => {
               <Projects />
             </TabContent>
             <TabContent value="all">
-              <AllTask />
+              <AllTask/>
             </TabContent>
-            {/* <TabContent value="archive">
-              <Archive />
-            </TabContent> */}
           </DataProvider>
         </div>
       </Tabs>

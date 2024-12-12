@@ -8,6 +8,7 @@ import EditTask from '../EditTask'
 import NoData from '@/views/pages/NoData'
 import { Tasks } from '../../store'
 import { useNavigate } from 'react-router-dom'
+import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 
 export type TaskDataResponse = {
     code: number;
@@ -24,9 +25,15 @@ const TaskDetails = () => {
     const queryParams = new URLSearchParams(location.search);
     const task_id = queryParams.get('task')
     const org_id = localStorage.getItem('orgId')
+    const role :any = localStorage.getItem('role')
     const navigate = useNavigate()
 
     const project_id = queryParams.get('project_id') || ''
+
+    const { roleData } = useRoleContext();
+
+    const projectSubtaskCreateAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.task?.create?.includes(role);
+    const projectSubtaskUpdateAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.task?.update?.includes(role);
 
     const [users, setUsers] = useState<any>()
 
@@ -50,7 +57,7 @@ const TaskDetails = () => {
         percentage: "",
     };
 
-    const [taskData, setTaskData] = React.useState<Tasks>(tempTasks)
+    const [taskData, setTaskData] = React.useState<any>(tempTasks)
     const [loading, setLoading] = useState(true)
     useEffect(() => {
         const fetchData = async () => {
@@ -71,7 +78,7 @@ const TaskDetails = () => {
 
     const cardFooter = (
         loading ? <div className='flex justify-center'><Skeleton width={400} /></div> :
-            <EditTask Data={taskData} users={users} task={true} />
+        projectSubtaskUpdateAccess &&  <EditTask Data={taskData} users={users} task={true} />
     )
 
 
@@ -133,7 +140,7 @@ const TaskDetails = () => {
 
                     <div className='flex justify-between mb-4 items-center'>
                         <h5>Subtasks</h5>
-                        <AddSubTask users={users} data={taskData} />
+                       { projectSubtaskCreateAccess && <AddSubTask users={users} data={taskData} />}
                     </div>
 
                     <Subtasks task={task_id} users={users} />

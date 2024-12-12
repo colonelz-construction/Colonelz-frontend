@@ -40,6 +40,8 @@ const EditSubTask = ({Data,users}:SubtaskData) => {
     const project_id=queryParams.get('project_id')
     const org_id = localStorage.getItem('orgId')
 
+    console.log(users)
+
     
   
 const openDialog = () => {
@@ -65,8 +67,8 @@ const priorityOptions = [
   ];
   
   const userOptions = users?.map((user:any) => ({
-    label: user.user_name,
-    value: user.user_name
+    label: user,
+    value: user
   }));
   
   const formateDate = (dateString:string) => {

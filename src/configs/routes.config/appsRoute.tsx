@@ -348,6 +348,18 @@ const appsRoute: Routes = [
     },
     {
         key: 'appsCrm.inventory',
+        path: `${APP_PREFIX_PATH}/crm/Tasks/OpenTaskDetails`,
+        component: lazy(
+            () =>
+                import(
+                    '@/views/crm/OpenTaskManger/Task/TaskDetails/TaskDetails'
+                ),
+        ),
+
+        authority: [],
+    },
+    {
+        key: 'appsCrm.inventory',
         path: `${APP_PREFIX_PATH}/crm/Leads/TaskDetails`,
         component: lazy(
             () =>

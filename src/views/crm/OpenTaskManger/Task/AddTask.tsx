@@ -3,7 +3,7 @@ import Button from '@/components/ui/Button'
 import Dialog from '@/components/ui/Dialog'
 import { Field, Form, Formik, FormikContext } from 'formik'
 import { DatePicker, FormItem, Input, Notification, Select, toast } from '@/components/ui'
-import { apiGetCrmLeadsAddTask, apiGetCrmProjectsAddTask, apiGetCrmUsersAssociatedToLead, apiGetUsersList } from '@/services/CrmService'
+import { apiGetCrmOpenAddTask, apiGetCrmProjectsAddTask, apiGetUsersList } from '@/services/CrmService'
 import * as Yup from 'yup'
 import { AiOutlinePlus } from "react-icons/ai";
 
@@ -23,28 +23,12 @@ type Task = {
     reporter: string;
   };
 
-const AddTask = ({leadId,userData}:any) => {
-    console.log(leadId)
+const AddTask = ({users, userData, addButton}:any) => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const org_id = localStorage.getItem('orgId')
-    const role :any = localStorage.getItem('role')
 
-
-
-    const [users, setUsers] = useState<any>([]);
     console.log(users)
-
-    useEffect(()=> {
-
-        const fetchData = async() => {
-            const list = await apiGetCrmUsersAssociatedToLead(leadId)
-        setUsers(list.data)
-        }
-
-        fetchData()
-
-    }, [])
     
     
 const openDialog = () => {
@@ -68,13 +52,14 @@ const priorityOptions = [
   ];
 
 //   console.log(userData)
-  const userOptions = users?.map((user:any) => ({label: user.user_name, value: user.user_name}))
+  const userOptions = users?.map((user:any) => ({label: user.username, value: user.username}))
 
   console.log(userOptions)
 
   return (
         <div>
-            <span onClick={openDialog} className='flex items-center gap-1 cursor-pointer'> <AiOutlinePlus/> <span>Add Task</span></span>
+            {addButton ? <Button onClick={openDialog}  variant='solid' size='sm'>Add Task</Button> : <span onClick={openDialog} className='flex items-center gap-1 cursor-pointer'> <AiOutlinePlus/> <span>Add Task</span></span>}
+            
             <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
                 <div className="pl-4 ">
                     <h3>Add New Task</h3>
@@ -83,7 +68,6 @@ const priorityOptions = [
                        initialValues={{
                         user_id: localStorage.getItem('userId') || '',
                         org_id,
-                        lead_id: leadId ,
                         task_name: "",
                         task_description: "",
                         estimated_task_start_date: "",
@@ -119,7 +103,7 @@ const priorityOptions = [
                       }
                      onSubmit={async(values, actions) => {
                         setLoading(true)
-                            const response = await apiGetCrmLeadsAddTask(values)
+                            const response = await apiGetCrmOpenAddTask(values)
                             
                             if(response.code===200){
                                 setLoading(false)
@@ -256,7 +240,7 @@ const priorityOptions = [
                             invalid={errors.task_priority && touched.task_priority} 
                             errorMessage={errors.task_priority}
                             >
-                                <Field name='task_priority'  placeholder='Task Priority'>
+                                <Field name='task_priority'  placeholder='Priority'>
                                     {({field}:any)=>(
                                         <Select
                                         name='task_priority'
@@ -271,7 +255,7 @@ const priorityOptions = [
 
                             </div>
                             <FormItem label='Desription'>
-                                <Field name='task_description' placeholder='Description'>
+                                <Field name='task_description' placeholder='Task Description'>
                                     {({field}:any)=>{
                                         return (
                                             <Input textArea name='task_description'

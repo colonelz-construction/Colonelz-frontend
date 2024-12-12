@@ -2,20 +2,15 @@ import { Button, Card, Skeleton } from '@/components/ui'
 import React, { useEffect, useState } from 'react'
 import Subtasks from '../Subtasks/Subtasks'
 import { useLocation } from 'react-router-dom'
-import { apiGetCrmLeadsSingleTaskData, apiGetCrmProjectsSingleTaskData, apiGetCrmUsersAssociatedToLead, apiGetUsersList, apiGetUsersListProject } from '@/services/CrmService'
+import { apiGetCrmProjectsSingleTaskData, apiGetCrmSingleOpenTaskData, apiGetUsers, apiGetUsersList, apiGetUsersListProject } from '@/services/CrmService'
 import AddSubTask from '../Subtasks/AddSubtask'
 import EditTask from '../EditTask'
 import NoData from '@/views/pages/NoData'
+import { Tasks } from '../store'
 import { useNavigate } from 'react-router-dom'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 
-type CustomerInfoFieldProps = {
-    title?: string
-    value?: any
-}
-
-export type LeadTasks = {
-    lead_id: string;
+export type OpenTasks = {
     task_id: string;
     task_name: string;
     task_description: string;
@@ -34,9 +29,14 @@ export type LeadTasks = {
     percentage:string;
 };
 
-export type LeadTaskDataResponse = {
+export type TaskDataResponse = {
     code: number;
-    data: LeadTasks[]
+    data: Tasks[]
+}
+
+type CustomerInfoFieldProps = {
+    title?: string
+    value?: any
 }
 
 const TaskDetails = () => {
@@ -44,15 +44,15 @@ const TaskDetails = () => {
     const queryParams = new URLSearchParams(location.search);
     const task_id = queryParams.get('task')
     const org_id = localStorage.getItem('orgId')
-    const role :any = localStorage.getItem('role')
+    const role:any = localStorage.getItem('role')
     const navigate = useNavigate()
+    const { roleData } = useRoleContext()
 
-    const lead_id = queryParams.get('lead_id') || ''
+    const project_id = queryParams.get('project_id') || ''
 
     const [users, setUsers] = useState<any>()
 
     const tempTasks = {
-        lead_id: "",
         task_id: "",
         task_name: "",
         task_description: "",
@@ -71,24 +71,35 @@ const TaskDetails = () => {
         percentage: "",
     };
 
-    const { roleData } = useRoleContext();
+    useEffect(() => {
+        const fetchData = async () => {
+         const res = await apiGetUsers();
+ 
+         // console.log(res)
+         setUsers(res.data)
+        }
+ 
+        fetchData()
+   }, [])
 
-    const hasLeadTaskUpdatePermission = role === 'SUPERADMIN' ? true :  roleData?.data?.leadtask?.update?.includes(role);
-    const leadSubtaskCreateAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.leadtask?.create?.includes(role);
+   const updateAccessOpen = role === 'SUPERADMIN' ? true : roleData?.data?.opentask?.update?.includes(`${localStorage.getItem('role')}`)
+   const createAccessOpen = role === 'SUPERADMIN' ? true : roleData?.data?.opentask?.create?.includes(`${localStorage.getItem('role')}`)
 
-    const [taskData, setTaskData] = React.useState<LeadTasks>(tempTasks)
+    
+
+    const [taskData, setTaskData] = React.useState<OpenTasks>(tempTasks)
     const [loading, setLoading] = useState(true)
     useEffect(() => {
         const fetchData = async () => {
-            const response = await apiGetCrmLeadsSingleTaskData(lead_id, task_id, org_id);
-            const list = await apiGetCrmUsersAssociatedToLead(lead_id)
+            const response = await apiGetCrmSingleOpenTaskData(task_id);
+            // const list = await apiGetUsersList(project_id)
             setLoading(false)
             setTaskData(response.data[0]);
-            setUsers(list.data)
+            // setUsers(list.data)
         }
         fetchData();
     }
-        , [lead_id, task_id])
+        , [project_id, task_id])
     const header = (
         <div className="flex items-center justify-between mt-2">
             <h5 className="pl-5">Task-{taskData?.task_name}</h5>
@@ -97,7 +108,7 @@ const TaskDetails = () => {
 
     const cardFooter = (
         loading ? <div className='flex justify-center'><Skeleton width={400} /></div> :
-        hasLeadTaskUpdatePermission && <EditTask Data={taskData} users={users} task={true} />
+        updateAccessOpen && <EditTask Data={taskData} users={users} task={true} />
     )
 
 
@@ -159,7 +170,7 @@ const TaskDetails = () => {
 
                     <div className='flex justify-between mb-4 items-center'>
                         <h5>Subtasks</h5>
-                        {leadSubtaskCreateAccess && <AddSubTask users={users} data={taskData} />}
+                        {createAccessOpen && <AddSubTask users={users} data={taskData} />}
                     </div>
 
                     <Subtasks task={task_id} users={users} />

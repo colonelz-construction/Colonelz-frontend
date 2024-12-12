@@ -16,7 +16,7 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
-import {  apiGetCrmLeadsSubTaskData, apiGetCrmLeadsSubTaskDelete, apiGetCrmProjectsSubTaskData, apiGetCrmProjectsSubTaskDelete, apiGetCrmProjectsTaskData, apiGetCrmProjectsTaskDelete } from '@/services/CrmService'
+import {  apiGetCrmOpenSubTaskData, apiGetCrmOpenSubTaskDelete, apiGetCrmProjectsSubTaskData, apiGetCrmProjectsSubTaskDelete, apiGetCrmProjectsTaskData, apiGetCrmProjectsTaskDelete } from '@/services/CrmService'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button, Notification, Pagination, Select, toast } from '@/components/ui'
 import { HiOutlineEye, HiOutlinePencil, HiPlusCircle } from 'react-icons/hi'
@@ -41,6 +41,7 @@ export type SubTaskResponse = {
     data: SubTask[]
 }
 type SubTask = {
+    project_id: string;
     lead_id: string;
     task_id: string;
     sub_task_id: string;
@@ -73,25 +74,26 @@ const pageSizeOption = [
     { value: 30, label: '30 / page' },
     { value: 40, label: '40 / page' },
     { value: 50, label: '50 / page' },
+    
 ]
+
 const ActionColumn = ({ row,users }: { row: SubTask,users:any}) => {
     const navigate = useNavigate()
     const { textTheme } = useThemeClass()
     const location=useLocation()
     const queryParams = new URLSearchParams(location.search);
-    const leadId=queryParams.get('lead_id') || '';
+    const projectId=queryParams.get('project_id') || '';
     const org_id = localStorage.getItem('orgId')
-    const role :any = localStorage.getItem('role')
+    const role = localStorage.getItem('role')
+    const { roleData } = useRoleContext()
+
+    const updateAccessOpen = role === 'SUPERADMIN' ? true : roleData?.data?.opentask?.update?.includes(`${localStorage.getItem('role')}`)
+    const deleteAccessOpen = role === 'SUPERADMIN' ? true : roleData?.data?.opentask?.delete?.includes(`${localStorage.getItem('role')}`)
 
     const data={user_id:localStorage.getItem('userId'),
-    lead_id:leadId,
+    project_id:projectId,
     task_id:row.task_id,
     sub_task_id:row.sub_task_id, org_id}
-
-    const { roleData } = useRoleContext();
-
-    const leadTaskUpdateAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.leadtask?.update?.includes(role);
-    const leadTaskDeleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.leadtask?.create?.includes(role);
 
     const [dialogIsOpen, setIsOpen] = useState(false)
 
@@ -103,7 +105,7 @@ const ActionColumn = ({ row,users }: { row: SubTask,users:any}) => {
     }
     
     const onDelete = async () => {
-        const response = await apiGetCrmLeadsSubTaskDelete(data)
+        const response = await apiGetCrmOpenSubTaskDelete(data)
         
         if(response.code===200){
             toast.push(
@@ -126,14 +128,14 @@ const ActionColumn = ({ row,users }: { row: SubTask,users:any}) => {
                 className={`cursor-pointer p-2  hover:${textTheme}`}
                 
             >
-                {leadTaskUpdateAccess && <EditSubTask Data={row} users={users}/>}
+              {updateAccessOpen &&  <EditSubTask Data={row} users={users}/>}
                 
             </span>
             <span
                 className={`cursor-pointer py-2  hover:${textTheme}`}
                 
             >
-                {leadTaskDeleteAccess && <MdDeleteOutline onClick={()=>openDialog()}/>}
+                { deleteAccessOpen && <MdDeleteOutline onClick={()=>openDialog()}/>}
                 
             </span>
 
@@ -208,13 +210,12 @@ const Subtasks = ({task,users}:any) => {
 
     const location=useLocation()
     const queryParams = new URLSearchParams(location.search);
-    const leadId=queryParams.get('lead_id') || '';
     const [taskData,setTaskData]=useState<SubTask[]>([])
     
   
     useEffect(() => {
         const TaskData=async()=>{
-            const response = await apiGetCrmLeadsSubTaskData(leadId,task, org_id);
+            const response = await apiGetCrmOpenSubTaskData(task);
 
             setTaskData(response.data)
         }

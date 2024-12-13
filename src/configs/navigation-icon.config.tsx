@@ -24,6 +24,8 @@ import {
     HiOutlineVariable,
     HiOutlineCode,
 } from 'react-icons/hi'
+
+import { BiTask } from "react-icons/bi";
 import { TbMessageChatbot } from "react-icons/tb";
 import { MdOutlineDashboard,MdManageAccounts } from "react-icons/md";
 import { LuWarehouse,LuFileStack } from "react-icons/lu";
@@ -39,6 +41,7 @@ const navigationIcon: NavigationIcons = {
     crm: <HiOutlineUserGroup />,
     salesa: <HiOutlineTrendingUp />,
     dashboard:<MdOutlineDashboard/>,
+    task:<BiTask/>,
     inventory:<LuWarehouse/>,
     files:<LuFileStack/>,
     projects:<GoProject/>,

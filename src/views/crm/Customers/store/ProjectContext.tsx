@@ -57,6 +57,7 @@ useEffect(() => {
     const fetchData = async () => {
         const response = await apiGetCrmProjects(org_id);
         const data = response.data.projects;
+        console.log(data)
         setProjects(data);
         setLoading(false);
         setApiData(response.data);

@@ -152,7 +152,7 @@ const Filtering = ({ task, users }: Data) => {
 
 
 
-    const ActionColumn = ({ row, users }: { row: Tasks, users: any }) => {
+    const ActionColumn = ({ row, users, projectId }: { row: Tasks, users: any, projectId:any }) => {
         const navigate = useNavigate()
         const { textTheme } = useThemeClass()
         const { roleData } = useRoleContext()
@@ -202,7 +202,7 @@ const Filtering = ({ task, users }: Data) => {
                 {editAccess &&
                     <span
                         className={`cursor-pointer p-2  hover:${textTheme}`}>
-                        <EditTask Data={row} users={users} task={false} />
+                        <EditTask projectId={projectId} Data={row} users={users} task={false} />
 
                     </span>
                 }
@@ -237,7 +237,7 @@ const Filtering = ({ task, users }: Data) => {
         return `${day}-${month}-${year}`;
     }
 
-    const columns = useMemo<ColumnDef<Tasks>[]>(
+    const columns = useMemo<ColumnDef<Tasks>[]>(  
         () => [
             {
                 header: 'Name',
@@ -257,22 +257,22 @@ const Filtering = ({ task, users }: Data) => {
                 }
             },
             {
-                header: 'Task Priority',
+                header: 'Priority',
                 accessorKey: 'task_priority',
             },
             {
-                header: 'Task Status',
+                header: 'Status',
                 accessorKey: 'task_status'
             },
             {
-                header: 'Task Start Date',
+                header: 'Start Date',
                 accessorKey: 'estimated_task_start_date',
                 cell: ({ row }) => {
                     return <span>{formateDate(row.original.estimated_task_start_date)}</span>
                 }
             },
             {
-                header: 'Task End Date',
+                header: 'End Date',
                 accessorKey: 'estimated_task_end_date',
                 cell: ({ row }) => {
                     return <span>{formateDate(row.original.estimated_task_end_date)}</span>
@@ -282,7 +282,12 @@ const Filtering = ({ task, users }: Data) => {
                 header: 'Action',
                 id: 'action',
                 accessorKey: 'action',
-                cell: ({ row }) => <ActionColumn row={row.original} users={users} />,
+                cell: ({ row }) => {
+
+                    const projectId = row.original.project_id
+                
+                return <ActionColumn projectId={projectId} row={row.original} users={users} />
+            },
             }
 
         ],
@@ -333,7 +338,7 @@ const Filtering = ({ task, users }: Data) => {
                     userAuthority={[`${localStorage.getItem('role')}`]}
                     authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.task?.create ?? []}
                 >
-                    <AddTask project={projectId} userData={userData} />
+                    <AddTask project={projectId} userData={userData} addButton={true} />
                 </AuthorityCheck>
             </div>
             {!loading ? task?.length === 0 ? (<NoData />) : (

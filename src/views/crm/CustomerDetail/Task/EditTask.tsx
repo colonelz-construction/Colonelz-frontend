@@ -29,17 +29,36 @@ type Task = {
 
   interface EditTaskProps extends Data {
     task: boolean;
-    users:String[]
+    users:String[];
+    projectId:any;
   }
 
-const EditTask = ({ Data,users,task }: EditTaskProps) => {
+const EditTask = ({ Data,users,task, projectId }: any) => {
 
     console.log(users)
+
+    
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const org_id = localStorage.getItem('orgId')
 
+    console.log(projectId)
+
+    
     const [userData,setUserData]=useState<any>(null)
+    const [user, setUser] = useState<any>([]);
+    console.log(user)
+
+    // useEffect(() => {
+
+    //     const fetchData = async() => {
+    //         const list = await apiGetUsersList(projectId)
+    //         setUser(list.data)
+    //     }
+
+    //     fetchData();
+
+    // }, [])
     
 
     
@@ -64,9 +83,9 @@ const priorityOptions = [
     { label: "Cancelled", value: "Cancelled" },
   ];
   
-  const userOptions = users?.map((user:any) => ({
-    label: user,
-    value: user
+  const userOptions = users?.map((u:any) => ({
+    label: u,
+    value: u
   }));
 
   const formateDate = (dateString:string) => {
@@ -120,8 +139,8 @@ const priorityOptions = [
                         ),
                         task_status: Yup.string().required("Task Status is required"),
                         task_priority: Yup.string().required("Task Priority is required"),
-                        task_assignee: Yup.string().required("Task Assignee is required"),
-                        reporter: Yup.string().required("Reporter is required"),
+                        // task_assignee: Yup.string().required("Task Assignee is required"),
+                        // reporter: Yup.string().required("Reporter is required"),
                       })
                       }
                      onSubmit={async(values, actions) => {
@@ -143,19 +162,19 @@ const priorityOptions = [
                         
                          
                      }} >
-                        {({values, errors, touched})=>(
+                        {({values, errors, touched} :any)=>(
 
                         <Form className=' p-4 max-h-96 overflow-y-auto'>
                             <div className=' grid grid-cols-2 gap-x-5'>
-                            <FormItem label='Task Name'
+                            <FormItem label='Name'
                             asterisk
                             invalid={errors.task_name && touched.task_name}
                             errorMessage={errors.task_name}>
-                                <Field name='task_name'  component={Input} placeholder='Task Name'/>
+                                <Field name='task_name'  component={Input} placeholder='Name'/>
                                
                             </FormItem>
-                            <FormItem label='Task Assignee'
-                            asterisk
+                            <FormItem label='Assignee'
+                            
                             invalid={errors.task_assignee && touched.task_assignee}
                             errorMessage={errors.task_assignee}>
                                 <Field name='task_assignee'   placeholder='Task'>
@@ -169,7 +188,7 @@ const priorityOptions = [
                                     )}
                                 </Field>
                             </FormItem>
-                            <FormItem label='Task Status'
+                            <FormItem label='Status'
                             asterisk
                             invalid={errors.task_status && touched.task_status}
                             errorMessage={errors.task_status}
@@ -239,7 +258,7 @@ const priorityOptions = [
                                 </Field>
                             </FormItem>
                             <FormItem label='Report to'
-                            asterisk
+                            
                             invalid={errors.reporter && touched.reporter}   
                             errorMessage={errors.reporter}
                             >
@@ -272,7 +291,7 @@ const priorityOptions = [
                             </FormItem>
                             </div>
                             <FormItem label='Desription'>
-                                <Field name='task_description' placeholder='Task Description'>
+                                <Field name='task_description' placeholder='Description'>
                                     {({field}:any)=>{
                                         return (
                                             <Input textArea name='task_description'

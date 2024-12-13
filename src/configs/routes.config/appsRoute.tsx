@@ -12,6 +12,13 @@ const appsRoute: Routes = [
         authority: [],
     },
     {
+        key: 'appsCrm.taskManager',
+        path: `${APP_PREFIX_PATH}/crm/taskManager`,
+        component: lazy(() => import('@/views/crm/taskManager')),
+
+        authority: [],
+    },
+    {
         key: 'appsCrm.ai-chatbot',
         path: `${APP_PREFIX_PATH}/crm/ai-chatbot`,
         component: lazy(() => import('@/views/crm/Chatbot/index')),
@@ -334,6 +341,30 @@ const appsRoute: Routes = [
             () =>
                 import(
                     '@/views/crm/CustomerDetail/Task/TaskDetails/TaskDetails'
+                ),
+        ),
+
+        authority: [],
+    },
+    {
+        key: 'appsCrm.inventory',
+        path: `${APP_PREFIX_PATH}/crm/Tasks/OpenTaskDetails`,
+        component: lazy(
+            () =>
+                import(
+                    '@/views/crm/OpenTaskManger/Task/TaskDetails/TaskDetails'
+                ),
+        ),
+
+        authority: [],
+    },
+    {
+        key: 'appsCrm.inventory',
+        path: `${APP_PREFIX_PATH}/crm/Leads/TaskDetails`,
+        component: lazy(
+            () =>
+                import(
+                    '@/views/crm/LeadsDetails/Task/TaskDetails/TaskDetails'
                 ),
         ),
 

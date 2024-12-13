@@ -40,6 +40,8 @@ const EditSubTask = ({Data,users}:SubtaskData) => {
     const project_id=queryParams.get('project_id')
     const org_id = localStorage.getItem('orgId')
 
+    console.log(users)
+
     
   
 const openDialog = () => {
@@ -65,8 +67,8 @@ const priorityOptions = [
   ];
   
   const userOptions = users?.map((user:any) => ({
-    label: user.user_name,
-    value: user.user_name
+    label: user,
+    value: user
   }));
   
   const formateDate = (dateString:string) => {
@@ -120,8 +122,8 @@ const priorityOptions = [
                         ),
                         sub_task_status: Yup.string().required('Subtask Status is required'),
                         sub_task_priority: Yup.string().required('Subtask Priority is required'),
-                        sub_task_assignee: Yup.string().required('Subtask Assignee is required'),
-                        sub_task_reporter: Yup.string().required('Subtask Reporter is required'),
+                        // sub_task_assignee: Yup.string().required('Subtask Assignee is required'),
+                        // sub_task_reporter: Yup.string().required('Subtask Reporter is required'),
                       })}
                      onSubmit={async(values, actions) => {
                          setLoading(true)
@@ -146,21 +148,21 @@ const priorityOptions = [
                         {({values, errors, touched}:any) => (
                         <Form className=' p-4 max-h-96 overflow-y-auto'>
                             <div className=' grid grid-cols-2 gap-x-5'>
-                            <FormItem label='Subtask Name'
+                            <FormItem label='Name'
                             asterisk
                             invalid={errors.sub_task_name && touched.sub_task_name}
                             errorMessage={errors.sub_task_name}
                             >
-                                <Field name='sub_task_name'  component={Input} placeholder='Subtask Name'/>
+                                <Field name='sub_task_name'  component={Input} placeholder='Name'/>
                             </FormItem>
 
 
-                            <FormItem label='Subtask Assignee'
-                            asterisk
+                            <FormItem label='Assignee'
+                            
                             invalid={errors.sub_task_assignee && touched.sub_task_assignee}
                             errorMessage={errors.sub_task_assignee}
                             >
-                                <Field name='sub_task_assignee' placeholder='Subtask Assignee'>
+                                <Field name='sub_task_assignee' placeholder='Assignee'>
                                     {({field}:any)=>(
                                         <Select
                                         placeholder={Data?.sub_task_assignee}
@@ -171,7 +173,7 @@ const priorityOptions = [
                                     )}
                                 </Field>
                             </FormItem>
-                            <FormItem label='Subtask Status'
+                            <FormItem label='Status'
                             asterisk
                             invalid={errors.sub_task_status && touched.sub_task_status}
                             errorMessage={errors.sub_task_status}
@@ -242,7 +244,7 @@ const priorityOptions = [
                                 <div className=' text-red-600'>{errors.estimated_sub_task_end_date}</div>
                             </FormItem>
                             <FormItem label='Report To'
-                            asterisk
+                            
                             invalid={errors.sub_task_reporter && touched.sub_task_reporter}
                             errorMessage={errors.sub_task_reporter} 
                             >
@@ -277,7 +279,7 @@ const priorityOptions = [
                             </FormItem>
                             </div>
                             <FormItem label='Desription'>
-                                <Field name='sub_task_description' placeholder='Task Description'>
+                                <Field name='sub_task_description' placeholder='Description'>
                                     {({field}:any)=>{
                                         return (
                                             <Input textArea name='sub_task_description'

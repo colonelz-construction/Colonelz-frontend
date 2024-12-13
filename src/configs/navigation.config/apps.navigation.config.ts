@@ -43,7 +43,7 @@ const appsNavigationConfig: NavigationTree[] = [
                 ? ['SUPERADMIN']
                 : data?.data?.file?.read ?? [],
         subMenu: [],
-    },
+    },  
     {
         key: 'appsSales.productList',
         path: `${APP_PREFIX_PATH}/leads`,
@@ -57,7 +57,7 @@ const appsNavigationConfig: NavigationTree[] = [
                 : data?.data?.lead?.read ?? [],
         subMenu: [],
     },
-
+    
     {
         key: 'appsCrm.mom',
         path: `${APP_PREFIX_PATH}/crm/MOM`,
@@ -82,6 +82,19 @@ const appsNavigationConfig: NavigationTree[] = [
             role === 'SUPERADMIN'
                 ? ['SUPERADMIN']
                 : data?.data?.project?.read ?? [],
+        subMenu: [],
+    },
+    {
+        key: 'appsCrm.taskManager',
+        path: `${APP_PREFIX_PATH}/crm/taskManager`,
+        title: 'Task Manager',
+        translateKey: 'nav.appsCrm.taskManager',
+        icon: 'task',
+        type: NAV_ITEM_TYPE_ITEM,
+        authority:
+            role === 'SUPERADMIN'
+                ? ['SUPERADMIN']
+                : data?.data?.task?.read ?? [],
         subMenu: [],
     },
     {

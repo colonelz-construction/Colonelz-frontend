@@ -6,6 +6,7 @@ type RoleAccessPermissions = {
     update?: string[];
     delete?: string[];
     restore?: string[];
+    move?: string[];
   };
   
   type ModuleNames = 
@@ -13,6 +14,8 @@ type RoleAccessPermissions = {
     | "lead"
     | "project"
     | "task"
+    | "leadtask"
+    | "opentask"
     | "file"
     | "mom"
     | "archive"

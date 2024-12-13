@@ -169,7 +169,7 @@ const priorityOptions = [
                                             <Select
                                             options={leadOptions}
                                             name={field.name}
-                                            value={leadOptions.find((option:any) => option.value === field.value)}
+                                            value={leadOptions?.find((option:any) => option.value === field.value)}
                                             onChange={(selectedOption: any) => {
                                               setFieldValue('lead_id', selectedOption.value);
                                             }}

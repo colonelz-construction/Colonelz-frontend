@@ -16,7 +16,7 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
-import {  apiGetCrmProjectsSubTaskData, apiGetCrmProjectsSubTaskDelete, apiGetCrmProjectsTaskData, apiGetCrmProjectsTaskDelete } from '@/services/CrmService'
+import {  apiGetCrmProjectsSubTaskData, apiGetCrmProjectsSubTaskDelete, apiGetCrmProjectsTaskData, apiGetCrmProjectsTaskDelete, apiGetUserData } from '@/services/CrmService'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button, Notification, Pagination, Select, toast } from '@/components/ui'
 import { HiOutlineEye, HiOutlinePencil, HiPlusCircle } from 'react-icons/hi'
@@ -25,6 +25,7 @@ import { MdDeleteOutline } from 'react-icons/md'
 import SubTaskDetails from './SubTaskDetailsDrawer'
 import EditSubTask from './EditSubTask'
 import { ConfirmDialog } from '@/components/shared'
+import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -41,6 +42,7 @@ export type SubTaskResponse = {
 }
 type SubTask = {
     project_id: string;
+    lead_id: string;
     task_id: string;
     sub_task_id: string;
     sub_task_name: string;
@@ -80,6 +82,12 @@ const ActionColumn = ({ row,users }: { row: SubTask,users:any}) => {
     const queryParams = new URLSearchParams(location.search);
     const projectId=queryParams.get('project_id') || '';
     const org_id = localStorage.getItem('orgId')
+    const role :any = localStorage.getItem('role')
+
+    const { roleData } = useRoleContext();
+
+    const projectSubtaskUpdateAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.task?.update?.includes(role);
+    const projectSubtaskDeleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.task?.delete?.includes(role);
 
     const data={user_id:localStorage.getItem('userId'),
     project_id:projectId,
@@ -119,14 +127,14 @@ const ActionColumn = ({ row,users }: { row: SubTask,users:any}) => {
                 className={`cursor-pointer p-2  hover:${textTheme}`}
                 
             >
-                <EditSubTask Data={row} users={users}/>
+              { projectSubtaskUpdateAccess &&  <EditSubTask Data={row} users={users}/>}
                 
             </span>
             <span
                 className={`cursor-pointer py-2  hover:${textTheme}`}
                 
             >
-                <MdDeleteOutline onClick={()=>openDialog()}/>
+             {projectSubtaskDeleteAccess &&   <MdDeleteOutline onClick={()=>openDialog()}/>}
                 
             </span>
 
@@ -203,6 +211,21 @@ const Subtasks = ({task,users}:any) => {
     const queryParams = new URLSearchParams(location.search);
     const projectId=queryParams.get('project_id') || '';
     const [taskData,setTaskData]=useState<SubTask[]>([])
+
+    const [user, setUser] = useState<any>('')
+    useEffect(() => {
+
+        const fetchData = async() => {
+            
+            const res = await apiGetUserData(localStorage.getItem("userId"))
+            console.log(res)
+            
+            setUser(res?.data)
+        }
+
+        fetchData();
+
+    }, [])
     
   
     useEffect(() => {
@@ -228,7 +251,7 @@ const Subtasks = ({task,users}:any) => {
             header:'Subtask',
             accessorKey:'sub_task_name',
            cell:({row})=>{
-            return <SubTaskDetails data={row.original}/>
+            return <SubTaskDetails user={user} data={row.original}/>
            }
          },
          {

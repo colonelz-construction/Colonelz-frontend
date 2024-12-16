@@ -4,8 +4,9 @@ import classNames from 'classnames';
 import { Segment } from '@/components/ui';
 import useThemeClass from '@/utils/hooks/useThemeClass';
 import useDarkMode from '@/utils/hooks/useDarkmode';
+import { RiDragMove2Line } from "react-icons/ri";
 
-type Permission = 'create' | 'read' | 'update' | 'delete' | 'restore';
+type Permission = 'create' | 'read' | 'update' | 'delete' | 'restore' | 'move';
 
 type SelectorProps = {
     field: any;
@@ -17,6 +18,8 @@ type SelectorProps = {
 const permissionsMap: { [key: string]: Permission[] } = {
     default: ['create', 'read', 'update', 'delete'],
     task: ['create', 'read', 'update', 'delete'],
+    leadtask: ['create', 'read', 'update', 'delete'],
+    opentask: ['create', 'read', 'update', 'delete', 'move'],
     role: ['create', 'read', 'update', 'delete'],
     file:['create','read','delete'],
     archive: ['read', 'restore','delete'],
@@ -28,6 +31,7 @@ const permissionsMap: { [key: string]: Permission[] } = {
     quotation: [ 'read','update'],
     user: [ 'create','read', 'update', 'delete'],
     userArchive:['read','restore','delete'],
+    leadArchive:['read','restore','delete'],
     companyData:['read']
 
 };
@@ -37,7 +41,8 @@ const icons = {
     read: <HiEye className="text-xl" />,
     update: <HiPencilAlt className="text-xl" />,
     delete: <HiTrash className="text-xl" />,
-    restore: <HiPlusCircle className="text-xl" /> // Assuming restore uses the same icon as create
+    restore: <HiPlusCircle className="text-xl" />,
+    move: <RiDragMove2Line className="text-xl" />
 };
 
 const Selector = ({ field, form, setCheckType, checkType }: SelectorProps) => {

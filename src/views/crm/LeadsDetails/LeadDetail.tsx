@@ -217,13 +217,13 @@ const CustomerDetail = () => {
 
                         </AuthorityCheck>}
 
-                        {leadAddMemberAccess && <AuthorityCheck
+                        {/* {leadAddMemberAccess && <AuthorityCheck
                             userAuthority={[`${localStorage.getItem('role')}`]}
                             authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.addMember?.create ?? []}
                         >
                             <Dropdown.Item eventKey="e" onClick={() => openDialog3()}><div>Add User</div></Dropdown.Item>
 
-                        </AuthorityCheck>}
+                        </AuthorityCheck>} */}
                     </Dropdown>
                 </div>
             </div>

@@ -14,7 +14,7 @@ const appsRoute: Routes = [
     {
         key: 'appsCrm.taskManager',
         path: `${APP_PREFIX_PATH}/crm/taskManager`,
-        component: lazy(() => import('@/views/crm/taskManager')),
+        component: lazy(() => import('@/views/crm/TaskManager')),
 
         authority: [],
     },

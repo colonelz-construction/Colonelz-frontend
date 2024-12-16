@@ -20,6 +20,7 @@ import { apiGetCrmProjectsTaskData, apiGetCrmProjectsTaskDelete } from '@/servic
 import { ConfirmDialog } from '@/components/shared';
 import AddTask from '../../CustomerDetail/Task/AddTask';
 import { useProjectContext } from '../../Customers/store/ProjectContext'
+import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 
 const { Tr, Th, Td, THead, TBody } = Table
 
@@ -36,6 +37,7 @@ function Expanding() {
     const navigate=useNavigate()
 
     const org_id = localStorage.getItem('orgId')
+    const [loadingChildData, setLoadingChildData] = useState<any>({});
 
     const createAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.task?.create?.includes(`${localStorage.getItem('role')}`)
 
@@ -50,13 +52,26 @@ function Expanding() {
         return `${day}-${month}-${year}`;
     }
 
-    // Fetch data for child table
     const fetchChildData = async (projectId: string) => {
-        if (!childData[projectId]) {
-            const taskResponse = await apiGetCrmProjectsTaskData(projectId, org_id);
-            setChildData((prev:any) => ({ ...prev, [projectId]: taskResponse.data }))
-        }
-    }
+            if (!childData[projectId] && !loadingChildData[projectId]) {
+                // Set loading for this lead's child data
+                setLoadingChildData((prev: any) => ({ ...prev, [projectId]: true }));
+    
+                try {
+                    const taskResponse = await apiGetCrmProjectsTaskData(projectId, org_id);
+                    setChildData((prev: any) => ({ ...prev, [projectId]: taskResponse.data }));
+                } catch (error) {
+                    toast.push(
+                        <Notification type="danger" duration={2000} closable>
+                            Error fetching tasks
+                        </Notification>
+                    );
+                } finally {
+                    // Set loading to false once the data is fetched
+                    setLoadingChildData((prev: any) => ({ ...prev, [projectId]: false }));
+                }
+            }
+        };
 
 
 
@@ -338,7 +353,16 @@ function Expanding() {
                                                 )})}
                                             </Tr>
                                         </THead>
-                                        <TBody>
+                                        {loadingChildData[row.original.project_id] ? 
+
+                                            <TableRowSkeleton 
+                                            rows={5}
+                                            avatarInColumns={[0]}
+                                            columns={6}
+                                            avatarProps={{ width: 14, height: 14 }}
+                                            /> : 
+                                            
+                                            <TBody>
                                             {childData[row.original.project_id]?.map((childRow: any) => {
 
                                                 console.log(childTableColumns)
@@ -406,7 +430,7 @@ function Expanding() {
                                                 
                                             }
                                             
-                                        </TBody>
+                                        </TBody>}
                                     </Table>
                                 </Td>
                             </Tr>

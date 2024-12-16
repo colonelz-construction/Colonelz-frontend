@@ -7,6 +7,15 @@ import { apiGetOrgData, apiEditOrgData } from '@/services/CrmService'
 
 const apiToken = import.meta.env.VITE_API_TOKEN;
 const userEmail = import.meta.env.VITE_USER_EMAIL;
+const currencyUrl = import.meta.env.VITE_CURRENCY_URL;
+const countryUrl = import.meta.env.VITE_COUNTRY_URL;
+
+console.log(apiToken)
+console.log(userEmail)
+
+console.log(currencyUrl)
+console.log(countryUrl)
+
 
 const org_id: any = localStorage.getItem('orgId')
 const userId: any = localStorage.getItem('userId')
@@ -65,6 +74,35 @@ const Primary = () => {
     const [countries, setCountries] = useState<Country[]>([]);
     const [authToken, setAuthToken] = useState<string | null>(null);
     const [file, setFile] = useState<string>('');
+    const [typeOptions, setTypeOptions] = useState<CurrencyOption[]>([]);
+
+
+    useEffect(() => {
+        const fetchCurrencies = async () => {
+            const response = await fetch(`${currencyUrl}v3.1/all`);
+            const data = await response.json();
+            console.log(data )
+
+            const currencyData: CurrencyOption[] = [];
+
+            data.forEach((country: any) => {
+                if (country.currencies) {
+                    Object.entries(country.currencies).forEach(([key, value]: [string, any]) => {
+                        currencyData.push({
+                            value: key,
+                            label: `${value.name} (${key})`
+                        });
+                    });
+                }
+            });
+            const uniqueCurrencies = Array.from(new Set(currencyData.map(c => c.value)))
+                .map(value => currencyData.find(c => c.value === value));
+
+            setTypeOptions(uniqueCurrencies.filter(Boolean) as CurrencyOption[]); // Type assertion
+        };
+
+        fetchCurrencies();
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -82,7 +120,7 @@ const Primary = () => {
     useEffect(() => {
         const getAuthToken = async () => {
             try {
-                const response = await fetch(`https://www.universal-tutorial.com/api/getaccesstoken`, {
+                const response = await fetch(`${countryUrl}api/getaccesstoken`, {
                     headers: {
                         "Accept": "application/json",
                         "api-token": apiToken,
@@ -103,7 +141,7 @@ const Primary = () => {
         const fetchCountries = async () => {
             if (!authToken) return;
             try {
-                const response = await fetch(`https://www.universal-tutorial.com/api/countries/`, {
+                const response = await fetch(`${countryUrl}api/countries/`, {
                     headers: {
                         "Authorization": `Bearer ${authToken}`,
                         "Accept": "application/json",
@@ -192,6 +230,7 @@ const Primary = () => {
                         values={values}
                         file={file} setFile={setFile}
                         authToken={authToken}
+                        typeOptions={typeOptions}
                     />
                 )}
             </Formik>
@@ -199,14 +238,17 @@ const Primary = () => {
     );
 };
 
-const FormContent = ({ countries, details, setFieldValue, values,authToken, file, setFile }: { setFile: (field: string) => void; file: string, countries: Country[]; details: any; setFieldValue: (field: string, value: any) => void; values: FormValues; authToken: string | null }) => {
+const FormContent = ({ countries, details, setFieldValue, values,authToken, file, setFile, typeOptions }: { setFile: (field: string) => void; file: string, countries: Country[]; details: any; setFieldValue: (field: string, value: any) => void; values: FormValues; authToken: string | null, typeOptions:any }) => {
 
     const [fileName, setFileName] = useState<string | undefined>(undefined);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
-    const [typeOptions, setTypeOptions] = useState<CurrencyOption[]>([]);
+    
 
     const [states, setStates] = useState<State[]>([]);
     const [cities, setCities] = useState<City[]>([]);
+
+
+    
 
     useEffect(() => {
         if (details && details.org_country) {
@@ -227,7 +269,7 @@ const FormContent = ({ countries, details, setFieldValue, values,authToken, file
     const fetchStates = async (countryName: string) => {
         if (!authToken) return;
         try {
-            const response = await fetch(`https://www.universal-tutorial.com/api/states/${countryName}`, {
+            const response = await fetch(`${countryUrl}api/states/${countryName}`, {
                 headers: {
                     "Authorization": `Bearer ${authToken}`,
                     "Accept": "application/json",
@@ -253,7 +295,7 @@ const FormContent = ({ countries, details, setFieldValue, values,authToken, file
     const fetchCities = async (stateName: string) => {
         if (!authToken) return;
             try {
-                const response = await fetch(`https://www.universal-tutorial.com/api/cities/${stateName}`, {
+                const response = await fetch(`${countryUrl}api/cities/${stateName}`, {
                     headers: {
                         "Authorization": `Bearer ${authToken}`,
                         "Accept": "application/json",
@@ -310,31 +352,7 @@ const FormContent = ({ countries, details, setFieldValue, values,authToken, file
         label: city.name,
     }));
 
-    useEffect(() => {
-        const fetchCurrencies = async () => {
-            const response = await fetch('https://restcountries.com/v3.1/all');
-            const data = await response.json();
-
-            const currencyData: CurrencyOption[] = [];
-
-            data.forEach((country: any) => {
-                if (country.currencies) {
-                    Object.entries(country.currencies).forEach(([key, value]: [string, any]) => {
-                        currencyData.push({
-                            value: key,
-                            label: `${value.name} (${key})`
-                        });
-                    });
-                }
-            });
-            const uniqueCurrencies = Array.from(new Set(currencyData.map(c => c.value)))
-                .map(value => currencyData.find(c => c.value === value));
-
-            setTypeOptions(uniqueCurrencies.filter(Boolean) as CurrencyOption[]); // Type assertion
-        };
-
-        fetchCurrencies();
-    }, []);
+    
 
     return (
         <>
@@ -565,7 +583,7 @@ const FormContent = ({ countries, details, setFieldValue, values,authToken, file
                             {({ field, form }: FieldProps) => (
                                 <Select
                                     options={typeOptions}
-                                    value={typeOptions.find(option => option.value === field.value)
+                                    value={typeOptions.find((option:any) => option.value === field.value)
                                         // || details?.currency
                                     }
                                     onChange={(option) => {

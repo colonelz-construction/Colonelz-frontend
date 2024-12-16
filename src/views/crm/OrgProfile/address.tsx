@@ -6,6 +6,7 @@ import { apiGetBillingData, apiEditBillingData } from '@/services/CrmService';
 
 const apiToken = import.meta.env.VITE_API_TOKEN;
 const userEmail = import.meta.env.VITE_USER_EMAIL;
+const countryUrl = import.meta.env.VITE_COUNTRY_URL;
 
 const org_id: any = localStorage.getItem('orgId');
 const userId: any = localStorage.getItem('userId');
@@ -61,7 +62,7 @@ const Address = () => {
     useEffect(() => {
         const getAuthToken = async () => {
             try {
-                const response = await fetch(`https://www.universal-tutorial.com/api/getaccesstoken`, {
+                const response = await fetch(`${countryUrl}api/getaccesstoken`, {
                     headers: {
                         "Accept": "application/json",
                         "api-token": apiToken,
@@ -84,7 +85,7 @@ const Address = () => {
 
             if (!authToken) return;
             try {
-                const response = await fetch(`https://www.universal-tutorial.com/api/countries/`, {
+                const response = await fetch(`${countryUrl}api/countries/`, {
                     headers: {
                         "Authorization": `Bearer ${authToken}`,
                         "Accept": "application/json",
@@ -183,7 +184,7 @@ const FormContent = ({ countries, details, setFieldValue, values, authToken }: {
     const fetchStates = async (countryName: string) => {
         if (!authToken) return;
         try {
-            const response = await fetch(`https://www.universal-tutorial.com/api/states/${countryName}`, {
+            const response = await fetch(`${countryUrl}api/states/${countryName}`, {
                 headers: {
                     "Authorization": `Bearer ${authToken}`,
                     "Accept": "application/json",
@@ -210,7 +211,7 @@ const FormContent = ({ countries, details, setFieldValue, values, authToken }: {
         
         if (!authToken) return;
             try {
-                const response = await fetch(`https://www.universal-tutorial.com/api/cities/${stateName}`, {
+                const response = await fetch(`${countryUrl}api/cities/${stateName}`, {
                     headers: {
                         "Authorization": `Bearer ${authToken}`,
                         "Accept": "application/json",

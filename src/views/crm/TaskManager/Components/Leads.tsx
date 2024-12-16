@@ -21,6 +21,7 @@ import AddTask from '../../LeadsDetails/Task/AddTask';
 import { useLeadContext } from '../../LeadList/store/LeadContext';
 import useThemeClass from '@/utils/hooks/useThemeClass';
 import { useRoleContext } from '../../Roles/RolesContext';
+import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 
 const { Tr, Th, Td, THead, TBody } = Table
 
@@ -36,6 +37,8 @@ function Expanding() {
     console.log(childData)
     const [expanded, setExpanded] = useState<ExpandedState>({})
     const navigate=useNavigate()
+
+    const [loadingChildData, setLoadingChildData] = useState<any>({});
 
     const org_id = localStorage.getItem('orgId')
 
@@ -139,14 +142,25 @@ function Expanding() {
 
     // Fetch data for child table
     const fetchChildData = async (leadId: string) => {
-        if (!childData[leadId]) {
+        if (!childData[leadId] && !loadingChildData[leadId]) {
+            // Set loading for this lead's child data
+            setLoadingChildData((prev: any) => ({ ...prev, [leadId]: true }));
 
-            const taskResponse = await apiGetCrmLeadsTaskData(leadId, org_id);
-            // const response = await fetch(`/api/child-data?parentId=${parentId}`)
-            // const data = await response.json()
-            setChildData((prev:any) => ({ ...prev, [leadId]: taskResponse.data }))
+            try {
+                const taskResponse = await apiGetCrmLeadsTaskData(leadId, org_id);
+                setChildData((prev: any) => ({ ...prev, [leadId]: taskResponse.data }));
+            } catch (error) {
+                toast.push(
+                    <Notification type="danger" duration={2000} closable>
+                        Error fetching tasks
+                    </Notification>
+                );
+            } finally {
+                // Set loading to false once the data is fetched
+                setLoadingChildData((prev: any) => ({ ...prev, [leadId]: false }));
+            }
         }
-    }
+    };
 
     // Columns for outer table
     const outerTableColumns = useMemo<ColumnDef<any>[]>(() => [
@@ -345,7 +359,17 @@ function Expanding() {
                                                 )})}
                                             </Tr>
                                         </THead>
-                                        <TBody>
+                                    {loadingChildData[row.original.lead_id] ? 
+
+                                                <TableRowSkeleton 
+                                                rows={5}
+                                                avatarInColumns={[0]}
+                                                columns={6}
+                                                avatarProps={{ width: 14, height: 14 }}
+                                                />
+
+                                    
+                                    : <TBody>
                                             {childData[row.original.lead_id]?.map((childRow: any) => {
 
                                                 console.log(childTableColumns)
@@ -423,7 +447,7 @@ function Expanding() {
                                                 
                                             }
                                             
-                                        </TBody>
+                                        </TBody> }
                                     </Table>
                                 </Td>
                             </Tr>

@@ -569,7 +569,7 @@ export async function apiGetCrmLeadsAddTask(Data: any) { //org done
 
 export async function apiGetCrmProjectsTaskData<T>(projectId: string, org_id: string | null) { // org done
     return ApiService.fetchData<TaskResponse>({
-        url: `admin/get/all/task?user_id=${userId}&project_id=${projectId}&org_id=${localStorage.getItem('orgId')}`,
+        url: `admin/get/all/task?user_id=${localStorage.getItem('userId')}&project_id=${projectId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -578,7 +578,7 @@ export async function apiGetCrmProjectsTaskData<T>(projectId: string, org_id: st
 
 export async function apiGetCrmLeadsTaskData<T>(leadId: string, org_id: string | null) { // org done
     return ApiService.fetchData<TaskResponse>({
-        url: `admin/get/all/leadtask?user_id=${userId}&lead_id=${leadId}&org_id=${localStorage.getItem('orgId')}`,
+        url: `admin/get/all/leadtask?user_id=${localStorage.getItem('userId')}&lead_id=${leadId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data

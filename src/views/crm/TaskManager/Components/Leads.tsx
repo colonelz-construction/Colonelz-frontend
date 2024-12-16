@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import Table from '@/components/ui/Table'
 import { useData } from '../FileManagerContext/FIleContext'
 import { MdDeleteOutline } from 'react-icons/md'
@@ -10,10 +10,10 @@ import {
 } from '@tanstack/react-table'
 import { RiArrowRightSFill } from "react-icons/ri";
 import { RiArrowDownSFill } from "react-icons/ri";
-import { HiOutlinePlusCircle, HiOutlineMinusCircle } from 'react-icons/hi'
+import { Timeout } from 'react-number-format/types/types'
 import type { ColumnDef, ExpandedState } from '@tanstack/react-table'
 import { useNavigate } from 'react-router-dom'
-import { Button, Notification, Pagination, Select, Skeleton, toast } from '@/components/ui'
+import { Button, Notification, Pagination, Select, Skeleton, toast, Tooltip } from '@/components/ui'
 import { apiGetCrmLeadsTaskData, apiGetCrmLeadsTaskDelete, apiGetCrmProjectsTaskData } from '@/services/CrmService'
 import { ActionLink, ConfirmDialog } from '@/components/shared';
 import index from './Template/index';
@@ -21,7 +21,6 @@ import AddTask from '../../LeadsDetails/Task/AddTask';
 import { useLeadContext } from '../../LeadList/store/LeadContext';
 import useThemeClass from '@/utils/hooks/useThemeClass';
 import { useRoleContext } from '../../Roles/RolesContext';
-// import AddTask from '../../CustomerDetail/Task/AddTask';
 
 const { Tr, Th, Td, THead, TBody } = Table
 
@@ -117,9 +116,11 @@ function Expanding() {
                     </span>
                 } */}
                 {hasLeadTaskDeletePermission &&
+                <Tooltip title='Delete'>
                     <span className={`cursor-pointer py-2  hover:${textTheme}`}>
                         <MdDeleteOutline onClick={() => openDialog()} />
                     </span>
+                </Tooltip>
                 }
                 <ConfirmDialog
                     isOpen={dialogIsOpen}
@@ -193,11 +194,36 @@ function Expanding() {
             accessorKey: 'name',
             cell: (props) => {
                 const row = props.row.original;
-                return (
-                    <div className='min-w-[100px] truncate font-bold'>
-                        {row.name}
+                const [isHovered, setIsHovered] = useState(false);
+                                const hoverTimeout = useRef<Timeout | null>(null);
+                
+                                const handleMouseEnter = () => {
+                                    if (hoverTimeout.current) {
+                                        clearTimeout(hoverTimeout.current);
+                                    }
+                                    setIsHovered(true);
+                                };
+                
+                                const handleMouseLeave = () => {
+                                    hoverTimeout.current = setTimeout(() => {
+                                        setIsHovered(false);
+                                    }, 200); 
+                                };
+
+                return (<div
+                className='relative inline-block min-w-[100px] font-bold'
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+            >
+                <span className='whitespace-wrap'>{row.name.length > 13 
+                                ? `${row.name.slice(0, 10)}...` 
+                                : row.name}</span>
+                {isHovered && (
+                    <div className='absolute bottom-0 left-[30%] ml-2 bg-white border border-gray-300 p-2 shadow-lg z-9999 whitespace-nowrap transition-opacity duration-200 font-normal'>
+                        <p>{row.name}</p>
                     </div>
-                )
+                )}
+            </div>)
               }},
               {
                 header: 'Task Count',
@@ -254,7 +280,7 @@ function Expanding() {
             }
         },
         {
-            header: 'Action',
+            header: '',
             id: 'action',
             accessorKey: 'action',
             cell: ({ row }) => <span></span>,

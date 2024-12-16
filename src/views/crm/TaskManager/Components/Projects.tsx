@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from 'react'
 import Table from '@/components/ui/Table'
-import { Button, Notification, Pagination, Select, Skeleton, toast } from '@/components/ui'
+import { Button, Notification, Pagination, Select, Skeleton, toast, Tooltip } from '@/components/ui'
 import { Timeout } from 'react-number-format/types/types'
 import {
     useReactTable,
@@ -115,9 +115,11 @@ function Expanding() {
                     </span>
                 } */}
                 {deleteAccess &&
+                <Tooltip title='Delete'>
                     <span className={`cursor-pointer py-2  hover:${textTheme}`}>
                         <MdDeleteOutline onClick={() => openDialog()} />
                     </span>
+                </Tooltip>
                 }
                 <ConfirmDialog
                     isOpen={dialogIsOpen}
@@ -269,7 +271,7 @@ function Expanding() {
             }
         },
         {
-            header: 'Action',
+            header: '',
             id: 'action',
             accessorKey: 'action',
             cell: ({ row }) => <span></span>,

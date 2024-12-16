@@ -58,11 +58,11 @@ const priorityOptions = [
 
   return (
         <div>
-            {addButton ? <Button onClick={openDialog}  variant='solid' size='sm'>Add Task</Button> : <span onClick={openDialog} className='flex items-center gap-1 cursor-pointer'> <AiOutlinePlus/> <span>Add Task</span></span>}
+            {addButton ? <Button onClick={openDialog}  variant='solid' size='sm'>Add Open Task</Button> : <span onClick={openDialog} className='flex items-center gap-1 cursor-pointer'> <AiOutlinePlus/> <span>Add Task</span></span>}
             
             <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
                 <div className="pl-4 ">
-                    <h3>Add New Task</h3>
+                    <h3>Add New Open Task</h3>
                 </div>
                 <Formik 
                        initialValues={{

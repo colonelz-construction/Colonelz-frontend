@@ -1,11 +1,12 @@
 
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import Table from '@/components/ui/Table'
 import Input from '@/components/ui/Input'
-import { Button, Card, Dialog, Dropdown, Notification, Skeleton, Steps, Tabs, toast } from '@/components/ui'
+import { Button, Card, Dialog, Dropdown, Notification, Skeleton, Steps, Tabs, toast, Tooltip } from '@/components/ui'
 
 
 import { IoIosCheckmarkCircle } from "react-icons/io";
+import { Timeout } from 'react-number-format/types/types'
 
 import Pagination from '@/components/ui/Pagination'
 import { MdDeleteOutline } from 'react-icons/md'
@@ -155,7 +156,7 @@ const pageSizeOption = [
     { value: 50, label: '50 / page' },
 ]
 const AllTask = () => {
-    const {projects,loading}=useProjectContext();
+    const { projects, loading } = useProjectContext();
     const apiData = useLeadContext()
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
@@ -235,10 +236,10 @@ const AllTask = () => {
     const ActionColumn = ({ row, users }: { row: any, users: any }) => {
         const navigate = useNavigate()
         const { textTheme } = useThemeClass()
-        
+
         const org_id = localStorage.getItem('orgId')
 
-        
+
 
         const [dialogIsOpen, setIsOpen] = useState(false)
 
@@ -249,13 +250,13 @@ const AllTask = () => {
             setIsOpen(false)
         }
 
-       
+
 
         let deleteAccess;
-        if(row?.lead_id) {
+        if (row?.lead_id) {
             deleteAccess = deleteAccessLead;
 
-        } else if(row?.project_id) {
+        } else if (row?.project_id) {
             deleteAccess = deleteAccessProject;
 
         } else {
@@ -268,7 +269,7 @@ const AllTask = () => {
                 let response;
 
                 if (row?.lead_id) {
-                    
+
 
                     const leadData = {
                         user_id: localStorage.getItem('userId'),
@@ -318,14 +319,18 @@ const AllTask = () => {
         return (
             <div className={`flex justify-between text-lg gap-5`}>
                 {deleteAccess &&
-                    <span className={`cursor-pointer py-2  hover:${textTheme}`}>
-                        <MdDeleteOutline onClick={() => openDialog()} />
-                    </span>
+                    <Tooltip title='Delete'>
+                        <span className={`cursor-pointer py-2  hover:${textTheme}`}>
+                            <MdDeleteOutline onClick={() => openDialog()} />
+                        </span>
+                    </Tooltip>
                 }
                 {moveAccess && row?.type == 'open type' &&
-                    <span className={`cursor-pointer py-2  hover:${textTheme}`}>
-                    <MoveToDialog users={users} projectData={projects} leadData={apiData} task_id={row.task_id} />
-                    </span>
+                    <Tooltip title='Move'>
+                        <span className={`cursor-pointer py-2  hover:${textTheme}`}>
+                            <MoveToDialog users={users} projectData={projects} leadData={apiData} task_id={row.task_id} />
+                        </span>
+                    </Tooltip>
                 }
                 <ConfirmDialog
                     isOpen={dialogIsOpen}
@@ -353,9 +358,36 @@ const AllTask = () => {
                 accessorKey: 'task_name',
                 cell: (props) => {
                     const row = props.row.original;
-                    return (
-                        <div className='cursor-pointer'>{row?.task_name}</div>
-                    )
+                    const [isHovered, setIsHovered] = useState(false);
+                    const hoverTimeout = useRef<Timeout | null>(null);
+
+                    const handleMouseEnter = () => {
+                        if (hoverTimeout.current) {
+                            clearTimeout(hoverTimeout.current);
+                        }
+                        setIsHovered(true);
+                    };
+
+                    const handleMouseLeave = () => {
+                        hoverTimeout.current = setTimeout(() => {
+                            setIsHovered(false);
+                        }, 200);
+                    };
+
+                    return (<div
+                        className='relative inline-block min-w-[100px] cursor-pointer'
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                    >
+                        <span className='whitespace-wrap'>{row.task_name.length > 13
+                            ? `${row.task_name.slice(0, 10)}...`
+                            : row.task_name}</span>
+                        {isHovered && (
+                            <div className='absolute bottom-0 left-[30%] ml-2 bg-white border border-gray-300 p-2 shadow-lg z-9999 whitespace-nowrap transition-opacity duration-200 font-normal'>
+                                <p>{row.task_name}</p>
+                            </div>
+                        )}
+                    </div>)
                 }
             },
             {
@@ -383,7 +415,7 @@ const AllTask = () => {
                 accessorKey: 'task_assignee',
                 cell: (props) => {
                     const row = props.row.original;
-                    if(row?.task_assignee) {
+                    if (row?.task_assignee) {
                         return (
                             <div>{row?.task_assignee}</div>
                         )
@@ -436,11 +468,11 @@ const AllTask = () => {
             },
 
             {
-                header: 'Action',
+                header: '',
                 id: 'action',
                 accessorKey: 'action',
                 cell: ({ row }) => {
-                    return <ActionColumn row={row.original} users={users}  />
+                    return <ActionColumn row={row.original} users={users} />
                 },
             }
 
@@ -603,9 +635,9 @@ const AllTask = () => {
                     </Dropdown>
                 </div>
 
-                { createAccessOpen &&
+                {createAccessOpen &&
 
-                <AddTask users={users} addButton={true} />
+                    <AddTask users={users} addButton={true} />
                 }
 
                 <DebouncedInput
@@ -644,7 +676,10 @@ const AllTask = () => {
                                                             ? 'cursor-pointer select-none'
                                                             : 'pointer-events-none',
                                                     onClick:
-                                                        header.column.getToggleSortingHandler(),
+                                                        header.column.id !==
+                                                            'action'
+                                                            ? header.column.getToggleSortingHandler()
+                                                            : undefined,
                                                 }}
                                             >
                                                 {flexRender(
@@ -653,9 +688,12 @@ const AllTask = () => {
                                                     header.getContext()
                                                 )}
                                                 {header.column.getCanSort() && (
-                                                    <Sorter
-                                                        sort={header.column.getIsSorted()}
-                                                    />
+                                                    header.column.id !==
+                                                    'action' && (
+                                                        <Sorter
+                                                            sort={header.column.getIsSorted()}
+                                                        />
+                                                    )
                                                 )}
                                             </div>
                                         )}

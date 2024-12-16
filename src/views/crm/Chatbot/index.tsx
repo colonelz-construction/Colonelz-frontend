@@ -10,6 +10,7 @@ import { FaChevronCircleUp } from "react-icons/fa";
 import { GoDotFill } from "react-icons/go";
 import ScrollableFeed from "react-scrollable-feed";
 import { apiGetUserData } from "@/services/CrmService";
+const chatApiUrl = import.meta.env.VITE_CHATAPI_URL;
 
 interface Message {
     text: string;
@@ -79,7 +80,7 @@ const Index = () => {
     const fetchData = async (inputValue: string) => {
         try {
             setLoading(true);
-            const response = await fetch(`http://127.0.0.1:8000/query/`, {
+            const response = await fetch(`${chatApiUrl}query/`, { 
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

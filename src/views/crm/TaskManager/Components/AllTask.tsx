@@ -210,7 +210,6 @@ const AllTask = () => {
         const fetchData = async () => {
             const response = await apiGetAllTasksDetails(filterTask);
 
-            console.log(response)
             setData(response.data)
             setLoading(false)
         }
@@ -516,7 +515,11 @@ const AllTask = () => {
     const Toggle = <Button variant='solid' size='sm' className='flex justify-center items-center gap-2'>
         <span>Filter</span><span><GoChevronDown /></span></Button>
 
-    const userOptions = users?.map((user: any) => ({ label: 'assignee', value: user.username }))
+    const userOptions = users?.filter((user: any) => user.role !== "SUPERADMIN")
+                            .map((user: any) => ({
+                            label: 'assignee',
+                            value: user.username
+                            }));
     const statusOptions = [
         { label: "In Progress", value: "In Progress" },
         { label: "Pending", value: "Pending" },

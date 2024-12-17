@@ -63,7 +63,10 @@ const priorityOptions = [
     { label: "Completed", value: "Completed" },
     { label: "Cancelled", value: "Cancelled" },
   ];
-  const userOptions = users?.map((user:any) => ({
+
+  const userOptions = users
+  ?.filter((u: any) => u.role !== "SUPERADMIN")
+  .map((user: any) => ({
     label: user.username,
     value: user.username
   }));

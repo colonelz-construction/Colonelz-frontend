@@ -34,7 +34,7 @@ function useAuth() {
                 const { token } = resp.data
                 tok=resp.data.token
                 localStorage.setItem('loginTime',new Date().getTime().toString())
-                dispatch(signInSuccess({ token, userId: resp.data.userID,role:resp.data.role,refreshToken:resp.data.refreshToken }))
+                dispatch(signInSuccess({ token, userId: resp.data.userID,role:resp.data.role,refreshToken:resp.data.refreshToken, orgId: resp.data.org_id }))
                 if (resp.data) {
                     dispatch(
                         setUser(
@@ -85,7 +85,7 @@ function useAuth() {
     }
     const tokens=localStorage.getItem('auth')
     if (tokens) {
-    setTimeout(signOut, 60*60*1000);
+    setTimeout(signOut, 60*60*1000*2);
     }
     return {
         authenticated: token && signedIn,

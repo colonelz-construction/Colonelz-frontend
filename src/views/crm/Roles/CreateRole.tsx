@@ -8,8 +8,8 @@ import { apiCreateRole, apiEditRoles, apiGetRoleDetails } from '@/services/CrmSe
 import { useNavigate } from 'react-router-dom';
 import { StickyFooter } from '@/components/shared';
 
-type Permission = 'create' | 'read' | 'update' | 'delete' | 'restore';
-type AccessType = 'lead' | 'user' | 'project' | 'task' | 'contract' | 'quotation' | 'file' | 'archive' | 'mom' | 'addMember' | 'role' | 'companyData' | 'userArchive';
+type Permission = 'create' | 'read' | 'update' | 'delete' | 'restore' | 'move';
+type AccessType = 'lead' | 'user' | 'project' | 'task' | 'leadtask' | 'opentask' | 'contract' | 'quotation' | 'file' | 'archive' | 'mom' | 'addMember' | 'role' | 'companyData' | 'userArchive' | 'leadArchive';
 
 type AccessPermissions = Permission[];
 
@@ -18,16 +18,18 @@ type FormValues = {
 };
 
 const accessTypes: AccessType[] = [
-    'lead', 'user', 'project', 'task', 'contract', 'quotation', 'file', 'archive', 'mom', 'addMember', 'role', 'companyData', 'userArchive'
+    'lead', 'user', 'project', 'task', 'leadtask', 'opentask', 'contract', 'quotation', 'file', 'archive', 'mom', 'addMember', 'role', 'companyData', 'userArchive', 'leadArchive'
 ];
 
 export const permissionsMap: { [key: string]: Permission[] } = {
     default: ['create', 'read', 'update', 'delete'],
     task: ['create', 'read', 'update', 'delete'],
+    leadtask: ['create', 'read', 'update', 'delete'],
+    opentask: ['create', 'read', 'update', 'delete', 'move'],
     role: ['create', 'read', 'update', 'delete'],
     file: ['create', 'read', 'delete'],
     archive: ['read', 'restore', 'delete'],
-    addMember: ['create'],
+    addMember: ['create', 'delete'],
     lead: ['create', 'read', 'update', 'delete'],
     project: ['create', 'read', 'update'],
     mom: ['create', 'read', 'delete', 'update'],
@@ -35,12 +37,13 @@ export const permissionsMap: { [key: string]: Permission[] } = {
     quotation: ['read', 'update'],
     user: ['create', 'read', 'update', 'delete'],
     userArchive: ['read', 'restore', 'delete'],
+    leadArchive: ['read', 'restore', 'delete'],
     companyData: ['read']
 };
 
 const validationSchema = Yup.object().shape(
     accessTypes.reduce((acc, type) => {
-        acc[type] = Yup.array().of(Yup.string().oneOf(['create', 'read', 'update', 'delete', 'restore']));
+        acc[type] = Yup.array().of(Yup.string().oneOf(['create', 'read', 'update', 'delete', 'restore', 'move']));
         return acc;
     }, {} as any)
 );
@@ -48,6 +51,8 @@ const validationSchema = Yup.object().shape(
 export const obj: Record<AccessType, boolean> = {
     // default: false,
     task: false,
+    leadtask: false,
+    opentask: false,
     file: false,
     archive: false,
     addMember: false,
@@ -59,6 +64,7 @@ export const obj: Record<AccessType, boolean> = {
     role: false,
     user: false,
     userArchive: false,
+    leadArchive: false,
     companyData: false
 
 }
@@ -68,6 +74,8 @@ const EditRoles = () => {
     const id = query.get('id');
     const [role, setRole] = useState<string | null>(null);
     const navigate = useNavigate();
+
+    const org_id = localStorage.getItem('orgId')
     const [initialValues, setInitialValues] = useState<FormValues>(() =>
         accessTypes.reduce((acc, type) => {
             acc[type] = [];
@@ -150,7 +158,8 @@ const EditRoles = () => {
 
                     const payload = {
                         role,
-                        access
+                        access,
+                        org_id
                     };
 
                     const response = await apiCreateRole(payload);
@@ -163,7 +172,7 @@ const EditRoles = () => {
                             </Notification>
                         );
                         setTimeout(() => {
-                            navigate('/app/crm/profile');
+                            navigate('/app/crm/profile?type=roles');
                             window.location.reload();
                         }, 2000);
                     } else {

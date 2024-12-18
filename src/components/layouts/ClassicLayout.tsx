@@ -16,7 +16,7 @@ const HeaderActionsStart = () => {
     return (
         <>
             <MobileNav />
-            <SideNavToggle />c
+            <SideNavToggle />
         </>
     )
 }

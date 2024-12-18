@@ -4,13 +4,14 @@ import useAuth from '@/utils/hooks/useAuth'
 import { useAppSelector } from '@/store'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
-import {  HiOutlineLogout, HiOutlineUser, HiOutlineUserAdd, HiUser } from 'react-icons/hi'
+import { HiOutlineLogout, HiOutlineUser, HiOutlineUserAdd, HiUser } from 'react-icons/hi'
 import type { CommonProps } from '@/@types/common'
 import { AiOutlineUser, AiOutlineUserAdd, } from 'react-icons/ai'
 import { useContext } from 'react'
 import { UserDetailsContext } from '@/views/Context/userdetailsContext'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import { AuthorityCheck } from '../shared'
+import { FaRegBuilding } from "react-icons/fa";
 
 type DropdownList = {
     label: string
@@ -21,61 +22,71 @@ type DropdownList = {
 
 
 const _UserDropdown = ({ className }: CommonProps) => {
-    const role=localStorage.getItem('role')
-    const data=useContext(UserDetailsContext)
-    const {roleData}=useRoleContext()
-    
+    const role = localStorage.getItem('role')
+    const data = useContext(UserDetailsContext)
+    const { roleData } = useRoleContext()
+
+
     const dropdownItemList: DropdownList[] = [
         {
-            label:"My Profile",
-            path:"/app/crm/profile?type=profile",
-            icon:<AiOutlineUser/>,
-            authority:[
+            label: "My Profile",
+            path: "/app/crm/profile?type=profile",
+            icon: <AiOutlineUser />,
+            authority: [
                 `${localStorage.getItem('role')}`
             ]
+
+        },
+
+        {
+            label:"Organisation Profile",
+            path:"/app/crm/org-profile?type=primary-details",
+            icon:<FaRegBuilding/>,
+            authority:['SUPERADMIN']
         
             },
+
         {
-        label:"Add User to Project",
-        path:"/app/crm/addmember",
-        icon:<AiOutlineUserAdd/>,
-        authority:roleData?.data?.addMember?.create
-    
+            label: "Add User to Project",
+            path: "/app/crm/addmember",
+            icon: <AiOutlineUserAdd />,
+            authority: role === 'SUPERADMIN' ? ['SUPERADMIN'] : roleData?.data?.addMember?.create
+
         },
         {
-        label:"Create User",
-        path:"/app/crm/register",
-        icon:<AiOutlineUserAdd/>,
-        authority:roleData?.data?.user?.create    
+            label: "Create User",
+            path: "/app/crm/register",
+            icon: <AiOutlineUserAdd />,
+            authority: role === 'SUPERADMIN' ? ['SUPERADMIN'] : roleData?.data?.user?.create
         },
         {
-        label:"Add User to Lead",
-        path:"/app/crm/addUserToLead",
-        icon:<AiOutlineUserAdd/>,
-        authority:roleData?.data?.addMember?.create
-    
+            label: "Add User to Lead",
+            path: "/app/crm/addUserToLead",
+            icon: <AiOutlineUserAdd />,
+            authority: role === 'SUPERADMIN' ? ['SUPERADMIN'] : roleData?.data?.addMember?.create
+
         },
-        
-      
+
+
     ]
 
-    const {  authority, email } = useAppSelector(
+    const { authority, email } = useAppSelector(
         (state) => state.auth.user
     )
 
     const { signOut } = useAuth()
-  
-    
+
+
 
     const UserAvatar = (
         <div className={classNames(className, 'flex items-center gap-2')}>
-            {data?.avatar.length ===0 ? <HiOutlineUser className=' text-xl'/>:<img src={data?data.avatar:""} className='w-8' alt="" />}
-           
+            {data?.avatar.length === 0 ? <HiOutlineUser className=' text-xl' /> : <img src={data ? data.avatar : ""} className='w-8' alt="" />}
+
             <div className="hidden md:block">
                 <div className="text-xs capitalize">
                     {authority?.[0] || 'guest'}
                 </div>
-               
+
             </div>
         </div>
     )
@@ -99,37 +110,37 @@ const _UserDropdown = ({ className }: CommonProps) => {
                 <Dropdown.Item variant="divider" />
 
                 {dropdownItemList.map((item) => {
-                
-                        return (
-                            <AuthorityCheck
+
+                    return (
+                        <AuthorityCheck
                             key={item.label}
                             userAuthority={[`${localStorage.getItem('role')}`]}
-                            authority={item.authority??[]}
-                            >
-                        <div>
-                            <Dropdown.Item
-                            key={item.label}
-                            eventKey={item.label}
-                            className="mb-1 px-0"
-                            >
-                            <Link 
-                                className="flex h-full w-full px-2" 
-                                to={item.path}
-                            >
-                                <span className="flex gap-2 items-center w-full">
-                                <span className="text-xl opacity-50">
-                                    {item.icon}
-                                </span>
-                                <span>{item.label}</span>
-                                </span>
-                            </Link>
-                            </Dropdown.Item>
-                            <Dropdown.Item variant="divider" />
-                        </div>
+                            authority={item.authority ?? []}
+                        >
+                            <div>
+                                <Dropdown.Item
+                                    key={item.label}
+                                    eventKey={item.label}
+                                    className="mb-1 px-0"
+                                >
+                                    <Link
+                                        className="flex h-full w-full px-2"
+                                        to={item.path}
+                                    >
+                                        <span className="flex gap-2 items-center w-full">
+                                            <span className="text-xl opacity-50">
+                                                {item.icon}
+                                            </span>
+                                            <span>{item.label}</span>
+                                        </span>
+                                    </Link>
+                                </Dropdown.Item>
+                                <Dropdown.Item variant="divider" />
+                            </div>
                         </AuthorityCheck>
-                        );
-                    }
-                    )}
+                    );
+                }
+                )}
                 <Dropdown.Item
                     eventKey="Sign Out"
                     className="gap-2"

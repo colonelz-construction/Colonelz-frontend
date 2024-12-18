@@ -137,6 +137,8 @@ const Roles = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
     const { roleData } = useRoleContext()
+    const org_id = localStorage.getItem('orgId')
+    const role = localStorage.getItem('role')
 
 
     const [open, setOpen] = useState(false)
@@ -218,18 +220,18 @@ const columns = useMemo<ColumnDef<Role>[]>(
             id: 'action',
             cell: (props) => {
                 const { row } = props
-                const role = row.original.role
+                const roleName = row.original.role
                 const id = row.original._id
                 const existUser = row.original.existUser
                 const { roleData } = useRoleContext()
-                const editAccess = roleData?.data?.role?.update?.includes(`${localStorage.getItem('role')}`)
-                const deleteAccess = roleData?.data?.role?.delete?.includes(`${localStorage.getItem('role')}`)
+                const editAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.role?.update?.includes(`${role}`)
+                const deleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.role?.delete?.includes(`${role}`)
                 return (
                     <span className='flex items-center text-lg gap-2'>
                         {editAccess &&
                             <Tooltip title='Edit'>
                                 <span className='hover:text-blue-500 text-lg'>
-                                    <Link to={`/app/crm/roles/edit?role=${role}&id=${id}`}>
+                                    <Link to={`/app/crm/roles/edit?role=${roleName}&id=${id}`}>
                                         <BiPencil />
                                     </Link>
                                 </span>
@@ -294,7 +296,7 @@ return (
         <div className="flex gap-3 justify-end">
             <AuthorityCheck
                 userAuthority={[`${localStorage.getItem('role')}`]}
-                authority={roleData?.data?.role?.create ?? []}
+                authority= {localStorage.getItem('role') === 'SUPERADMIN' ? ['SUPERADMIN'] : roleData?.data?.role?.create ?? []}
             >
                 <Link to={`/app/crm/roles/create`}>
                     <Button size="sm" className="ml-2" variant='solid'>

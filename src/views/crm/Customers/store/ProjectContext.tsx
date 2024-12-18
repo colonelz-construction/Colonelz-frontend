@@ -48,14 +48,16 @@ interface ProjectContextType {
 const ProjectContext = createContext<ProjectContextType>({ projects: [], apiData: {},loading:true });
 
 export const useProjectContext = () => useContext(ProjectContext);
+const org_id = localStorage.getItem('orgId')
 export const ProjectProvider = ({ children }: { children: ReactNode }) => {
     const [projects, setProjects] = useState<ProjectData[]>([]);
     const [apiData, setApiData] = useState<Data>();
     const [loading, setLoading] = useState(true);
 useEffect(() => {
     const fetchData = async () => {
-        const response = await apiGetCrmProjects();
+        const response = await apiGetCrmProjects(org_id);
         const data = response.data.projects;
+        console.log(data)
         setProjects(data);
         setLoading(false);
         setApiData(response.data);

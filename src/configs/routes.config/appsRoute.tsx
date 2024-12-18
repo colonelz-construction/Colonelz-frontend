@@ -12,9 +12,30 @@ const appsRoute: Routes = [
         authority: [],
     },
     {
+        key: 'appsCrm.taskManager',
+        path: `${APP_PREFIX_PATH}/crm/taskManager`,
+        component: lazy(() => import('@/views/crm/TaskManager')),
+
+        authority: [],
+    },
+    {
+        key: 'appsCrm.ai-chatbot',
+        path: `${APP_PREFIX_PATH}/crm/ai-chatbot`,
+        component: lazy(() => import('@/views/crm/Chatbot/index')),
+
+        authority: [],
+    },
+    {
         key: 'appsCrm.register',
         path: `${APP_PREFIX_PATH}/crm/profile`,
         component: lazy(() => import('@/views/crm/Profile/index')),
+
+        authority: [],
+    },
+    {
+        key: 'appsCrm.register',
+        path: `${APP_PREFIX_PATH}/crm/org-profile`,
+        component: lazy(() => import('@/views/crm/OrgProfile/index')),
 
         authority: [],
     },
@@ -208,16 +229,6 @@ const appsRoute: Routes = [
     },
     {
         key: 'appsCrm.fileManager',
-        path: `${APP_PREFIX_PATH}/crm/fileManager/project/templates/residential/subfolder/files`,
-        component: lazy(
-            () => import('@/views/crm/FileManager/Components/Template/Files'),
-        ),
-
-        authority: [],
-        meta: {},
-    },
-    {
-        key: 'appsCrm.fileManager',
         path: `${APP_PREFIX_PATH}/crm/layout`,
         component: lazy(() => import('@/views/crm/Layout/layout')),
 
@@ -330,6 +341,30 @@ const appsRoute: Routes = [
             () =>
                 import(
                     '@/views/crm/CustomerDetail/Task/TaskDetails/TaskDetails'
+                ),
+        ),
+
+        authority: [],
+    },
+    {
+        key: 'appsCrm.inventory',
+        path: `${APP_PREFIX_PATH}/crm/Tasks/OpenTaskDetails`,
+        component: lazy(
+            () =>
+                import(
+                    '@/views/crm/OpenTaskManger/Task/TaskDetails/TaskDetails'
+                ),
+        ),
+
+        authority: [],
+    },
+    {
+        key: 'appsCrm.inventory',
+        path: `${APP_PREFIX_PATH}/crm/Leads/TaskDetails`,
+        component: lazy(
+            () =>
+                import(
+                    '@/views/crm/LeadsDetails/Task/TaskDetails/TaskDetails'
                 ),
         ),
 

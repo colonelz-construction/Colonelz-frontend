@@ -2,16 +2,10 @@
 import { useEffect, useState } from 'react'
 import Button from '@/components/ui/Button'
 import Drawer from '@/components/ui/Drawer'
-import { HiOutlinePencil } from 'react-icons/hi'
 import { Progress, Tabs } from '@/components/ui';
 import TabList from '@/components/ui/Tabs/TabList';
 import TabNav from '@/components/ui/Tabs/TabNav';
 import TabContent from '@/components/ui/Tabs/TabContent';
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdOutlineAdd } from 'react-icons/md';
-import Subtasks from './Subtasks/Subtasks';
-import AddSubTask from './Subtasks/AddSubtask';
-import { AiOutlineEye } from 'react-icons/ai';
-import { BiArrowFromRight } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 
 type Task = {
@@ -26,9 +20,9 @@ type Task = {
     task_status: string;
     task_priority: string;
     task_createdOn: string;
+    task_assignee: string;
     reporter: string;
     task_createdBy: string;
-    number_of_subtasks: number;
     percentage:string
 };
 type Data={
@@ -49,6 +43,7 @@ const formateDate = (dateString:string) => {
 const TaskDetails = (Data:Data) => {
     const [verticalOpen, setVerticalOpen] = useState(false)
     const navigate=useNavigate();
+
     
     
     const onVerticalOpen = () => {
@@ -108,7 +103,6 @@ const TaskDetails = (Data:Data) => {
                     <TabContent value="tab1">
                     <CustomerInfoField title="Creator" value={Data.data.task_createdBy} />
                     <CustomerInfoField title="Created On" value={formateDate(Data.data.task_createdOn)} />
-                    <div className='p-1'> </div>
                     <CustomerInfoField title="Task Name" value={(Data.data.task_name)} />
                     <CustomerInfoField title="Task Status" value={(Data.data.task_status)} />
                     <CustomerInfoField title="Task Priority" value={(Data.data.task_priority)} />
@@ -117,7 +111,7 @@ const TaskDetails = (Data:Data) => {
                     <CustomerInfoField title="Estimated Task Start Date" value={formateDate(Data.data.estimated_task_start_date)} />
                     <CustomerInfoField title="Estimated Task End Date" value={formateDate(Data.data.estimated_task_end_date)} />
                     <CustomerInfoField title="Reporter" value={(Data.data.reporter)} />
-                    <CustomerInfoField title="Number of Subtasks" value={Data.data.number_of_subtasks} />
+                    <CustomerInfoField title="Assignee" value={(Data.data.task_assignee)} />
                     <div><p><span className='text-gray-700 dark:text-gray-200 font-semibold'>Description: </span>{Data.data.task_description}</p></div>
                     {/* <div className='my-4'>
                     <div className='flex justify-between items-center py-2'>

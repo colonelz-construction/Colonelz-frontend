@@ -6,14 +6,14 @@ import React, { useContext } from 'react'
 import Profile from './profile'
 import Password from './passsword'
 import Users from '../users'
-import { UserDetailsContext, UserDetailsProvider } from '@/views/Context/userdetailsContext'
+import { UserDetailsContext} from '@/views/Context/userdetailsContext'
 import Roles from './Roles'
 import { useRoleContext } from '../Roles/RolesContext'
 import { AuthorityCheck } from '@/components/shared'
 import ArchivedUsers from '../users/ArchivedUsers'
 import { useNavigate } from 'react-router-dom'
 
-const Index = () => {
+  const Index = () => {
     const userRole=localStorage.getItem('role') || ''
     const {roleData}=useRoleContext()
     const data = useContext(UserDetailsContext);
@@ -36,9 +36,9 @@ const Index = () => {
       navigate(`${location.pathname}?${currentUrlParams.toString()}`);
   };
     
-    const userAccess=roleData?.data?.user?.read?roleData?.data?.user?.read.includes(userRole):false
-    const roleAccess=roleData?.data?.role?.read?roleData?.data?.role?.read.includes(userRole):false
-    const archivedAccess=roleData?.data?.userArchive?.read?roleData?.data?.userArchive?.read.includes(userRole):false
+    const userAccess= userRole === 'SUPERADMIN' ? true : roleData?.data?.user?.read?roleData?.data?.user?.read.includes(userRole):false
+    const roleAccess= userRole === 'SUPERADMIN' ? true : roleData?.data?.role?.read?roleData?.data?.role?.read.includes(userRole):false
+    const archivedAccess= userRole === 'SUPERADMIN' ? true : roleData?.data?.userArchive?.read?roleData?.data?.userArchive?.read.includes(userRole):false
     
 
     

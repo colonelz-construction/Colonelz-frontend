@@ -124,9 +124,14 @@ const Index = () => {
   const leadId = queryParams.get('lead_id');
   const leadName = queryParams.get('lead_name');
   const folderName = queryParams.get('folder_name');
+  const role = localStorage.getItem('role')
+  const org_id : any = localStorage.getItem('orgId')
+
+  console.log(leadData)
+
 
   const { roleData } = useRoleContext();
-  const fileUploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
+  const fileUploadAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.file?.create?.includes(`${role}`)
   const [users, setUsers] = useState<User[]>([]);
   useEffect(() => {
     const fetchDataAndLog = async () => {
@@ -254,6 +259,7 @@ const Index = () => {
       file_id: selectedFiles,
       folder_name: folderName,
       lead_id: leadId,
+      org_id,
     };
     try {
       await apiDeleteFileManagerFiles(postData);
@@ -283,7 +289,8 @@ const Index = () => {
       bcc: selectedEmailsBCc,
       subject: subject,
       body: body,
-      user_id: localStorage.getItem('userId')
+      user_id: localStorage.getItem('userId'),
+      org_id,
     };
 
     const response = await apiGetCrmFileManagerShareFiles(postData);
@@ -454,8 +461,8 @@ const Index = () => {
         cell: ({ row }) => {
           return <div className='flex items-center gap-2'>
             <AuthorityCheck
-              userAuthority={[`${localStorage.getItem('role')}`]}
-              authority={roleData?.data?.file?.delete ?? []}
+              userAuthority={[`${role}`]}
+              authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.file?.delete ?? []}
             >
               <MdDeleteOutline className='text-xl cursor-pointer hover:text-red-500' onClick={() => openDialog3(row.original.fileId)} />
             </AuthorityCheck>
@@ -466,7 +473,7 @@ const Index = () => {
     ],
     []
   )
-  const role = localStorage.getItem('role')
+  // const role = localStorage.getItem('role')
 
   const table = useReactTable({
     data: leadData,
@@ -696,6 +703,7 @@ const Index = () => {
             formData.append('file_id', values.file_id)
             // formData.append('user_name',values.user_name)
             formData.append('type', values.type)
+            formData.append('org_id', org_id)
 
             const response = await apiGetCrmFileManagerShareContractFile(formData)
             // console.log(response);
@@ -888,6 +896,8 @@ const Index = () => {
               for (let i = 0; i < values.files.length; i++) {
                 formData.append('files', values.files[i]);
               }
+
+              formData.append('org_id', org_id)
               const response = await apiGetCrmFileManagerCreateLeadFolder(formData)
               // const responseData=await response.json()
               setFormLoading(false)

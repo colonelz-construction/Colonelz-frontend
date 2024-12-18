@@ -56,13 +56,14 @@ const App = () => {
 
   const location = useLocation();
   const [data, setdata] = useState<MomDataType[] | []>([]);
+  const org_id = localStorage.getItem('orgId')
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const projectId = searchParams.get('project_id');
     if (projectId) {
       const fetchData = async () => {
         try {
-          const response = await apiGetCrmProjectsMom(projectId);
+          const response = await apiGetCrmProjectsMom(projectId, org_id);
           const data = response;
           setdata(data.data.mom_data);
         } catch (error) {

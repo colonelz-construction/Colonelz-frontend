@@ -126,6 +126,9 @@ const ArchivedUsers = () => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [dialogIsOpen1, setIsOpen1] = useState(false)
     const [userId, setUserId] = useState('')
+    const org_id = localStorage.getItem('orgId')
+
+    const role = localStorage.getItem('role')
     
         const openDialog = (UserId:any) => {
             setIsOpen(true)  
@@ -144,7 +147,7 @@ const ArchivedUsers = () => {
 
     useEffect(() => {
       const fetchData = async () => {
-        const response = await apiGetDeletedUsers(); 
+        const response = await apiGetDeletedUsers(org_id); 
         
         const data =  response
         setLoading(false)
@@ -158,7 +161,7 @@ const ArchivedUsers = () => {
     }, []);
 
     const deleteuser=async(UserId:string)=>{
-        const response=await apiPermanantlyDeleteUsers(UserId);
+        const response=await apiPermanantlyDeleteUsers(UserId, org_id);
         
         
         if(response.code===200){
@@ -217,8 +220,10 @@ const ArchivedUsers = () => {
             cell: ({row}) => {
                 const {roleData}=useRoleContext()
                 const role=localStorage.getItem('role') || ''
-                const restoreAccess=roleData?.data?.userArchive?.restore?roleData?.data?.userArchive?.restore.includes(role):false
-                const deleteAccess=roleData?.data?.userArchive?.delete?roleData?.data?.userArchive?.delete.includes(role):false
+                
+                const restoreAccess=role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.userArchive?.restore?roleData?.data?.userArchive?.restore.includes(role):false
+
+                const deleteAccess=role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.userArchive?.delete?roleData?.data?.userArchive?.delete.includes(role):false
                 
                 return (
                     <div className="">
@@ -227,14 +232,12 @@ const ArchivedUsers = () => {
                         <p className=" text-xl hover:text-red-500 cursor-pointer" onClick={()=>openDialog1(row.original.UserId)}><LiaTrashRestoreSolid/></p>
                         </Tooltip>
                         }
-                        <AuthorityCheck 
-                        userAuthority={[`${role}`]}
-                        authority={roleData?.data?.userArchive?.delete??[]}
-                         >
+                        {
+                            deleteAccess && 
                        <Tooltip title='Delete'>
                         <p className=" text-xl hover:text-red-500 cursor-pointer" onClick={()=>openDialog(row.original.UserId)}><AiOutlineDelete/></p>
                         </Tooltip>
-                        </AuthorityCheck>
+                    }
                     </div>
                 )
             },

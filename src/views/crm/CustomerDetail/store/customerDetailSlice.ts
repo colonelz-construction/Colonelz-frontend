@@ -52,6 +52,7 @@ export type Customer = {
 }
 export type Tasks = {
     project_id: string;
+    lead_id: string;
     task_id: string;
     task_name: string;
     task_description: string;

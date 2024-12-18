@@ -12,7 +12,7 @@ const Template = () => {
   const {roleData} = useRoleContext()
   const role = localStorage.getItem('role')
   return (
-    <div className='grid xl:grid-cols-4 sm:grid-cols-3 gap-4 cursor-pointer'>
+    <div className='grid xl:grid-cols-3 sm:grid-cols-3 gap-4 cursor-pointer'>
      {role !== 'Jr. Executive HR & Marketing' && (
   <>
     <Card 
@@ -36,16 +36,6 @@ const Template = () => {
           <div className=' text-lg ' ><FaRegFolderOpen/></div>
        <p> Company Policies</p>
         </div></Card>
-        <AuthorityCheck
-                       userAuthority={[`${localStorage.getItem('role')}`]}
-                       authority={roleData?.data?.archive?.read??[]}
-                       >
-        
-      <Card onClick={()=>navigate('/app/crm/fileManager/archive')}>  <div className='flex gap-4'>
-          <div className=' text-lg ' ><IoMdArchive /></div>
-       <p> Archive</p>
-        </div></Card>
-        </AuthorityCheck>
       
       </div>
   )

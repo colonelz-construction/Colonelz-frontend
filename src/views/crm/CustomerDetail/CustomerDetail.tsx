@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import Container from '@/components/shared/Container'
 import CustomerProfile from './components/CustomerProfile'
-import { injectReducer, setUser } from '@/store'
 import useQuery from '@/utils/hooks/useQuery'
 import MOM from './components/MOM/Mom'
 import { Skeleton, Tabs } from '@/components/ui'
@@ -9,18 +8,17 @@ import TabList from '@/components/ui/Tabs/TabList'
 import TabNav from '@/components/ui/Tabs/TabNav'
 import TabContent from '@/components/ui/Tabs/TabContent'
 import { useLocation, useNavigate } from 'react-router-dom'
-import AllMom from './components/MOM/AllMom'
-import { apiGetCrmProjectActivity, apiGetCrmProjectsMom, apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList } from '@/services/CrmService'
-import { FileItem } from '../FileManager/Components/Project/data'
+import { apiGetCrmProjectsMom, apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList, apiGetUsersListProject } from '@/services/CrmService'
 import Index from './Quotation'
-import { ProjectProvider } from '../Customers/store/ProjectContext'
 import Task from './Task/index'
 import Activity from './Project Progress/Activity'
 import Timeline from './Timeline/Timeline'
 import { AuthorityCheck } from '@/components/shared'
 import { useRoleContext } from '../Roles/RolesContext'
-import { Customer, Tasks } from './store'
+import { Customer, Data, Tasks } from './store'
 import { FileItemType } from './Quotation/Quotations'
+import Assignee, { UsersResponse } from './Project Progress/Assignee'
+import { update } from 'lodash'
 
 
 export type QuotationResponseType = {
@@ -75,15 +73,19 @@ const CustomerDetail = () => {
     mom: queryParams.get('type') || '',
   };
   const [details, setDetails] = useState<any | null>(null);
-  const [projectData, setProjectData] = useState<Customer[]>([])
+  const [projectData, setProjectData] = useState<any>()
+  console.log(projectData)
   const [task, setTaskData] = useState<Tasks[]>([])
+  const [data, setData] = useState<any>([])
   const [report, setReport] = useState<ReportResponse>()
   const [activity, setActivity] = useState<any>()
-  // console.log(activity)
-  const [users, setUsers] = useState<string[]>([])
-  const quotationAccess = roleData?.data?.quotation?.read?.includes(`${localStorage.getItem('role')}`)
-  const momAccess = roleData?.data?.mom?.read?.includes(`${localStorage.getItem('role')}`)
-  const taskAccess = roleData?.data?.task?.read?.includes(`${localStorage.getItem('role')}`)
+  const [users, setUsers] = useState<any>([])
+  const quotationAccess = role === 'SUPERADMIN' ? true : roleData?.data?.quotation?.read?.includes(`${localStorage.getItem('role')}`)
+  const momAccess = role === 'SUPERADMIN' ? true : roleData?.data?.mom?.read?.includes(`${localStorage.getItem('role')}`)
+  const taskAccess = role === 'SUPERADMIN' ? true : roleData?.data?.task?.read?.includes(`${localStorage.getItem('role')}`)
+  const projectAccess = role === 'SUPERADMIN' ? true : roleData?.data?.project?.read?.includes(`${localStorage.getItem('role')}`)
+
+  const org_id = localStorage.getItem('orgId')
 
   const handleTabChange = (selectedTab: any) => {
     const currentUrlParams = new URLSearchParams(location.search);
@@ -94,11 +96,13 @@ const CustomerDetail = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await apiGetCrmSingleProjects(allQueryParams.project_id);
-        const Report = await apiGetCrmSingleProjectReport(allQueryParams.project_id);
+        const response = await apiGetCrmSingleProjects(allQueryParams.project_id, org_id);
+        const Report = await apiGetCrmSingleProjectReport(allQueryParams.project_id, org_id);
 
 
         const list = await apiGetUsersList(allQueryParams.project_id)
+
+        console.log(list)
         const data = response
         setActivity(data.data)
         setProjectData(data.data)
@@ -118,6 +122,12 @@ const CustomerDetail = () => {
     const fetchDataAndLog = async () => {
       try {
         const leadData = await apiGetCrmSingleProjectQuotation(allQueryParams.project_id);
+        const response = await apiGetUsersListProject(allQueryParams.project_id)
+
+        const data: UsersResponse = response
+
+        setData(data.data)
+        console.log(data)
 
         setFileData(leadData.data);
       } catch (error) {
@@ -132,7 +142,7 @@ const CustomerDetail = () => {
 
     const fetchDataAndLog = async () => {
       try {
-        const response = await apiGetCrmProjectsMom(allQueryParams.project_id);
+        const response = await apiGetCrmProjectsMom(allQueryParams.project_id, org_id);
         setDetails(response.data);
       } catch (error) {
         console.error('Error fetching lead data', error);
@@ -148,7 +158,8 @@ const CustomerDetail = () => {
 
     const fetchDataAndLog = async () => {
       try {
-        const taskResponse = await apiGetCrmProjectsTaskData(allQueryParams.project_id);
+        const taskResponse = await apiGetCrmProjectsTaskData(allQueryParams.project_id, org_id);
+        console.log(taskResponse.data)
         setTaskData(taskResponse.data);
       } catch (error) {
         console.error('Error fetching task data', error);
@@ -157,8 +168,6 @@ const CustomerDetail = () => {
 
     fetchDataAndLog();
   }, [allQueryParams.project_id, taskAccess]);
-
-
 
   return (
     <>
@@ -182,12 +191,18 @@ const CustomerDetail = () => {
                 }
                 <AuthorityCheck
                   userAuthority={[`${localStorage.getItem('role')}`]}
-                  authority={['ADMIN']}
+                  authority={['ADMIN', 'SUPERADMIN']}
                 >
                   <TabNav value="activity">Project Activity</TabNav>
                 </AuthorityCheck>
                 {taskAccess &&
                   <TabNav value="timeline">Timeline</TabNav>
+                }
+                {
+                  <TabNav value="assignee" className='flex gap-1'>
+                    <span>Assignee</span>
+                    <span className={data?.length == 0 ? "text-red-500" : ""}>{"("}{data?.length}{")"}</span>
+                  </TabNav>
                 }
               </>
 
@@ -214,6 +229,9 @@ const CustomerDetail = () => {
               </TabContent>
               <TabContent value="timeline">
                 <Timeline />
+              </TabContent>
+              <TabContent value="assignee">
+                <Assignee data={data} />
               </TabContent>
 
             </div>

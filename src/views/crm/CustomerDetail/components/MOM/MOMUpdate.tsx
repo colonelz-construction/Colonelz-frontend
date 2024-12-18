@@ -18,6 +18,8 @@ const YourFormComponent = () => {
   const [details, setDetails] = useState<any>({})
   const [initialValues, setInitialValues] = useState<any>({})
   const [imgAttributes, setImgAttributes] = useState<any>({ width: '', style: '' });
+  const org_id = localStorage.getItem('orgId')
+
   // console.log(initialValues.remark)
   // console.log(imgAttributes)
 
@@ -43,7 +45,7 @@ const YourFormComponent = () => {
   useEffect(() => {
     const fetchDataAndSetValues = async () => {
       try {
-        const response:any = await apiGetCrmProjectsSingleMom(allQueryParams.project_id, allQueryParams.mom_id)
+        const response:any = await apiGetCrmProjectsSingleMom(allQueryParams.project_id, allQueryParams.mom_id, org_id)
         const fetchedDetails = response.data[0]
         setDetails(fetchedDetails)
         const clientOptions = fetchedDetails.attendees.client_name.map((item: string) => ({
@@ -126,7 +128,7 @@ const YourFormComponent = () => {
           
 
           try {
-            const response = await apiGetMomUpdate(formData,allQueryParams.project_id,allQueryParams.mom_id)
+            const response = await apiGetMomUpdate(formData,allQueryParams.project_id,allQueryParams.mom_id, org_id)
             if (response.code === 200) {
               setSubmitting(false)
               toast.push(

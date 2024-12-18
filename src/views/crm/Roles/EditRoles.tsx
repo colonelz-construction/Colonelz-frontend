@@ -9,8 +9,8 @@ import { StickyFooter } from '@/components/shared';
 import { useNavigate } from 'react-router-dom';
 import { obj, permissionsMap } from './CreateRole';
 
-type Permission = 'create' | 'read' | 'update' | 'delete'| 'restore';
-type AccessType = 'lead' | 'user' | 'project' | 'task' | 'contract' | 'quotation' | 'file' | 'archive' | 'mom' | 'addMember' | 'role' | 'companyData'| 'userArchive';
+type Permission = 'create' | 'read' | 'update' | 'delete'| 'restore' | 'move';
+type AccessType = 'lead' | 'user' | 'project' | 'task' | 'leadtask' | 'opentask' | 'contract' | 'quotation' | 'file' | 'archive' | 'mom' | 'addMember' | 'role' | 'companyData'| 'userArchive' | 'leadArchive';
 
 type AccessPermissions = Permission[];
 
@@ -19,7 +19,7 @@ export type FormValues = {
 };
 
 const accessTypes: AccessType[] = [
-    'lead', 'user', 'project', 'task', 'contract', 'quotation', 'file', 'archive', 'mom', 'addMember', 'role','companyData','userArchive'
+    'lead', 'user', 'project', 'task', 'leadtask', 'opentask', 'contract', 'quotation', 'file', 'archive', 'mom', 'addMember', 'role','companyData','userArchive', 'leadArchive'
 ];
 
 
@@ -29,8 +29,10 @@ const EditRoles = () => {
     const role = query.get('role');
     const id = query.get('id');
     const navigate = useNavigate();
-    const [checkType, setCheckType] = useState(obj);
+    const [checkType, setCheckType] = useState<any>(obj);
     const [newName, setNewName] = useState(role);
+    const org_id = localStorage.getItem('orgId')
+
 
 
     const [initialValues, setInitialValues] = useState<FormValues>(() =>
@@ -73,7 +75,7 @@ const EditRoles = () => {
         for (const key in checkType) {
             const typedKey = key as AccessType;
             if (initialValues[typedKey].length == permissionsMap[typedKey].length) {
-                setCheckType(prevCheckType => ({
+                setCheckType((prevCheckType : any) => ({
                     ...prevCheckType, 
                     [typedKey]: true
                 }));
@@ -134,7 +136,8 @@ const EditRoles = () => {
 
         const payload = {
             role: newName,
-            access
+            access,
+            org_id
         };
 
         const response = await apiEditRoles(payload, id);

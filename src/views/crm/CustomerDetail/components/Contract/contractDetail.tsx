@@ -150,6 +150,8 @@ const ContractDetails = (data: FileItemProps) => {
     const { roleData } = useRoleContext()
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
+    const org_id = localStorage.getItem('orgId')
+
 
 
 
@@ -170,6 +172,7 @@ const ContractDetails = (data: FileItemProps) => {
             file_id: fileID,
             status: status,
             remark: remark,
+            org_id,
         };
         try {
             const response = await apiGetCrmProjectShareContractApproval(postData);
@@ -203,9 +206,38 @@ const ContractDetails = (data: FileItemProps) => {
                         accessorKey: 'file_name',
                         cell: ({ row }) => {
                             const fileName = row.original.file_name;
+                            const [isHovered, setIsHovered] = useState(false);
+                            const hoverTimeout = useRef<any>(null);
+
+                            const handleMouseEnter = () => {
+                                if (hoverTimeout.current) {
+                                    clearTimeout(hoverTimeout.current);
+                                }
+                                setIsHovered(true);
+                            };
+
+                            const handleMouseLeave = () => {
+                                hoverTimeout.current = setTimeout(() => {
+                                    setIsHovered(false);
+                                }, 200);
+                            };
                             return (
-                                <a href={`${row.original.files[0].fileUrl}`} className=' cursor-pointer' target='_blank'>
-                                    <div>{fileName.length > 20 ? `${fileName.substring(0, 20)}...` : fileName}</div></a>)
+                                <div
+                                    className='relative inline-block'
+                                    onMouseEnter={handleMouseEnter}
+                                    onMouseLeave={handleMouseLeave}
+                                >
+                                    <a href={`${row.original.files[0].fileUrl}`} className=' cursor-pointer' target='_blank'>
+                                        <div>{fileName.length > 20 ? `${fileName.substring(0, 20)}...` : fileName}</div></a>
+                                    {isHovered && (
+                                        <div className='absolute bottom-0 left-full ml-2 bg-white border border-gray-300 p-2 shadow-lg z-9999 whitespace-nowrap transition-opacity duration-200'>
+                                            <p>File Name: {fileName}</p>
+
+                                        </div>
+                                    )}
+                                </div>
+                            );
+
                         }
                     },
 
@@ -237,7 +269,7 @@ const ContractDetails = (data: FileItemProps) => {
                                     <div>Rejected</div>
                                 ) : status === 'pending' ?
                                     (
-                                        !roleData.data.contract?.update?.includes(`${role}`) ? (
+                                        (role !== 'SUPERADMIN' && !roleData.data.contract?.update?.includes(`${role}`)) ? (
                                             <div>Pending</div>
                                         ) : (
                                             <div className='flex gap-1'>
@@ -250,7 +282,7 @@ const ContractDetails = (data: FileItemProps) => {
                                                 >
                                                     <h3 className='mb-4'> Reject Remarks</h3>
                                                     <Formik
-                                                        initialValues={{ lead_id: leadId, file_id: fileId, status: 'rejected', remark: '' }}
+                                                        initialValues={{ lead_id: leadId, file_id: fileId, status: 'rejected', remark: '', org_id }}
                                                         validationSchema={Yup.object({ remark: Yup.string().required('Required') })}
                                                         onSubmit={async (values, { setSubmitting }) => {
                                                             setSubmitting(true);
@@ -419,6 +451,7 @@ const ContractDetails = (data: FileItemProps) => {
             file_id: selectedFileIds[0],
             folder_name: 'Quotation',
             lead_id: leadId,
+            org_id,
         };
         try {
             const response = await apiGetCrmProjectShareQuotation(postData);
@@ -456,6 +489,7 @@ const ContractDetails = (data: FileItemProps) => {
         formData.append('project_name', values.project_name);
         formData.append('site_location', values.site_location);
         formData.append('user_id', localStorage.getItem('userId') as string);
+        formData.append('org_id', localStorage.getItem('orgId') as string);
 
         setLoading(true);
         values.quotation.forEach((file: File) => {

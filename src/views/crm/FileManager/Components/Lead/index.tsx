@@ -108,12 +108,15 @@ const Index = () => {
     const queryParams = new URLSearchParams(location.search);
     const leadId = queryParams.get('lead_id');
     const leadName = queryParams.get('lead_name');
-    const role = localStorage.getItem('role')
+    const role :any = localStorage.getItem('role')
     const { roleData } = useRoleContext();
-    const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
+    const org_id = localStorage.getItem('orgId')
+
+    const uploadAccess = role === 'SUPERADMIN' ? true : roleData?.data?.file?.create?.includes(`${role}`)
     useEffect(() => {
         const fetchData = async () => {
             const data = await fetchLeadData(leadId);
+            console.log(data)
             setLeadData(data);
             setLoading(false);
         };
@@ -151,7 +154,8 @@ const Index = () => {
             lead_id: leadId,
             folder_name: folder_name,
             type: "",
-            project_id: ""
+            project_id: "",
+            org_id
         };
 
         const response = await apiDeleteFileManagerFolders(postData);
@@ -238,7 +242,7 @@ const Index = () => {
                     return (
                         <AuthorityCheck
                             userAuthority={[`${localStorage.getItem('role')}`]}
-                            authority={roleData?.data?.file?.delete ?? []}
+                            authority={ role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.file?.delete ?? []}
                         >
                             <div className=' ml-3 cursor-pointer' onClick={() => openDialog2(row.original.folder_name)}>
                                 <Tooltip title="Delete">
@@ -274,20 +278,21 @@ const Index = () => {
     }
 
     const filteredProjectData = useMemo(() => {
-        if (!roleData?.data?.quotation?.read?.includes(`${role}`)) {
+        if (role !== "SUPERADMIN" && !roleData?.data?.quotation?.read?.includes(`${role}`)) {
             return leadData.filter(item =>
                 item.folder_name.toLowerCase() !== 'quotation' &&
                 item.folder_name.toLowerCase() !== 'procurement data'
             );
         }
-        else if (!roleData?.data?.contract?.read?.includes(`${role}`)) {
+        if (role !== "SUPERADMIN" && !roleData?.data?.contract?.read?.includes(`${role}`)) {
             return leadData.filter(item =>
                 item.folder_name.toLowerCase() !== 'contract'
             )
         }
+
+        
         return leadData;
     }, [leadData, role]);
-    // console.log(filteredProjectData);
 
 
     const table = useReactTable({

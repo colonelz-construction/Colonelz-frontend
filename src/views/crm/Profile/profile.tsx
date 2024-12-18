@@ -42,6 +42,8 @@ const Profile = ({
 }: ProfileProps) => {
 
     const [usernameData, setUserNameData] = useState<any>(data?.username);
+    const org_id : any= localStorage.getItem('orgId')
+
     
     const [avatarUrl, setAvatarUrl] = useState<string | undefined>(data?.avatar);
     const onSetFormFile = (
@@ -63,6 +65,7 @@ const Profile = ({
         formData.append('userId', values.userId);
         formData.append('file', values.avatar); 
         formData.append('user_name', usernameData); 
+        formData.append('org_id', org_id); 
         
         const response = await addProfilePhoto(formData); 
 
@@ -130,6 +133,7 @@ const Profile = ({
                         onChange={(event:any) => {
                         const file = event.target.files[0];
                         const url = URL.createObjectURL(file);
+                        console.log(url)
                         form.setFieldValue('avatarUrl', url);
                         form.setFieldValue(field.name, file);
                         setAvatarUrl(url);

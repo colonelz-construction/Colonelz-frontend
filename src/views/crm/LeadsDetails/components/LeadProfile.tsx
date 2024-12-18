@@ -39,7 +39,8 @@ interface Note {
 type AddProject ={
     lead_id:string
     user_id:string | null
-    type:string
+    type:string,
+    org_id : string | null
 }
 
 
@@ -53,9 +54,13 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
     const myParam = queryParams.get('id') || ''
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [dialogIsOpen2, setIsOpen2] = useState(false)
+    const org_id = localStorage.getItem('orgId')
+
+
+    const role = localStorage.getItem('role')
     const [project, setProject] = useState<AddProject>()
     const {roleData} = useRoleContext()
-    const createProjectAccess = roleData?.data?.project?.create?.includes(`${localStorage.getItem('role')}`)
+    const createProjectAccess = role === 'SUPERADMIN' ? true : roleData?.data?.project?.create?.includes(`${role}`)
     
 
     const onDialogClose = () => {
@@ -63,7 +68,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
     }
     const openDialog2 = () => {
         setIsOpen2(true)
-        setProject({lead_id:myParam,user_id:localStorage.getItem('userId'),type:'true'})
+        setProject({lead_id:myParam,user_id:localStorage.getItem('userId'),type:'true', org_id})
     }
 
     const onDialogClose2 = () => {
@@ -192,9 +197,9 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
                         </Dialog>
                     </div>
                     <div className=''>
-                    <div className='my-3'>
-                                                <p>Description</p>
-                                                <p className="text-gray-700 dark:text-gray-200 font-semibold text-wrap">
+                    <div className='flex mb-3'>
+                                                <p className=' text-gray-700 dark:text-gray-200 font-semibold'>Description:</p>
+                                                <p className="text-wrap">
                                                    <div className="remark-content" dangerouslySetInnerHTML={{ __html: data?.notes?data?.notes[0]?.content:"" }} /></p>
                                             </div>
                                        { createProjectAccess && data?.contract_Status &&<>

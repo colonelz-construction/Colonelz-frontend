@@ -24,6 +24,8 @@ const EditLead = ({ details }: any) => {
   const queryParams = new URLSearchParams(location.search);
   const LeadId = queryParams.get('id') || '';
   const data = details.data[0];
+  const org_id = localStorage.getItem('orgId')
+
 
   const statusOptions = [
     { value: 'No Response', label: 'No Response' },
@@ -39,6 +41,7 @@ const EditLead = ({ details }: any) => {
       <Formik
         initialValues={{
           user_id: localStorage.getItem('userId') || '',
+          org_id,
           lead_id: LeadId,
           lead_name: data.name,
           email: data.email,

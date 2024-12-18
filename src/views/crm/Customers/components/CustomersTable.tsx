@@ -105,7 +105,7 @@ const formateDate = (dateString:string) => {
     const month=(date.getMonth() + 1).toString().padStart(2, '0');
     const year=date.getFullYear();
     return `${day}-${month}-${year}`;
-    }
+}
 const Filtering = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')

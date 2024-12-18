@@ -1,5 +1,5 @@
 export type SignInCredential = {
-    user_name: string
+    email: string
     password: string
 }
 
@@ -20,13 +20,14 @@ export type SignUpCredential = {
     user_name: string
     email: string
     role: string
+    org_id: string | null
 }
 
 export type ForgotPassword = {
     email: string
 }
 export type OtpVerify = {
-    email: string
+    email: string | null
     otp: string
 }
 

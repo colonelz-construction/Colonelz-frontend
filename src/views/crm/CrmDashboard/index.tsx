@@ -4,6 +4,8 @@ import { ProjectProvider } from '../Customers/store/ProjectContext'
 
 const Index = () => {
   return (
+
+    // <div>dashboard</div>
     <CrmDashboard/>
   )
 }

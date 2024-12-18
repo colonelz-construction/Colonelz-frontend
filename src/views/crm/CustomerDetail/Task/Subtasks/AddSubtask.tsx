@@ -35,6 +35,8 @@ const AddSubTask = ({data,users}:Data) => {
     const location=useLocation()
     const queryParams=new URLSearchParams(location.search)
     const project_id=queryParams.get('project_id')
+    const org_id = localStorage.getItem('orgId')
+
     const task_id=queryParams.get('task')
     
     
@@ -75,6 +77,7 @@ const priorityOptions = [
                 <Formik 
                        initialValues={{
                         user_id: localStorage.getItem('userId') || '',
+                        org_id,
                         project_id: project_id || '',
                         task_id: task_id || '',
                         sub_task_name: "",
@@ -105,8 +108,8 @@ const priorityOptions = [
                         ),
                         sub_task_status: Yup.string().required('Subtask Status is required'),
                         sub_task_priority: Yup.string().required('Subtask Priority is required'),
-                        sub_task_assignee: Yup.string().required('Subtask Assignee is required'),
-                        sub_task_reporter: Yup.string().required('Subtask Reporter is required'),
+                        // sub_task_assignee: Yup.string().required('Subtask Assignee is required'),
+                        // sub_task_reporter: Yup.string().required('Subtask Reporter is required'),
                       })}
                      onSubmit={async(values, actions) => {
                         setLoading(true)
@@ -131,21 +134,21 @@ const priorityOptions = [
                             <div className=' grid grid-cols-2 gap-x-5'>
 
 
-                            <FormItem label='Subtask Name'
+                            <FormItem label='Name'
                             asterisk
                         invalid={errors.sub_task_name && touched.sub_task_name}
                         errorMessage={errors.sub_task_name}
                             >
-                                <Field name='sub_task_name'  component={Input} placeholder='Subtask Name'/>
+                                <Field name='sub_task_name'  component={Input} placeholder='Name'/>
                             </FormItem>
 
 
-                            <FormItem label='Subtask Assignee'
-                            asterisk
+                            <FormItem label='Assignee'
+                            
                             invalid={errors.sub_task_assignee && touched.sub_task_assignee}
                             errorMessage={errors.sub_task_assignee}
                             >
-                                <Field name='sub_task_assignee'   placeholder='Subtask Assignee'>
+                                <Field name='sub_task_assignee'   placeholder='Assignee'>
                                     {({field}:any)=>(
                                         <Select
                                         options={userOptions}
@@ -157,7 +160,7 @@ const priorityOptions = [
                             </FormItem>
 
 
-                            <FormItem label='Subtask Status'
+                            <FormItem label='Status'
                             asterisk
                             invalid={errors.sub_task_status && touched.sub_task_status}
                             errorMessage={errors.sub_task_status}
@@ -236,7 +239,7 @@ const priorityOptions = [
 
 
                             <FormItem label='Report To'
-                            asterisk
+                            
                             invalid={errors.sub_task_reporter && touched.sub_task_reporter}
                             errorMessage={errors.sub_task_reporter}
                             >
@@ -271,7 +274,7 @@ const priorityOptions = [
 
                             </div>
                             <FormItem label='Desription'>
-                                <Field name='sub_task_description' placeholder='Task Description'>
+                                <Field name='sub_task_description' placeholder='Description'>
                                     {({field}:any)=>{
                                         return (
                                             <Input textArea name='sub_task_description'

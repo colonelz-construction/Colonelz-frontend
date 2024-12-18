@@ -135,8 +135,11 @@ const Index = () => {
     const [shareLoading, setShareLoading] = useState(false)
     const [selectedFileId, setSelectedFileId] = React.useState<string | null>(null,)
     const { roleData } = useRoleContext()
-    const uploadAccess = roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
+    const role = localStorage.getItem('role')
+    const uploadAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
     const { folderData, projectId, projectName } = location.state || {}
+    const org_id : any= localStorage.getItem('orgId')
+
     // const folderName = folderData.folder_name
 
     interface User {
@@ -258,6 +261,7 @@ const Index = () => {
             file_id: selectedFiles,
             folder_name: folderName,
             project_id: leadId,
+            org_id,
         }
         try {
             const response = await apiDeleteFileManagerFiles(postData)
@@ -309,6 +313,7 @@ const Index = () => {
             folder_name: folderName,
             project_id: leadId,
             user_id: localStorage.getItem('userId'),
+            org_id,
         }
 
         const response = await apiGetCrmProjectShareQuotation(postData)
@@ -344,6 +349,7 @@ const Index = () => {
             subject: subject,
             body: body,
             user_id: localStorage.getItem('userId'),
+            org_id,
         }
         const response = await apiGetCrmFileManagerShareFiles(postData)
         setShareLoading(false)
@@ -527,11 +533,11 @@ const Index = () => {
                 header: 'Actions', accessorKey: 'actions',
                 cell: ({ row }) => {
                     const { roleData } = useRoleContext()
-                    const deleteAccess = roleData?.data?.file?.delete?.includes(`${localStorage.getItem('role')}`)
+                    const deleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.file?.delete?.includes(`${role}`)
                     return <div className='flex items-center gap-2'>
                         {deleteAccess &&
                             <MdDeleteOutline className='text-xl cursor-pointer hover:text-red-500' onClick={() => openDialog3(row.original.fileId)} />}
-                        <HiShare className='text-xl cursor-pointer' onClick={() => openDialog(row.original.fileId)} />
+                        <HiShare className='text-xl cursor-pointer hover:text-blue-500' onClick={() => openDialog(row.original.fileId)} />
                     </div>
                 }
             },
@@ -570,7 +576,6 @@ const Index = () => {
         table.setPageSize(Number(value))
     }
 
-    const role = localStorage.getItem('role');
 
     return (
         <div>
@@ -1006,6 +1011,10 @@ const Index = () => {
                             for (let i = 0; i < values.files.length; i++) {
                                 formData.append('files', values.files[i])
                             }
+
+                            formData.append('org_id', org_id)
+
+
                             const response =
                                 await apiGetCrmFileManagerCreateProjectFolder(
                                     formData,

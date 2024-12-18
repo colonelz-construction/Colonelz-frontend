@@ -52,9 +52,16 @@ const priorityOptions = [
   ];
 
 //   console.log(userData)
-  const userOptions = users?.map((user:any) => ({label: user.username, value: user.username}))
+//   const userOptions = users?.map((user:any) => ({label: user.username, value: user.username}))
 
-  console.log(userOptions)
+  const userOptions = users
+  ?.filter((user: any) => user.role !== "SUPERADMIN")
+  .map((user: any) => ({
+    label: user.username,
+    value: user.username
+  }));
+
+//   console.log(userOptions)
 
   return (
         <div>

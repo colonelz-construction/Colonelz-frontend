@@ -108,7 +108,7 @@ const Index = () => {
     const queryParams = new URLSearchParams(location.search);
     const leadId = queryParams.get('lead_id');
     const leadName = queryParams.get('lead_name');
-    const role = localStorage.getItem('role')
+    const role :any = localStorage.getItem('role')
     const { roleData } = useRoleContext();
     const org_id = localStorage.getItem('orgId')
 
@@ -278,20 +278,21 @@ const Index = () => {
     }
 
     const filteredProjectData = useMemo(() => {
-        if (!roleData?.data?.quotation?.read?.includes(`${role}`)) {
+        if (role !== "SUPERADMIN" && !roleData?.data?.quotation?.read?.includes(`${role}`)) {
             return leadData.filter(item =>
                 item.folder_name.toLowerCase() !== 'quotation' &&
                 item.folder_name.toLowerCase() !== 'procurement data'
             );
         }
-        else if (!roleData?.data?.contract?.read?.includes(`${role}`)) {
+        if (role !== "SUPERADMIN" && !roleData?.data?.contract?.read?.includes(`${role}`)) {
             return leadData.filter(item =>
                 item.folder_name.toLowerCase() !== 'contract'
             )
         }
+
+        
         return leadData;
     }, [leadData, role]);
-    // console.log(filteredProjectData);
 
 
     const table = useReactTable({

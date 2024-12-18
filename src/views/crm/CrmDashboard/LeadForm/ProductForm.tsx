@@ -61,7 +61,10 @@ const LeadForm: React.FC = () => {
         name: Yup.string()
         .matches(/^[A-Za-z\s]+$/, 'Name can only contain letters and spaces')
         .required('Name is required'),
-            email: Yup.string().email('Must be a valid email').required('Email is required'),
+            email: Yup.string().email('Must be a valid email').required('Email is required').matches(
+                /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                'Invalid email address'
+              ),
             phone: Yup.string().required('Phone number is required').length(10, 'Phone number must be exactly 10 digits'),
             location: Yup.string().required('Location is required'),
             lead_manager: Yup.string().required('Lead Manager is required'),

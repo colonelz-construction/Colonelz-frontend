@@ -127,6 +127,8 @@ const Index = () => {
   const role = localStorage.getItem('role')
   const org_id : any = localStorage.getItem('orgId')
 
+  console.log(leadData)
+
 
   const { roleData } = useRoleContext();
   const fileUploadAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.file?.create?.includes(`${role}`)

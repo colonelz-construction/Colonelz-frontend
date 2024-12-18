@@ -61,9 +61,16 @@ const priorityOptions = [
     { label: "Cancelled", value: "Cancelled" },
   ];
   
-  const userOptions = users?.map((u:any) => ({
-    label: u.username,
-    value: u.username
+//   const userOptions = users?.map((u:any) => ({
+//     label: u.username,
+//     value: u.username
+//   }));
+
+  const userOptions = users
+  ?.filter((u: any) => u.role !== "SUPERADMIN")
+  .map((user: any) => ({
+    label: user.username,
+    value: user.username
   }));
 
   const formateDate = (dateString:string) => {

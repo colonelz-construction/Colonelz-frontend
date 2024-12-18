@@ -1050,7 +1050,7 @@ export async function apiGetCrmFileManagerShareContractFile(data: any) { //org d
         url: 'admin/share/contract',
         method: 'post',
         data,
-    }).then((response) => {
+    }).then((response :any) => {
         return response.data
     })
 }

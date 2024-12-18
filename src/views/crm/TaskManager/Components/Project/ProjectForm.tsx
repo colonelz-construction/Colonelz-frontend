@@ -34,6 +34,7 @@ const FolderSelect = ({ setSelected, selected, clientOptions, handleSelectChange
           inputRef.current.select();
         }
       }, 0); // Ensure input is rendered before focusing
+      setSelected(true)
     } else {
       setIsRenaming(false);
       handleSelectChange(selectedOption, 'folder_name'); // Call the handler for other options

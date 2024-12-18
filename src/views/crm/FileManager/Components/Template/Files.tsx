@@ -10,6 +10,7 @@ import { apiDeleteFileManagerFiles, apiGetCrmFileManagerCreateTemplateFolder, ap
 import { HiShare, HiTrash } from 'react-icons/hi';
 import { format, parseISO } from 'date-fns';
 import { Field, Form, Formik } from 'formik';
+import NoData from '@/views/pages/NoData'
 
 
 import { useMemo } from 'react'
@@ -496,7 +497,7 @@ const Index = () => {
           </Button>}
 
       </div>
-      {leadData && leadData.length > 0 ? (
+      {(
 
         <div className="h-screen w-full">
           <div className="flex-1 p-4">
@@ -585,7 +586,7 @@ const Index = () => {
                     </Tr>
                   ))}
                 </THead>
-                <TBody>
+                {leadData && leadData.length > 0 ? <TBody>
                   {table.getRowModel().rows.map((row) => {
                     return (
                       <Tr key={row.id}>
@@ -602,7 +603,7 @@ const Index = () => {
                       </Tr>
                     )
                   })}
-                </TBody>
+                </TBody> : <Td colSpan={columns.length}><NoData /></Td>}
               </Table>
               <div className="flex items-center justify-between mt-4">
                 <Pagination
@@ -628,8 +629,6 @@ const Index = () => {
             </>
           </div>
         </div>
-      ) : (
-        <p>No files</p>
       )}
       <StickyFooter
         className="-mx-8 px-8 flex items-center justify-between py-4 mt-7"

@@ -79,7 +79,7 @@ const LeadForm: React.FC = () => {
 
                 
                 const response = await apiGetCrmCreateLead(values)
-                console.log(response)
+                // console.log(response)
                 setLoading(false)
                 if (response.code===200){
                     toast.push(

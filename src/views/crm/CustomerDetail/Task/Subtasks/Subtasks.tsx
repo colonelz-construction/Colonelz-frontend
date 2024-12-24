@@ -218,7 +218,7 @@ const Subtasks = ({task,users}:any) => {
         const fetchData = async() => {
             
             const res = await apiGetUserData(localStorage.getItem("userId"))
-            console.log(res)
+            // console.log(res)
             
             setUser(res?.data)
         }

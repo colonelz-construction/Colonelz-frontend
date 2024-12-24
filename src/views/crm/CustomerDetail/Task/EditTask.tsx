@@ -35,19 +35,19 @@ type Task = {
 
 const EditTask = ({ Data,users,task, projectId }: any) => {
 
-    console.log(users)
+    // console.log(users)
 
     
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const org_id = localStorage.getItem('orgId')
 
-    console.log(projectId)
+    // console.log(projectId)
 
     
     const [userData,setUserData]=useState<any>(null)
     const [user, setUser] = useState<any>([]);
-    console.log(user)
+    // console.log(user)
 
     // useEffect(() => {
 

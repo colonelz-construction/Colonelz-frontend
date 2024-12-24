@@ -10,13 +10,6 @@ const userEmail = import.meta.env.VITE_USER_EMAIL;
 const currencyUrl = import.meta.env.VITE_CURRENCY_URL;
 const countryUrl = import.meta.env.VITE_COUNTRY_URL;
 
-console.log(apiToken)
-console.log(userEmail)
-
-console.log(currencyUrl)
-console.log(countryUrl)
-
-
 const org_id: any = localStorage.getItem('orgId')
 const userId: any = localStorage.getItem('userId')
 
@@ -81,7 +74,7 @@ const Primary = () => {
         const fetchCurrencies = async () => {
             const response = await fetch(`${currencyUrl}v3.1/all`);
             const data = await response.json();
-            console.log(data )
+            // console.log(data )
 
             const currencyData: CurrencyOption[] = [];
 

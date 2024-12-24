@@ -144,7 +144,7 @@ const YourFormComponent: React.FC<Data> = (leadData) => {
       if (formData.lead_id !== null) {
         postData.append('lead_id', formData.lead_id);
       }
-      console.log(newFolderName)
+      // console.log(newFolderName)
       postData.append('folder_name', newFolderName);
 
       formData.files.forEach((file) => {

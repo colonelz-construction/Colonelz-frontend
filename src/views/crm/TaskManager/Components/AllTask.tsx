@@ -195,7 +195,7 @@ const AllTask = () => {
     }
     const [filterTask, setFilterTask] = useState<any>(filterTaskObj);
     const [filterCheck, setFilterCheck] = useState<any>(filterCheckObj);
-    console.log(filterTask)
+    // console.log(filterTask)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -515,18 +515,24 @@ const AllTask = () => {
     const Toggle = <Button variant='solid' size='sm' className='flex justify-center items-center gap-2'>
         <span>Filter</span><span><GoChevronDown /></span></Button>
 
-    const userOptions = users?.filter((user: any) => user.role !== "SUPERADMIN")
+    const UserOptions = users?.filter((user: any) => user.role !== "SUPERADMIN")
                             .map((user: any) => ({
                             label: 'assignee',
                             value: user.username
                             }));
+
+    const userOptions = [{ label: "None", value: "None" }, ...UserOptions]
+    
+                            
     const statusOptions = [
+        { label: "None", value: "None" },
         { label: "In Progress", value: "In Progress" },
         { label: "Pending", value: "Pending" },
         { label: "Completed", value: "Completed" },
         { label: "Cancelled", value: "Cancelled" },
     ]
     const priorityOptions = [
+        { label: "None", value: "None" },
         { label: "Low", value: "Low" },
         { label: "Medium", value: "Medium" },
         { label: "High", value: "High" },
@@ -587,10 +593,17 @@ const AllTask = () => {
 
             const key = keyMapping[name]; // Map name to the corresponding key in filterTaskObj
             if (key) {
-                setFilterTask((prev: any) => ({
-                    ...prev,
-                    [key]: value, // Update the corresponding key's value
-                }));
+                if(value === 'None') {
+                    setFilterTask((prev: any) => ({
+                        ...prev,
+                        [key]: '', // Update the corresponding key's value
+                    }));
+                } else {
+                    setFilterTask((prev: any) => ({
+                        ...prev,
+                        [key]: value, // Update the corresponding key's value
+                    }));
+                }
             }
 
         };

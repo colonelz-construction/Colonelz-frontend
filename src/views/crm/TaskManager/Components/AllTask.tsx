@@ -155,7 +155,7 @@ const pageSizeOption = [
     { value: 40, label: '40 / page' },
     { value: 50, label: '50 / page' },
 ]
-const AllTask = () => {
+const AllTask = ({users}:any) => {
     const { projects, loading } = useProjectContext();
     const apiData = useLeadContext()
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -165,7 +165,7 @@ const AllTask = () => {
     const navigate = useNavigate()
     const [data, setData] = useState<any>([]);
 
-    const [users, setUsers] = useState<any>();
+    
 
     const tempFilterBox = [
         {
@@ -197,14 +197,7 @@ const AllTask = () => {
     const [filterCheck, setFilterCheck] = useState<any>(filterCheckObj);
     // console.log(filterTask)
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const res = await apiGetUsers();
-            setUsers(res.data)
-        }
-
-        fetchData()
-    }, [])
+    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -515,13 +508,17 @@ const AllTask = () => {
     const Toggle = <Button variant='solid' size='sm' className='flex justify-center items-center gap-2'>
         <span>Filter</span><span><GoChevronDown /></span></Button>
 
-    const UserOptions = users?.filter((user: any) => user.role !== "SUPERADMIN")
+    const userOptions = users?.filter((user: any) => user.role !== "SUPERADMIN")
                             .map((user: any) => ({
                             label: 'assignee',
                             value: user.username
                             }));
 
-    const userOptions = [{ label: "None", value: "None" }, ...UserOptions]
+    // console.log(users)
+    // console.log(userOptions)
+    
+    const UserOptions = [{ label: "None", value: "None" }, ...userOptions]
+    // console.log(UserOptions)
     
                             
     const statusOptions = [
@@ -585,7 +582,7 @@ const AllTask = () => {
             temp = statusOptions
         }
         else if (name === 'assignee') {
-            temp = userOptions
+            temp = UserOptions
         }
 
         const handleSelect = async (value: string) => {

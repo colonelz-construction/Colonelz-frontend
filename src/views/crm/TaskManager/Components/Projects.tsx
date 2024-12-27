@@ -32,7 +32,7 @@ function Expanding() {
     // const [outerData, setOuterData] = useState<any>(projectData)
     // console.log(outerData)
     const [childData, setChildData] = useState<any>({})
-    console.log(childData)
+    // console.log(childData)
     const [expanded, setExpanded] = useState<ExpandedState>({})
     const navigate=useNavigate()
 
@@ -234,7 +234,7 @@ function Expanding() {
                 accessorKey: 'count_task',
                 cell: (props) => {
                     const row = props.row.original;
-                    console.log(row)
+                    // console.log(row)
                     return (
                         <div className='min-w-[100px]'>
                                {row.count_task}
@@ -314,7 +314,7 @@ function Expanding() {
                 {table.getHeaderGroups().map((headerGroup) => (
                     <Tr key={headerGroup.id} className='flex w-full'>
                     {headerGroup.headers.map((header) => {
-                        console.log(headerGroup)
+                        // console.log(headerGroup)
                        return (header.id !== 'expander' ? <Th key={header.id} colSpan={header.colSpan}>
                             {flexRender(
                                 header.column.columnDef.header,
@@ -365,12 +365,12 @@ function Expanding() {
                                             <TBody>
                                             {childData[row.original.project_id]?.map((childRow: any) => {
 
-                                                console.log(childTableColumns)
+                                                // console.log(childTableColumns)
 
                                                 return(
                                                 <Tr key={childRow.project_id}>
                                                     {childTableColumns.map((col:any, idx) => {
-                                                        console.log(col)
+                                                        // console.log(col)
 
                                                         if(col.accessorKey === 'estimated_task_end_date' ||  col.accessorKey === 'estimated_task_start_date') {
 

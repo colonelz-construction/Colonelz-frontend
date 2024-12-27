@@ -29,7 +29,7 @@ const AddTask = ({project,userData, addButton}:any) => {
     const org_id = localStorage.getItem('orgId')
 
     const [users, setUsers] = useState<any>([]);
-    console.log(users)
+    // console.log(users)
 
     useEffect(()=> {
 
@@ -66,7 +66,7 @@ const priorityOptions = [
 //   console.log(userData)
   const userOptions = users?.map((user:any) => ({label: user, value: user}))
 
-  console.log(userOptions)
+//   console.log(userOptions)
 
   return (
         <div>

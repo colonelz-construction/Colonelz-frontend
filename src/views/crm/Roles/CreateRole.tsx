@@ -121,10 +121,6 @@ const EditRoles = () => {
     };
 
     const handleSelectType = (setFieldValue: any, type: AccessType, value: boolean, selectAll: boolean) => {
-        // console.log(type)
-        // console.log("type", checkType[type])
-        // console.log("selectall", selectAll)
-        // console.log("value", value)
 
         if (!checkType[type]) {
             setCheckType({ ...checkType, [type]: true })

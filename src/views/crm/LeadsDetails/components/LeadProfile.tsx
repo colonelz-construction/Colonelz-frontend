@@ -5,6 +5,7 @@ import { Card, Dialog, Notification, Skeleton, toast } from '@/components/ui'
 import { AuthorityCheck, ConfirmDialog } from '@/components/shared'
 import { apiLeadsAnotherProject } from '@/services/CrmService'
 import { useRoleContext } from '../../Roles/RolesContext'
+import Report from './Report'
 
 type CustomerInfoFieldProps = {
     title?: string
@@ -12,7 +13,8 @@ type CustomerInfoFieldProps = {
 }
 
 type CustomerProfileProps = {
-    data?: Partial<CustomerType>
+    data?: Partial<CustomerType>;
+    report?: any
 }
 export type CustomerType = {
     _id: string
@@ -47,7 +49,7 @@ type AddProject ={
 
 
 
-const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
+const CustomerProfile: React.FC<CustomerProfileProps> = ({ data, report }) => {
 
     const location = useLocation()
     const queryParams = new URLSearchParams(location.search)
@@ -111,13 +113,31 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
                 }
             }
     return (
-        <div className=" flex flex-col gap-3 xl:w-2/5  ">
-            <Card>
+        <div className=" flex flex-col gap-5 lg:flex-row  ">
+            <Card className='lg:w-2/5'>
                 <div className="flex flex-col xl:justify-between h-full 2xl:min-w-[360px] mx-auto">
+                    <div className="">
                     <div className="flex justify-between items-center">
                         <h5>Lead Details</h5>
+                        {
+                         createProjectAccess && data?.contract_Status &&<>
+                           {data?.project?
+                        <Button onClick={()=>openDialog2()}  variant='solid'>
+                            Add Another Project
+                        </Button>:
+                        <Button
+                            variant="solid"
+                            
+                            onClick={() =>
+                                navigate(
+                                    `/app/crm/lead-project/?id=${myParam}&name=${data?.name}&email=${data?.email}&phone=${data?.phone}&location=${data?.location}`,
+                                )
+                            }
+                        >
+                            Create Project
+                        </Button>}
+                        </> }
                     </div>
-                    <div className="">
                         <CustomerInfoField
                             title="Lead Name"
                             value={data?.name}
@@ -202,27 +222,12 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data }) => {
                                                 <p className="text-wrap">
                                                    <div className="remark-content" dangerouslySetInnerHTML={{ __html: data?.notes?data?.notes[0]?.content:"" }} /></p>
                                             </div>
-                                       { createProjectAccess && data?.contract_Status &&<>
-                           {data?.project?
-                        <Button onClick={()=>openDialog2()} block variant='solid'>
-                            Add Another Project
-                        </Button>:
-                        <Button
-                            variant="solid"
-                            block
-                            onClick={() =>
-                                navigate(
-                                    `/app/crm/lead-project/?id=${myParam}&name=${data?.name}&email=${data?.email}&phone=${data?.phone}&location=${data?.location}`,
-                                )
-                            }
-                        >
-                            Create Project
-                        </Button>}
-                        </> }
+                                       
                         </div>
-                    <div className="mt-4 flex flex-col xl:flex-row gap-2"></div>
+                    {/* <div className="mt-4 flex flex-col xl:flex-row gap-2"></div> */}
                 </div>
             </Card>
+            <Report report={report}/>
 
             <ConfirmDialog
           isOpen={dialogIsOpen2}

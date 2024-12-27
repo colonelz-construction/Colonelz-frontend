@@ -74,7 +74,7 @@ const CustomerDetail = () => {
   };
   const [details, setDetails] = useState<any | null>(null);
   const [projectData, setProjectData] = useState<any>()
-  console.log(projectData)
+  // console.log(projectData)
   const [task, setTaskData] = useState<Tasks[]>([])
   const [data, setData] = useState<any>([])
   const [report, setReport] = useState<ReportResponse>()
@@ -102,7 +102,7 @@ const CustomerDetail = () => {
 
         const list = await apiGetUsersList(allQueryParams.project_id)
 
-        console.log(list)
+        // console.log(list)
         const data = response
         setActivity(data.data)
         setProjectData(data.data)
@@ -127,7 +127,7 @@ const CustomerDetail = () => {
         const data: UsersResponse = response
 
         setData(data.data)
-        console.log(data)
+        // console.log(data)
 
         setFileData(leadData.data);
       } catch (error) {
@@ -159,7 +159,7 @@ const CustomerDetail = () => {
     const fetchDataAndLog = async () => {
       try {
         const taskResponse = await apiGetCrmProjectsTaskData(allQueryParams.project_id, org_id);
-        console.log(taskResponse.data)
+        // console.log(taskResponse.data)
         setTaskData(taskResponse.data);
       } catch (error) {
         console.error('Error fetching task data', error);

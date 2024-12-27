@@ -12,12 +12,24 @@ import { useRoleContext } from '../Roles/RolesContext';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AllTask from './Components/AllTask';
+import { apiGetUsers } from '@/services/CrmService';
 
 const TaskManager = () => {
   const navigate = useNavigate();
   const role = localStorage.getItem('role') || '';
   const { roleData, loading } = useRoleContext();
   const [isLoading, setIsLoading] = useState(true);
+  const [users, setUsers] = useState<any>();
+
+  useEffect(() => {
+          const fetchData = async () => {
+              const res = await apiGetUsers();
+              console.log(res)
+              setUsers(res.data)
+          }
+  
+          fetchData()
+      }, [])
 
   useEffect(() => {
     if (roleData) {
@@ -78,7 +90,7 @@ const TaskManager = () => {
               <Projects />
             </TabContent>
             <TabContent value="all">
-              <AllTask/>
+              <AllTask users={users}/>
             </TabContent>
           </DataProvider>
         </div>

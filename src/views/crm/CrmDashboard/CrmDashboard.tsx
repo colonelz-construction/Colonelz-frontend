@@ -16,11 +16,11 @@ interface Data {
 }
 const CrmDashboard = () => {
     const { apiData, loading } = useProjectContext()
-    console.log(apiData)
+    // console.log(apiData)
 
     const residentialCount = apiData?.projects?.reduce((acc:any, obj:any) => obj.project_type === "residential" ? acc + 1 : acc, 0);
     const commercialCount = apiData?.projects?.length - residentialCount;
-    console.log(residentialCount, commercialCount)
+    // console.log(residentialCount, commercialCount)
     // const apiData : any = []
 
     // console.log(parseInt(apiData?.commercial))

@@ -127,7 +127,7 @@ const Index = () => {
   const role = localStorage.getItem('role')
   const org_id : any = localStorage.getItem('orgId')
 
-  console.log(leadData)
+  // console.log(leadData)
 
 
   const { roleData } = useRoleContext();
@@ -311,7 +311,7 @@ const Index = () => {
     setShareLoading(false)
     onDialogClose()
     const responseData = await response.json();
-    console.log('Files shared successfully:', responseData);
+    // console.log('Files shared successfully:', responseData);
     setSelectedFiles([]);
     setSelectedEmails([]);
     setSelectedEmailsCc([]);

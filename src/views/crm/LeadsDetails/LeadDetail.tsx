@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import LeadForm from './components/LeadForm'
 import { Button, Card, Dialog, Dropdown, Notification, Skeleton, Steps, Tabs, toast } from '@/components/ui'
 import CustomerProfile from './components/LeadProfile'
-import { apiDeleteInactiveLead, apiGetCrmLeadsDetails, apiGetCrmUsersAssociatedToLead } from '@/services/CrmService'
+import { apiDeleteInactiveLead, apiGetCrmLeadsDetails, apiGetCrmLeadsTaskData, apiGetCrmSingleLeadReport, apiGetCrmUsersAssociatedToLead } from '@/services/CrmService'
 import TabList from '@/components/ui/Tabs/TabList'
 import TabNav from '@/components/ui/Tabs/TabNav'
 import TabContent from '@/components/ui/Tabs/TabContent'
@@ -23,6 +23,8 @@ import { useRoleContext } from '../Roles/RolesContext'
 import { Lead } from '../LeadList/store/LeadContext'
 import  AddedUser  from './components/AddedUser'
 import AddUserToLead from './components/AddUserToLead'
+import LeadTask from './components/LeadTask'
+import { fetchData } from '../FileManager/Components/data';
 
 export type LeadDetailsResponse = {
     code: number;
@@ -59,6 +61,8 @@ const CustomerDetail = () => {
     const [dialogIsOpen2, setIsOpen2] = useState(false)
     const [dialogIsOpen3, setIsOpen3] = useState(false)
     const [leadData, setLeadData] = useState<any>([])
+    
+    const [task, setTask] = useState<any>([])
 
     const openDialog1 = () => {
         setIsOpen1(true)
@@ -115,11 +119,29 @@ const CustomerDetail = () => {
 
   const org_id = localStorage.getItem('orgId')
 
+  const [report, setReport] = useState<any>([])
+
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const Report = await apiGetCrmSingleLeadReport(myParam);
+            setReport(Report)
+            
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            
+        }
+    }
+    fetchData();
+  }, [myParam])
+
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await apiGetCrmLeadsDetails(myParam, org_id);
+                
+
                 setLoading(false)
                 setDetails(response);
             } catch (error) {
@@ -136,7 +158,11 @@ const CustomerDetail = () => {
 
         const fetchDataAndLog = async () => {
             try {
+                const taskResponse = await apiGetCrmLeadsTaskData(lead_id, org_id);
+                setTask(taskResponse.data)
                 const leadData = await apiGetCrmUsersAssociatedToLead(lead_id)
+
+                // console.log(leadData)
                 setLeadData(leadData?.data)
 
 
@@ -157,7 +183,8 @@ const CustomerDetail = () => {
 
     const contractAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.contract?.read?.includes(`${role}`)
     const leadDeleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.lead?.delete?.includes(`${role}`)
-    const leadAddMemberAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.addMember?.create?.includes(`${role}`)
+    const taskReadAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.leadtask?.read?.includes(`${localStorage.getItem('role')}`)
+
 
     const handleDeleteInactiveLead = async () => {
 
@@ -240,18 +267,24 @@ const CustomerDetail = () => {
                     <Steps.Item title="Project" />
                 </Steps>
             </Card>
-            <div className='flex gap-5 xl:flex-row flex-col'>
-                <CustomerProfile data={lead} />
-                <Card className='xl:w-3/5 ' >
+            <div className='w-full'>
+                {/* <CustomerProfile data={lead} /> */}
+                {/* <Card className='w-full h-full' > */}
                     <Tabs defaultValue={allQueryParams.type} onChange={handleTabChange}>
                         <TabList>
+                            <TabNav value="Details" >
+                                Details
+                            </TabNav>
                             <TabNav value="Actions" >
-                                Follow-Ups
+                                Follow-ups
                             </TabNav>
                             {contractAccess &&
                                 <TabNav value="Contract" >
                                     Contract
                                 </TabNav>}
+                                <TabNav value="Tasks" >
+                                Task Manager
+                            </TabNav>
                             {['ADMIN', 'SUPERADMIN'].includes(localStorage.getItem('role') || '') &&
                                 <TabNav value="Activity" >
                                     Lead Activity
@@ -265,18 +298,34 @@ const CustomerDetail = () => {
                                 </TabNav>}
                         </TabList>
                         <div className="p-4">
-                            <TabContent value="Actions">
 
+                            <TabContent value="Details">
+                                <div className='h-[18rem] overflow-y-auto' style={{ scrollbarWidth: 'none' }}>
+                                <CustomerProfile data={lead} report={report} />
+                                </div>
+                            </TabContent>
+
+                            
+                            <TabContent value="Actions">
                                 <div className='h-[18rem] overflow-y-auto' style={{ scrollbarWidth: 'none' }}>
 
                                 <FollowDetails details={notes} />
                                 </div>
-
-
                             </TabContent>
                             <TabContent value="Contract">
                                 <Contract />
                             </TabContent>
+
+                            { taskReadAccess &&
+                            <TabContent value="Tasks">
+                                <div className='h-[18rem] overflow-y-auto' style={{ scrollbarWidth: 'none' }}>
+                                <LeadTask task={task} users={leadData} />
+                                </div>
+                            </TabContent>
+
+                            }
+
+
                             <TabContent value="Activity">
                                 <LeadActivity details={details} />
                             </TabContent>
@@ -286,7 +335,7 @@ const CustomerDetail = () => {
                             </TabContent>
                         </div>
                     </Tabs>
-                </Card>
+                {/* </Card> */}
             </div>
 
             {/* <Tabs defaultValue="Details">

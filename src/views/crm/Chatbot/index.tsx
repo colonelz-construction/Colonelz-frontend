@@ -28,7 +28,7 @@ const Index = () => {
         const fetchData = async() => {
             try {
                 const res = await apiGetUserData(localStorage.getItem("userId"))
-                console.log(res)
+                // console.log(res)
              
                 setUser(res?.data?.username)
                 
@@ -69,7 +69,7 @@ const Index = () => {
         textToCopy = textToCopy.replace(regex2, '').trim();
 
         navigator.clipboard.writeText(textToCopy).then(() => {
-            console.log('Text copied to clipboard!');
+            // console.log('Text copied to clipboard!');
             setCopiedMessageIndex(index);
             setTimeout(() => setCopiedMessageIndex(null), 2000);
         }).catch(err => {
@@ -88,7 +88,7 @@ const Index = () => {
                 body: JSON.stringify({ question: inputValue, org_id, user_id }),
             });
 
-            console.log(response)
+            // console.log(response)
 
             const reader = response.body?.getReader();
             const decoder = new TextDecoder();
@@ -101,7 +101,7 @@ const Index = () => {
                     // Decode the chunk and append to the accumulated message
                     const chunk = decoder.decode(value, { stream: false });
 
-                    console.log(chunk)
+                    // console.log(chunk)
                     const regex = /"content":"(.*?)"/g;
 
                             // Use matchAll to find all matches
@@ -124,7 +124,7 @@ const Index = () => {
 
                             setFileUrl((prevUrls : any) => [...prevUrls, result ? result : null]);
                             
-                            console.log(fileUrl)
+                            // console.log(fileUrl)
 
                     accumulatedMessages += chunk;
 
@@ -288,7 +288,7 @@ const Index = () => {
                                                         </div>
                                                     }
 
-                                                    {/* For Tasks */}
+                                                    {/* For project  Tasks */}
                                                     {line.includes('responseEnd') && projectId && taskId && projectId != '00000000000' && taskId != '222222222' ? lineIndex === lines.length - 1 && (
                                                         <div className="flex mt-[0.30rem]">
                                                             <div>
@@ -304,6 +304,58 @@ const Index = () => {
                                                         <div className="flex ">
                                                             <div>
                                                                 <ActionLink target="_blank" to={`/app/crm/project-details?project_id=${projectId}&id=${userId}&type=task`}>
+                                                                    {"Click here "}
+                                                                </ActionLink>
+                                                                to see more info
+                                                            </div>
+
+
+                                                        </div>
+
+                                                    )}
+
+                                                    {/* For lead  Tasks */}
+                                                    {line.includes('responseEnd') && leadId && taskId && leadId != '111111' && taskId != '222222222' ? lineIndex === lines.length - 1 && (
+                                                        <div className="flex mt-[0.30rem]">
+                                                            <div>
+                                                                <ActionLink target="_blank" to={`/app/crm/Leads/TaskDetails?lead_id=${leadId}&task=${taskId}`}>
+                                                                    {"Click here "}
+                                                                </ActionLink>
+                                                                to see more info
+                                                            </div>
+
+                                                        </div>
+
+                                                    ) : line.includes('responseEnd') && leadId && taskId && leadId != '111111' && taskId == '222222222' && lineIndex === lines.length - 1 && (
+                                                        <div className="flex ">
+                                                            <div>
+                                                                <ActionLink target="_blank" to={`/app/crm/lead/?id=${leadId}&tab=Tasks`}>
+                                                                    {"Click here "}
+                                                                </ActionLink>
+                                                                to see more info
+                                                            </div>
+
+
+                                                        </div>
+
+                                                    )}
+
+                                                    {/* For open  Tasks */}
+                                                    {line.includes('responseEnd') && !leadId && !projectId && taskId && leadId != '111111' && taskId != '222222222' ? lineIndex === lines.length - 1 && (
+                                                        <div className="flex mt-[0.30rem]">
+                                                            <div>
+                                                                <ActionLink target="_blank" to={`/app/crm/Tasks/OpenTaskDetails?task=${taskId}`}>
+                                                                    {"Click here "}
+                                                                </ActionLink>
+                                                                to see more info
+                                                            </div>
+
+                                                        </div>
+
+                                                    ) : line.includes('responseEnd') && !leadId && !projectId && taskId && leadId != '111111' && taskId == '222222222' && lineIndex === lines.length - 1 && (
+                                                        <div className="flex ">
+                                                            <div>
+                                                                <ActionLink target="_blank" to={`/app/crm/taskManager?tab=all`}>
                                                                     {"Click here "}
                                                                 </ActionLink>
                                                                 to see more info
@@ -339,10 +391,10 @@ const Index = () => {
 
 
                                                     {/* For Leads */}
-                                                    {line.includes('responseEnd') && leadId && leadId != '111111' ? lineIndex === lines.length - 1 && (
+                                                    {line.includes('responseEnd') && leadId && !taskId && leadId != '111111' ? lineIndex === lines.length - 1 && (
                                                         <div className="flex ">
                                                             <div>
-                                                                <ActionLink target="_blank" to={`/app/crm/lead/?id=${leadId}&tab=Actions`}>
+                                                                <ActionLink target="_blank" to={`/app/crm/lead/?id=${leadId}&tab=Details`}>
                                                                     {"Click here "}
                                                                 </ActionLink>
                                                                 to see more info

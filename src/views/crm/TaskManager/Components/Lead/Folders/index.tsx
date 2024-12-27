@@ -309,7 +309,7 @@ const Index = () => {
     setShareLoading(false)
     onDialogClose()
     const responseData = await response.json();
-    console.log('Files shared successfully:', responseData);
+    // console.log('Files shared successfully:', responseData);
     setSelectedFiles([]);
     setSelectedEmails([]);
     setSelectedEmailsCc([]);

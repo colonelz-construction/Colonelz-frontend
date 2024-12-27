@@ -116,7 +116,7 @@ const Index = () => {
         const fetchDataAndLog = async () => {
             try {
                 const templateData = (await getTemplateData()) || []
-                console.log(templateData);
+                // console.log(templateData);
 
                 setLoading(false)
                 setTemplateData(

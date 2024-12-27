@@ -23,8 +23,8 @@ type Task = {
     reporter: string;
   };
 
-const AddTask = ({leadId,userData}:any) => {
-    console.log(leadId)
+const AddTask = ({leadId,addButton}:any) => {
+    // console.log(leadId)
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const org_id = localStorage.getItem('orgId')
@@ -33,7 +33,7 @@ const AddTask = ({leadId,userData}:any) => {
 
 
     const [users, setUsers] = useState<any>([]);
-    console.log(users)
+    // console.log(users)
 
     useEffect(()=> {
 
@@ -70,11 +70,12 @@ const priorityOptions = [
 //   console.log(userData)
   const userOptions = users?.map((user:any) => ({label: user.user_name, value: user.user_name}))
 
-  console.log(userOptions)
+//   console.log(userOptions)
 
   return (
         <div>
-            <span onClick={openDialog} className='flex items-center gap-1 cursor-pointer'> <AiOutlinePlus/> <span>Add Task</span></span>
+            {addButton ? <Button onClick={openDialog}  variant='solid' size='sm'>Add Task</Button> : <span onClick={openDialog} className='flex items-center gap-1 cursor-pointer'> <AiOutlinePlus/> <span>Add Task</span></span>}
+
             <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
                 <div className="pl-4 ">
                     <h3>Add New Task</h3>

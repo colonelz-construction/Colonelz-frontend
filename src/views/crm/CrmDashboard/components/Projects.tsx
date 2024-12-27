@@ -37,7 +37,7 @@ const Project = ({ className }: LeadsProps) => {
     }
  
     const projects = useProjectContext() || { projects: [] } // Ensure projects is defined
-    console.log(projects)
+    // console.log(projects)
     // console.log(projects.loading)
     const memoizedProjects = useMemo(
         () => projects.projects || [],

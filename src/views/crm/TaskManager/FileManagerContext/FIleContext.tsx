@@ -20,7 +20,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const fetchData = async () => {
       try {
         const response = await apiGetCrmFileManager();
-        console.log(response)
+        // console.log(response)
         setData(response);
         // console.log('response', response);
         setLoading(false);

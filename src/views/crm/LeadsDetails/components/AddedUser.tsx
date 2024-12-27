@@ -251,7 +251,7 @@ const AddedUser = ({leadData, openDialog3}:any) => {
                 header: 'Actions', accessorKey: 'actions',
                 cell: ({ row }) => {
                     const { roleData } = useRoleContext()
-                    console.log(roleData)
+                    // console.log(roleData)
                     const deleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.addMember?.delete?.includes(`${localStorage.getItem('role')}`)
                     return <div className='flex items-center gap-2'>
                         {deleteAccess &&

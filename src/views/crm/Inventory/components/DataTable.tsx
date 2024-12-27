@@ -182,8 +182,6 @@ const Filtering = () => {
 
                     const projectId = row.original.project_id
                     const clientName = row.original.client_name
-                    console.log(projectId)
-                    console.log(clientName)
                     return (
                         <div className="">
                             

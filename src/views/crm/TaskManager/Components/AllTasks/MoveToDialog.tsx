@@ -29,7 +29,7 @@ const MoveToDialog = ({users, projectData, leadData, task_id}:any) => {
     const [loading, setLoading] = useState(false)
     const [type, setType] = useState('Project')
     const org_id = localStorage.getItem('orgId')
-    console.log(task_id)
+    // console.log(task_id)
 
     // console.log(users)
     
@@ -90,14 +90,14 @@ const priorityOptions = [
                       }
                      onSubmit={async(values, actions) => {
                         //  setLoading(true)
-                        console.log(values)
+                        // console.log(values)
 
                         if (!values.project_id && !values.lead_id) {
                             actions.setFieldError('project_id', 'Project or Lead is required');
                             actions.setFieldError('lead_id', 'Project or Lead is required');
                             return;
                         }
-                        console.log("values")
+                        // console.log("values")
                             const response = await apiGetCrmMoveOpenTask(values)
                             
                             if(response.code===200){

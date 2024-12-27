@@ -155,7 +155,7 @@ const pageSizeOption = [
     { value: 40, label: '40 / page' },
     { value: 50, label: '50 / page' },
 ]
-const AllTask = () => {
+const AllTask = ({users}:any) => {
     const { projects, loading } = useProjectContext();
     const apiData = useLeadContext()
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -165,7 +165,7 @@ const AllTask = () => {
     const navigate = useNavigate()
     const [data, setData] = useState<any>([]);
 
-    const [users, setUsers] = useState<any>();
+    
 
     const tempFilterBox = [
         {
@@ -195,16 +195,9 @@ const AllTask = () => {
     }
     const [filterTask, setFilterTask] = useState<any>(filterTaskObj);
     const [filterCheck, setFilterCheck] = useState<any>(filterCheckObj);
-    console.log(filterTask)
+    // console.log(filterTask)
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const res = await apiGetUsers();
-            setUsers(res.data)
-        }
-
-        fetchData()
-    }, [])
+    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -520,13 +513,23 @@ const AllTask = () => {
                             label: 'assignee',
                             value: user.username
                             }));
+
+    // console.log(users)
+    // console.log(userOptions)
+    
+    const UserOptions = [{ label: "None", value: "None" }, ...userOptions]
+    // console.log(UserOptions)
+    
+                            
     const statusOptions = [
+        { label: "None", value: "None" },
         { label: "In Progress", value: "In Progress" },
         { label: "Pending", value: "Pending" },
         { label: "Completed", value: "Completed" },
         { label: "Cancelled", value: "Cancelled" },
     ]
     const priorityOptions = [
+        { label: "None", value: "None" },
         { label: "Low", value: "Low" },
         { label: "Medium", value: "Medium" },
         { label: "High", value: "High" },
@@ -579,7 +582,7 @@ const AllTask = () => {
             temp = statusOptions
         }
         else if (name === 'assignee') {
-            temp = userOptions
+            temp = UserOptions
         }
 
         const handleSelect = async (value: string) => {
@@ -587,10 +590,17 @@ const AllTask = () => {
 
             const key = keyMapping[name]; // Map name to the corresponding key in filterTaskObj
             if (key) {
-                setFilterTask((prev: any) => ({
-                    ...prev,
-                    [key]: value, // Update the corresponding key's value
-                }));
+                if(value === 'None') {
+                    setFilterTask((prev: any) => ({
+                        ...prev,
+                        [key]: '', // Update the corresponding key's value
+                    }));
+                } else {
+                    setFilterTask((prev: any) => ({
+                        ...prev,
+                        [key]: value, // Update the corresponding key's value
+                    }));
+                }
             }
 
         };

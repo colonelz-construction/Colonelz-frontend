@@ -189,7 +189,7 @@ const Users = () => {
                 id: 'action',
                 cell: ({ row }) => {
 
-                    console.log(row.original.role)
+                    // console.log(row.original.role)
                     return (
                         <div className="">
                             {row.original.role !== "SUPERADMIN" &&

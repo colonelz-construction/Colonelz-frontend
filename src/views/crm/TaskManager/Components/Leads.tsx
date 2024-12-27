@@ -32,9 +32,9 @@ function Expanding() {
     const apiData : any = useLeadContext()
     const role :any = localStorage.getItem('role')
     // const [outerData, setOuterData] = useState<any>(projectData)
-    console.log(apiData)
+    // console.log(apiData)
     const [childData, setChildData] = useState<any>({})
-    console.log(childData)
+    // console.log(childData)
     const [expanded, setExpanded] = useState<ExpandedState>({})
     const navigate=useNavigate()
 
@@ -318,7 +318,7 @@ function Expanding() {
                 {table.getHeaderGroups().map((headerGroup) => (
                     <Tr key={headerGroup.id} className='flex w-full'>
                         {headerGroup.headers.map((header) => {
-                            console.log(headerGroup)
+                            // console.log(headerGroup)
                            return (header.id !== 'expander' ? <Th key={header.id} colSpan={header.colSpan}>
                                 {flexRender(
                                     header.column.columnDef.header,
@@ -372,12 +372,12 @@ function Expanding() {
                                     : <TBody>
                                             {childData[row.original.lead_id]?.map((childRow: any) => {
 
-                                                console.log(childTableColumns)
+                                                // console.log(childTableColumns)
 
                                                 return(
                                                 <Tr key={childRow.lead_id}>
                                                     {childTableColumns.map((col:any, idx) => {
-                                                        console.log(col)
+                                                        // console.log(col)
 
                                                         if(col.accessorKey === 'estimated_task_end_date' ||  col.accessorKey === 'estimated_task_start_date') {
 

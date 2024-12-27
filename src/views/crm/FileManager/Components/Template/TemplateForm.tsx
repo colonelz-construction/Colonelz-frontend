@@ -162,10 +162,6 @@ const YourFormComponent: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log(selected)
-    console.log(formData.sub_folder_name_second)
-    console.log(formData.files.length)
-
 
 
     if(selected && (!formData.sub_folder_name_second && formData.files.length !== 0)) {
@@ -183,7 +179,6 @@ const YourFormComponent: React.FC = () => {
         postData.append('files', file),
       )
 
-      console.log("inner")
 
       try {
         const response = await apiGetCrmFileManagerCreateTemplateFolder(postData);
@@ -217,7 +212,6 @@ const YourFormComponent: React.FC = () => {
 
     }
     else if (!formData.sub_folder_name_second || formData.files.length === 0) {
-      console.log("222")
       toast.push(
         <Notification closable type="warning" duration={3000}>
           Please select a folder and upload at least one file.
@@ -227,7 +221,6 @@ const YourFormComponent: React.FC = () => {
       return;
     }
 
-    console.log("outer")
     setSubmit(true);
     const postData = new FormData();
 

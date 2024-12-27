@@ -80,7 +80,7 @@ const SubTaskDetails = (Data:any) => {
     const org_id = localStorage.getItem('orgId')
     const role:any = localStorage.getItem('role')
 
-    console.log(Data.user)
+    // console.log(Data.user)
     // console.log(Data.data.sub_task_assignee)
 
 

@@ -496,6 +496,17 @@ export async function apiGetCrmSingleProjectReport<T>( // org done
     })
 }
 
+export async function apiGetCrmSingleLeadReport<T>( // org done
+    leadId: string | null
+) { //org done
+    return ApiService.fetchData<ReportResponse>({
+        url: `admin/getleadtask/details?lead_id=${leadId}&org_id=${localStorage.getItem('orgId')}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmSingleProjectEdit(formData: any) { // org done
     return ApiService.fetchData<any>({
         url: `admin/update/project`,
@@ -576,7 +587,7 @@ export async function apiGetCrmProjectsTaskData<T>(projectId: string, org_id: st
     })
 }
 
-export async function apiGetCrmLeadsTaskData<T>(leadId: string, org_id: string | null) { // org done
+export async function apiGetCrmLeadsTaskData<T>(leadId: any, org_id: string | null) { // org done
     return ApiService.fetchData<TaskResponse>({
         url: `admin/get/all/leadtask?user_id=${localStorage.getItem('userId')}&lead_id=${leadId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',

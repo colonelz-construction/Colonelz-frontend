@@ -28,7 +28,6 @@ const LeadForm = () => {
     { value: 'Not Contacted', label: 'Not Contacted' },
     { value: 'Follow Up', label: 'Follow Up' },
     { value: 'Interested', label: 'Interested' },
-    { value: 'Inactive', label: 'Inactive' },
   ];
 
 

@@ -4,6 +4,7 @@ import { FormikValuesContext } from './index';
 import { addcontractinfileManager } from '@/services/CrmService';
 import { Button, Notification, toast } from '@/components/ui';
 import { useNavigate } from 'react-router-dom';
+import AccessDenied from '../../../../pages/AccessDenied/AccessDenied';
 
  
 Font.register({
@@ -842,13 +843,7 @@ modified based on the Location & the Scope of work.
 completion of stage OR intimation from the Designer as elucidated below:
 </Text></View>
 
-
-     
-
-
-
-
-        <View  >
+        <View>
 
         <View> <Text> </Text></View>
         <View> <Text style={styles.part1}>Designing Payment Terms & Conditions
@@ -864,7 +859,7 @@ of Mobilization Advance & Work Contract duly signed.
         <View style={styles.design}><Text>2.</Text><Text>Payment Terms:</Text></View>
 
 </View>
-    
+
 <View style={styles.scope1}>
 <View style={styles.sectionfees}>
         <View style={styles.feeItem}>
@@ -1129,10 +1124,6 @@ in Timeline will be communicated. A detailed timeline shall be shared.
 
       {/* 8thpage */}
 
-      
-
-      
-
 
 <View style={{display:'flex' ,gap:10, flexDirection:'row'}}>
         <View><Text style={styles.part11} >7.</Text></View>
@@ -1191,10 +1182,6 @@ actual.
 </Text></View>
 
 
-
-
-
-
 <View style={styles.header1}>
         <View style={styles.column}>
         <View style={styles.line}></View>
@@ -1217,6 +1204,10 @@ actual.
 
       </View>
   </Page>
+
+  <Page></Page>
+  <Page></Page>
+  <Page></Page>
 </Document>
 )};
 export const useFormikValues = () => useContext(FormikValuesContext);
@@ -1224,7 +1215,6 @@ const MyComponent = (data:any) => {
   const org_id : any = localStorage.getItem('orgId')
  
   const navigate = useNavigate();
-  
   
   const [isLoading, setIsLoading] = useState(false);
 
@@ -1277,7 +1267,7 @@ const MyComponent = (data:any) => {
         );
       }}
     </BlobProvider>
-    <PDFViewer width="100%" height="600">
+    <PDFViewer width="100%" height="900">
       <MyDocument data={data.data}/>
     </PDFViewer>
   </div>

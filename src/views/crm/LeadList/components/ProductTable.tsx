@@ -25,6 +25,7 @@ import { useRoleContext } from '../../Roles/RolesContext'
 import { AuthorityCheck } from '@/components/shared'
 import formateDate from '@/store/dateformate'
 import { useLeadContext } from '../store/LeadContext'
+import NoData from '@/views/pages/NoData'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -183,6 +184,8 @@ const Filtering = () => {
         []
     )
 
+    console.log(responseData)
+
 
     const table = useReactTable({
         data:responseData || [],
@@ -261,6 +264,9 @@ const Filtering = () => {
                         </Tr>
                     ))}
                 </THead>
+
+                {responseData && responseData?.length <= 0 ? <Tr><Td colSpan={columns.length}><NoData /></Td></Tr> :
+
                 <TBody>
                     {table.getRowModel().rows.map((row) => {
                         return (
@@ -279,6 +285,7 @@ const Filtering = () => {
                         )
                     })}
                 </TBody>
+                }
             </Table>
             <div className="flex items-center justify-between mt-4">
                 <Pagination

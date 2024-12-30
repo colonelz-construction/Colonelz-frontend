@@ -398,78 +398,89 @@ marginLeft: 20,
   }
 });
 
-function numberToWords(number:number) {
-  const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
-  const teens = ['', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-  const tens = ['', 'Ten', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
- 
-  let result = '';
- 
-  const hundreds = Math.floor(number / 100);
-  const tensAndUnits = number % 100;
- 
-  if (hundreds > 0) {
-    result += units[hundreds] + ' hundred ';
+function formatCurrency(amount:any) {
+  let numStr = amount.toString();
+  
+  let lastThree = numStr.slice(-3);
+  
+  let otherDigits = numStr.slice(0, -3);
+  
+  if (otherDigits.length > 0) {
+      otherDigits = otherDigits.replace(/\B(?=(\d{2})+(?!\d))/g, ",");
   }
- 
-  if (tensAndUnits > 0) {
-    if (tensAndUnits < 10) {
-      result += units[tensAndUnits];
-    } else if (tensAndUnits < 20) {
-      result += teens[tensAndUnits - 10];
-    } else {
-      const tensDigit = Math.floor(tensAndUnits / 10);
-      const unitsDigit = tensAndUnits % 10;
-      result += tens[tensDigit];
-      if (unitsDigit > 0) {
-        result += ' ' + units[unitsDigit];
-      }
-    }
-  }
- 
-  return result;
+  
+  return otherDigits.length > 0 ? otherDigits + ',' + lastThree : lastThree;
 }
 
-function numberToWordsString(number:number) {
+
+function numberToWordsString(number: number) {
   if (number === 0) {
     return 'zero';
   }
- 
+
   let result = '';
- 
+
   if (number < 0) {
     result += 'negative ';
     number = Math.abs(number);
   }
- 
-  const billion = Math.floor(number / 1000000000);
-  const million = Math.floor((number % 1000000000) / 1000000);
-  const thousand = Math.floor((number % 1000000) / 1000);
+
+  const crore = Math.floor(number / 10000000);
+  const lakh = Math.floor((number % 10000000) / 100000);
+  const thousand = Math.floor((number % 100000) / 1000);
   const remainder = number % 1000;
- 
-  if (billion > 0) {
-    result += numberToWords(billion) + ' billion ';
+
+  if (crore > 0) {
+    result += numberToWords(crore) + ' crore ';
   }
- 
-  if (million > 0) {
-    result += numberToWords(million) + ' million ';
+
+  if (lakh > 0) {
+    result += numberToWords(lakh) + ' lakh ';
   }
- 
+
   if (thousand > 0) {
     result += numberToWords(thousand) + ' thousand ';
   }
- 
+
   if (remainder > 0) {
     result += numberToWords(remainder);
   }
- 
+
   return result.trim();
+}
+
+// Helper function to convert numbers to words
+function numberToWords(number: number): string {
+  const ones = [
+    '', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 
+    'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 
+    'seventeen', 'eighteen', 'nineteen'
+  ];
+
+  const tens = [
+    '', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 
+    'eighty', 'ninety'
+  ];
+
+  if (number < 20) {
+    return ones[number];
+  } else if (number < 100) {
+    return tens[Math.floor(number / 10)] + (number % 10 ? ' ' + ones[number % 10] : '');
+  } else {
+    return (
+      ones[Math.floor(number / 100)] +
+      ' hundred' +
+      (number % 100 ? ' ' + numberToWords(number % 100) : '')
+    );
+  }
 }
  
 const MyDocument = (data:any) => {
   const pdfData=data.data;
   const role = localStorage.getItem('role');
   const org_id : any= localStorage.getItem('orgId')
+
+  console.log(pdfData)
 
 
 
@@ -821,7 +832,7 @@ checks, coordination and supervision with all teams.
     <View> <Text style={styles.part1}>Fee Proposal</Text></View>
       <View><Text style={styles.text1}>The Designing & Project Management will be done as per the following rates;
 </Text></View>
-      <View><Text style={styles.text1}>Total cost for Designing and Supervision shall be INR <Text style={{textDecoration:'underline'}}>{pdfData.design_charges}</Text>/excl. taxes <Text>(Rupees {numberToWordsString(pdfData.design_charges)}</Text> Only)
+      <View> <Text style={styles.text1}>Total cost for Designing and Supervision shall be INR <Text style={{textDecoration:'underline'}}>{formatCurrency(pdfData.design_charges)}</Text>/excl. taxes <Text>(Rupees {numberToWordsString(pdfData.design_charges)}</Text> Only)
 applicable solely to the “{pdfData.company_name}” situated at “{pdfData.site_address}”.
 </Text></View>
       <View><Text style={styles.text1}>For all “{pdfData.company_name}” Projects at other locations, the contract will be duly 
@@ -1233,6 +1244,7 @@ const MyComponent = (data:any) => {
           Contract Created Successfully
         </Notification>
       )
+      navigate(-1)
     }
     else{
       toast.push(

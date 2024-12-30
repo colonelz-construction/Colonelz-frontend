@@ -21,6 +21,7 @@ import { ConfirmDialog } from '@/components/shared';
 import AddTask from '../../CustomerDetail/Task/AddTask';
 import { useProjectContext } from '../../Customers/store/ProjectContext'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
+import NoData from '@/views/pages/NoData'
 
 const { Tr, Th, Td, THead, TBody } = Table
 
@@ -36,10 +37,20 @@ function Expanding() {
     const [expanded, setExpanded] = useState<ExpandedState>({})
     const navigate=useNavigate()
 
+    const [projectData, setProjectData] = useState<any>([]);
+
+    // console.log(projects)
+
     const org_id = localStorage.getItem('orgId')
     const [loadingChildData, setLoadingChildData] = useState<any>({});
 
     const createAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.task?.create?.includes(`${localStorage.getItem('role')}`)
+
+    useEffect(() => {
+        
+        if(projects) setProjectData(projects)
+
+    }, [])
 
 
     
@@ -218,7 +229,7 @@ function Expanding() {
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
                     >
-                        <span className='whitespace-wrap'>{row.project_name.length > 13 
+                        <span className='whitespace-wrap'>{row.project_name?.length > 13 
                                         ? `${row.project_name.slice(0, 10)}...` 
                                         : row.project_name}</span>
                         {isHovered && (
@@ -294,7 +305,7 @@ function Expanding() {
     ], [])
 
     const table = useReactTable({
-        data: projects,
+        data: projectData || [] ,
         columns: outerTableColumns,
         state: {
             expanded,
@@ -325,11 +336,13 @@ function Expanding() {
                 </Tr>
                 ))}
             </THead>
+
+            { projectData && projectData?.length > 0 ? 
             <TBody>
-                {table.getRowModel().rows.map((row) => (
+                {table?.getRowModel()?.rows?.map((row) => (
                     <>
                         <Tr key={row.id} className='flex w-full'>
-                            {row.getVisibleCells().map((cell) => (
+                            {row.getVisibleCells()?.map((cell) => (
                                 <Td key={cell.id}>
                                     {flexRender(
                                         cell.column.columnDef.cell,
@@ -340,11 +353,11 @@ function Expanding() {
                         </Tr>
                         {row.getIsExpanded() && (
                             <Tr>
-                                <Td colSpan={row.getVisibleCells().length}>
+                                <Td colSpan={row.getVisibleCells()?.length}>
                                     <Table>
                                         <THead>
                                             <Tr>
-                                                {childTableColumns.map((col, idx) => 
+                                                {childTableColumns?.map((col, idx) => 
                                                  {
                                                     const tempObj :any = {}
                                                     return (<Th key={idx}>
@@ -369,7 +382,7 @@ function Expanding() {
 
                                                 return(
                                                 <Tr key={childRow.project_id}>
-                                                    {childTableColumns.map((col:any, idx) => {
+                                                    {childTableColumns?.map((col:any, idx) => {
                                                         // console.log(col)
 
                                                         if(col.accessorKey === 'estimated_task_end_date' ||  col.accessorKey === 'estimated_task_start_date') {
@@ -437,7 +450,11 @@ function Expanding() {
                         )}
                     </>
                 ))}
-            </TBody>
+            </TBody> :
+            <Tr><Td><NoData /></Td></Tr>
+
+
+            }
         </Table>
     )
 }

@@ -22,6 +22,7 @@ import { useLeadContext } from '../../LeadList/store/LeadContext';
 import useThemeClass from '@/utils/hooks/useThemeClass';
 import { useRoleContext } from '../../Roles/RolesContext';
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
+import NoData from '@/views/pages/NoData'
 
 const { Tr, Th, Td, THead, TBody } = Table
 
@@ -302,7 +303,7 @@ function Expanding() {
     ], [])
 
     const table = useReactTable({
-        data: apiData,
+        data: apiData || [],
         columns: outerTableColumns,
         state: {
             expanded,
@@ -329,6 +330,9 @@ function Expanding() {
                     </Tr>
                 ))}
             </THead>
+
+            {
+                apiData && apiData?.length > 0 ? 
             <TBody>
                 {table.getRowModel().rows.map((row) => (
                     <>
@@ -454,7 +458,8 @@ function Expanding() {
                         )}
                     </>
                 ))}
-            </TBody>
+            </TBody> : <Tr><Td><NoData /></Td></Tr>
+            }
         </Table>
     )
 }

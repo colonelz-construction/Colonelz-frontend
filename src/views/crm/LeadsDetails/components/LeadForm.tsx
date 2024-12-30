@@ -41,7 +41,7 @@ const LeadForm = () => {
     org_id,
     lead_id: LeadId,
     status: '',
-    date: '',
+    date: new Date(),
     content: '',
     createdBy: 'ADMIN'
   }}
@@ -106,6 +106,7 @@ const LeadForm = () => {
       <Field>
       {({field,form}:any) => (
       <DateTimepicker
+      defaultValue={new Date()}
       onChange={(date) => form.setFieldValue('date', date)}
       />
       )}

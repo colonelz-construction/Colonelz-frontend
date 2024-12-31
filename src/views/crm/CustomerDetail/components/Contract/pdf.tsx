@@ -1325,6 +1325,9 @@ const MyDocument = (data: any) => {
 
         </View>
       </Page>
+      <Page></Page>
+      <Page></Page>
+      <Page></Page>
     </Document>
   )
 };
@@ -1356,6 +1359,8 @@ const MyComponent = (data: any) => {
           Contract Created Successfully
         </Notification>
       )
+      navigate(-1)
+      
     }
     else {
       toast.push(

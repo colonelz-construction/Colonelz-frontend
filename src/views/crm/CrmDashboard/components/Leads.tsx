@@ -86,7 +86,7 @@ const Leads = ({ data = [], className }: any) => {
    />
       ) : (
         apiData?.slice(0, 5).map((item, index) => (
-          <Tr key={index} onClick={()=>navigate(`/app/crm/lead/?id=${item.lead_id}`)} className=' cursor-pointer'>
+          <Tr key={index} onClick={()=>navigate(`/app/crm/lead/?id=${item.lead_id}&tab=Details`)} className=' cursor-pointer'>
             <Td className=' capitalize'>{item.name}</Td>
             <Td className={`capitalize`}>
               <span className={`${statusColors[item.status]} px-2 py-1 rounded-sm text-xs font-semibold`}>{item.status}</span>

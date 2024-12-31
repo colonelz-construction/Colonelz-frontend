@@ -87,11 +87,24 @@ const Notification1 = () => {
     <div>
       <Dropdown
         renderTitle={
+          unreadNotifications.length > 0 ? 
+
           <>
             <Badge className="mr-4 text-2xl rounded-md cursor-pointer" content={unreadNotifications.length}>
               <HiOutlineBell />
             </Badge>
           </>
+          :
+
+          <>
+            {/* <Badge className="mr-4 text-2xl rounded-md cursor-pointer" content={unreadNotifications.length}> */}
+          
+
+              <HiOutlineBell className='mt-[0.4rem] text-2xl rounded-md cursor-pointer' />
+           
+            {/* </Badge> */}
+          </>
+
         }
         className="mr-2"
         menuClass="p-0 w-[200px] min-w-[250px] md:min-w-[350px] max-h-85 "

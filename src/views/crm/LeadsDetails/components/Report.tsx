@@ -41,7 +41,6 @@ const Report = ({report}:any) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-//   console.log(report)
 
   useEffect(() => {
     const fetchData = async () => {

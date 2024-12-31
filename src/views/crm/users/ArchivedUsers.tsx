@@ -26,6 +26,7 @@ import { AuthorityCheck, ConfirmDialog } from '@/components/shared'
 import { LiaTrashRestoreSolid } from 'react-icons/lia'
 import { AiOutlineDelete } from 'react-icons/ai'
 import { AccessType } from '../Profile/Roles'
+import NoData from '@/views/pages/NoData'
 
 
 export type ArchiveUserResponseType = {
@@ -249,7 +250,7 @@ const ArchivedUsers = () => {
     const [datas] = useState(() => data)
 
     const table = useReactTable({
-        data,
+        data : data || [],
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -341,7 +342,8 @@ const ArchivedUsers = () => {
                  columns={columns.length}
                  rows={10}
                 
-             />:
+             />: (
+                data && data?.length > 0 ?
                 <TBody>
                     {table.getRowModel().rows.map((row) => {
                         return (
@@ -359,7 +361,11 @@ const ArchivedUsers = () => {
                             </Tr>
                         )
                     })}
-                </TBody>}
+                </TBody> :
+                <Tr><Td colSpan={columns.length}><NoData /></Td></Tr>
+
+             )
+                }
             </Table>
             <div className="flex items-center justify-between mt-4">
                 <Pagination

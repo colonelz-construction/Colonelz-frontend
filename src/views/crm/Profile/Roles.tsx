@@ -27,6 +27,7 @@ import type { InputHTMLAttributes } from 'react'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import { useRoleContext } from '../Roles/RolesContext'
 import { FormValues } from '../Roles/EditRoles'
+import NoData from '@/views/pages/NoData'
 
 export type RoleResponse = {
     data: Data[]
@@ -267,7 +268,7 @@ useEffect(() => {
     fetchData()
 }, [])
 const table = useReactTable({
-    data: data,
+    data: data || [],
     columns,
     filterFns: {
         fuzzy: fuzzyFilter,
@@ -362,6 +363,8 @@ return (
                         columns={columns.length}
                         rows={10}
                     /> :
+                    (data && data?.length > 0 ? 
+
                     <TBody>
                         {table.getRowModel().rows.map((row) => {
                             return (
@@ -379,7 +382,12 @@ return (
                                 </Tr>
                             )
                         })}
-                    </TBody>}
+                    </TBody> :
+                    <Tr><Td colSpan={columns.length}><NoData /></Td></Tr>
+
+                    )
+                    
+                    }
             </Table>
             <div className="flex items-center justify-between mt-4">
                 <Pagination

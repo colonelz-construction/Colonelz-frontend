@@ -1234,7 +1234,7 @@ const MyComponent = (data:any) => {
           Contract Created Successfully
         </Notification>
       )
-      navigate(-1)
+      navigate(`/app/crm/lead/?id=${data.data.lead_id}&tab=Details`)
     }
     else{
       toast.push(

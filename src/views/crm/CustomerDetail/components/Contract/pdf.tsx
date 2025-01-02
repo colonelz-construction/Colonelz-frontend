@@ -1348,7 +1348,7 @@ const MyComponent = (data: any) => {
     formData.append('lead_id', data.data.lead_id);
     formData.append('user_id', localStorage.getItem('userId') || '');
     formData.append('file', blob, `${data.data.file_name}.pdf`);
-    formData.append('org_id', blob, org_id);
+    formData.append('org_id', org_id);
 
     const response = await addcontractinfileManager(formData);
 
@@ -1359,7 +1359,7 @@ const MyComponent = (data: any) => {
           Contract Created Successfully
         </Notification>
       )
-      navigate(-1)
+      navigate(`/app/crm/lead/?id=${data.data.lead_id}&tab=Details`)
       
     }
     else {

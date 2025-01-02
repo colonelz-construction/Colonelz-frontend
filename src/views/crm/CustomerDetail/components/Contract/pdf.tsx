@@ -392,37 +392,20 @@ const styles = StyleSheet.create({
   }
 });
 
-function numberToWords(number: number) {
-  const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
-  const teens = ['', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-  const tens = ['', 'Ten', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-
-  let result = '';
-
-  const hundreds = Math.floor(number / 100);
-  const tensAndUnits = number % 100;
-
-  if (hundreds > 0) {
-    result += units[hundreds] + ' hundred ';
+function formatCurrency(amount:any) {
+  let numStr = amount.toString();
+  
+  let lastThree = numStr.slice(-3);
+  
+  let otherDigits = numStr.slice(0, -3);
+  
+  if (otherDigits.length > 0) {
+      otherDigits = otherDigits.replace(/\B(?=(\d{2})+(?!\d))/g, ",");
   }
-
-  if (tensAndUnits > 0) {
-    if (tensAndUnits < 10) {
-      result += units[tensAndUnits];
-    } else if (tensAndUnits < 20) {
-      result += teens[tensAndUnits - 10];
-    } else {
-      const tensDigit = Math.floor(tensAndUnits / 10);
-      const unitsDigit = tensAndUnits % 10;
-      result += tens[tensDigit];
-      if (unitsDigit > 0) {
-        result += ' ' + units[unitsDigit];
-      }
-    }
-  }
-
-  return result;
+  
+  return otherDigits.length > 0 ? otherDigits + ',' + lastThree : lastThree;
 }
+
 
 function numberToWordsString(number: number) {
   if (number === 0) {
@@ -436,17 +419,17 @@ function numberToWordsString(number: number) {
     number = Math.abs(number);
   }
 
-  const billion = Math.floor(number / 1000000000);
-  const million = Math.floor((number % 1000000000) / 1000000);
-  const thousand = Math.floor((number % 1000000) / 1000);
+  const crore = Math.floor(number / 10000000);
+  const lakh = Math.floor((number % 10000000) / 100000);
+  const thousand = Math.floor((number % 100000) / 1000);
   const remainder = number % 1000;
 
-  if (billion > 0) {
-    result += numberToWords(billion) + ' billion ';
+  if (crore > 0) {
+    result += numberToWords(crore) + ' crore ';
   }
 
-  if (million > 0) {
-    result += numberToWords(million) + ' million ';
+  if (lakh > 0) {
+    result += numberToWords(lakh) + ' lakh ';
   }
 
   if (thousand > 0) {
@@ -458,6 +441,32 @@ function numberToWordsString(number: number) {
   }
 
   return result.trim();
+}
+
+// Helper function to convert numbers to words
+function numberToWords(number: number): string {
+  const ones = [
+    '', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 
+    'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 
+    'seventeen', 'eighteen', 'nineteen'
+  ];
+
+  const tens = [
+    '', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 
+    'eighty', 'ninety'
+  ];
+
+  if (number < 20) {
+    return ones[number];
+  } else if (number < 100) {
+    return tens[Math.floor(number / 10)] + (number % 10 ? ' ' + ones[number % 10] : '');
+  } else {
+    return (
+      ones[Math.floor(number / 100)] +
+      ' hundred' +
+      (number % 100 ? ' ' + numberToWords(number % 100) : '')
+    );
+  }
 }
 
 const MyDocument = (data: any) => {
@@ -837,14 +846,14 @@ const MyDocument = (data: any) => {
 
         <View style={styles.scopepart}>
           <View> <Text style={styles.part1}>Fee Proposal</Text></View>
-          <View><Text style={styles.text1}>Our Design charges are @ ₹{pdfData.design_charges}/ Sft but with special regards we offer {pdfData.discount}%
+          <View><Text style={styles.text1}>Our Design charges are @ ₹{formatCurrency(pdfData.design_charges)}/ Sft but with special regards we offer {pdfData.discount}%
             discount for you, thus the complete process of designing, supervision, site and
             joint material selection visits will be done as per the following rates:
           </Text></View>
 
 
           <View >
-            <View ><Text style={styles.fee} >{number++}. Design charges @ ₹{pdfData.design_charges_per_sft}/ Sft x Covered area @{pdfData.design_cover_area_in_sft} Sft = ₹{Number(pdfData.design_charges_per_sft) * Number(pdfData.design_cover_area_in_sft)}/-</Text></View>
+            <View ><Text style={styles.fee} >{number++}. Design charges @ ₹{formatCurrency(pdfData.design_charges_per_sft)}/ Sft x Covered area @{pdfData.design_cover_area_in_sft} Sft = ₹{formatCurrency(Number(pdfData.design_charges_per_sft) * Number(pdfData.design_cover_area_in_sft))}/-</Text></View>
           </View>
           <View>
             <Text style={styles.subfee} >({numberToWordsString(Number(pdfData.design_charges_per_sft) * Number(pdfData.design_cover_area_in_sft))}) excl. of
@@ -857,7 +866,7 @@ const MyDocument = (data: any) => {
               return (
                 <>
                   <View >
-                    <View ><Text style={styles.fee} >{number++}. Balconies @ ₹{pdfData.balcony_charges_per_sft}/ Sft x Balcony area @ {pdfData.balcony_area_in_sft} Sft = ₹{Number(pdfData.balcony_area_in_sft) * Number(pdfData.balcony_charges_per_sft)}/-</Text></View>
+                    <View ><Text style={styles.fee} >{number++}. Balconies @ ₹{formatCurrency(pdfData.balcony_charges_per_sft)}/ Sft x Balcony area @ {pdfData.balcony_area_in_sft} Sft = ₹{formatCurrency(Number(pdfData.balcony_area_in_sft) * Number(pdfData.balcony_charges_per_sft))}/-</Text></View>
                   </View>
                   <View>
                     <Text style={styles.subfee} >({numberToWordsString(Number(pdfData.balcony_area_in_sft) * Number(pdfData.balcony_charges_per_sft))}) excl. of taxes.
@@ -875,8 +884,8 @@ const MyDocument = (data: any) => {
               return (
                 <>
                   <View>
-                    <View><Text style={styles.fee} >{number++}. Terrace covered area @ ₹{pdfData.terrace_covered_charges_per_sft}/ Sft x Terrace area @ {pdfData.terrace_covered_area_in_sft} Sft =
-                      ₹{Number(pdfData.terrace_covered_area_in_sft) * Number(pdfData.terrace_covered_charges_per_sft)}/-</Text></View>
+                    <View><Text style={styles.fee} >{number++}. Terrace covered area @ ₹{formatCurrency(pdfData.terrace_covered_charges_per_sft)}/ Sft x Terrace area @ {formatCurrency(pdfData.terrace_covered_area_in_sft)} Sft =
+                      ₹{formatCurrency(Number(pdfData.terrace_covered_area_in_sft) * Number(pdfData.terrace_covered_charges_per_sft))}/-</Text></View>
                   </View>
                   <View>
                     <Text style={styles.subfee} > ({numberToWordsString(Number(pdfData.terrace_covered_area_in_sft) * Number(pdfData.terrace_covered_charges_per_sft))}) excl. of taxes.
@@ -884,7 +893,7 @@ const MyDocument = (data: any) => {
                   </View>
 
                   <View>
-                    <View><Text style={styles.fee} >{number++}. Terrace open area @ ₹{pdfData.terrace_open_charges_per_sft}/ Sft x Terrace area @ {pdfData.terrace_open_area_in_sft} Sft = {Number(pdfData.terrace_open_area_in_sft) * Number(pdfData.terrace_open_charges_per_sft)}/-</Text></View>
+                    <View><Text style={styles.fee} >{number++}. Terrace open area @ ₹{formatCurrency(pdfData.terrace_open_charges_per_sft)}/ Sft x Terrace area @ {pdfData.terrace_open_area_in_sft} Sft = {Number(pdfData.terrace_open_area_in_sft) * Number(pdfData.terrace_open_charges_per_sft)}/-</Text></View>
                   </View>
                   <View>
                     <Text style={styles.subfee} > ({numberToWordsString(Number(pdfData.terrace_open_area_in_sft) * Number(pdfData.terrace_open_charges_per_sft))}) excl. of
@@ -900,8 +909,8 @@ const MyDocument = (data: any) => {
 
           <View>   <View >
             <View ><Text style={styles.fee} >{number++}. Final Design charges as per the site areas mentioned above are ₹
-              {Number(pdfData.design_charges_per_sft) * Number(pdfData.design_cover_area_in_sft)}/- (Covered area) + ₹ {Number(pdfData.balcony_area_in_sft) * Number(pdfData.balcony_charges_per_sft)}/- (Balcony area) + ₹ {Number(pdfData.terrace_covered_area_in_sft) * Number(pdfData.terrace_covered_charges_per_sft)}/- (Terrace covered area)+ ₹ {Number(pdfData.terrace_open_area_in_sft) * Number(pdfData.terrace_open_charges_per_sft)}/- (Terrace open area) =
-              ₹{Number(pdfData.design_charges_per_sft) * Number(pdfData.design_cover_area_in_sft) + Number(pdfData.balcony_area_in_sft) * Number(pdfData.balcony_charges_per_sft) + Number(pdfData.terrace_covered_area_in_sft) * Number(pdfData.terrace_covered_charges_per_sft) + Number(pdfData.terrace_open_area_in_sft) * Number(pdfData.terrace_open_charges_per_sft)}/-</Text></View>
+              {formatCurrency(Number(pdfData.design_charges_per_sft) * Number(pdfData.design_cover_area_in_sft))}/- (Covered area) + ₹ {formatCurrency(Number(pdfData.balcony_area_in_sft) * Number(pdfData.balcony_charges_per_sft))}/- (Balcony area) + ₹ {formatCurrency(Number(pdfData.terrace_covered_area_in_sft) * Number(pdfData.terrace_covered_charges_per_sft))}/- (Terrace covered area)+ ₹ {formatCurrency(Number(pdfData.terrace_open_area_in_sft) * Number(pdfData.terrace_open_charges_per_sft))}/- (Terrace open area) =
+              ₹{formatCurrency(Number(pdfData.design_charges_per_sft) * Number(pdfData.design_cover_area_in_sft) + Number(pdfData.balcony_area_in_sft) * Number(pdfData.balcony_charges_per_sft) + Number(pdfData.terrace_covered_area_in_sft) * Number(pdfData.terrace_covered_charges_per_sft) + Number(pdfData.terrace_open_area_in_sft) * Number(pdfData.terrace_open_charges_per_sft))}/-</Text></View>
           </View>
             <View>
               <Text style={styles.subfee} > ({numberToWordsString(Number(pdfData.design_charges_per_sft) * Number(pdfData.design_cover_area_in_sft) + Number(pdfData.balcony_area_in_sft) * Number(pdfData.balcony_charges_per_sft) + Number(pdfData.terrace_covered_area_in_sft) * Number(pdfData.terrace_covered_charges_per_sft) + Number(pdfData.terrace_open_area_in_sft) * Number(pdfData.terrace_open_charges_per_sft))})

@@ -508,16 +508,21 @@ const AllTask = ({users}:any) => {
     const Toggle = <Button variant='solid' size='sm' className='flex justify-center items-center gap-2'>
         <span>Filter</span><span><GoChevronDown /></span></Button>
 
-    const userOptions = users?.filter((user: any) => user.role !== "SUPERADMIN")
-                            .map((user: any) => ({
-                            label: 'assignee',
-                            value: user.username
-                            }));
+    let noneUser = [{ label: "None", value: "None" }]
+     
+    let userOptions = users
+            ?.filter((user: any) => user.role !== "SUPERADMIN")
+            .map((user: any) => ({
+                label: 'assignee',
+                value: user.username,
+            }));
+
+    userOptions = [...noneUser, ...(userOptions || [])];
 
     // console.log(users)
     // console.log(userOptions)
     
-    const UserOptions = [{ label: "None", value: "None" }, ...userOptions]
+    // const UserOptions = [{ label: "None", value: "None" }, ...userOptions]
     // console.log(UserOptions)
     
                             
@@ -582,7 +587,7 @@ const AllTask = ({users}:any) => {
             temp = statusOptions
         }
         else if (name === 'assignee') {
-            temp = UserOptions
+            temp = userOptions
         }
 
         const handleSelect = async (value: string) => {

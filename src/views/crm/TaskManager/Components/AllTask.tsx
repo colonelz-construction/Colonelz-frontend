@@ -1,17 +1,12 @@
-
 import { useMemo, useState, useEffect, useRef } from 'react'
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
 import Input from '@/components/ui/Input'
-import { Button, Card, Dialog, Dropdown, Notification, Skeleton, Steps, Tabs, toast, Tooltip } from '@/components/ui'
-
-
+import { Button, Dropdown, Notification, toast, Tooltip } from '@/components/ui'
 import { IoIosCheckmarkCircle } from "react-icons/io";
 import { Timeout } from 'react-number-format/types/types'
-
 import Pagination from '@/components/ui/Pagination'
 import { MdDeleteOutline } from 'react-icons/md'
 import { apiGetCrmLeadsTaskDelete, apiGetCrmOpenTaskDelete, apiGetCrmProjectsTaskDelete, apiGetUsers } from '@/services/CrmService'
-
 import {
     useReactTable,
     getCoreRowModel,
@@ -25,29 +20,32 @@ import {
 } from '@tanstack/react-table'
 import { GoChevronDown } from 'react-icons/go'
 import { rankItem } from '@tanstack/match-sorter-utils'
-import { ProjectDataItem } from './type'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getProjectData } from './data'
 import { Select } from '@/components/ui'
-import { GoProjectRoadmap } from 'react-icons/go'
-import { useData } from '../FileManagerContext/FIleContext'
-import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
-import NoData from '@/views/pages/NoData'
 import formateDate from '@/store/dateformate'
 import { apiGetAllTasksDetails } from '@/services/CrmService'
-import { AuthorityCheck, ConfirmDialog } from '@/components/shared'
-import Assignee from '../../CustomerDetail/Project Progress/Assignee';
+import { ConfirmDialog } from '@/components/shared'
 import { MdOutlineCancel } from "react-icons/md";
-import VerticalMenuContent from '@/components/template/VerticalMenuContent';
 import AddTask from '../../OpenTaskManger/Task/AddTask'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import { useRoleContext } from '../../Roles/RolesContext'
 import MoveToDialog from './AllTasks/MoveToDialog';
 import { useProjectContext } from '../../Customers/store/ProjectContext';
 import { useLeadContext } from '../../LeadList/store/LeadContext';
-
+import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton';
+import NoData from '@/views/pages/NoData';
+import {
+    Table,
+    TableHead,
+    TableBody,
+    TableRow,
+    TableCell,
+    TableContainer,
+    Paper,
+} from "@mui/material";
+import Sorter from '@/components/ui/Table/Sorter';
 
 export type OpenTaskDataItem = {
     task_name: string;
@@ -86,7 +84,7 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
     debounce?: number
 }
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
 function DebouncedInput({
     value: initialValue,
@@ -155,7 +153,7 @@ const pageSizeOption = [
     { value: 40, label: '40 / page' },
     { value: 50, label: '50 / page' },
 ]
-const AllTask = ({users}:any) => {
+const AllTask = ({ users }: any) => {
     const { projects, loading } = useProjectContext();
     const apiData = useLeadContext()
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -165,7 +163,7 @@ const AllTask = ({users}:any) => {
     const navigate = useNavigate()
     const [data, setData] = useState<any>([]);
 
-    
+
 
     const tempFilterBox = [
         {
@@ -197,7 +195,7 @@ const AllTask = ({users}:any) => {
     const [filterCheck, setFilterCheck] = useState<any>(filterCheckObj);
     // console.log(filterTask)
 
-    
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -509,23 +507,23 @@ const AllTask = ({users}:any) => {
         <span>Filter</span><span><GoChevronDown /></span></Button>
 
     let noneUser = [{ label: "None", value: "None" }]
-     
+
     let userOptions = users
-            ?.filter((user: any) => user.role !== "SUPERADMIN")
-            .map((user: any) => ({
-                label: 'assignee',
-                value: user.username,
-            }));
+        ?.filter((user: any) => user.role !== "SUPERADMIN")
+        .map((user: any) => ({
+            label: 'assignee',
+            value: user.username,
+        }));
 
     userOptions = [...noneUser, ...(userOptions || [])];
 
     // console.log(users)
     // console.log(userOptions)
-    
+
     // const UserOptions = [{ label: "None", value: "None" }, ...userOptions]
     // console.log(UserOptions)
-    
-                            
+
+
     const statusOptions = [
         { label: "None", value: "None" },
         { label: "In Progress", value: "In Progress" },
@@ -595,7 +593,7 @@ const AllTask = ({users}:any) => {
 
             const key = keyMapping[name]; // Map name to the corresponding key in filterTaskObj
             if (key) {
-                if(value === 'None') {
+                if (value === 'None') {
                     setFilterTask((prev: any) => ({
                         ...prev,
                         [key]: '', // Update the corresponding key's value
@@ -676,141 +674,166 @@ const AllTask = ({users}:any) => {
 
 
 
-            <Table>
-                <THead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <Tr key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <Th
-                                        key={header.id}
-                                        colSpan={header.colSpan}
-                                    >
+            <TableContainer component={Paper} className="max-h-[350px] overflow-y-auto shadow-none" style={{ scrollbarWidth: 'none', boxShadow: 'none'}}>
+                <Table stickyHeader className='shadow-none border-none' sx={{ textAlign: 'center', color:"#6B7280", border: "0.09rem"}}>
+                    <TableHead>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => (
+                                    <TableCell key={header.id} colSpan={header.colSpan} className='font-bold' sx={{ textAlign: 'center', backgroundColor: '#f9fafb', color:"#6B7280", fontWeight: "600",  }}>
                                         {header.isPlaceholder ? null : (
                                             <div
                                                 {...{
-                                                    className:
-                                                        header.column.getCanSort()
-                                                            ? 'cursor-pointer select-none'
-                                                            : 'pointer-events-none',
+                                                    className: header.column.getCanSort()
+                                                        ? "cursor-pointer select-none"
+                                                        : "pointer-events-none",
                                                     onClick:
-                                                        header.column.id !==
-                                                            'action'
+                                                        header.column.id !== "action"
                                                             ? header.column.getToggleSortingHandler()
                                                             : undefined,
                                                 }}
                                             >
                                                 {flexRender(
-                                                    header.column.columnDef
-                                                        .header,
+                                                    header.column.columnDef.header,
                                                     header.getContext()
                                                 )}
-                                                {header.column.getCanSort() && (
-                                                    header.column.id !==
-                                                    'action' && (
-                                                        <Sorter
-                                                            sort={header.column.getIsSorted()}
-                                                        />
-                                                    )
-                                                )}
+                                                {header.column.getCanSort() &&
+                                                    header.column.id !== "action" && (
+                                                        <Sorter sort={header.column.getIsSorted()} />
+                                                    )}
                                             </div>
                                         )}
-                                    </Th>
-                                )
-                            })}
-                        </Tr>
-                    ))}
-                </THead>
-                {skloading ? <TableRowSkeleton
-                    avatarInColumns={[0]}
-                    columns={columns.length}
-                    avatarProps={{ width: 14, height: 14 }}
-                /> : data.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
-                    <TBody>
-                        {table.getRowModel().rows.map((row) => {
-                            return (
-                                <Tr key={row.id} className=' capitalize'>
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        ))}
+                    </TableHead>
+
+                    {skloading ? (
+                        <TableBody>
+                            <TableRow>
+                                <TableCell colSpan={columns.length}>
+                                    <TableRowSkeleton
+                                        avatarInColumns={[0]}
+                                        columns={columns.length}
+                                        avatarProps={{ width: 14, height: 14 }}
+                                    />
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    ) : data.length === 0 ? (
+                        <TableBody>
+                            <TableRow>
+                                <TableCell colSpan={columns.length}>
+                                    <NoData />
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    ) : (
+                        <TableBody>
+                            {table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id} className="capitalize" sx={{ textAlign: 'center', color:"#6B7280" ,cursor: 'pointer', '&:hover': { backgroundColor: '#dfedfe' },}}>
                                     {row.getVisibleCells().map((cell) => {
+                                        const taskType = row.original.type;
 
-                                        // console.log(row)
-                                        const taskType = row.original.type
-                                        // console.log(cell)
-
-                                        if (taskType === 'project type') {
-
-                                            if (cell.column.id === 'task_name') {
+                                        if (taskType === "project type") {
+                                            if (cell.column.id === "task_name") {
                                                 return (
-                                                    <Td key={cell.id} onClick={() => navigate(`/app/crm/Projects/TaskDetails?project_id=${row.original.project_id}&task=${row.original.task_id}`)}>
+                                                    <TableCell
+                                                        key={cell.id}
+                                                        onClick={() =>
+                                                            navigate(
+                                                                `/app/crm/Projects/TaskDetails?project_id=${row.original.project_id}&task=${row.original.task_id}`
+                                                            )
+                                                        }
+                                                    >
                                                         {flexRender(
                                                             cell.column.columnDef.cell,
                                                             cell.getContext()
                                                         )}
-                                                    </Td>
-                                                )
+                                                    </TableCell>
+                                                );
                                             } else {
                                                 return (
-                                                    <Td key={cell.id}>
+                                                    <TableCell key={cell.id}>
                                                         {flexRender(
                                                             cell.column.columnDef.cell,
                                                             cell.getContext()
                                                         )}
-                                                    </Td>
-                                                )
-
+                                                    </TableCell>
+                                                );
                                             }
-
-                                        }
-                                        else if (taskType === 'lead type') {
-                                            if (cell.column.id === 'task_name') {
+                                        } else if (taskType === "lead type") {
+                                            if (cell.column.id === "task_name") {
                                                 return (
-                                                    <Td key={cell.id} onClick={() => navigate(`/app/crm/Leads/TaskDetails?lead_id=${row.original.lead_id}&task=${row.original.task_id}`)}>
+                                                    <TableCell
+                                                        key={cell.id}
+                                                        onClick={() =>
+                                                            navigate(
+                                                                `/app/crm/Leads/TaskDetails?lead_id=${row.original.lead_id}&task=${row.original.task_id}`
+                                                            )
+                                                        }
+                                                    >
                                                         {flexRender(
                                                             cell.column.columnDef.cell,
                                                             cell.getContext()
                                                         )}
-                                                    </Td>
-                                                )
+                                                    </TableCell>
+                                                );
                                             } else {
                                                 return (
-                                                    <Td key={cell.id}>
+                                                    <TableCell key={cell.id}>
                                                         {flexRender(
                                                             cell.column.columnDef.cell,
                                                             cell.getContext()
                                                         )}
-                                                    </Td>
-                                                )
-
+                                                    </TableCell>
+                                                );
+                                                
                                             }
 
                                         } else {
-                                            if (cell.column.id === 'task_name') {
+                                            if (cell.column.id === "task_name") {
                                                 return (
-                                                    <Td key={cell.id} onClick={() => navigate(`/app/crm/Tasks/OpenTaskDetails?task=${row.original.task_id}`)}>
+                                                    <TableCell
+                                                        key={cell.id}
+                                                        onClick={() =>
+                                                            navigate(
+                                                                `/app/crm/Tasks/OpenTaskDetails?task=${row.original.task_id}`
+                                                            )
+                                                        }
+                                                        sx={{ textAlign: 'center', color:"#6B7280" }}
+                                                    >
                                                         {flexRender(
                                                             cell.column.columnDef.cell,
                                                             cell.getContext()
                                                         )}
-                                                    </Td>
-                                                )
+                                                    </TableCell>
+                                                );
                                             } else {
                                                 return (
-                                                    <Td key={cell.id}>
+                                                    <TableCell key={cell.id} sx={{ textAlign: 'center', color:"#6B7280" }}>
                                                         {flexRender(
                                                             cell.column.columnDef.cell,
                                                             cell.getContext()
                                                         )}
-                                                    </Td>
-                                                )
+                                                    </TableCell>
+                                                );
 
                                             }
 
                                         }
                                     })}
-                                </Tr>
-                            )
-                        })}
-                    </TBody>}
-            </Table>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    )}
+                </Table>
+            </TableContainer>
+
+
+
+
             <div className="flex items-center justify-between mt-4">
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}

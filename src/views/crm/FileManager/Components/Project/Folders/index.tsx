@@ -34,7 +34,9 @@ import { Field, Form, Formik } from 'formik'
 import NoData from '@/views/pages/NoData'
 import { AiOutlineDelete } from 'react-icons/ai'
 
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import Sorter from '@/components/ui/Table/Sorter'
 import {
     useReactTable,
     getCoreRowModel,
@@ -59,7 +61,7 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
     debounce?: number
 }
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
 function DebouncedInput({
     value: initialValue,
@@ -136,9 +138,9 @@ const Index = () => {
     const [selectedFileId, setSelectedFileId] = React.useState<string | null>(null,)
     const { roleData } = useRoleContext()
     const role = localStorage.getItem('role')
-    const uploadAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
+    const uploadAccess = role === 'SUPERADMIN' ? true : roleData?.data?.file?.create?.includes(`${localStorage.getItem('role')}`)
     const { folderData, projectId, projectName } = location.state || {}
-    const org_id : any= localStorage.getItem('orgId')
+    const org_id: any = localStorage.getItem('orgId')
 
     // const folderName = folderData.folder_name
 
@@ -533,7 +535,7 @@ const Index = () => {
                 header: 'Actions', accessorKey: 'actions',
                 cell: ({ row }) => {
                     const { roleData } = useRoleContext()
-                    const deleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.file?.delete?.includes(`${role}`)
+                    const deleteAccess = role === 'SUPERADMIN' ? true : roleData?.data?.file?.delete?.includes(`${role}`)
                     return <div className='flex items-center gap-2'>
                         {deleteAccess &&
                             <MdDeleteOutline className='text-xl cursor-pointer hover:text-red-500' onClick={() => openDialog3(row.original.fileId)} />}
@@ -647,66 +649,69 @@ const Index = () => {
                             onChange={(value) => setGlobalFilter(String(value))}
                         />
                     </div>
-                    <Table>
-                        <THead>
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <Tr key={headerGroup.id}>
-                                    {headerGroup.headers.map((header) => {
-                                        return (
-                                            <Th
-                                                key={header.id}
-                                                colSpan={header.colSpan}
-                                            >
-                                                {header.isPlaceholder || header.id === 'actions' ? null : (
-                                                    <div
-                                                        {...{
-                                                            className:
-                                                                header.column.getCanSort()
-                                                                    ? 'cursor-pointer select-none'
-                                                                    : '',
-                                                            onClick:
-                                                                header.column.getToggleSortingHandler(),
-                                                        }}
-                                                    >
-                                                        {flexRender(
-                                                            header.column.columnDef
-                                                                .header,
-                                                            header.getContext()
-                                                        )}
-                                                        {
-                                                            <Sorter
-                                                                sort={header.column.getIsSorted()}
-                                                            />
-                                                        }
-                                                    </div>
-                                                )}
-                                            </Th>
-                                        )
-                                    })}
-                                </Tr>
-                            ))}
-                        </THead>
-                        {
-                            leadData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
-                                <TBody>
-                                    {table.getRowModel().rows.map((row) => {
-                                        return (
-                                            <Tr key={row.id}>
-                                                {row.getVisibleCells().map((cell) => {
-                                                    return (
-                                                        <Td key={cell.id}>
+                    <TableContainer className="max-h-[400px]" style={{ scrollbarWidth: 'none', boxShadow: 'none' }}>
+                        <Table stickyHeader>
+                            <TableHead>
+                                {table.getHeaderGroups().map((headerGroup) => (
+                                    <TableRow key={headerGroup.id} className='uppercase'>
+                                        {headerGroup.headers.map((header) => {
+                                            return (
+                                                <TableCell
+                                                    key={header.id}
+                                                    colSpan={header.colSpan}
+                                                    sx={{ fontWeight: "600" }}
+                                                >
+                                                    {header.isPlaceholder || header.id === 'actions' ? null : (
+                                                        <div
+                                                            {...{
+                                                                className:
+                                                                    header.column.getCanSort()
+                                                                        ? 'cursor-pointer select-none'
+                                                                        : '',
+                                                                onClick:
+                                                                    header.column.getToggleSortingHandler(),
+                                                            }}
+                                                        >
                                                             {flexRender(
-                                                                cell.column.columnDef.cell,
-                                                                cell.getContext()
+                                                                header.column.columnDef
+                                                                    .header,
+                                                                header.getContext()
                                                             )}
-                                                        </Td>
-                                                    )
-                                                })}
-                                            </Tr>
-                                        )
-                                    })}
-                                </TBody>}
-                    </Table>
+                                                            {
+                                                                <Sorter
+                                                                    sort={header.column.getIsSorted()}
+                                                                />
+                                                            }
+                                                        </div>
+                                                    )}
+                                                </TableCell>
+                                            )
+                                        })}
+                                    </TableRow>
+                                ))}
+                            </TableHead>
+                            {
+                                leadData.length === 0 ? <TableCell colSpan={columns.length}><NoData /></TableCell> :
+                                    <TableBody>
+                                        {table.getRowModel().rows.map((row) => {
+                                            return (
+                                                <TableRow key={row.id} sx={{ '&:hover': { backgroundColor: '#dfedfe' } }}>
+                                                    {row.getVisibleCells().map((cell) => {
+                                                        return (
+                                                            <TableCell key={cell.id}>
+                                                                {flexRender(
+                                                                    cell.column.columnDef.cell,
+                                                                    cell.getContext()
+                                                                )}
+                                                            </TableCell>
+                                                        )
+                                                    })}
+                                                </TableRow>
+                                            )
+                                        })}
+                                    </TableBody>}
+                        </Table>
+                    </TableContainer>
 
                     <div className="flex items-center justify-between mt-4">
                         <Pagination

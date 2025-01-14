@@ -1,6 +1,6 @@
 
 import { useMemo, useState, useEffect } from 'react'
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
 import Input from '@/components/ui/Input'
 import Pagination from '@/components/ui/Pagination'
 import {
@@ -26,6 +26,8 @@ import { useData } from '../FileManagerContext/FIleContext'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import NoData from '@/views/pages/NoData'
 import formateDate from '@/store/dateformate'
+import { Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import Sorter from '@/components/ui/Table/Sorter'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -33,7 +35,7 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
     debounce?: number
 }
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
 function DebouncedInput({
     value: initialValue,
@@ -57,7 +59,7 @@ function DebouncedInput({
 
     return (
         <div className="flex justify-between ">
-<div></div>
+            <div></div>
             <div className="flex items-center mb-4">
                 <Input
                     {...props}
@@ -66,15 +68,15 @@ function DebouncedInput({
                     onChange={(e) => setValue(e.target.value)}
                 />
             </div>
-       
+
         </div>
     )
 }
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    let itemValue:any = row.getValue(columnId);
+    let itemValue: any = row.getValue(columnId);
 
-    
+
     if (columnId === 'project_end_date') {
         itemValue = formateDate(itemValue);
     }
@@ -101,65 +103,69 @@ const pageSizeOption = [
 const Filtering = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
-    const navigate=useNavigate()
+    const navigate = useNavigate()
 
     const columns = useMemo<ColumnDef<ProjectDataItem>[]>(
         () => [
-           
+
             {
                 header: 'Project Name',
                 accessorKey: 'project_name',
                 cell: (props) => {
                     const row = props.row.original;
                     return (
-                        <div className=' cursor-pointer' onClick={()=>navigate(`/app/crm/fileManager/project?project_id=${row.project_id}&project_name=${row.project_name}`)}>
+                        <div className=' cursor-pointer' onClick={() => navigate(`/app/crm/fileManager/project?project_id=${row.project_id}&project_name=${row.project_name}`)}>
                             {row.project_name}
                         </div>
                     )
-                  }},
+                }
+            },
             {
                 header: 'Project Type',
                 accessorKey: 'project_type',
                 cell: (props) => {
                     const row = props.row.original;
                     return (
-                        <div className=' cursor-pointer' onClick={()=>navigate(`/app/crm/fileManager/project?project_id=${row.project_id}&project_name=${row.project_name}`)}>
+                        <div className=' cursor-pointer' onClick={() => navigate(`/app/crm/fileManager/project?project_id=${row.project_id}&project_name=${row.project_name}`)}>
                             {row.project_type}
                         </div>
                     )
-                  }},
+                }
+            },
             {
                 header: 'Project Status',
                 accessorKey: 'project_status',
                 cell: (props) => {
                     const row = props.row.original;
                     return (
-                        <div className=' cursor-pointer' onClick={()=>navigate(`/app/crm/fileManager/project?project_id=${row.project_id}&project_name=${row.project_name}`)}>
+                        <div className=' cursor-pointer' onClick={() => navigate(`/app/crm/fileManager/project?project_id=${row.project_id}&project_name=${row.project_name}`)}>
                             {row.project_status}
                         </div>
                     )
-                  }},
+                }
+            },
             {
                 header: 'Client Name',
                 accessorKey: 'client_name',
                 cell: (props) => {
                     const row = props.row.original;
                     return (
-                        <div className=' cursor-pointer' onClick={()=>navigate(`/app/crm/fileManager/project?project_id=${row.project_id}&project_name=${row.project_name}`)}>
+                        <div className=' cursor-pointer' onClick={() => navigate(`/app/crm/fileManager/project?project_id=${row.project_id}&project_name=${row.project_name}`)}>
                             {row.client_name}
                         </div>
                     )
-                  }},
-            
+                }
+            },
+
         ],
         []
     )
 
-    const { projectData,loading } = useData();
-    const totalData=projectData?.length
-    
+    const { projectData, loading } = useData();
+    const totalData = projectData?.length
+
     const table = useReactTable({
-        data:projectData.reverse() || [],
+        data: projectData.reverse() || [],
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -189,82 +195,86 @@ const Filtering = () => {
     const onSelectChange = (value = 0) => {
         table.setPageSize(Number(value))
     }
-   
+
 
 
 
     return (
         <>
-            
+
             <DebouncedInput
                 value={globalFilter ?? ''}
                 className="p-2 font-lg shadow border border-block"
                 placeholder="Search ..."
                 onChange={(value) => setGlobalFilter(String(value))}
             />
-            <Table>
-                <THead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <Tr key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <Th
-                                        key={header.id}
-                                        colSpan={header.colSpan}
-                                    >
-                                        {header.isPlaceholder ? null : (
-                                            <div
-                                                {...{
-                                                    className:
-                                                        header.column.getCanSort()
-                                                            ? 'cursor-pointer select-none'
-                                                            : 'pointer-events-none',
-                                                    onClick:
-                                                        header.column.getToggleSortingHandler(),
-                                                }}
-                                            >
-                                                {flexRender(
-                                                    header.column.columnDef
-                                                        .header,
-                                                    header.getContext()
-                                                )}
-                                                {header.column.getCanSort() && (
-                                                    <Sorter
-                                                        sort={header.column.getIsSorted()}
-                                                    />
-                                                )}
-                                            </div>
-                                        )}
-                                    </Th>
-                                )
-                            })}
-                        </Tr>
-                    ))}
-                </THead>
-                {loading?<TableRowSkeleton
-                      avatarInColumns= {[0]}
-                      columns={columns.length}
-                      avatarProps={{ width: 14, height: 14 }}
-                  />:projectData?.length===0?<Td colSpan={columns?.length}><NoData/></Td>:
-                <TBody>
-                    {table?.getRowModel().rows.map((row) => {
-                        return (
-                            <Tr key={row.id} className=' capitalize'>
-                                {row.getVisibleCells().map((cell) => {
+            <TableContainer className="max-h-[400px]" style={{ scrollbarWidth: 'none', boxShadow: 'none' }}>
+                <Table stickyHeader>
+                    <TableHead>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id} className='uppercase'>
+                                {headerGroup.headers.map((header) => {
                                     return (
-                                        <Td key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
+                                        <TableCell
+                                            key={header.id}
+                                            colSpan={header.colSpan}
+                                            sx={{ fontWeight: "600" }}
+                                        >
+                                            {header.isPlaceholder ? null : (
+                                                <div
+                                                    {...{
+                                                        className:
+                                                            header.column.getCanSort()
+                                                                ? 'cursor-pointer select-none'
+                                                                : 'pointer-events-none',
+                                                        onClick:
+                                                            header.column.getToggleSortingHandler(),
+                                                    }}
+                                                >
+                                                    {flexRender(
+                                                        header.column.columnDef
+                                                            .header,
+                                                        header.getContext()
+                                                    )}
+                                                    {header.column.getCanSort() && (
+                                                        <Sorter
+                                                            sort={header.column.getIsSorted()}
+                                                        />
+                                                    )}
+                                                </div>
                                             )}
-                                        </Td>
+                                        </TableCell>
                                     )
                                 })}
-                            </Tr>
-                        )
-                    })}
-                </TBody>}
-            </Table>
+                            </TableRow>
+                        ))}
+                    </TableHead>
+                    {loading ? <TableRowSkeleton
+                        avatarInColumns={[0]}
+                        columns={columns.length}
+                        avatarProps={{ width: 14, height: 14 }}
+                    /> : projectData?.length === 0 ? <TableCell colSpan={columns?.length}><NoData /></TableCell> :
+                        <TableBody>
+                            {table?.getRowModel().rows.map((row) => {
+                                return (
+                                    <TableRow key={row.id} className='capitalize' sx={{ '&:hover': { backgroundColor: '#dfedfe' } }}>
+                                        {row.getVisibleCells().map((cell) => {
+                                            return (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext()
+                                                    )}
+                                                </TableCell>
+                                            )
+                                        })}
+                                    </TableRow>
+                                )
+                            })}
+                        </TableBody>}
+                </Table>
+            </TableContainer>
+
             <div className="flex items-center justify-between mt-4">
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}
@@ -286,7 +296,7 @@ const Filtering = () => {
                     />
                 </div>
             </div>
-        
+
         </>
     )
 }

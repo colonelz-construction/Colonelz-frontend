@@ -9,7 +9,7 @@ import formateDate from '@/store/dateformate'
 import { Link } from 'react-router-dom'
 import { AuthorityCheck, ConfirmDialog } from '@/components/shared'
 import { Notification, Pagination, Select, toast, Tooltip } from '@/components/ui'
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
 import {
     useReactTable,
     getCoreRowModel,
@@ -28,6 +28,8 @@ import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import { useRoleContext } from '../Roles/RolesContext'
 import { FormValues } from '../Roles/EditRoles'
 import NoData from '@/views/pages/NoData'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import Sorter from '@/components/ui/Table/Sorter'
 
 export type RoleResponse = {
     data: Data[]
@@ -51,7 +53,7 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
     debounce?: number
 }
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
 function DebouncedInput({
     value: initialValue,
@@ -158,275 +160,276 @@ const Roles = () => {
             );
         }
     }
-const handleClose = () => {
-    setOpen(false)
-}
-
-const handleConfirm = (id: string) => {
-    setOpen(false)
-}
-
-
-
-
-
-const deleteRole = async (id: string) => {
-    const response = await apiDeleteRole(id)
-    
-    if (response.code === 200) {
-        toast.push(
-            <Notification type='success' duration={2000} closable>
-                {response.message}
-            </Notification>
-        )
-        window.location.reload()
-
+    const handleClose = () => {
+        setOpen(false)
     }
-    else {
-        toast.push(
-            <Notification type='danger' duration={2000} closable>
-                {response.errorMessage}
-            </Notification>
-        )
+
+    const handleConfirm = (id: string) => {
+        setOpen(false)
     }
-}
 
 
-const columns = useMemo<ColumnDef<Role>[]>(
-    () => [
-        {
-            header: 'Role',
-            accessorKey: 'role',
-        },
-        {
-            header: 'Created At',
-            accessorKey: 'createdAt',
-            cell: ({ row }) => {
-                return <span>{formateDate(row.original.createdAt)}</span>
-            }
-        },
-        {
-            header: 'Access Level',
-            accessorKey: 'access',
-            cell: ({ row }) => {
-                const access = row.original.access
-                const accessLevels = Object.entries(access).map(([key, value]: any) => {
-                    return `${key}: ${value.join(', ')}`
-                }).join(' | ')
-                return <span>{accessLevels}</span>
-            }
-        },
-        {
-            header: '',
-            id: 'action',
-            cell: (props) => {
-                const { row } = props
-                const roleName = row.original.role
-                const id = row.original._id
-                const existUser = row.original.existUser
-                const { roleData } = useRoleContext()
-                const editAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.role?.update?.includes(`${role}`)
-                const deleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.role?.delete?.includes(`${role}`)
-                return (
-                    <span className='flex items-center text-lg gap-2'>
-                        {editAccess &&
-                            <Tooltip title='Edit'>
-                                <span className='hover:text-blue-500 text-lg'>
-                                    <Link to={`/app/crm/roles/edit?role=${roleName}&id=${id}`}>
-                                        <BiPencil />
-                                    </Link>
-                                </span>
-                            </Tooltip>}
-                        {deleteAccess &&
-                            <Tooltip title='Delete'>
-                                <span onClick={() => handleOpen(id, existUser)} className=' cursor-pointer hover:text-red-500 text-lg'><MdDeleteOutline /></span></Tooltip>}
-                    </span>)
-            },
-        },
-    ], [])
 
-const onPaginationChange = (page: number) => {
-    table.setPageIndex(page - 1)
-}
 
-const onSelectChange = (value = 0) => {
-    table.setPageSize(Number(value))
-}
 
-useEffect(() => {
-    const fetchData = async () => {
-        setLoading(true)
-        const response = await apiGetRoleDetails()
+    const deleteRole = async (id: string) => {
+        const response = await apiDeleteRole(id)
 
-        if (response) {
-            
-            setData(response.data)
-            setLoading(false)
+        if (response.code === 200) {
+            toast.push(
+                <Notification type='success' duration={2000} closable>
+                    {response.message}
+                </Notification>
+            )
+            window.location.reload()
 
         }
+        else {
+            toast.push(
+                <Notification type='danger' duration={2000} closable>
+                    {response.errorMessage}
+                </Notification>
+            )
+        }
     }
-    fetchData()
-}, [])
-const table = useReactTable({
-    data: data || [],
-    columns,
-    filterFns: {
-        fuzzy: fuzzyFilter,
-    },
-    state: {
-        columnFilters,
-        globalFilter,
-    },
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    globalFilterFn: fuzzyFilter,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
-    debugHeaders: true,
-    debugColumns: false,
-})
 
 
-return (
-    <>
-        <div className="flex gap-3 justify-end">
-            <AuthorityCheck
-                userAuthority={[`${localStorage.getItem('role')}`]}
-                authority= {localStorage.getItem('role') === 'SUPERADMIN' ? ['SUPERADMIN'] : roleData?.data?.role?.create ?? []}
-            >
-                <Link to={`/app/crm/roles/create`}>
-                    <Button size="sm" className="ml-2" variant='solid'>
-                        Create Role
-                    </Button>
-                </Link>
-            </AuthorityCheck>
-            <DebouncedInput
-                value={globalFilter ?? ''}
-                className="p-2 font-lg shadow border border-block"
-                placeholder="Search..."
-                onChange={(value) => setGlobalFilter(String(value))}
-            />
-        </div>
+    const columns = useMemo<ColumnDef<Role>[]>(
+        () => [
+            {
+                header: 'Role',
+                accessorKey: 'role',
+            },
+            {
+                header: 'Created At',
+                accessorKey: 'createdAt',
+                cell: ({ row }) => {
+                    return <span>{formateDate(row.original.createdAt)}</span>
+                }
+            },
+            {
+                header: 'Access Level',
+                accessorKey: 'access',
+                cell: ({ row }) => {
+                    const access = row.original.access
+                    const accessLevels = Object.entries(access).map(([key, value]: any) => {
+                        return `${key}: ${value.join(', ')}`
+                    }).join(' | ')
+                    return <span>{accessLevels}</span>
+                }
+            },
+            {
+                header: '',
+                id: 'action',
+                cell: (props) => {
+                    const { row } = props
+                    const roleName = row.original.role
+                    const id = row.original._id
+                    const existUser = row.original.existUser
+                    const { roleData } = useRoleContext()
+                    const editAccess = role === 'SUPERADMIN' ? true : roleData?.data?.role?.update?.includes(`${role}`)
+                    const deleteAccess = role === 'SUPERADMIN' ? true : roleData?.data?.role?.delete?.includes(`${role}`)
+                    return (
+                        <span className='flex items-center text-lg gap-2'>
+                            {editAccess &&
+                                <Tooltip title='Edit'>
+                                    <span className='hover:text-blue-500 text-lg'>
+                                        <Link to={`/app/crm/roles/edit?role=${roleName}&id=${id}`}>
+                                            <BiPencil />
+                                        </Link>
+                                    </span>
+                                </Tooltip>}
+                            {deleteAccess &&
+                                <Tooltip title='Delete'>
+                                    <span onClick={() => handleOpen(id, existUser)} className=' cursor-pointer hover:text-red-500 text-lg'><MdDeleteOutline /></span></Tooltip>}
+                        </span>)
+                },
+            },
+        ], [])
+
+    const onPaginationChange = (page: number) => {
+        table.setPageIndex(page - 1)
+    }
+
+    const onSelectChange = (value = 0) => {
+        table.setPageSize(Number(value))
+    }
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true)
+            const response = await apiGetRoleDetails()
+
+            if (response) {
+
+                setData(response.data)
+                setLoading(false)
+
+            }
+        }
+        fetchData()
+    }, [])
+    const table = useReactTable({
+        data: data || [],
+        columns,
+        filterFns: {
+            fuzzy: fuzzyFilter,
+        },
+        state: {
+            columnFilters,
+            globalFilter,
+        },
+        onColumnFiltersChange: setColumnFilters,
+        onGlobalFilterChange: setGlobalFilter,
+        globalFilterFn: fuzzyFilter,
+        getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getFacetedRowModel: getFacetedRowModel(),
+        getFacetedUniqueValues: getFacetedUniqueValues(),
+        getFacetedMinMaxValues: getFacetedMinMaxValues(),
+        debugHeaders: true,
+        debugColumns: false,
+    })
+
+
+    return (
         <>
-
-            <Table>
-                <THead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <Tr key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <Th
-                                        key={header.id}
-                                        colSpan={header.colSpan}
-                                    >
-                                        {header.isPlaceholder ? null : (
-                                            <div
-                                                {...{
-                                                    className:
-                                                        header.column.getCanSort()
-                                                            ? 'cursor-pointer select-none'
-                                                            : '',
-                                                    onClick:
-                                                    header.column.id !==
-                                                    'action'
-                                                        ? header.column.getToggleSortingHandler()
-                                                        : undefined,
-                                                }}
-                                            >
-                                                {flexRender(
-                                                    header.column.columnDef
-                                                        .header,
-                                                    header.getContext()
-                                                )}
-                                                {header.column.id !==
-                                                    'action' && (
-                                                    <Sorter
-                                                        sort={header.column.getIsSorted()}
-                                                    />
-                                                )}
-                                            </div>
-                                        )}
-                                    </Th>
-                                )
-                            })}
-                        </Tr>
-                    ))}
-                </THead>
-                {loading ?
-                    <TableRowSkeleton
-                        avatarInColumns={[0]}
-                        columns={columns.length}
-                        rows={10}
-                    /> :
-                    (data && data?.length > 0 ? 
-
-                    <TBody>
-                        {table.getRowModel().rows.map((row) => {
-                            return (
-                                <Tr key={row.id}>
-                                    {row.getVisibleCells().map((cell) => {
+            <div className="flex gap-3 justify-end">
+                <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={localStorage.getItem('role') === 'SUPERADMIN' ? ['SUPERADMIN'] : roleData?.data?.role?.create ?? []}
+                >
+                    <Link to={`/app/crm/roles/create`}>
+                        <Button size="sm" className="ml-2" variant='solid'>
+                            Create Role
+                        </Button>
+                    </Link>
+                </AuthorityCheck>
+                <DebouncedInput
+                    value={globalFilter ?? ''}
+                    className="p-2 font-lg shadow border border-block"
+                    placeholder="Search..."
+                    onChange={(value) => setGlobalFilter(String(value))}
+                />
+            </div>
+            <>
+                <TableContainer className="max-h-[400px]" style={{ scrollbarWidth: 'none', boxShadow: 'none' }}>
+                    <Table stickyHeader>
+                        <TableHead>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id} className='uppercase'>
+                                    {headerGroup.headers.map((header) => {
                                         return (
-                                            <Td key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
+                                            <TableCell
+                                                key={header.id}
+                                                colSpan={header.colSpan}
+                                                className='uppercase'
+                                            >
+                                                {header.isPlaceholder ? null : (
+                                                    <div
+                                                        {...{
+                                                            className:
+                                                                header.column.getCanSort()
+                                                                    ? 'cursor-pointer select-none'
+                                                                    : '',
+                                                            onClick:
+                                                                header.column.id !==
+                                                                    'action'
+                                                                    ? header.column.getToggleSortingHandler()
+                                                                    : undefined,
+                                                        }}
+                                                    >
+                                                        {flexRender(
+                                                            header.column.columnDef
+                                                                .header,
+                                                            header.getContext()
+                                                        )}
+                                                        {header.column.id !==
+                                                            'action' && (
+                                                                <Sorter
+                                                                    sort={header.column.getIsSorted()}
+                                                                />
+                                                            )}
+                                                    </div>
                                                 )}
-                                            </Td>
+                                            </TableCell>
                                         )
                                     })}
-                                </Tr>
+                                </TableRow>
+                            ))}
+                        </TableHead>
+                        {loading ?
+                            <TableRowSkeleton
+                                avatarInColumns={[0]}
+                                columns={columns.length}
+                                rows={10}
+                            /> :
+                            (data && data?.length > 0 ?
+
+                                <TableBody>
+                                    {table.getRowModel().rows.map((row) => {
+                                        return (
+                                            <TableRow key={row.id} sx={{ '&:hover': { backgroundColor: '#dfedfe' } }}>
+                                                {row.getVisibleCells().map((cell) => {
+                                                    return (
+                                                        <TableCell key={cell.id}>
+                                                            {flexRender(
+                                                                cell.column.columnDef.cell,
+                                                                cell.getContext()
+                                                            )}
+                                                        </TableCell>
+                                                    )
+                                                })}
+                                            </TableRow>
+                                        )
+                                    })}
+                                </TableBody> :
+                                <TableRow><TableCell colSpan={columns.length}><NoData /></TableCell></TableRow>
                             )
-                        })}
-                    </TBody> :
-                    <Tr><Td colSpan={columns.length}><NoData /></Td></Tr>
+                        }
+                    </Table>
+                </TableContainer>
 
-                    )
-                    
-                    }
-            </Table>
-            <div className="flex items-center justify-between mt-4">
-                <Pagination
-                    pageSize={table.getState().pagination.pageSize}
-                    currentPage={table.getState().pagination.pageIndex + 1}
-                    total={table.getFilteredRowModel().rows.length}
-                    onChange={onPaginationChange}
-                />
-                <div style={{ minWidth: 130 }}>
-                    <Select<Option>
-                        size="sm"
-                        isSearchable={false}
-                        value={pageSizeOption.filter(
-                            (option) =>
-                                option.value ===
-                                table.getState().pagination.pageSize
-                        )}
-                        options={pageSizeOption}
-                        onChange={(option) => onSelectChange(option?.value)}
+                <div className="flex items-center justify-between mt-4">
+                    <Pagination
+                        pageSize={table.getState().pagination.pageSize}
+                        currentPage={table.getState().pagination.pageIndex + 1}
+                        total={table.getFilteredRowModel().rows.length}
+                        onChange={onPaginationChange}
                     />
+                    <div style={{ minWidth: 130 }}>
+                        <Select<Option>
+                            size="sm"
+                            isSearchable={false}
+                            value={pageSizeOption.filter(
+                                (option) =>
+                                    option.value ===
+                                    table.getState().pagination.pageSize
+                            )}
+                            options={pageSizeOption}
+                            onChange={(option) => onSelectChange(option?.value)}
+                        />
+                    </div>
                 </div>
-            </div>
+            </>
+
+            <ConfirmDialog
+                isOpen={open}
+                type={'danger'}
+                title={`Delete Role`}
+                confirmButtonColor={'red-600'}
+                onClose={handleClose}
+                children={<p>Are you sure you want to delete this role?</p>}
+                onRequestClose={handleClose}
+                onCancel={handleClose}
+                onConfirm={() => deleteRole(id)}
+            >
+
+            </ConfirmDialog>
         </>
-
-        <ConfirmDialog
-            isOpen={open}
-            type={'danger'}
-            title={`Delete Role`}
-            confirmButtonColor={'red-600'}
-            onClose={handleClose}
-            children={<p>Are you sure you want to delete this role?</p>}
-            onRequestClose={handleClose}
-            onCancel={handleClose}
-            onConfirm={() => deleteRole(id)}
-        >
-
-        </ConfirmDialog>
-    </>
-)
+    )
 }
 
 export default Roles

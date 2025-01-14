@@ -11,7 +11,8 @@ import { apiDeleteFileManagerFolders } from '@/services/CrmService'
 import { AuthorityCheck, ConfirmDialog, StickyFooter } from '@/components/shared'
 
 import { useMemo } from 'react'
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import Input from '@/components/ui/Input'
 import {
     useReactTable,
@@ -35,6 +36,7 @@ import { AiOutlineDelete, AiOutlineFolder } from 'react-icons/ai'
 import NoData from '@/views/pages/NoData'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import formateDate from '@/store/dateformate'
+import Sorter from '@/components/ui/Table/Sorter'
 
 interface DebouncedInputProps
     extends Omit<
@@ -46,7 +48,7 @@ interface DebouncedInputProps
     debounce?: number
 }
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 type Option = {
     value: number;
     label: string;
@@ -111,7 +113,7 @@ const Index = () => {
     const { roleData } = useRoleContext()
     const role = localStorage.getItem('role')
     const org_id = localStorage.getItem('orgId')
-    const uploadAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.file?.create?.includes(`${role}`)
+    const uploadAccess = role === 'SUPERADMIN' ? true : roleData?.data?.file?.create?.includes(`${role}`)
     useEffect(() => {
         const fetchDataAndLog = async () => {
             try {
@@ -368,76 +370,79 @@ const Index = () => {
                                 onChange={(value) => setGlobalFilter(String(value))}
                             /></div>
                         <>
-                            <Table>
-                                <THead>
-                                    {table
-                                        .getHeaderGroups()
-                                        .map((headerGroup) => (
-                                            <Tr key={headerGroup.id}>
-                                                {headerGroup.headers.map(
-                                                    (header) => {
-                                                        return (
-                                                            <Th
-                                                                key={header.id}
-                                                                colSpan={
-                                                                    header.colSpan
-                                                                }
-                                                            >
-                                                                {header.isPlaceholder || header.id === 'actions' ? null : (
-                                                                    <div
-                                                                        {...{
-                                                                            className:
-                                                                                header.column.getCanSort()
-                                                                                    ? 'cursor-pointer select-none'
-                                                                                    : '',
-                                                                            onClick:
-                                                                                header.column.getToggleSortingHandler(),
-                                                                        }}
-                                                                    >
-                                                                        {flexRender(
-                                                                            header
-                                                                                .column
-                                                                                .columnDef
-                                                                                .header,
-                                                                            header.getContext(),
-                                                                        )}
-                                                                        {
-                                                                            <Sorter
-                                                                                sort={header.column.getIsSorted()}
-                                                                            />
-                                                                        }
-                                                                    </div>
-                                                                )}
-                                                            </Th>
-                                                        )
-                                                    },
-                                                )}
-                                            </Tr>
-                                        ))}
-                                </THead>
-                                <TBody>
-                                    {table.getRowModel().rows.map((row) => {
-                                        return (
-                                            <Tr key={row.id}>
-                                                {row
-                                                    .getVisibleCells()
-                                                    .map((cell) => {
-                                                        return (
-                                                            <Td key={cell.id}>
-                                                                {flexRender(
-                                                                    cell.column
-                                                                        .columnDef
-                                                                        .cell,
-                                                                    cell.getContext(),
-                                                                )}
-                                                            </Td>
-                                                        )
-                                                    })}
-                                            </Tr>
-                                        )
-                                    })}
-                                </TBody>
-                            </Table>
+                            <TableContainer className="max-h-[400px]" style={{ scrollbarWidth: 'none', boxShadow: 'none' }}>
+                                <Table stickyHeader>
+                                    <TableHead>
+                                        {table
+                                            .getHeaderGroups()
+                                            .map((headerGroup) => (
+                                                <TableRow key={headerGroup.id} className='uppercase'>
+                                                    {headerGroup.headers.map(
+                                                        (header) => {
+                                                            return (
+                                                                <TableCell
+                                                                    key={header.id}
+                                                                    colSpan={
+                                                                        header.colSpan
+                                                                    }
+                                                                    sx={{ fontWeight: "600" }}
+                                                                >
+                                                                    {header.isPlaceholder || header.id === 'actions' ? null : (
+                                                                        <div
+                                                                            {...{
+                                                                                className:
+                                                                                    header.column.getCanSort()
+                                                                                        ? 'cursor-pointer select-none'
+                                                                                        : '',
+                                                                                onClick:
+                                                                                    header.column.getToggleSortingHandler(),
+                                                                            }}
+                                                                        >
+                                                                            {flexRender(
+                                                                                header
+                                                                                    .column
+                                                                                    .columnDef
+                                                                                    .header,
+                                                                                header.getContext(),
+                                                                            )}
+                                                                            {
+                                                                                <Sorter
+                                                                                    sort={header.column.getIsSorted()}
+                                                                                />
+                                                                            }
+                                                                        </div>
+                                                                    )}
+                                                                </TableCell>
+                                                            )
+                                                        },
+                                                    )}
+                                                </TableRow>
+                                            ))}
+                                    </TableHead>
+                                    <TableBody>
+                                        {table.getRowModel().rows.map((row) => {
+                                            return (
+                                                <TableRow key={row.id} sx={{ '&:hover': { backgroundColor: '#dfedfe' } }}>
+                                                    {row
+                                                        .getVisibleCells()
+                                                        .map((cell) => {
+                                                            return (
+                                                                <TableCell key={cell.id}>
+                                                                    {flexRender(
+                                                                        cell.column
+                                                                            .columnDef
+                                                                            .cell,
+                                                                        cell.getContext(),
+                                                                    )}
+                                                                </TableCell>
+                                                            )
+                                                        })}
+                                                </TableRow>
+                                            )
+                                        })}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
                             <div className="flex items-center justify-between mt-4">
                                 <Pagination
                                     pageSize={table.getState().pagination.pageSize}

@@ -9,7 +9,9 @@ import { AuthorityCheck, ConfirmDialog, StickyFooter } from '@/components/shared
 import { HiTrash } from 'react-icons/hi';
 import { apiDeleteFileManagerFolders } from '@/services/CrmService';
 import { useMemo } from 'react'
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import Sorter from '@/components/ui/Table/Sorter';
 import Input from '@/components/ui/Input'
 import {
   useReactTable,
@@ -39,7 +41,7 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
   debounce?: number
 }
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 type Option = {
   value: number;
   label: string;
@@ -110,7 +112,7 @@ const Index = () => {
   const org_id = localStorage.getItem('orgId')
 
   const { roleData } = useContext(RoleContext);
-  const uploadAccess =role === 'SUPERADMIN' ? true :  roleData?.data?.file?.create?.includes(`${role}`)
+  const uploadAccess = role === 'SUPERADMIN' ? true : roleData?.data?.file?.create?.includes(`${role}`)
 
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -354,16 +356,17 @@ const Index = () => {
             onChange={(value) => setGlobalFilter(String(value))}
           />
         </div>
-        
-          <Table className=''>
-            <THead className='sticky top-0 z-10'>
+        <TableContainer className="max-h-[400px]" style={{ scrollbarWidth: 'none', boxShadow: 'none' }}>
+          <Table stickyHeader>
+            <TableHead>
               {table.getHeaderGroups().map((headerGroup) => (
-                <Tr key={headerGroup.id} className="">
+                <TableRow key={headerGroup.id} className='uppercase'>
                   {headerGroup.headers.map((header) => {
                     return (
-                      <Th
+                      <TableCell
                         key={header.id}
                         colSpan={header.colSpan}
+                        sx={{ fontWeight: "600" }}
                       >
                         {header.isPlaceholder || header.id === 'actions' ? null : (
                           <div
@@ -388,43 +391,44 @@ const Index = () => {
                             }
                           </div>
                         )}
-                      </Th>
+                      </TableCell>
                     )
                   })}
-                </Tr>
+                </TableRow>
               ))}
-              
-            </THead>
+
+            </TableHead>
             {isLoading ? <TableRowSkeleton
               avatarInColumns={[0]}
               columns={columns.length}
               avatarProps={{ width: 14, height: 14 }}
-            /> : projectData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
+            /> : projectData.length === 0 ? <TableCell colSpan={columns.length}><NoData /></TableCell> :
 
-     
-              <TBody className="max-h-[400px] overflow-y-auto block">
+
+              <TableBody>
                 {table.getRowModel().rows.map((row) => {
                   return (
-                    <Tr key={row.id} className=''>
+                    <TableRow key={row.id} sx={{ '&:hover': { backgroundColor: '#dfedfe' } }}>
                       {row.getVisibleCells().map((cell) => {
                         return (
-                          <Td key={cell.id}>
+                          <TableCell key={cell.id}>
                             {flexRender(
                               cell.column.columnDef.cell,
                               cell.getContext()
                             )}
-                          </Td>
+                          </TableCell>
                         )
                       })}
-                    </Tr>
+                    </TableRow>
                   )
                 })}
-              </TBody>
+              </TableBody>
 
-            
-              }
+
+            }
           </Table>
-        
+        </TableContainer>
+
         <div className="flex items-center justify-between mt-4">
           <Pagination
             pageSize={table.getState().pagination.pageSize}

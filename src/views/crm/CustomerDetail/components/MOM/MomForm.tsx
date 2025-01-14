@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from 'react'
+import React, { useState, FormEvent, useRef, useEffect } from 'react'
 import {
     Button,
     DatePicker,
@@ -20,11 +20,163 @@ import { MultiValue } from 'react-select'
 import { StickyFooter } from '@/components/shared'
 import { Field, Form, Formik } from 'formik'
 import * as Yup from 'yup'
+import useDarkMode from '@/utils/hooks/useDarkmode'
 
 type Option = {
     value: string
     label: string
 }
+
+// type ValidationType = 'number' | 'email' | 'text';
+
+interface MultiInputOptionsProps {
+    value?: Option[];
+    onChange: (val: any) => void;
+    type?: 'text' | 'email' | 'number';
+    placeholder?: string;
+    errorMessage?: string;
+    minLength?: number;
+    maxLength?: number;
+    options?: Option[];
+}
+
+export const MultiInputOptions = ({
+    value = [],
+    onChange,
+    type = 'text',
+    placeholder = 'Enter value',
+    errorMessage,
+    minLength = 1,
+    maxLength = Infinity,
+    options = [],
+}: MultiInputOptionsProps) => {
+    const [isDark, setIsDark] = useDarkMode()
+
+    // console.log(value)
+    const [inputValue, setInputValue] = useState<string>('');
+    const [error, setError] = useState<string | null>(null);
+    const [isDropdownVisible, setDropdownVisible] = useState<boolean>(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    const validators: Record<'text' | 'email' | 'number', RegExp> = {
+        text: /^[a-zA-Z0-9-\s]*$/,
+        email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        number: /^[0-9\s]*$/,
+    };
+
+    const filteredOptions = options?.filter(option =>
+        option.label.toLowerCase().includes(inputValue.toLowerCase())
+    );
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        if (type === 'email' || validators[type].test(newValue)) {
+            setInputValue(newValue);
+            setDropdownVisible(true);
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && inputValue.trim()) {
+            const sanitizedValue = inputValue.trim();
+            const isValid =
+                sanitizedValue.length >= minLength &&
+                sanitizedValue.length <= maxLength &&
+                (type !== 'email' || validators.email.test(sanitizedValue));
+
+            
+
+            if (!isValid) {
+                setError(
+                    errorMessage ||
+                        `Value must be ${
+                            minLength === maxLength
+                                ? `exactly ${minLength}`
+                                : `between ${minLength} and ${maxLength}`
+                        } characters${type === 'email' ? ' and a valid email address' : ''}.`
+                );
+            } else {
+                setError(null);
+                onChange([...value, sanitizedValue]);
+                setInputValue('');
+            }
+            e.preventDefault();
+        }
+    };
+
+    const handleRemove = (index: number) => {
+        const newValue = value.filter((_:any, i:any) => i !== index);
+        onChange(newValue);
+    };
+
+    const handleOptionSelect = (option: Option) => {
+        if (!value.some((v:any) => v.value === option.value)) {
+            onChange([...value, option.value]);
+        }
+        setInputValue('');
+        setDropdownVisible(false);
+    };
+
+    const handleClickOutside = (event: MouseEvent) => {
+        if (ref.current && !ref.current.contains(event.target as Node)) {
+            setDropdownVisible(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    return (
+        <div ref={ref}>
+            <div className="border-[0.09rem] border-[#D1D5DB] rounded-md p-1 relative">
+                <div className="flex flex-wrap gap-2">
+                    {value.map((val:any, index:any) => (
+                        <div
+                            key={index}
+                            className="flex items-center gap-1 bg-[#F3F4F6] px-2 py-1 rounded"
+                        >
+                            <span className="font-semibold">{val}</span>
+                            <button
+                                type="button"
+                                className="font-semibold"
+                                onClick={() => handleRemove(index)}
+                            >
+                                &times;
+                            </button>
+                        </div>
+                    ))}
+                </div>
+                <input
+                    type="text"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    placeholder={placeholder}
+                    className={`mt-1 border-none rounded px-2 py-1 w-full outline-none ${isDark && "bg-[#1F2937]"}`}
+                    onFocus={() => setDropdownVisible(true)}
+                />
+                {isDropdownVisible && filteredOptions.length > 0 && (
+                    <div className="mt-1 absolute top-full left-0 w-full bg-white border border-gray-300 rounded-md shadow-md z-10">
+                        {filteredOptions.map((option, index) => (
+                            <div
+                                key={index}
+                                className="px-2 py-3 cursor-pointer hover:bg-gray-100"
+                                onClick={() => handleOptionSelect(option)}
+                            >
+                                {option.label}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+            {error && <div className="text-red-600 mt-1">{error}</div>}
+        </div>
+    );
+};
 
 
 const YourFormComponent = () => {
@@ -67,9 +219,9 @@ const optionsSource = [
                 {
                     user_id:localStorage.getItem('userId'),
                     org_id,
-                    client_name: '',
-                    organisor: '',
-                    attendees: '',
+                    client_name: [],
+                    organisor: [],
+                    attendees: [],
                     meetingDate: '',
                     location: '',
                     remark: '',
@@ -78,8 +230,8 @@ const optionsSource = [
                 }
             }
             validationSchema={Yup.object().shape({
-                client_name: Yup.array().required('Client Name is required'),
-                organisor: Yup.array().required("Organisor's Name is required"),
+                // client_name: Yup.array().required('Client Name is required'),
+                // organisor: Yup.array().required("Organisor's Name is required"),
                 meetingDate: Yup.string().required('Meeting Date is required'),
                 location: Yup.string().required('Location is required'),
             })
@@ -87,6 +239,8 @@ const optionsSource = [
             onSubmit={async(values,{setSubmitting}) => {
                 const formData = new FormData()
                 ;
+
+                console.log(values.client_name)
                 
                 formData.append('user_id', (values.user_id || ''))
                 formData.append('client_name', JSON.stringify(values.client_name))
@@ -140,7 +294,7 @@ const optionsSource = [
                     <div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-x-5">
                     <FormItem label="Client's Name" asterisk>
                                 <Field name="client_name">
-                                    {({ field, form }:any) => (
+                                    {/* {({ field, form }:any) => (
                                         <Select
                                             isMulti
                                             componentAs={CreatableSelect}
@@ -150,6 +304,18 @@ const optionsSource = [
                                                 form.setFieldValue('client_name', values);
                                             }}
                                         />
+                                    )} */}
+                                    {({ form }: { form: any }) => (
+                                        <MultiInputOptions
+                                        value={form.values.client_name}
+                                        onChange={(val) => form.setFieldValue('client_name', val)}
+                                        type="text"
+                                        placeholder="Client Name"
+                                        options={clientOptions}
+                                        minLength={3}
+                                        maxLength={60}
+                                        errorMessage="Name must have at least 3 characters."
+                                    />
                                     )}
                                 </Field>
                                 {errors.client_name && (
@@ -160,15 +326,17 @@ const optionsSource = [
                         <FormItem label="Organised By"
                         asterisk>
                             <Field name="organisor">
-                                    {({ field, form }:any) => (
-                                        <Select
-                                            isMulti
-                                            componentAs={CreatableSelect}
-                                            onChange={(selectedOptions) => {
-                                                const values = selectedOptions ? selectedOptions.map((option: any) => option.value) : [];
-                                                form.setFieldValue('organisor', values);
-                                            }}
-                                        />
+                                    {({ form }: { form: any }) => (
+                                            <MultiInputOptions
+                                                value={form.values.organisor}
+                                                onChange={(val) => form.setFieldValue('organisor', val)}
+                                                type="text"
+                                                placeholder="Organised By"
+                                                options={[]}
+                                                minLength={3}
+                                                maxLength={60}
+                                                errorMessage="Name must have at least 3 characters."
+                                            />
                                     )}
                                 </Field>
                             {errors.organisor && (
@@ -180,15 +348,17 @@ const optionsSource = [
                        
                         <FormItem label="Others" >
                         <Field name="attendees">
-                                    {({ field, form }:any) => (
-                                        <Select
-                                            isMulti
-                                            componentAs={CreatableSelect}
-                                            onChange={(selectedOptions) => {
-                                                const values = selectedOptions ? selectedOptions.map((option: any) => option.value) : [];
-                                                form.setFieldValue('attendees', values);
-                                            }}
-                                        />
+                                    {({ form }: { form: any }) => (
+                                            <MultiInputOptions
+                                                value={form.values.attendees}
+                                                onChange={(val) => form.setFieldValue('attendees', val)}
+                                                type="text"
+                                                placeholder="Others"
+                                                options={[]}
+                                                minLength={3}
+                                                maxLength={60}
+                                                errorMessage="Name must have at least 3 characters."
+                                            />
                                     )}
                                 </Field>
                             {

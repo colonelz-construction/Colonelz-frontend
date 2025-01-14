@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Field, Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import CreatableSelect from 'react-select/creatable'
@@ -7,11 +7,168 @@ import { apiCreateMom, apiGetCrmProjectsSingleMom, apiGetMomUpdate } from '@/ser
 import { useLocation, useNavigate } from 'react-router-dom'
 import { StickyFooter } from '@/components/shared'
 import App from './Richtext'
+import useDarkMode from '@/utils/hooks/useDarkmode'
+// import { MultiInputOptions } from './MomForm'
+
 
 type Option = {
-  value: string
-  label: string
+    value: string
+    label: string
 }
+
+// type ValidationType = 'number' | 'email' | 'text';
+
+interface MultiInputOptionsProps {
+  value?: Option[];
+  onChange: (val: Option[]) => void;
+  type?: 'text' | 'email' | 'number';
+  placeholder?: string;
+  errorMessage?: string;
+  minLength?: number;
+  maxLength?: number;
+  options?: Option[];
+}
+
+export const MultiInputOptions = ({
+  value = [],
+  onChange,
+  type = 'text',
+  placeholder = 'Enter value',
+  errorMessage,
+  minLength = 1,
+  maxLength = Infinity,
+  options = [],
+}: MultiInputOptionsProps) => {
+  const [isDark, setIsDark] = useDarkMode()
+  const [inputValue, setInputValue] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+  const [isDropdownVisible, setDropdownVisible] = useState<boolean>(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const validators: Record<'text' | 'email' | 'number', RegExp> = {
+      text: /^[a-zA-Z0-9-\s]*$/,
+      email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+      number: /^[0-9\s]*$/,
+  };
+
+  const filteredOptions = options?.filter(option =>
+      option.label.toLowerCase().includes(inputValue.toLowerCase())
+  );
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.value;
+      if (type === 'email' || validators[type].test(newValue)) {
+          setInputValue(newValue);
+          setDropdownVisible(true);
+      }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter' && inputValue.trim()) {
+          const sanitizedValue = inputValue.trim();
+          const isValid =
+              sanitizedValue.length >= minLength &&
+              sanitizedValue.length <= maxLength &&
+              (type !== 'email' || validators.email.test(sanitizedValue));
+
+          const isDuplicate = value.some(
+              (v) => v.value.toLowerCase() === sanitizedValue.toLowerCase()
+          );
+
+          if (!isValid) {
+              setError(
+                  errorMessage ||
+                      `Value must be ${
+                          minLength === maxLength
+                              ? `exactly ${minLength}`
+                              : `between ${minLength} and ${maxLength}`
+                      } characters${type === 'email' ? ' and a valid email address' : ''}.`
+              );
+          } else if (isDuplicate) {
+              setError('This value is already added.');
+          } else {
+              setError(null);
+              onChange([...value, { value: sanitizedValue, label: sanitizedValue }]);
+              setInputValue('');
+          }
+          e.preventDefault();
+      }
+  };
+
+  const handleRemove = (index: number) => {
+      const newValue = value.filter((_, i) => i !== index);
+      onChange(newValue);
+  };
+
+  const handleOptionSelect = (option: Option) => {
+      if (!value.some((v) => v.value === option.value)) {
+          onChange([...value, option]);
+      }
+      setInputValue('');
+      setDropdownVisible(false);
+  };
+
+  const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+          setDropdownVisible(false);
+      }
+  };
+
+  useEffect(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+          document.removeEventListener('mousedown', handleClickOutside);
+      };
+  }, []);
+
+  return (
+      <div ref={ref}>
+          <div className="border-[0.09rem] border-[#D1D5DB] rounded-md p-1 relative">
+              <div className="flex flex-wrap gap-2">
+                  {value.map((val, index) => (
+                      <div
+                          key={index}
+                          className="flex items-center gap-1 bg-[#F3F4F6] px-2 py-1 rounded"
+                      >
+                          <span className="font-semibold">{val.label}</span>
+                          <button
+                              type="button"
+                              className="font-semibold"
+                              onClick={() => handleRemove(index)}
+                          >
+                              &times;
+                          </button>
+                      </div>
+                  ))}
+              </div>
+              <input
+                  type="text"
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  placeholder={placeholder}
+                  className={`mt-1 border-none rounded px-2 py-1 w-full outline-none ${isDark && "bg-[#1F2937]"}`}
+                  onFocus={() => setDropdownVisible(true)}
+              />
+              {isDropdownVisible && filteredOptions.length > 0 && (
+                  <div className="mt-1 absolute top-full left-0 w-full bg-white border border-gray-300 rounded-md shadow-md z-10">
+                      {filteredOptions.map((option, index) => (
+                          <div
+                              key={index}
+                              className="px-2 py-1 cursor-pointer hover:bg-gray-100"
+                              onClick={() => handleOptionSelect(option)}
+                          >
+                              {option.label}
+                          </div>
+                      ))}
+                  </div>
+              )}
+          </div>
+          {error && <div className="text-red-600 mt-1">{error}</div>}
+      </div>
+  );
+};
+
 
 const YourFormComponent = () => {
   const navigate = useNavigate()
@@ -58,6 +215,9 @@ const YourFormComponent = () => {
           label: item,
         })) || []
 
+        console.log(clientOptions)
+        console.log(organisorOptions)
+
         setInitialValues({
           client_name: clientOptions,
           organisor: organisorOptions,
@@ -100,12 +260,14 @@ const YourFormComponent = () => {
       <Formik
         enableReinitialize
         initialValues={initialValues}
-        validationSchema={Yup.object().shape({
-          client_name: Yup.array().min(1, 'Client Name is required'),
-          organisor: Yup.array().min(1, 'Organisor Name is required'),
+        validationSchema={
+          Yup.object().shape({
+          // client_name: Yup.array().min(1, 'Client Name is required'),
+          // organisor: Yup.array().min(1, 'Organisor Name is required'),
           meetingdate: Yup.string().required('Meeting Date is required'),
           location: Yup.string().required('Location is required'),
-        })}
+        })
+      }
         onSubmit={async (values, { setSubmitting }) => {
           const payload = {
             client_name: values.client_name.map((option:any) => option.value), 
@@ -160,28 +322,19 @@ const YourFormComponent = () => {
             <div className='grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-x-5'>
               <FormItem label="Client's Name" asterisk>
                 <Field name="client_name">
-                  {({ field, form }: any) => {
+
+                  {({ form }: { form: any }) => {
                     return (
-                      <>
-                        <CreatableSelect
-                          isMulti
-                          value={values.client_name}
-                          name="client_name"
-                          onChange={(selectedOptions: any) => {
-                            const formattedValues = selectedOptions
-                              ? selectedOptions.map((option: any) => ({ value: option.value, label: option.label }))
-                              : []
-                            setFieldValue('client_name', formattedValues)
-                          }}
-                          options={details.client_name?.map((item: string) => ({
-                            value: item,
-                            label: item,
-                          })) || []}
-                        />
-                        {errors.client_name && (
-                          <span className='text-red-500'>{errors.client_name}</span>
-                        )}
-                      </>
+                        <MultiInputOptions
+                        value={form.values.client_name}
+                        onChange={(val) => form.setFieldValue('client_name', val)}
+                        type="text"
+                        placeholder="Client Name"
+                        options={[]}
+                        minLength={3}
+                        maxLength={60}
+                        errorMessage="Name must have at least 3 characters."
+                    />
                     )
                   }}
                 </Field>
@@ -189,22 +342,20 @@ const YourFormComponent = () => {
 
               <FormItem label="Organised By" asterisk>
                 <Field name="organisor">
-                  {({ field, form }: any) => (
-                    <CreatableSelect
-                      isMulti
-                      value={values.organisor}
-                      onChange={(selectedOptions) => {
-                        const formattedValues = selectedOptions
-                          ? selectedOptions.map((option: any) => ({ value: option.value, label: option.label }))
-                          : []
-                        setFieldValue('organisor', formattedValues)
-                      }}
-                      options={details.organisor?.map((item: string) => ({
-                        value: item,
-                        label: item,
-                      })) || []}
+                  {({ form }: { form: any }) => {
+                    return (
+                        <MultiInputOptions
+                        value={form.values.organisor}
+                        onChange={(val) => form.setFieldValue('organisor', val)}
+                        type="text"
+                        placeholder="Organisor"
+                        options={[]}
+                        minLength={3}
+                        maxLength={60}
+                        errorMessage="Name must have at least 3 characters."
                     />
-                  )}
+                    )
+                  }}
                 </Field>
                 {errors.organisor && (
                   <span className='text-red-500'>{errors.organisor}</span>

@@ -9,7 +9,9 @@ import { AuthorityCheck, ConfirmDialog, StickyFooter } from '@/components/shared
 import { HiTrash } from 'react-icons/hi';
 import { apiDeleteFileManagerFolders } from '@/services/CrmService';
 import { useMemo } from 'react'
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import Sorter from '@/components/ui/Table/Sorter';
 import Input from '@/components/ui/Input'
 import {
   useReactTable,
@@ -31,6 +33,7 @@ import { AiOutlineDelete } from 'react-icons/ai';
 import { MdOutlineDelete } from 'react-icons/md';
 import { RoleContext, useRoleContext } from '@/views/crm/Roles/RolesContext';
 import formateDate from '@/store/dateformate';
+import StickyHeader from '@/components/shared/StickyHeader';
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
   value: string | number
@@ -38,7 +41,7 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
   debounce?: number
 }
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 type Option = {
   value: number;
   label: string;
@@ -109,7 +112,7 @@ const Index = () => {
   const org_id = localStorage.getItem('orgId')
 
   const { roleData } = useContext(RoleContext);
-  const uploadAccess =role === 'SUPERADMIN' ? true :  roleData?.data?.file?.create?.includes(`${role}`)
+  const uploadAccess = role === 'SUPERADMIN' ? true : roleData?.data?.file?.create?.includes(`${role}`)
 
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -353,69 +356,79 @@ const Index = () => {
             onChange={(value) => setGlobalFilter(String(value))}
           />
         </div>
-        <Table>
-          <THead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+        <TableContainer className="max-h-[400px]" style={{ scrollbarWidth: 'none', boxShadow: 'none' }}>
+          <Table stickyHeader>
+            <TableHead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className='uppercase'>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableCell
+                        key={header.id}
+                        colSpan={header.colSpan}
+                        sx={{ fontWeight: "600" }}
+                      >
+                        {header.isPlaceholder || header.id === 'actions' ? null : (
+                          <div
+                            {...{
+                              className:
+                                header.column.getCanSort()
+                                  ? 'cursor-pointer select-none'
+                                  : '',
+                              onClick:
+                                header.column.getToggleSortingHandler(),
+                            }}
+                          >
+                            {flexRender(
+                              header.column.columnDef
+                                .header,
+                              header.getContext()
+                            )}
+                            {
+                              <Sorter
+                                sort={header.column.getIsSorted()}
+                              />
+                            }
+                          </div>
+                        )}
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+              ))}
+
+            </TableHead>
+            {isLoading ? <TableRowSkeleton
+              avatarInColumns={[0]}
+              columns={columns.length}
+              avatarProps={{ width: 14, height: 14 }}
+            /> : projectData.length === 0 ? <TableCell colSpan={columns.length}><NoData /></TableCell> :
+
+
+              <TableBody>
+                {table.getRowModel().rows.map((row) => {
                   return (
-                    <Th
-                      key={header.id}
-                      colSpan={header.colSpan}
-                    >
-                      {header.isPlaceholder || header.id === 'actions' ? null : (
-                        <div
-                          {...{
-                            className:
-                              header.column.getCanSort()
-                                ? 'cursor-pointer select-none'
-                                : '',
-                            onClick:
-                              header.column.getToggleSortingHandler(),
-                          }}
-                        >
-                          {flexRender(
-                            header.column.columnDef
-                              .header,
-                            header.getContext()
-                          )}
-                          {
-                            <Sorter
-                              sort={header.column.getIsSorted()}
-                            />
-                          }
-                        </div>
-                      )}
-                    </Th>
+                    <TableRow key={row.id} sx={{ '&:hover': { backgroundColor: '#dfedfe' } }}>
+                      {row.getVisibleCells().map((cell) => {
+                        return (
+                          <TableCell key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        )
+                      })}
+                    </TableRow>
                   )
                 })}
-              </Tr>
-            ))}
-          </THead>
-          {isLoading ? <TableRowSkeleton
-            avatarInColumns={[0]}
-            columns={columns.length}
-            avatarProps={{ width: 14, height: 14 }}
-          /> : projectData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
-            <TBody>
-              {table.getRowModel().rows.map((row) => {
-                return (
-                  <Tr key={row.id}>
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <Td key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </Td>
-                      )
-                    })}
-                  </Tr>
-                )
-              })}
-            </TBody>}
-        </Table>
+              </TableBody>
+
+
+            }
+          </Table>
+        </TableContainer>
+
         <div className="flex items-center justify-between mt-4">
           <Pagination
             pageSize={table.getState().pagination.pageSize}

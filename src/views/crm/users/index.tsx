@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react'
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
 import Input from '@/components/ui/Input'
 import { Dialog } from '@/components/ui'
 import { MdDeleteOutline } from 'react-icons/md'
@@ -37,6 +37,8 @@ import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import { AuthorityCheck, ConfirmDialog } from '@/components/shared'
 import { AiOutlineDelete } from 'react-icons/ai'
 import EditUserRole from './EditUserRole'
+import { TableContainer, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
+import Sorter from '@/components/ui/Table/Sorter'
 
 type User = {
     username: string
@@ -59,7 +61,7 @@ interface DebouncedInputProps
     debounce?: number
 }
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
 function DebouncedInput({
     value: initialValue,
@@ -126,10 +128,10 @@ const Users = () => {
     const role = localStorage.getItem('role')
 
     const [editRoledialogIsOpen, setEditRoleIsOpen] = useState(false)
-  
-    
 
-    const openEditRoleDialog = (Data : any) => {
+
+
+    const openEditRoleDialog = (Data: any) => {
         setEditRoleIsOpen(true)
         setUserData(Data)
     }
@@ -159,8 +161,8 @@ const Users = () => {
 
     const deleteuser = async (UserId: string) => {
         const response = await apiDeleteUsers(UserId, org_id)
-        
-        
+
+
 
         if (response.code === 200) {
             toast.push(
@@ -193,33 +195,33 @@ const Users = () => {
                     return (
                         <div className="">
                             {row.original.role !== "SUPERADMIN" &&
-                                
+
                                 <span className="flex items-center text-lg gap-2">
-                                {
-                                    // editAccess&&
-                                    <Tooltip title="Edit">
-                                        <AuthorityCheck
-                                            userAuthority={[
-                                                `${localStorage.getItem(
-                                                    'role',
-                                                )}`,
-                                            ]}
-                                            authority={
-                                                role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.user
-                                                    ?.update ?? []
-                                            }
-                                        >
-                                            
+                                    {
+                                        // editAccess&&
+                                        <Tooltip title="Edit">
+                                            <AuthorityCheck
+                                                userAuthority={[
+                                                    `${localStorage.getItem(
+                                                        'role',
+                                                    )}`,
+                                                ]}
+                                                authority={
+                                                    role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.user
+                                                        ?.update ?? []
+                                                }
+                                            >
+
                                                 <span className="cursor-pointer" onClick={() => openEditRoleDialog(row.original)}>
-                                             
+
                                                     <BiPencil />
                                                 </span>
-                                        
-                                        </AuthorityCheck>
-                                    </Tooltip>
-                                }
-                                <Tooltip title="Delete">
-                                <AuthorityCheck
+
+                                            </AuthorityCheck>
+                                        </Tooltip>
+                                    }
+                                    <Tooltip title="Delete">
+                                        <AuthorityCheck
                                             userAuthority={[
                                                 `${localStorage.getItem(
                                                     'role',
@@ -230,17 +232,17 @@ const Users = () => {
                                                     ?.delete ?? []
                                             }
                                         >
-                                    <p
-                                        className=" text-xl hover:text-red-500 cursor-pointer"
-                                        onClick={() =>
-                                            openDialog(row.original.UserId)
-                                        }
-                                    >
-                                        <MdDeleteOutline />
-                                    </p>
-                                    </AuthorityCheck>
-                                </Tooltip>
-                            </span>}
+                                            <p
+                                                className=" text-xl hover:text-red-500 cursor-pointer"
+                                                onClick={() =>
+                                                    openDialog(row.original.UserId)
+                                                }
+                                            >
+                                                <MdDeleteOutline />
+                                            </p>
+                                        </AuthorityCheck>
+                                    </Tooltip>
+                                </span>}
                         </div>
                     )
                 },
@@ -307,78 +309,82 @@ const Users = () => {
                     />
                 </div>
 
-                
+
             </div>
-            <Table>
-                <THead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <Tr key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
+            <TableContainer className="max-h-[400px]" style={{ scrollbarWidth: 'none', boxShadow: 'none' }}>
+                <Table stickyHeader>
+                    <TableHead>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id} className='uppercase'>
+                                {headerGroup.headers.map((header) => {
+                                    return (
+                                        <TableCell
+                                            key={header.id}
+                                            colSpan={header.colSpan}
+                                            sx={{ fontWeight: "600" }}
+                                        >
+                                            {header.isPlaceholder ? null : (
+                                                <div
+                                                    {...{
+                                                        className:
+                                                            header.column.getCanSort()
+                                                                ? 'cursor-pointer select-none'
+                                                                : '',
+                                                        onClick:
+                                                            header.column.id !==
+                                                                'action'
+                                                                ? header.column.getToggleSortingHandler()
+                                                                : undefined,
+                                                    }}
+                                                >
+                                                    {flexRender(
+                                                        header.column.columnDef
+                                                            .header,
+                                                        header.getContext(),
+                                                    )}
+                                                    {header.column.id !==
+                                                        'action' && (
+                                                            <Sorter
+                                                                sort={header.column.getIsSorted()}
+                                                            />
+                                                        )}
+                                                </div>
+                                            )}
+                                        </TableCell>
+                                    )
+                                })}
+                            </TableRow>
+                        ))}
+                    </TableHead>
+                    {loading ? (
+                        <TableRowSkeleton
+                            avatarInColumns={[0]}
+                            columns={columns.length}
+                            rows={10}
+                        />
+                    ) : (
+                        <TableBody>
+                            {table.getRowModel().rows.map((row) => {
                                 return (
-                                    <Th
-                                        key={header.id}
-                                        colSpan={header.colSpan}
-                                    >
-                                        {header.isPlaceholder ? null : (
-                                            <div
-                                                {...{
-                                                    className:
-                                                        header.column.getCanSort()
-                                                            ? 'cursor-pointer select-none'
-                                                            : '',
-                                                    onClick:
-                                                        header.column.id !==
-                                                        'action'
-                                                            ? header.column.getToggleSortingHandler()
-                                                            : undefined,
-                                                }}
-                                            >
-                                                {flexRender(
-                                                    header.column.columnDef
-                                                        .header,
-                                                    header.getContext(),
-                                                )}
-                                                {header.column.id !==
-                                                    'action' && (
-                                                    <Sorter
-                                                        sort={header.column.getIsSorted()}
-                                                    />
-                                                )}
-                                            </div>
-                                        )}
-                                    </Th>
+                                    <TableRow key={row.id} sx={{ '&:hover': { backgroundColor: '#dfedfe' } }}>
+                                        {row.getVisibleCells().map((cell) => {
+                                            return (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext(),
+                                                    )}
+                                                </TableCell>
+                                            )
+                                        })}
+                                    </TableRow>
                                 )
                             })}
-                        </Tr>
-                    ))}
-                </THead>
-                {loading ? (
-                    <TableRowSkeleton
-                        avatarInColumns={[0]}
-                        columns={columns.length}
-                        rows={10}
-                    />
-                ) : (
-                    <TBody>
-                        {table.getRowModel().rows.map((row) => {
-                            return (
-                                <Tr key={row.id}>
-                                    {row.getVisibleCells().map((cell) => {
-                                        return (
-                                            <Td key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext(),
-                                                )}
-                                            </Td>
-                                        )
-                                    })}
-                                </Tr>
-                            )
-                        })}
-                    </TBody>
-                )}
-            </Table>
+                        </TableBody>
+                    )}
+                </Table>
+            </TableContainer>
+
             <div className="flex items-center justify-between mt-4">
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}
@@ -418,7 +424,7 @@ const Users = () => {
                 onRequestClose={onEditRoleDialogClose}
                 className=""
             >
-                {<EditUserRole Data={userData}/>}
+                {<EditUserRole Data={userData} />}
             </Dialog>
         </>
     )

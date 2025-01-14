@@ -15,6 +15,7 @@ const Contract = () => {
   const queryParams = new URLSearchParams(location.search);
   const lead_id = queryParams.get('id')
   const [details, setDetails] = useState<ContractResponseType>();
+  console.log(details?.data)
  useEffect(() => {
     const fetchData = async () => {
       try {

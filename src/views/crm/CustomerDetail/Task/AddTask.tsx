@@ -70,7 +70,7 @@ const priorityOptions = [
 
   return (
         <div>
-            {addButton ? <Button onClick={openDialog}  variant='solid' size='sm'>Add Task</Button> : <span onClick={openDialog} className='flex items-center gap-1 cursor-pointer'> <AiOutlinePlus/> <span>Add Task</span></span>}
+            {addButton ? <Button onClick={openDialog}  variant='solid' size='sm'>Add Task</Button> : <span onClick={openDialog} className='flex items-center gap-1 cursor-pointer text-[#6B7280] font-semibold'> <AiOutlinePlus/> <span>Add Task</span></span>}
             
             <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
                 <div className="pl-4 ">

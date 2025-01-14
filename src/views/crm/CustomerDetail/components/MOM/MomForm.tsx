@@ -20,6 +20,7 @@ import { MultiValue } from 'react-select'
 import { StickyFooter } from '@/components/shared'
 import { Field, Form, Formik } from 'formik'
 import * as Yup from 'yup'
+import useDarkMode from '@/utils/hooks/useDarkmode'
 
 type Option = {
     value: string
@@ -49,8 +50,9 @@ export const MultiInputOptions = ({
     maxLength = Infinity,
     options = [],
 }: MultiInputOptionsProps) => {
+    const [isDark, setIsDark] = useDarkMode()
 
-    console.log(value)
+    // console.log(value)
     const [inputValue, setInputValue] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [isDropdownVisible, setDropdownVisible] = useState<boolean>(false);
@@ -154,7 +156,7 @@ export const MultiInputOptions = ({
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
                     placeholder={placeholder}
-                    className="mt-1 border-none rounded px-2 py-1 w-full outline-none"
+                    className={`mt-1 border-none rounded px-2 py-1 w-full outline-none ${isDark && "bg-[#1F2937]"}`}
                     onFocus={() => setDropdownVisible(true)}
                 />
                 {isDropdownVisible && filteredOptions.length > 0 && (

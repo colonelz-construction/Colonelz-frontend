@@ -8,6 +8,7 @@ import { apiGetCrmProjectMakeContract } from '@/services/CrmService'
 import CreatableSelect from 'react-select/creatable'
 import MyComponent from './CommercialPdf'
 import MyComponent1 from './pdf'
+import useDarkMode from '@/utils/hooks/useDarkmode'
 
 interface FormValues {
     project_type: string;
@@ -190,6 +191,8 @@ export const MultiInput = ({
     minLength = 1,
     maxLength = Infinity,
 }: MultiInputProps) => {
+
+    const [isDark, setIsDark] = useDarkMode()
     const [inputValue, setInputValue] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
 
@@ -240,7 +243,7 @@ export const MultiInput = ({
 
     return (
         <div>
-            <div className="border-[0.09rem] border-[#D1D5DB] rounded-md p-1">
+            <div className="border-[0.03rem] border-[#D1D5DB] rounded-md p-1">
                 <div className="flex flex-wrap gap-2">
                     {value.map((val, index) => (
                         <div
@@ -264,7 +267,7 @@ export const MultiInput = ({
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
                     placeholder={placeholder}
-                    className="mt-1 border-none rounded px-2 py-1 w-full outline-none"
+                    className={`mt-1 border-none rounded px-2 py-1 w-full outline-none ${isDark && "bg-[#1F2937]"}`}
                 />
             </div>
             {error && <div className="text-red-600 mt-1">{error}</div>}

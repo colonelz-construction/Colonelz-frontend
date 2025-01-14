@@ -7,6 +7,7 @@ import { apiCreateMom, apiGetCrmProjectsSingleMom, apiGetMomUpdate } from '@/ser
 import { useLocation, useNavigate } from 'react-router-dom'
 import { StickyFooter } from '@/components/shared'
 import App from './Richtext'
+import useDarkMode from '@/utils/hooks/useDarkmode'
 // import { MultiInputOptions } from './MomForm'
 
 
@@ -38,6 +39,7 @@ export const MultiInputOptions = ({
   maxLength = Infinity,
   options = [],
 }: MultiInputOptionsProps) => {
+  const [isDark, setIsDark] = useDarkMode()
   const [inputValue, setInputValue] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [isDropdownVisible, setDropdownVisible] = useState<boolean>(false);
@@ -145,7 +147,7 @@ export const MultiInputOptions = ({
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
                   placeholder={placeholder}
-                  className="mt-1 border-none rounded px-2 py-1 w-full outline-none"
+                  className={`mt-1 border-none rounded px-2 py-1 w-full outline-none ${isDark && "bg-[#1F2937]"}`}
                   onFocus={() => setDropdownVisible(true)}
               />
               {isDropdownVisible && filteredOptions.length > 0 && (

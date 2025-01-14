@@ -343,7 +343,7 @@ const Filtering = ({ task, users }: Data) => {
                     <AddTask project={projectId} userData={userData} addButton={true} />
                 </AuthorityCheck>
             </div>
-            {!loading ? task?.length === 0 ? (<NoData />) : (
+            { !loading ? task?.length === 0 ? (<NoData />) : ( 
                 <TableContainer className='max-h-[400px]' style={{ scrollbarWidth: 'none', boxShadow: 'none'}}>
                     <Table stickyHeader>
                         <TableHead >

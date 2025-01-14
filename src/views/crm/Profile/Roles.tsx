@@ -326,6 +326,7 @@ const Roles = () => {
                                                 key={header.id}
                                                 colSpan={header.colSpan}
                                                 className='uppercase'
+                                                sx={{fontWeight:'600'}}
                                             >
                                                 {header.isPlaceholder ? null : (
                                                     <div

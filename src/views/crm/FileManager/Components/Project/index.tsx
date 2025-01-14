@@ -31,6 +31,7 @@ import { AiOutlineDelete } from 'react-icons/ai';
 import { MdOutlineDelete } from 'react-icons/md';
 import { RoleContext, useRoleContext } from '@/views/crm/Roles/RolesContext';
 import formateDate from '@/store/dateformate';
+import StickyHeader from '@/components/shared/StickyHeader';
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
   value: string | number
@@ -353,69 +354,77 @@ const Index = () => {
             onChange={(value) => setGlobalFilter(String(value))}
           />
         </div>
-        <Table>
-          <THead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+        
+          <Table className=''>
+            <THead className='sticky top-0 z-10'>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <Tr key={headerGroup.id} className="">
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <Th
+                        key={header.id}
+                        colSpan={header.colSpan}
+                      >
+                        {header.isPlaceholder || header.id === 'actions' ? null : (
+                          <div
+                            {...{
+                              className:
+                                header.column.getCanSort()
+                                  ? 'cursor-pointer select-none'
+                                  : '',
+                              onClick:
+                                header.column.getToggleSortingHandler(),
+                            }}
+                          >
+                            {flexRender(
+                              header.column.columnDef
+                                .header,
+                              header.getContext()
+                            )}
+                            {
+                              <Sorter
+                                sort={header.column.getIsSorted()}
+                              />
+                            }
+                          </div>
+                        )}
+                      </Th>
+                    )
+                  })}
+                </Tr>
+              ))}
+              
+            </THead>
+            {isLoading ? <TableRowSkeleton
+              avatarInColumns={[0]}
+              columns={columns.length}
+              avatarProps={{ width: 14, height: 14 }}
+            /> : projectData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
+
+     
+              <TBody className="max-h-[400px] overflow-y-auto block">
+                {table.getRowModel().rows.map((row) => {
                   return (
-                    <Th
-                      key={header.id}
-                      colSpan={header.colSpan}
-                    >
-                      {header.isPlaceholder || header.id === 'actions' ? null : (
-                        <div
-                          {...{
-                            className:
-                              header.column.getCanSort()
-                                ? 'cursor-pointer select-none'
-                                : '',
-                            onClick:
-                              header.column.getToggleSortingHandler(),
-                          }}
-                        >
-                          {flexRender(
-                            header.column.columnDef
-                              .header,
-                            header.getContext()
-                          )}
-                          {
-                            <Sorter
-                              sort={header.column.getIsSorted()}
-                            />
-                          }
-                        </div>
-                      )}
-                    </Th>
+                    <Tr key={row.id} className=''>
+                      {row.getVisibleCells().map((cell) => {
+                        return (
+                          <Td key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </Td>
+                        )
+                      })}
+                    </Tr>
                   )
                 })}
-              </Tr>
-            ))}
-          </THead>
-          {isLoading ? <TableRowSkeleton
-            avatarInColumns={[0]}
-            columns={columns.length}
-            avatarProps={{ width: 14, height: 14 }}
-          /> : projectData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
-            <TBody>
-              {table.getRowModel().rows.map((row) => {
-                return (
-                  <Tr key={row.id}>
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <Td key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </Td>
-                      )
-                    })}
-                  </Tr>
-                )
-              })}
-            </TBody>}
-        </Table>
+              </TBody>
+
+            
+              }
+          </Table>
+        
         <div className="flex items-center justify-between mt-4">
           <Pagination
             pageSize={table.getState().pagination.pageSize}

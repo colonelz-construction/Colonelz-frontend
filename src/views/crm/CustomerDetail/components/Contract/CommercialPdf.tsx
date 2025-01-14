@@ -481,7 +481,7 @@ const MyDocument = (data:any) => {
   const role = localStorage.getItem('role');
   const org_id : any= localStorage.getItem('orgId')
 
-  console.log(pdfData)
+  // console.log(pdfData)
 
 
 
@@ -1234,7 +1234,7 @@ const MyComponent = (data:any) => {
           Contract Created Successfully
         </Notification>
       )
-      navigate(`/app/crm/lead/?id=${data.data.lead_id}&tab=Details`)
+      navigate(`/app/crm/lead/?id=${data.data.lead_id}&tab=Contract`)
     }
     else{
       toast.push(

@@ -1368,7 +1368,7 @@ const MyComponent = (data: any) => {
           Contract Created Successfully
         </Notification>
       )
-      navigate(`/app/crm/lead/?id=${data.data.lead_id}&tab=Details`)
+      navigate(`/app/crm/lead/?id=${data.data.lead_id}&tab=Contract`)
       
     }
     else {

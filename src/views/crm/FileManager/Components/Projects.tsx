@@ -156,10 +156,10 @@ const Filtering = () => {
     )
 
     const { projectData,loading } = useData();
-    const totalData=projectData.length
+    const totalData=projectData?.length
     
     const table = useReactTable({
-        data:projectData.reverse(),
+        data:projectData.reverse() || [],
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -245,9 +245,9 @@ const Filtering = () => {
                       avatarInColumns= {[0]}
                       columns={columns.length}
                       avatarProps={{ width: 14, height: 14 }}
-                  />:projectData.length===0?<Td colSpan={columns.length}><NoData/></Td>:
+                  />:projectData?.length===0?<Td colSpan={columns?.length}><NoData/></Td>:
                 <TBody>
-                    {table.getRowModel().rows.map((row) => {
+                    {table?.getRowModel().rows.map((row) => {
                         return (
                             <Tr key={row.id} className=' capitalize'>
                                 {row.getVisibleCells().map((cell) => {

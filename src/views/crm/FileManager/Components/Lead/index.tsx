@@ -116,7 +116,7 @@ const Index = () => {
     useEffect(() => {
         const fetchData = async () => {
             const data = await fetchLeadData(leadId);
-            // console.log(data)
+            console.log(data)
             setLeadData(data);
             setLoading(false);
         };

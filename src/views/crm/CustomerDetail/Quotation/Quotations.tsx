@@ -7,7 +7,7 @@ import {
     getPaginationRowModel,
     useReactTable,
 } from '@tanstack/react-table'
-import Table from '@/components/ui/Table'
+
 import Checkbox from '@/components/ui/Checkbox'
 import type { ChangeEvent } from 'react'
 import type { CheckboxProps } from '@/components/ui/Checkbox'
@@ -22,6 +22,7 @@ import NoData from '@/views/pages/NoData'
 import { useRoleContext } from '../../Roles/RolesContext'
 import { AuthorityCheck } from '@/components/shared'
 import { PropsValue } from 'react-select'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 
 type FormData = {
     user_name: string;
@@ -43,7 +44,7 @@ interface IndeterminateCheckboxProps extends Omit<CheckboxProps, 'onChange'> {
     onIndeterminateCheckBoxChange?: (event: CheckBoxChangeEvent) => void;
 }
 
-const { Tr, Th, Td, THead, TBody } = Table
+// const { Tr, Th, Td, THead, TBody } = Table
 
 const pageSizeOption = [
     { value: 10, label: '10 / page' },
@@ -412,30 +413,32 @@ const Quotations = (data: FileItemProps) => {
             </div>
             {table.getRowModel().rows.length > 0 ? (
                 <div>
-                    <Table>
-                        <THead>
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <Tr key={headerGroup.id}>
-                                    {headerGroup.headers.map((header) => (
-                                        <Th key={header.id} colSpan={header.colSpan}>
-                                            {flexRender(header.column.columnDef.header, header.getContext())}
-                                        </Th>
-                                    ))}
-                                </Tr>
-                            ))}
-                        </THead>
-                        <TBody>
-                            {table.getRowModel().rows.map((row) => (
-                                <Tr key={row.id}>
-                                    {row.getVisibleCells().map((cell) => (
-                                        <Td key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </Td>
-                                    ))}
-                                </Tr>
-                            ))}
-                        </TBody>
-                    </Table>
+                    <TableContainer className="max-h-[400px]" style={{ scrollbarWidth: 'none', boxShadow: 'none'}}>
+                        <Table stickyHeader>
+                            <TableHead>
+                                {table.getHeaderGroups().map((headerGroup) => (
+                                    <TableRow key={headerGroup.id}>
+                                        {headerGroup.headers.map((header) => (
+                                            <TableCell key={header.id} colSpan={header.colSpan} className='font-bold uppercase' sx={{backgroundColor: '#f9fafb', color:"#6B7280", fontWeight: "600",  }}>
+                                                {flexRender(header.column.columnDef.header, header.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableHead>
+                            <TableBody>
+                                {table.getRowModel().rows.map((row) => (
+                                    <TableRow key={row.id} sx={{'&:hover': { backgroundColor: '#dfedfe' }}}>
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                     <div className="flex items-center justify-between mt-4">
                         <Pagination
                             pageSize={table.getState().pagination.pageSize}

@@ -139,6 +139,8 @@ const statusColors: { [key: string]: string } = {
     'No Response': 'bg-red-200 text-red-700',
     'Not Contacted': 'bg-red-200 text-red-700',
     'Inactive': 'bg-yellow-200 text-yellow-700',
+    'Contract': 'bg-violet-200 text-violet-700',
+    'Project': 'bg-lime-200 text-lime-700',
 };
 
 const Filtering = () => {
@@ -158,7 +160,16 @@ const Filtering = () => {
         }},
         { header: 'Lead Status', accessorKey: 'status',
             cell: ({ row }) => {
-                const status = row.original.status
+
+                let status;
+                if(row.original.lead_status === 'contract') {
+                    status = 'Contract'
+                } else if(row.original.lead_status === 'project') {
+                    status = 'Project'
+                } else {
+                    status = row.original.status
+                }
+            
                 return (
                     <span
                         className={`px-2 py-1 rounded-sm text-xs font-semibold ${statusColors[status]}`}

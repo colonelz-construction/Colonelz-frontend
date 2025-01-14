@@ -674,13 +674,13 @@ const AllTask = ({ users }: any) => {
 
 
 
-            <TableContainer component={Paper} className="max-h-[350px] overflow-y-auto shadow-none" style={{ scrollbarWidth: 'none', boxShadow: 'none'}}>
+            <TableContainer  className="max-h-[400px]" style={{ scrollbarWidth: 'none', boxShadow: 'none'}}>
                 <Table stickyHeader className='shadow-none border-none' sx={{ textAlign: 'center', color:"#6B7280", border: "0.09rem"}}>
                     <TableHead>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
-                                    <TableCell key={header.id} colSpan={header.colSpan} className='font-bold' sx={{ textAlign: 'center', backgroundColor: '#f9fafb', color:"#6B7280", fontWeight: "600",  }}>
+                                    <TableCell key={header.id} colSpan={header.colSpan} className='font-bold uppercase' sx={{ textAlign: 'center', backgroundColor: '#f9fafb', color:"#6B7280", fontWeight: "600",  }}>
                                         {header.isPlaceholder ? null : (
                                             <div
                                                 {...{
@@ -710,17 +710,13 @@ const AllTask = ({ users }: any) => {
                     </TableHead>
 
                     {skloading ? (
-                        <TableBody>
-                            <TableRow>
-                                <TableCell colSpan={columns.length}>
-                                    <TableRowSkeleton
-                                        avatarInColumns={[0]}
-                                        columns={columns.length}
-                                        avatarProps={{ width: 14, height: 14 }}
-                                    />
-                                </TableCell>
-                            </TableRow>
-                        </TableBody>
+                 
+                        <TableRowSkeleton
+                            avatarInColumns={[0]}
+                            columns={columns.length}
+                            avatarProps={{ width: 14, height: 14 }}
+                        />
+                             
                     ) : data.length === 0 ? (
                         <TableBody>
                             <TableRow>
@@ -732,7 +728,7 @@ const AllTask = ({ users }: any) => {
                     ) : (
                         <TableBody>
                             {table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} className="capitalize" sx={{ textAlign: 'center', color:"#6B7280" ,cursor: 'pointer', '&:hover': { backgroundColor: '#dfedfe' },}}>
+                                <TableRow key={row.id} className="capitalize" sx={{ textAlign: 'center', color:"#6B7280" ,cursor: 'pointer', '&:hover': { backgroundColor: '#dfedfe' } }}>
                                     {row.getVisibleCells().map((cell) => {
                                         const taskType = row.original.type;
 
@@ -740,6 +736,7 @@ const AllTask = ({ users }: any) => {
                                             if (cell.column.id === "task_name") {
                                                 return (
                                                     <TableCell
+                                                        sx={{ textAlign: 'center', color:"#6B7280" }}
                                                         key={cell.id}
                                                         onClick={() =>
                                                             navigate(
@@ -755,7 +752,7 @@ const AllTask = ({ users }: any) => {
                                                 );
                                             } else {
                                                 return (
-                                                    <TableCell key={cell.id}>
+                                                    <TableCell key={cell.id} sx={{ textAlign: 'center', color:"#6B7280" }}>
                                                         {flexRender(
                                                             cell.column.columnDef.cell,
                                                             cell.getContext()
@@ -767,6 +764,7 @@ const AllTask = ({ users }: any) => {
                                             if (cell.column.id === "task_name") {
                                                 return (
                                                     <TableCell
+                                                        sx={{ textAlign: 'center', color:"#6B7280" }}
                                                         key={cell.id}
                                                         onClick={() =>
                                                             navigate(
@@ -782,7 +780,7 @@ const AllTask = ({ users }: any) => {
                                                 );
                                             } else {
                                                 return (
-                                                    <TableCell key={cell.id}>
+                                                    <TableCell key={cell.id} sx={{ textAlign: 'center', color:"#6B7280" }}>
                                                         {flexRender(
                                                             cell.column.columnDef.cell,
                                                             cell.getContext()

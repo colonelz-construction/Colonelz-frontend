@@ -1,6 +1,6 @@
 
 import { useMemo, useState, useEffect } from 'react'
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
 import Input from '@/components/ui/Input'
 import {
     useReactTable,
@@ -26,6 +26,10 @@ import SubTaskDetails from './SubTaskDetailsDrawer'
 import EditSubTask from './EditSubTask'
 import { ConfirmDialog } from '@/components/shared'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import Sorter from '@/components/ui/Table/Sorter'
+import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
+import NoData from '@/views/pages/NoData'
 
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -34,7 +38,7 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
     debounce?: number
 }
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
 export type SubTaskResponse = {
     code: number;
@@ -204,6 +208,7 @@ const Subtasks = ({task,users}:any) => {
     const [globalFilter, setGlobalFilter] = useState('')
     const navigate = useNavigate()
     const org_id = localStorage.getItem('orgId')
+    const [skLoading, setLoading] = useState<any>(true);
 
 
 
@@ -231,8 +236,8 @@ const Subtasks = ({task,users}:any) => {
     useEffect(() => {
         const TaskData=async()=>{
             const response = await apiGetCrmProjectsSubTaskData(projectId,task, org_id);
-
             setTaskData(response.data)
+            setLoading(false);
         }
         TaskData();
   
@@ -320,15 +325,19 @@ const Subtasks = ({task,users}:any) => {
     }
     return (
         <>
-            <Table>
-                <THead>
+
+        <TableContainer className='max-h-[400px]' style={{ scrollbarWidth: 'none', boxShadow: 'none'}}>
+
+            <Table stickyHeader>
+                <TableHead>
                     {table.getHeaderGroups().map((headerGroup) => (
-                        <Tr key={headerGroup.id}>
+                        <TableRow key={headerGroup.id} className='uppercase'>
                             {headerGroup.headers.map((header) => {
                                 return (
-                                    <Th
+                                    <TableCell
                                         key={header.id}
                                         colSpan={header.colSpan}
+                                        sx={{fontWeight:"600"}}
                                     >
                                         {header.isPlaceholder || header.id==='action' ? null : (
                                             <div
@@ -353,31 +362,50 @@ const Subtasks = ({task,users}:any) => {
                                                 }
                                             </div>
                                         )}
-                                    </Th>
+                                    </TableCell>
                                 )
                             })}
-                        </Tr>
+                        </TableRow>
                     ))}
-                </THead>
-                <TBody>
+                </TableHead>
+
+                {skLoading ? <TableRowSkeleton
+                            avatarInColumns={[0]}
+                            columns={columns.length}
+                            avatarProps={{ width: 14, height: 14 }}
+                        />: taskData.length === 0 ? (
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell colSpan={columns.length}>
+                                        <NoData />
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>)
+                            :
+                            <TableBody>
                     {table.getRowModel().rows.map((row) => {
                         return (
-                            <Tr key={row.id} className=''>
+                            <TableRow key={row.id} className='' sx={{'&:hover': { backgroundColor: '#dfedfe' }}}>
                                 {row.getVisibleCells().map((cell) => {
                                     return (
-                                        <Td key={cell.id}>
+                                        <TableCell key={cell.id}>
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
                                             )}
-                                        </Td>
+                                        </TableCell>
                                     )
                                 })}
-                            </Tr>
+                            </TableRow>
                         )
                     })}
-                </TBody>
+                            </TableBody>
+                }
+
             </Table>
+
+        </TableContainer>
+
             <div className="flex items-center justify-between mt-4">
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}

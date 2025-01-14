@@ -82,30 +82,71 @@ const validationSchema = Yup.object().shape({
     // ),
 })
 
+// const NumberInput = (props: any) => {
+//     const [val, setVal] = useState<any>('')
+  
+//     const handleInputChange = (newValue: string) => {
+//       // Allow only numbers and spaces
+//       if (/^[0-9\s]*$/.test(newValue)) {
+//         setVal(newValue)
+//         return newValue;
+//       }
+  
+//       return val;
+//     };
+  
+//     const animatedComponents = makeAnimated()
+  
+//     return (
+//       <CreatableSelect
+//         {...props}
+//         isClearable
+//         onInputChange={handleInputChange}
+//         components={animatedComponents}
+//       />
+//     );
+//   };
+
+
 const NumberInput = (props: any) => {
-
-    const [val, setVal] = useState<any>('')
+    const [inputValue, setInputValue] = useState<string>(''); // External state for input value
+  
     const handleInputChange = (newValue: string) => {
-      // Allow only numbers (including decimal points, if needed)
-      if (/^[0-9]*$/.test(newValue)) {
-        setVal(newValue)
-        return newValue;
-      }
-
-      return val;
+        // Allow only numbers and spaces
+        if (/^[0-9\s]*$/.test(newValue)) {
+            setInputValue(newValue);
+        }
     };
-
-    const animatedComponents = makeAnimated()
+  
+    const handleBlur = () => {
+        // Preserve the inputValue when the input loses focus
+        setInputValue((prev) => prev.trim());
+    };
+  
+    const handleKeyDown = (event: React.KeyboardEvent) => {
+        if (event.key === 'Enter' && inputValue.trim()) {
+            // Add the value when 'Enter' is pressed
+            if (props.onChange) {
+                props.onChange([...props.value || [], { label: inputValue, value: inputValue }]);
+            }
+            setInputValue(''); // Clear the input field after adding
+        }
+    };
   
     return (
-      <CreatableSelect
-        {...props}
-        isClearable
-        onInputChange={handleInputChange}
-        components={animatedComponents}
-      />
+        <CreatableSelect
+            {...props}
+            isClearable
+            inputValue={inputValue} // Controlled input value
+            onInputChange={handleInputChange}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            components={makeAnimated()}
+        />
     );
-  };
+};
+
+  
 
 export const FormikValuesContext = createContext(null);
 
@@ -124,6 +165,115 @@ const FormComponent = ({ children }: any) => {
         </div>
     );
 };
+
+
+
+
+type ValidationType = 'number' | 'email' | 'text';
+
+interface MultiInputProps {
+    value: string[];
+    onChange: (val: string[]) => void;
+    type: ValidationType;
+    placeholder?: string;
+    errorMessage?: string;
+    minLength?: number;
+    maxLength?: number;
+}
+
+export const MultiInput = ({
+    value = [],
+    onChange,
+    type,
+    placeholder = 'Enter value',
+    errorMessage,
+    minLength = 1,
+    maxLength = Infinity,
+}: MultiInputProps) => {
+    const [inputValue, setInputValue] = useState<string>('');
+    const [error, setError] = useState<string | null>(null);
+
+    // Validation rules
+    const validators: Record<ValidationType, RegExp> = {
+        number: /^[0-9\s]*$/,
+        email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        text: /^[a-zA-Z0-9-\s]*$/,
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        if (type === 'email' || validators[type].test(newValue)) {
+            setInputValue(newValue);
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && inputValue.trim()) {
+            const sanitizedValue = inputValue.trim();
+            const isValid =
+                sanitizedValue.length >= minLength &&
+                sanitizedValue.length <= maxLength &&
+                (type !== 'email' || validators.email.test(sanitizedValue));
+
+            if (isValid) {
+                setError(null);
+                onChange([...value, sanitizedValue]);
+                setInputValue('');
+            } else {
+                setError(
+                    errorMessage ||
+                        `Value must be ${
+                            minLength === maxLength
+                                ? `exactly ${minLength}`
+                                : `between ${minLength} and ${maxLength}`
+                        } characters${type === 'email' ? ' and a valid email address' : ''}.`
+                );
+            }
+            e.preventDefault();
+        }
+    };
+
+    const handleRemove = (index: number) => {
+        const newValue = value.filter((_, i) => i !== index);
+        onChange(newValue);
+    };
+
+    return (
+        <div>
+            <div className="border-[0.09rem] border-[#D1D5DB] rounded-md p-1">
+                <div className="flex flex-wrap gap-2">
+                    {value.map((val, index) => (
+                        <div
+                            key={index}
+                            className="flex items-center gap-1 bg-[#F3F4F6] px-2 py-1 rounded"
+                        >
+                            <span className="font-semibold">{val}</span>
+                            <button
+                                type="button"
+                                className="font-semibold"
+                                onClick={() => handleRemove(index)}
+                            >
+                                &times;
+                            </button>
+                        </div>
+                    ))}
+                </div>
+                <input
+                    type="text"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    placeholder={placeholder}
+                    className="mt-1 border-none rounded px-2 py-1 w-full outline-none"
+                />
+            </div>
+            {error && <div className="text-red-600 mt-1">{error}</div>}
+        </div>
+    );
+};
+
+
+
 
 const Index = () => {
 
@@ -274,6 +424,8 @@ const FormContent = () => {
 
         <>
             <h3 className="mb-4">Contract</h3>
+            
+           
             <Form className="">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     
@@ -336,23 +488,15 @@ const FormContent = () => {
 
                     <FormItem label="Client Name">
                         <Field name="client_name">
-                            {({ field, form }: FieldProps) => (
-                                <Select
-                                    isMulti
-                                    components={animatedComponents}
-                                    componentAs={CreatableSelect}
-                                    onChange={(value) =>
-                                        form.setFieldValue(
-                                            field.name,
-                                            value.map((v: any) => v.value),
-                                        )
-                                    }
-                                    onBlur={() =>
-                                        form.setFieldTouched(
-                                            field.name,
-                                            true,
-                                        )
-                                    }
+                            {({ form }: { form: any }) => (
+                                <MultiInput
+                                    value={form.values.client_name}
+                                    onChange={(val) => form.setFieldValue('client_name', val)}
+                                    type="text"
+                                    placeholder="Client Name"
+                                    minLength={3}
+                                    maxLength={60}
+                                    errorMessage="Name must have atleast 3 characters."
                                 />
                             )}
                         </Field>
@@ -363,27 +507,19 @@ const FormContent = () => {
                         />
                     </FormItem>
                     <FormItem label="Client Phone">
-                        <Field name="client_phone">
-                            {({ field, form }: FieldProps) => (
-                                <Select
-                                    isMulti
-                                    components={animatedComponents}
-                                    componentAs={NumberInput}
-                                    onChange={(value) =>
-                                        form.setFieldValue(
-                                            field.name,
-                                            value.map((v: any) => v.value),
-                                        )
-                                    }
-                                    onBlur={() =>
-                                        form.setFieldTouched(
-                                            field.name,
-                                            true,
-                                        )
-                                    }
-                                />
-                            )}
-                        </Field>
+                    <Field name="client_phone">
+                        {({ form }: { form: any }) => (
+                            <MultiInput
+                                value={form.values.client_phone}
+                                onChange={(val) => form.setFieldValue('client_phone', val)}
+                                type="number"
+                                placeholder="Phone Number"
+                                minLength={5}
+                                maxLength={10}
+                                errorMessage="Phone number must be between 5 and 10 digits."
+                            />
+                        )}
+                    </Field>
                         <ErrorMessage
                             name="client_phone"
                             component="div"
@@ -392,23 +528,15 @@ const FormContent = () => {
                     </FormItem>
                     <FormItem label="Client Email">
                         <Field name="client_email">
-                            {({ field, form }: FieldProps) => (
-                                <Select
-                                    isMulti
-                                    componentAs={CreatableSelect}
-                                    components={animatedComponents}
-                                    onChange={(value) =>
-                                        form.setFieldValue(
-                                            field.name,
-                                            value.map((v: any) => v.value),
-                                        )
-                                    }
-                                    onBlur={() =>
-                                        form.setFieldTouched(
-                                            field.name,
-                                            true,
-                                        )
-                                    }
+                            {({ form }: { form: any }) => (
+                                <MultiInput
+                                    value={form.values.client_email}
+                                    onChange={(val) => form.setFieldValue('client_email', val)}
+                                    type="email"
+                                    placeholder="Client Email"
+                                    minLength={4}
+                                    maxLength={50}
+                                    errorMessage="Enter a valid email."
                                 />
                             )}
                         </Field>
@@ -849,6 +977,8 @@ const FormContent = () => {
                         */}
                 <FormComponent />
             </Form>
+
+          
         </>
 
     )

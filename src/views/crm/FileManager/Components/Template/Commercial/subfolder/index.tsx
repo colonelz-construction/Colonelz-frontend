@@ -142,73 +142,93 @@ const Index = () => {
             </div>
 
             <div className="border rounded-lg shadow-sm dark:border-gray-700">
-              <div className="relative w-full overflow-auto">
-                <table className="w-full caption-bottom text-sm">
-                  <thead className="[&amp;_tr]:border-b">
-                    <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
-                        Name
-                      </th>
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
-                        Type
-                      </th>
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
-                        Size
-                      </th>
-                      <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
-                        Modified
-                      </th>
-                      <th className="h-12 px-4 align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0  ">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
+            <div className="relative w-full overflow-auto">
+  <table className="w-full caption-bottom text-sm">
+    <thead className="[&_tr]:border-b">
+      <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+        {["Name", "Type", "Size", "Modified", "Actions"].map((header) => (
+          <th
+            key={header}
+            className={`h-12 px-4 ${
+              header === "Actions" ? "text-center" : "text-left"
+            } align-middle font-medium text-muted-foreground`}
+          >
+            {header}
+          </th>
+        ))}
+      </tr>
+    </thead>
+    <tbody className="[&_tr:last-child]:border-0">
+      {templateData
+        .filter(
+          (item) =>
+            item.files &&
+            item.files[0] &&
+            item.files[0].folder_name === type &&
+            item.files[0].sub_folder_name_first === folderName
+        )
+        .map((item) =>
+          item.files && item.files[0] ? (
+            <tr
+              key={item.files[0].folder_id}
+              className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+            >
+              <td className="p-4 align-middle">
+                <div className="flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-5 w-5 text-gray-500 dark:text-gray-400"
+                  >
+                    <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+                  </svg>
+                  <a
+                    className="font-medium cursor-pointer"
+                    onClick={() =>
+                      navigate(
+                        `/app/crm/fileManager/project/templates/residential/subfolder/files?type=${type}&folder=${folderName}&subfolder=${item.files[0].sub_folder_name_second}&folder_id=${item.files[0].folder_id}`
+                      )
+                    }
+                  >
+                    {item.files[0].sub_folder_name_second}
+                  </a>
+                </div>
+              </td>
+              <td className="p-4 align-middle">Folder</td>
+              <td className="p-4 align-middle">
+                {Number(item.files[0].total_files) > 1
+                  ? `${item.files[0].total_files} items`
+                  : `${item.files[0].total_files} item`}
+              </td>
+              <td className="p-4 align-middle">
+                {formatDate(item.files[0].updated_date)}
+              </td>
+              <td className="p-4 align-middle text-center">
+                <div
+                  className="flex justify-center"
+                  onClick={() =>
+                    openDialog2(item.files[0].sub_folder_name_second)
+                  }
+                >
+                  <HiTrash className="text-xl text-center hover:text-red-500" />
+                </div>
+              </td>
+            </tr>
+          ) : (
+            "No folder"
+          )
+        )}
+    </tbody>
+  </table>
+</div>
 
-
-                  <tbody className="[&amp;_tr:last-child]:border-0">
-                    {templateData.filter(item => item.files && item.files[0] && item.files[0].folder_name === type && item.files[0].sub_folder_name_first === folderName).map((item) => (
-                      item.files && item.files[0] ? (
-
-                        <tr key={item.files[0].folder_id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                          <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">
-                            <div className="flex items-center gap-2">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                className="h-5 w-5 text-gray-500 dark:text-gray-400"
-                              >
-                                <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
-                              </svg>
-                              <a className="font-medium cursor-pointer" onClick={() =>
-                                navigate(
-                                  `/app/crm/fileManager/project/templates/residential/subfolder/files?type=${type}&folder=${folderName}&subfolder=${item.files[0].sub_folder_name_second}&folder_id=${item.files[0].folder_id}`,
-                                )
-                              }>
-                                {item.files[0].sub_folder_name_second}
-                              </a>
-                            </div>
-                          </td>
-                          <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">Folder</td>
-                          <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">{Number(item.files[0].total_files) > 1 ? `${item.files[0].total_files} items` : `${item.files[0].total_files} item`}</td>
-                          <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">{formatDate(item.files[0].updated_date)}</td>
-                          <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0 text-center">
-                            <div className=' flex justify-center' onClick={() => openDialog2(item.files[0].sub_folder_name_second)}>
-                              <HiTrash className=' text-xl text-center hover:text-red-500' />
-                            </div>
-                          </td>
-                        </tr>) : "No folder"))}
-
-                  </tbody>
-
-                </table>
-              </div>
             </div>
           </div>
         </div>

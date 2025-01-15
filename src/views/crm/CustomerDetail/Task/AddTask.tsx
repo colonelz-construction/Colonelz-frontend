@@ -4,6 +4,7 @@ import Dialog from '@/components/ui/Dialog'
 import { Field, Form, Formik, FormikContext } from 'formik'
 import { DatePicker, FormItem, Input, Notification, Select, toast } from '@/components/ui'
 import { apiGetCrmProjectsAddTask, apiGetUsersList } from '@/services/CrmService'
+import { IoIosAddCircleOutline } from "react-icons/io";
 import * as Yup from 'yup'
 import { AiOutlinePlus } from "react-icons/ai";
 
@@ -70,7 +71,7 @@ const priorityOptions = [
 
   return (
         <div>
-            {addButton ? <Button onClick={openDialog}  variant='solid' size='sm'>Add Task</Button> : <span onClick={openDialog} className='flex items-center gap-1 cursor-pointer text-[#6B7280] font-semibold'> <AiOutlinePlus/> <span>Add Task</span></span>}
+            {addButton ? <Button onClick={openDialog}  variant='solid' size='sm'>Add Task</Button> : <span onClick={openDialog} className='flex items-center gap-1 cursor-pointer text-[#6B7280] font-semibold text-xl'> <IoIosAddCircleOutline/></span>}
             
             <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
                 <div className="pl-4 ">

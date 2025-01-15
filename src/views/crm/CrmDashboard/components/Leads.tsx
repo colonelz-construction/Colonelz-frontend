@@ -75,71 +75,38 @@ const Leads = ({ data = [], className }: any) => {
         </Button>
       </div>
       <TableContainer
-        className="overflow-y-auto shadow-none"
         style={{ scrollbarWidth: 'none', boxShadow: 'none' }}
       >
-        <Table
-          stickyHeader
-          className="shadow-none border-none"
-          sx={{
-            textAlign: 'center',
-            // color: '#6B7280',
-            border: '0.09rem',
-          }}
-        >
+        <Table stickyHeader>
           <TableHead>
-            <TableRow>
+            <TableRow className='uppercase'>
               <TableCell
-                className="font-bold"
-                sx={{
-                  color: '#6B7280',
-                  fontWeight: '600',
-                }}
+                sx={{fontWeight:"600"}}
               >
                 Lead Name
               </TableCell>
               <TableCell
-                className="font-bold"
-                sx={{
-                  color: '#6B7280',
-                  fontWeight: '600',
-                }}
+                sx={{fontWeight:"600"}}
               >
                 Lead Status
               </TableCell>
               <TableCell
-                className="font-bold"
-                sx={{
-                  color: '#6B7280',
-                  fontWeight: '600',
-                }}
+              sx={{fontWeight:"600"}}
               >
                 Location
               </TableCell>
               <TableCell
-                className="font-bold"
-                sx={{
-                  color: '#6B7280',
-                  fontWeight: '600',
-                }}
+              sx={{fontWeight:"600"}}
               >
                 Phone
               </TableCell>
               <TableCell
-                className="font-bold"
-                sx={{
-                  color: '#6B7280',
-                  fontWeight: '600',
-                }}
+                sx={{fontWeight:"600"}}
               >
                 Email
               </TableCell>
               <TableCell
-                className="font-bold"
-                sx={{
-                  color: '#6B7280',
-                  fontWeight: '600',
-                }}
+                sx={{fontWeight:"600"}}
               >
                 Created Date
               </TableCell>

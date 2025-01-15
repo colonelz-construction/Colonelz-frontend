@@ -31,21 +31,21 @@ function Expanding() {
 
     const { roleData } = useRoleContext();
     // State for outer table and child table data
-    const apiData : any = useLeadContext()
-    const role :any = localStorage.getItem('role')
+    const apiData: any = useLeadContext()
+    const role: any = localStorage.getItem('role')
     // const [outerData, setOuterData] = useState<any>(projectData)
     // console.log(apiData)
     const [childData, setChildData] = useState<any>({})
     // console.log(childData)
     const [expanded, setExpanded] = useState<ExpandedState>({})
-    const navigate=useNavigate()
+    const navigate = useNavigate()
 
     const [loadingChildData, setLoadingChildData] = useState<any>({});
 
     const org_id = localStorage.getItem('orgId')
 
 
-    
+
 
     const formateDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -63,12 +63,12 @@ function Expanding() {
     //     setUsers(list.data)
     // }
 
-  const hasLeadTaskDeletePermission = role === 'SUPERADMIN' ? true :  roleData?.data?.leadtask?.delete?.includes(role);
-  const hasLeadTaskCreatePermission = role === 'SUPERADMIN' ? true :  roleData?.data?.leadtask?.create?.includes(role);
+    const hasLeadTaskDeletePermission = role === 'SUPERADMIN' ? true : roleData?.data?.leadtask?.delete?.includes(role);
+    const hasLeadTaskCreatePermission = role === 'SUPERADMIN' ? true : roleData?.data?.leadtask?.create?.includes(role);
 
 
 
-    const ActionColumn = ({ row, childRow }: { row: any, childRow:any }) => {
+    const ActionColumn = ({ row, childRow }: { row: any, childRow: any }) => {
         const navigate = useNavigate()
         const { textTheme } = useThemeClass()
         const { roleData } = useRoleContext()
@@ -121,11 +121,11 @@ function Expanding() {
                     </span>
                 } */}
                 {hasLeadTaskDeletePermission &&
-                <Tooltip title='Delete'>
-                    <span className={`cursor-pointer py-2  hover:${textTheme}`}>
-                        <MdDeleteOutline onClick={() => openDialog()} />
-                    </span>
-                </Tooltip>
+                    <Tooltip title='Delete'>
+                        <span className={`cursor-pointer py-2  hover:${textTheme}`}>
+                            <MdDeleteOutline onClick={() => openDialog()} />
+                        </span>
+                    </Tooltip>
                 }
                 <ConfirmDialog
                     isOpen={dialogIsOpen}
@@ -180,27 +180,28 @@ function Expanding() {
                     )}
                 </button>
             ),
-            cell: ({ row }) =>{
+            cell: ({ row }) => {
 
                 // console.log(row.original)
-                if(true) { 
+                if (true) {
                     return (
-                   <button
-                        className="text-xl"
-                        {...{
-                            onClick: async () => {
-                                row.toggleExpanded()
-                                await fetchChildData(row.original.lead_id) // Fetch child data dynamically
-                            },
-                        }}
-                    >
-                        {row.getIsExpanded() ? (
-                            <RiArrowDownSFill />
-                        ) : (
-                            <RiArrowRightSFill />
-                        )}
-                    </button>
-                )} else {
+                        <button
+                            className="text-xl"
+                            {...{
+                                onClick: async () => {
+                                    row.toggleExpanded()
+                                    await fetchChildData(row.original.lead_id) // Fetch child data dynamically
+                                },
+                            }}
+                        >
+                            {row.getIsExpanded() ? (
+                                <RiArrowDownSFill />
+                            ) : (
+                                <RiArrowRightSFill />
+                            )}
+                        </button>
+                    )
+                } else {
                     return null
                 }
             }
@@ -211,47 +212,49 @@ function Expanding() {
             cell: (props) => {
                 const row = props.row.original;
                 const [isHovered, setIsHovered] = useState(false);
-                                const hoverTimeout = useRef<Timeout | null>(null);
-                
-                                const handleMouseEnter = () => {
-                                    if (hoverTimeout.current) {
-                                        clearTimeout(hoverTimeout.current);
-                                    }
-                                    setIsHovered(true);
-                                };
-                
-                                const handleMouseLeave = () => {
-                                    hoverTimeout.current = setTimeout(() => {
-                                        setIsHovered(false);
-                                    }, 200); 
-                                };
+                const hoverTimeout = useRef<Timeout | null>(null);
+
+                const handleMouseEnter = () => {
+                    if (hoverTimeout.current) {
+                        clearTimeout(hoverTimeout.current);
+                    }
+                    setIsHovered(true);
+                };
+
+                const handleMouseLeave = () => {
+                    hoverTimeout.current = setTimeout(() => {
+                        setIsHovered(false);
+                    }, 200);
+                };
 
                 return (<div
-                className='relative inline-block min-w-[100px] font-bold text-[#6B7280] capitalize'
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-            >
-                <span className='whitespace-wrap'>{row.name.length > 13 
-                                ? `${row.name.slice(0, 10)}...` 
-                                : row.name}</span>
-                {isHovered && (
-                    <div className='capitalize absolute bottom-0 left-[30%] ml-2 bg-white border border-gray-300 p-2 shadow-lg z-9999 whitespace-nowrap transition-opacity duration-200 font-normal'>
-                        <p>{row.name}</p>
-                    </div>
-                )}
-            </div>)
-              }},
-              {
-                header: 'Task Count',
-                accessorKey: 'count_task',
-                cell: (props) => {
-                    const row = props.row.original;
-                    return (
-                        <div className='min-w-[100px] truncate text-[#6B7280]'>
-                            {row.count_task}
+                    className='relative inline-block min-w-[100px] font-bold text-[#6B7280] capitalize'
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                >
+                    <span className='whitespace-wrap'>{row.name.length > 13
+                        ? `${row.name.slice(0, 10)}...`
+                        : row.name}</span>
+                    {isHovered && (
+                        <div className='capitalize absolute bottom-0 left-[30%] ml-2 bg-white border border-gray-300 p-2 shadow-lg z-9999 whitespace-nowrap transition-opacity duration-200 font-normal'>
+                            <p>{row.name}</p>
                         </div>
-                    )
-                  }},
+                    )}
+                </div>)
+            }
+        },
+        {
+            header: 'Task Count',
+            accessorKey: 'count_task',
+            cell: (props) => {
+                const row = props.row.original;
+                return (
+                    <div className='min-w-[100px] truncate text-[#6B7280]'>
+                        {row.count_task}
+                    </div>
+                )
+            }
+        },
     ], [])
 
     // Columns for child table
@@ -315,156 +318,158 @@ function Expanding() {
     })
 
     return (
-        <TableContainer className="max-h-[400px]" style={{ scrollbarWidth: 'none', boxShadow: 'none'}}>
+        <TableContainer className="max-h-[400px]" style={{ scrollbarWidth: 'none', boxShadow: 'none' }}>
             <Table stickyHeader className='table-auto text-left'>
                 <TableHead>
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id} className='flex w-full'>
                             {headerGroup.headers.map((header) => {
                                 // console.log(headerGroup)
-                            return (header.id !== 'expander' ? <TableCell className='uppercase' key={header.id} colSpan={header.colSpan} sx={{fontWeight:'600', color:'#6B7280'}}>
+                                return (header.id !== 'expander' ? <TableCell className='uppercase' key={header.id} colSpan={header.colSpan} sx={{ fontWeight: '600', color: '#6B7280' }}>
                                     {flexRender(
                                         header.column.columnDef.header,
                                         header.getContext()
                                     )}
-                                </TableCell> : <><TableCell>{}</TableCell></>)
+                                </TableCell> : <><TableCell>{ }</TableCell></>)
                             })}
                         </TableRow>
                     ))}
                 </TableHead>
 
                 {
-                    apiData && apiData?.length > 0 ? 
-                <TableBody>
-                    {table.getRowModel().rows.map((row) => (
-                        <>
-                            <TableRow key={row.id} className='flex w-full'>
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id}>
-                                        {flexRender(
-                                            cell.column.columnDef.cell,
-                                            cell.getContext()
-                                        )}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                            {row.getIsExpanded() && (
-                                <TableRow>
-                                    <TableCell colSpan={row.getVisibleCells().length}>
-                                        <TableContainer className="max-h-[400px]" sx={{ scrollbarWidth: 'none', boxShadow: 'none', '&:hover': { backgroundColor: '#dfedfe' }}}>
-                                            <Table stickyHeader>
-                                                <TableHead>
-                                                    <TableRow>
-                                                        {childTableColumns.map((col, idx) => {
+                    apiData && apiData?.length > 0 ?
+                        <TableBody>
+                            {table.getRowModel().rows.map((row) => (
+                                <>
+                                    <TableRow key={row.id} className='flex w-full'>
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                    {row.getIsExpanded() && (
+                                        <TableRow>
+                                            <TableCell colSpan={row.getVisibleCells().length}>
+                                                <TableContainer className="max-h-[400px]" sx={{ scrollbarWidth: 'none', boxShadow: 'none', '&:hover': { backgroundColor: '#dfedfe' } }}>
+                                                    <Table stickyHeader>
+                                                        <TableHead>
+                                                            <TableRow>
+                                                                {childTableColumns.map((col, idx) => {
 
-                                                            const tempObj :any = {}
-                                                            
-                                                            return (<TableCell className='uppercase' key={idx} sx={{color:'#6B7280', fontWeight:'600'}}>
+                                                                    const tempObj: any = {}
 
-                                                                {flexRender(col.header, tempObj)}
-                                                            </TableCell>
-                                                        )})}
-                                                    </TableRow>
-                                                </TableHead>
-                                            {loadingChildData[row.original.lead_id] ? 
+                                                                    return (<TableCell className='uppercase' key={idx} sx={{ color: '#6B7280', fontWeight: '600' }}>
 
-                                                        <TableRowSkeleton 
-                                                        rows={5}
-                                                        avatarInColumns={[0]}
-                                                        columns={6}
-                                                        avatarProps={{ width: 14, height: 14 }}
-                                                        />
-
-                                            
-                                            : <TableBody>
-                                                    {childData[row.original.lead_id]?.map((childRow: any) => {
-
-                                                        // console.log(childTableColumns)
-
-                                                        return(
-                                                        <TableRow key={childRow.lead_id}>
-                                                            {childTableColumns.map((col:any, idx) => {
-                                                                // console.log(col)
-
-                                                                if(col.accessorKey === 'estimated_task_end_date' ||  col.accessorKey === 'estimated_task_start_date') {
-
-                                                                    const formattedDate = formateDate(childRow[col.accessorKey])
-
-                                                                    return(
-                                                                        <TableCell key={idx} sx={{color:'#6B7280'}}>
-                                                                            {formattedDate}
-                                                                        </TableCell>)
-                                                                    
-
-                                                                } else if(col.accessorKey === 'task_name') {
-                                                                    return (
-                                                                        <TableCell sx={{color:'#6B7280'}} key={idx} className='hover:cursor-pointer capitalize' onClick={() => navigate(`/app/crm/Leads/TaskDetails?lead_id=${row.original.lead_id}&task=${childRow.task_id}`)}>
-                                                                                {childRow[col.accessorKey]}
-                                                                        </TableCell>
-
+                                                                        {flexRender(col.header, tempObj)}
+                                                                    </TableCell>
                                                                     )
+                                                                })}
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        {loadingChildData[row.original.lead_id] ?
 
-                                                                } else if (col.accessorKey === 'action') {
+                                                            <TableRowSkeleton
+                                                                rows={5}
+                                                                avatarInColumns={[0]}
+                                                                columns={6}
+                                                                avatarProps={{ width: 14, height: 14 }}
+                                                            />
+
+
+                                                            : <TableBody>
+                                                                {childData[row.original.lead_id]?.map((childRow: any) => {
+
+                                                                    // console.log(childTableColumns)
 
                                                                     return (
-                                                                        <TableCell key={idx} sx={{color:'#6B7280'}}>
-                                                                            <ActionColumn row={row.original} childRow={childRow}/>
-                                                                        </TableCell>)
-                                                                }
-                                                                
-                                                                else {
-                                                                    return (
-                                                                        <TableCell key={idx} sx={{color:'#6B7280'}}>
-                                                                            {childRow[col.accessorKey]}
-                                                                        </TableCell>)
-                                                                }
-                                                                
-                                                                
-                                                            })}
+                                                                        <TableRow key={childRow.lead_id}>
+                                                                            {childTableColumns.map((col: any, idx) => {
+                                                                                // console.log(col)
 
-                                                        </TableRow>
-                                                    )})
-                                                    
-                                                    // || 
-                                                    
-                                                    // (
-                                                    //     <Tr>
-                                                    //         <Td colSpan={childTableColumns.length}>
-                                                    //             Loading...
-                                                    //         </Td>
-                                                    //     </Tr>
-                                                    // )
-                                                    
-                                                    }
+                                                                                if (col.accessorKey === 'estimated_task_end_date' || col.accessorKey === 'estimated_task_start_date') {
 
-                                                    { hasLeadTaskCreatePermission &&
-                                                        <TableRow className=''>
-                                                            <TableCell>
-                                                                <AddTask leadId={row.original.lead_id} user={[]} addButton={false}/>
-                                                            </TableCell>
-                                                            <TableCell>
-                                                            </TableCell>
-                                                            <TableCell>
-                                                            </TableCell>
-                                                            <TableCell>
-                                                            </TableCell>
-                                                            <TableCell>
-                                                            </TableCell>
-                                                            <TableCell>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                        
-                                                    }
-                                                    
-                                                </TableBody> }
-                                            </Table>
-                                        </TableContainer>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </>
-                    ))}
-                </TableBody> : <TableRow><TableCell><NoData /></TableCell></TableRow>
+                                                                                    const formattedDate = formateDate(childRow[col.accessorKey])
+
+                                                                                    return (
+                                                                                        <TableCell key={idx} sx={{ color: '#6B7280' }}>
+                                                                                            {formattedDate}
+                                                                                        </TableCell>)
+
+
+                                                                                } else if (col.accessorKey === 'task_name') {
+                                                                                    return (
+                                                                                        <TableCell sx={{ color: '#6B7280' }} key={idx} className='hover:cursor-pointer capitalize' onClick={() => navigate(`/app/crm/Leads/TaskDetails?lead_id=${row.original.lead_id}&task=${childRow.task_id}`)}>
+                                                                                            {childRow[col.accessorKey]}
+                                                                                        </TableCell>
+
+                                                                                    )
+
+                                                                                } else if (col.accessorKey === 'action') {
+
+                                                                                    return (
+                                                                                        <TableCell key={idx} sx={{ color: '#6B7280' }}>
+                                                                                            <ActionColumn row={row.original} childRow={childRow} />
+                                                                                        </TableCell>)
+                                                                                }
+
+                                                                                else {
+                                                                                    return (
+                                                                                        <TableCell key={idx} sx={{ color: '#6B7280' }}>
+                                                                                            {childRow[col.accessorKey]}
+                                                                                        </TableCell>)
+                                                                                }
+
+
+                                                                            })}
+
+                                                                        </TableRow>
+                                                                    )
+                                                                })
+
+                                                                    // || 
+
+                                                                    // (
+                                                                    //     <Tr>
+                                                                    //         <Td colSpan={childTableColumns.length}>
+                                                                    //             Loading...
+                                                                    //         </Td>
+                                                                    //     </Tr>
+                                                                    // )
+
+                                                                }
+
+                                                                {hasLeadTaskCreatePermission &&
+                                                                    <TableRow className=''>
+                                                                        <TableCell>
+                                                                            <AddTask leadId={row.original.lead_id} user={[]} addButton={false} />
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                        </TableCell>
+                                                                    </TableRow>
+
+                                                                }
+
+                                                            </TableBody>}
+                                                    </Table>
+                                                </TableContainer>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </>
+                            ))}
+                        </TableBody> : <TableRow><TableCell><NoData /></TableCell></TableRow>
                 }
             </Table>
         </TableContainer>

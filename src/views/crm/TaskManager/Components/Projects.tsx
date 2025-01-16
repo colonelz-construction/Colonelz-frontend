@@ -51,18 +51,18 @@ function Expanding() {
 
     const [data, setData] = useState<any>(() => projects || []);
 
-    const [loadingRows, setLoadingRows] = useState([]);
 
     // console.log(projects)
 
     const fetchChildData = async (projectId: string) => {
+        handleRowClick(projectId)
+
         if (!childData[projectId] && !loadingChildData[projectId]) {
             // Set loading for this lead's child data
             setLoadingChildData((prev: any) => ({ ...prev, [projectId]: true }));
 
             try {
                 const taskResponse = await apiGetCrmProjectsTaskData(projectId, org_id);
-                await handleRowClick(projectId)
                 setChildData((prev: any) => ({ ...prev, [projectId]: taskResponse.data }));
             } catch (error) {
                 toast.push(
@@ -70,11 +70,9 @@ function Expanding() {
                         Error fetching tasks
                     </Notification>
                 );
-            } finally {
-                // Set loading to false once the data is fetched
-                setLoadingChildData((prev: any) => ({ ...prev, [projectId]: false }));
             }
         }
+        setLoadingChildData((prev: any) => ({ ...prev, [projectId]: false }));
     };
 
     const [expandedRowIds, setExpandedRowIds] = useState<any>([]);

@@ -172,6 +172,8 @@ function Expanding() {
 
     // Fetch data for child table
     const fetchChildData = async (leadId: string) => {
+        handleRowClick(leadId)
+        
         if (!childData[leadId] && !loadingChildData[leadId]) {
             // Set loading for this lead's child data
             setLoadingChildData((prev: any) => ({ ...prev, [leadId]: true }));
@@ -179,18 +181,15 @@ function Expanding() {
             try {
                 const taskResponse = await apiGetCrmLeadsTaskData(leadId, org_id);
                 setChildData((prev: any) => ({ ...prev, [leadId]: taskResponse.data }));
-                await handleRowClick(leadId)
             } catch (error) {
                 toast.push(
                     <Notification type="danger" duration={2000} closable>
                         Error fetching tasks
                     </Notification>
                 );
-            } finally {
-                // Set loading to false once the data is fetched
-                setLoadingChildData((prev: any) => ({ ...prev, [leadId]: false }));
-            }
+            } 
         }
+        setLoadingChildData((prev: any) => ({ ...prev, [leadId]: false }));
     };
 
     // Columns for outer table

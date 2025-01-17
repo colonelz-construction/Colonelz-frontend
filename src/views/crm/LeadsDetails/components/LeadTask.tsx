@@ -1,6 +1,6 @@
 
 import { useMemo, useState, useEffect } from 'react'
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
 import Input from '@/components/ui/Input'
 import {
     useReactTable,
@@ -31,6 +31,8 @@ import { useRoleContext } from '../../Roles/RolesContext'
 import formateDate from '@/store/dateformate'
 import EditTask from '../Task/EditTask'
 import AddTask from '../Task/AddTask'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import Sorter from '@/components/ui/Table/Sorter'
 // import { Tasks } from '../store'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -39,7 +41,7 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
     debounce?: number
 }
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
 type Data = {
     task: any[]
@@ -349,64 +351,67 @@ const LeadTask = ({ task, users }: any) => {
                 </AuthorityCheck>}
             </div>
             {!loading ? task?.length === 0 ? (<NoData />) : (
-                <Table>
-                    <THead>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <Tr key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <Th
-                                            key={header.id}
-                                            colSpan={header.colSpan}
-                                        >
-                                            {header.isPlaceholder || header.id === 'action' ? null : (
-                                                <div
-                                                    {...{
-                                                        className:
-                                                            header.column.getCanSort()
-                                                                ? 'cursor-pointer select-none'
-                                                                : '',
-                                                        onClick:
-                                                            header.column.getToggleSortingHandler(),
-                                                    }}
-                                                >
-                                                    {flexRender(
-                                                        header.column.columnDef
-                                                            .header,
-                                                        header.getContext()
-                                                    )}
-                                                    {
-                                                        <Sorter
-                                                            sort={header.column.getIsSorted()}
-                                                        />
-                                                    }
-                                                </div>
-                                            )}
-                                        </Th>
-                                    )
-                                })}
-                            </Tr>
-                        ))}
-                    </THead>
-                    <TBody>
-                        {table.getRowModel().rows.map((row) => {
-                            return (
-                                <Tr key={row.id} className=''>
-                                    {row.getVisibleCells().map((cell) => {
+                <TableContainer className='max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100' style={{ boxShadow: 'none'}}>
+                    <Table stickyHeader>
+                        <TableHead>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id} className='uppercase'>
+                                    {headerGroup.headers.map((header) => {
                                         return (
-                                            <Td key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
+                                            <TableCell
+                                                key={header.id}
+                                                colSpan={header.colSpan}
+                                                sx={{fontWeight:"600"}}
+                                            >
+                                                {header.isPlaceholder || header.id === 'action' ? null : (
+                                                    <div
+                                                        {...{
+                                                            className:
+                                                                header.column.getCanSort()
+                                                                    ? 'cursor-pointer select-none'
+                                                                    : '',
+                                                            onClick:
+                                                                header.column.getToggleSortingHandler(),
+                                                        }}
+                                                    >
+                                                        {flexRender(
+                                                            header.column.columnDef
+                                                                .header,
+                                                            header.getContext()
+                                                        )}
+                                                        {
+                                                            <Sorter
+                                                                sort={header.column.getIsSorted()}
+                                                            />
+                                                        }
+                                                    </div>
                                                 )}
-                                            </Td>
+                                            </TableCell>
                                         )
                                     })}
-                                </Tr>
-                            )
-                        })}
-                    </TBody>
-                </Table>
+                                </TableRow>
+                            ))}
+                        </TableHead>
+                        <TableBody>
+                            {table.getRowModel().rows.map((row) => {
+                                return (
+                                    <TableRow key={row.id} className='' sx={{'&:hover': { backgroundColor: '#dfedfe' }}}>
+                                        {row.getVisibleCells().map((cell) => {
+                                            return (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext()
+                                                    )}
+                                                </TableCell>
+                                            )
+                                        })}
+                                    </TableRow>
+                                )
+                            })}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             ) : (<Skeleton height={300} />)}
 
             <div className="flex items-center justify-between mt-4">

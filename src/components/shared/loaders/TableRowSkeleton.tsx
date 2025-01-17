@@ -1,6 +1,7 @@
 import Skeleton from '@/components/ui/Skeleton'
 import Table from '@/components/ui/Table'
 import type { SkeletonProps } from '@/components/ui/Skeleton'
+import { TableBody, TableCell, TableRow } from '@mui/material'
 
 type TableRowSkeletonProps = {
     columns?: number
@@ -15,12 +16,12 @@ const TableRowSkeleton = (props: TableRowSkeletonProps) => {
     const { columns = props.columns, rows = 10, avatarInColumns = [], avatarProps } = props
 
     return (
-        <TBody>
+        <TableBody>
             {Array.from(new Array(rows), (_, i) => i + 0).map((row) => (
-                <Tr key={`row-${row}`}>
+                <TableRow key={`row-${row}`}>
                     {Array.from(new Array(columns), (_, i) => i + 0).map(
                         (col) => (
-                            <Td key={`col-${col}`}>
+                            <TableCell key={`col-${col}`}>
                                 <div className="flex flex-auto items-center gap-2">
                                     {/* {avatarInColumns.includes(col) && (
                                         <div>
@@ -32,12 +33,12 @@ const TableRowSkeleton = (props: TableRowSkeletonProps) => {
                                     )} */}
                                     <Skeleton />
                                 </div>
-                            </Td>
+                            </TableCell>
                         )
                     )}
-                </Tr>
+                </TableRow>
             ))}
-        </TBody>
+        </TableBody>
     )
 }
 

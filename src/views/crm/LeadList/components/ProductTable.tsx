@@ -1,6 +1,6 @@
 
 import { useMemo, useState, useEffect } from 'react'
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
 import Input from '@/components/ui/Input'
 import {
     useReactTable,
@@ -22,10 +22,12 @@ import { Button, Pagination, Select } from '@/components/ui'
 import { HiOutlineEye, HiPlusCircle } from 'react-icons/hi'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import { useRoleContext } from '../../Roles/RolesContext'
-import { AuthorityCheck } from '@/components/shared'
+import { AuthorityCheck, StickyFooter } from '@/components/shared';
 import formateDate from '@/store/dateformate'
 import { useLeadContext } from '../store/LeadContext'
 import NoData from '@/views/pages/NoData'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import Sorter from '@/components/ui/Table/Sorter'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -34,7 +36,7 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
 }
 
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
 
 
@@ -139,6 +141,8 @@ const statusColors: { [key: string]: string } = {
     'No Response': 'bg-red-200 text-red-700',
     'Not Contacted': 'bg-red-200 text-red-700',
     'Inactive': 'bg-yellow-200 text-yellow-700',
+    'Contract': 'bg-violet-200 text-violet-700',
+    'Project': 'bg-lime-200 text-lime-700',
 };
 
 const Filtering = () => {
@@ -158,7 +162,16 @@ const Filtering = () => {
         }},
         { header: 'Lead Status', accessorKey: 'status',
             cell: ({ row }) => {
-                const status = row.original.status
+
+                let status;
+                if(row.original.lead_status === 'contract') {
+                    status = 'Contract'
+                } else if(row.original.lead_status === 'project') {
+                    status = 'Project'
+                } else {
+                    status = row.original.status
+                }
+            
                 return (
                     <span
                         className={`px-2 py-1 rounded-sm text-xs font-semibold ${statusColors[status]}`}
@@ -225,68 +238,78 @@ const Filtering = () => {
                 placeholder="Search..."
                 onChange={(value) => setGlobalFilter(String(value))}
             />
-            <Table>
-                <THead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <Tr key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <Th
-                                        key={header.id}
-                                        colSpan={header.colSpan}
-                                    >
-                                        {header.isPlaceholder ? null : (
-                                            <div
-                                                {...{
-                                                    className:
-                                                        header.column.getCanSort()
-                                                            ? 'cursor-pointer select-none'
-                                                            : '',
-                                                    onClick:
-                                                        header.column.getToggleSortingHandler(),
-                                                }}
-                                            >
-                                                {flexRender(
-                                                    header.column.columnDef
-                                                        .header,
-                                                    header.getContext()
-                                                )}
-                                                {
-                                                    <Sorter
-                                                        sort={header.column.getIsSorted()}
-                                                    />
-                                                }
-                                            </div>
-                                        )}
-                                    </Th>
-                                )
-                            })}
-                        </Tr>
-                    ))}
-                </THead>
-
-                {responseData && responseData?.length <= 0 ? <Tr><Td colSpan={columns.length}><NoData /></Td></Tr> :
-
-                <TBody>
-                    {table.getRowModel().rows.map((row) => {
-                        return (
-                            <Tr key={row.id} onClick={()=>navigate(`/app/crm/lead/?id=${row.original.lead_id}&tab=Details`)} className=' cursor-pointer'>
-                                {row.getVisibleCells().map((cell) => {
+            <TableContainer className='max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100' style={{ boxShadow: 'none'}}>
+                <Table stickyHeader>
+                    <TableHead>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id} className='uppercase'>
+                                {headerGroup.headers.map((header) => {
                                     return (
-                                        <Td key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
+                                        <TableCell
+                                            key={header.id}
+                                            colSpan={header.colSpan}
+                                            sx={{fontWeight:'600'}}
+                                        >
+                                            {header.isPlaceholder ? null : (
+                                                <div
+                                                    {...{
+                                                        className:
+                                                            header.column.getCanSort()
+                                                                ? 'cursor-pointer select-none'
+                                                                : '',
+                                                        onClick:
+                                                            header.column.getToggleSortingHandler(),
+                                                    }}
+                                                >
+                                                    {flexRender(
+                                                        header.column.columnDef
+                                                            .header,
+                                                        header.getContext()
+                                                    )}
+                                                    {
+                                                        <Sorter
+                                                            sort={header.column.getIsSorted()}
+                                                        />
+                                                    }
+                                                </div>
                                             )}
-                                        </Td>
+                                        </TableCell>
                                     )
                                 })}
-                            </Tr>
-                        )
-                    })}
-                </TBody>
-                }
-            </Table>
+                            </TableRow>
+                        ))}
+                    </TableHead>
+
+                    {responseData && responseData?.length <= 0 ? <TableBody>
+                            <TableRow>
+                                <TableCell colSpan={columns.length}>
+                                    <NoData />
+                                </TableCell>
+                            </TableRow>
+                        </TableBody> :
+
+                    <TableBody>
+                        {table.getRowModel().rows.map((row) => {
+                            return (
+                                <TableRow sx={{'&:hover': { backgroundColor: '#dfedfe' }}} key={row.id} onClick={()=>navigate(`/app/crm/lead/?id=${row.original.lead_id}&tab=Details`)} className=' cursor-pointer'>
+                                    {row.getVisibleCells().map((cell) => {
+                                        return (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </TableCell>
+                                        )
+                                    })}
+                                </TableRow>
+                            )
+                        })}
+                    </TableBody>
+                    }
+                </Table>
+
+            </TableContainer>
             <div className="flex items-center justify-between mt-4">
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}

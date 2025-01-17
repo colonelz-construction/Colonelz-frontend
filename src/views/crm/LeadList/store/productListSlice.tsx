@@ -14,6 +14,7 @@ export type Product = {
     email: string
     phone: string
     status: string
+    lead_status: string
     date:string
 }
 

@@ -1,5 +1,5 @@
 import { useMemo, Fragment, useState, useEffect } from 'react';
-import Table from '@/components/ui/Table';
+// import Table from '@/components/ui/Table';
 import {
     useReactTable,
     getCoreRowModel,
@@ -25,6 +25,7 @@ import { DataType, MomDataType } from '../../store/MomContext';
 import useThemeClass from '@/utils/hooks/useThemeClass';
 import { apiGetMomDelete } from '@/services/CrmService';
 import { AnyMxRecord } from 'dns';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number;
@@ -90,7 +91,7 @@ type ReactTableProps<T> = {
     data: DataType;
 };
 
-const { Tr, Th, Td, THead, TBody } = Table;
+// const { Tr, Th, Td, THead, TBody } = Table;
 type Option={
     value:number;
     label:string;
@@ -372,12 +373,13 @@ function ReactTable({
             </div>
             {table.getRowModel().rows.length > 0 ? (
                 <>
-                    <Table>
-                        <THead>
+                <TableContainer className="max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100" style={{ boxShadow: 'none'}}>
+                    <Table stickyHeader>
+                        <TableHead>
                             {table.getHeaderGroups().map((headerGroup) => (
-                                <Tr key={headerGroup.id}>
+                                <TableRow key={headerGroup.id} className='uppercase' >
                                     {headerGroup.headers.map((header) => (
-                                        <Th key={header.id} colSpan={header.colSpan}>
+                                        <TableCell key={header.id} colSpan={header.colSpan} sx={{fontWeight:"600"}}>
                                             {header.isPlaceholder || header.id==='action' ? null : (
                                                 <div
                                                     {...{
@@ -393,32 +395,34 @@ function ReactTable({
                                                     )}
                                                 </div>
                                             )}
-                                        </Th>
+                                        </TableCell>
                                     ))}
-                                </Tr>
+                                </TableRow>
                             ))}
-                        </THead>
-                        <TBody>
+                        </TableHead>
+                        <TableBody>
                             {filteredRows.map((row) => (
                                 <Fragment key={row.id}>
-                                    <Tr>
+                                    <TableRow sx={{'&:hover': { backgroundColor: '#dfedfe' }}}>
                                         {row.getVisibleCells().map((cell) => (
-                                            <td key={cell.id}>
+                                            <TableCell key={cell.id}>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </td>
+                                            </TableCell>
                                         ))}
-                                    </Tr>
+                                    </TableRow>
                                     {row.getIsExpanded() && (
-                                        <Tr>
-                                            <Td colSpan={row.getVisibleCells().length}>
+                                        <TableRow sx={{'&:hover': { backgroundColor: '#dfedfe' }}}>
+                                            <TableCell colSpan={row.getVisibleCells().length}>
                                                 {renderRowSubComponent({ row })}
-                                            </Td>
-                                        </Tr>
+                                            </TableCell>
+                                        </TableRow>
                                     )}
                                 </Fragment>
                             ))}
-                        </TBody>
+                        </TableBody>
                     </Table>
+
+                </TableContainer>
                     <div className="flex items-center justify-between mt-4">
                     <Pagination
     pageSize={table.getState().pagination.pageSize}

@@ -8,7 +8,7 @@ import {
     useReactTable,
     FilterFn
 } from '@tanstack/react-table'
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
 import Checkbox from '@/components/ui/Checkbox'
 import type { ChangeEvent, InputHTMLAttributes } from 'react'
 import type { CheckboxProps } from '@/components/ui/Checkbox'
@@ -22,6 +22,9 @@ import { use } from 'i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import { rankItem } from '@tanstack/match-sorter-utils'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import NoData from '@/views/pages/NoData'
+import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 
 type FormData = {
     user_name: string;
@@ -44,7 +47,7 @@ interface IndeterminateCheckboxProps extends Omit<CheckboxProps, 'onChange'> {
     onIndeterminateCheckBoxChange?: (event: CheckBoxChangeEvent) => void;
 }
 
-const { Tr, Th, Td, THead, TBody } = Table
+// const { Tr, Th, Td, THead, TBody } = Table
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -100,6 +103,7 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 }
 export type FileItemProps = {
     data: FileItem[]
+    loading: any
 }
 export type FileItem = {
     admin_status: string,
@@ -145,16 +149,49 @@ const ContractDetails = (data: FileItemProps) => {
     const [remark, setRemark] = useState("");
     const location = useLocation()
     const queryParams = new URLSearchParams(location.search)
-    const leadId = queryParams.get('id')
+    const leadId :any = queryParams.get('id')
     const [approvalLoading, setApprovalLoading] = useState(false)
     const { roleData } = useRoleContext()
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
-    const org_id = localStorage.getItem('orgId')
+    const org_id:any= localStorage.getItem('orgId')
 
 
 
-
+    const contractApproval = async (fileId:any) => {
+        try {
+            const formData = new FormData()
+                        formData.append('lead_id', leadId)
+                        formData.append('folder_name', 'Contract')
+                        formData.append('file_id', fileId)
+                        // formData.append('user_name',values.user_name)
+                        formData.append('type', 'Internal')
+                        formData.append('org_id', org_id)
+            
+                        const response = await apiGetCrmFileManagerShareContractFile(formData)
+                        // console.log(response);
+            
+                        if (response.code === 200) {
+                          toast.push(
+                            <Notification closable type="success" duration={2000}>
+                              Shared for approval successfully
+                            </Notification>, { placement: 'top-end' }
+                          )
+                          window.location.reload();
+                          
+                        }
+                        else {
+                          toast.push(
+                            <Notification closable type="danger" duration={2000}>
+                              {response.errorMessage}
+                            </Notification>, { placement: 'top-end' }
+                          )
+                        }
+        } catch (error:any) {
+            throw new Error(error);
+            
+        }
+    }
 
     const openDialog = () => {
         setIsOpen(true)
@@ -228,7 +265,7 @@ const ContractDetails = (data: FileItemProps) => {
                                     onMouseLeave={handleMouseLeave}
                                 >
                                     <a href={`${row.original.files[0].fileUrl}`} className=' cursor-pointer' target='_blank'>
-                                        <div>{fileName.length > 20 ? `${fileName.substring(0, 20)}...` : fileName}</div></a>
+                                        {fileName.length > 31 ? `${fileName.substring(0,31)}...` : fileName}</a>
                                     {isHovered && (
                                         <div className='absolute bottom-0 left-full ml-2 bg-white border border-gray-300 p-2 shadow-lg z-9999 whitespace-nowrap transition-opacity duration-200'>
                                             <p>File Name: {fileName}</p>
@@ -262,6 +299,8 @@ const ContractDetails = (data: FileItemProps) => {
                                 setIsOpen(false)
                             }
 
+                            console.log(status)
+
                             return (
                                 status === 'approved' ? (
                                     <div>Approved</div>
@@ -270,7 +309,7 @@ const ContractDetails = (data: FileItemProps) => {
                                 ) : status === 'pending' ?
                                     (
                                         (role !== 'SUPERADMIN' && !roleData.data.contract?.update?.includes(`${role}`)) ? (
-                                            <div>Pending</div>
+                                            <div>Pending for approval from Admin</div>
                                         ) : (
                                             <div className='flex gap-1'>
                                                 <Button variant='solid' size='sm' onClick={() => Approval(fileId, 'approved')}>{approvalLoading ? "Approving..." : 'Approve'}</Button>
@@ -334,7 +373,7 @@ const ContractDetails = (data: FileItemProps) => {
                                             </div>
                                         )
                                     ) : (
-                                        <div>Not Sent</div>
+                                        <Button variant='solid' size='sm' onClick={() => contractApproval(fileId)}>Share for approval</Button>
                                     )
                             )
                         }
@@ -377,7 +416,7 @@ const ContractDetails = (data: FileItemProps) => {
                 [])
 
     const table = useReactTable({
-        data: data?.data || [],
+        data: data?.data.reverse() || [],
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -534,30 +573,55 @@ const ContractDetails = (data: FileItemProps) => {
             </div>
             {table.getRowModel().rows.length > 0 ? (
                 <div>
-                    <Table>
-                        <THead>
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <Tr key={headerGroup.id}>
-                                    {headerGroup.headers.map((header) => (
-                                        <Th key={header.id} colSpan={header.colSpan}>
-                                            {flexRender(header.column.columnDef.header, header.getContext())}
-                                        </Th>
-                                    ))}
-                                </Tr>
-                            ))}
-                        </THead>
-                        <TBody>
-                            {table.getRowModel().rows.map((row) => (
-                                <Tr key={row.id}>
-                                    {row.getVisibleCells().map((cell) => (
-                                        <Td key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </Td>
-                                    ))}
-                                </Tr>
-                            ))}
-                        </TBody>
-                    </Table>
+                    <TableContainer className='max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100' style={{ boxShadow: 'none'}}>
+                        <Table stickyHeader>
+                            <TableHead>
+                                {table.getHeaderGroups().map((headerGroup) => (
+                                    <TableRow key={headerGroup.id} className='uppercase'>
+                                        {headerGroup.headers.map((header) => (
+                                            <TableCell key={header.id} colSpan={header.colSpan} sx={{fontWeight:"600"}}>
+                                                {flexRender(header.column.columnDef.header, header.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableHead>
+                            {
+
+                                loading ? (
+                                                
+                                    <TableRowSkeleton
+                                        avatarInColumns={[0]}
+                                        columns={columns.length}
+                                        avatarProps={{ width: 14, height: 14 }}
+                                    />
+                                        
+                                ) : data?.data.length === 0 ? (
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell colSpan={columns.length}>
+                                                <NoData />
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                ) :
+
+
+                            (<TableBody>
+                                {table.getRowModel().rows.map((row) => (
+                                    <TableRow key={row.id} sx={{'&:hover': { backgroundColor: '#dfedfe' }}} >
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableBody>)
+                            }
+
+                        </Table>
+                    </TableContainer>
                     <div className="flex items-center justify-between mt-4">
                         <Pagination
                             pageSize={table.getState().pagination.pageSize}

@@ -1,6 +1,6 @@
 
 import { useMemo, useState, useEffect } from 'react'
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
 import Input from '@/components/ui/Input'
 import {
     useReactTable,
@@ -26,6 +26,8 @@ import SubTaskDetails from './SubTaskDetailsDrawer'
 import EditSubTask from './EditSubTask'
 import { ConfirmDialog } from '@/components/shared'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import Sorter from '@/components/ui/Table/Sorter'
 
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -34,7 +36,7 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
     debounce?: number
 }
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
 export type SubTaskResponse = {
     code: number;
@@ -304,15 +306,17 @@ const Subtasks = ({task,users}:any) => {
     }
     return (
         <>
-            <Table>
-                <THead>
+        <TableContainer className='max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100' style={{ boxShadow: 'none'}}>
+            <Table stickyHeader>
+                <TableHead>
                     {table.getHeaderGroups().map((headerGroup) => (
-                        <Tr key={headerGroup.id}>
+                        <TableRow key={headerGroup.id} className='uppercase'>
                             {headerGroup.headers.map((header) => {
                                 return (
-                                    <Th
+                                    <TableCell
                                         key={header.id}
                                         colSpan={header.colSpan}
+                                        sx={{fontWeight:"600"}}
                                     >
                                         {header.isPlaceholder || header.id==='action' ? null : (
                                             <div
@@ -337,31 +341,33 @@ const Subtasks = ({task,users}:any) => {
                                                 }
                                             </div>
                                         )}
-                                    </Th>
+                                    </TableCell>
                                 )
                             })}
-                        </Tr>
+                        </TableRow>
                     ))}
-                </THead>
-                <TBody>
+                </TableHead>
+                <TableBody>
                     {table.getRowModel().rows.map((row) => {
                         return (
-                            <Tr key={row.id} className=''>
+                            <TableRow key={row.id} className='' sx={{'&:hover': { backgroundColor: '#dfedfe' }}}>
                                 {row.getVisibleCells().map((cell) => {
                                     return (
-                                        <Td key={cell.id}>
+                                        <TableCell key={cell.id}>
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
                                             )}
-                                        </Td>
+                                        </TableCell>
                                     )
                                 })}
-                            </Tr>
+                            </TableRow>
                         )
                     })}
-                </TBody>
+                </TableBody>
             </Table>
+
+        </TableContainer>
             <div className="flex items-center justify-between mt-4">
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}

@@ -123,7 +123,7 @@ export const MultiInputOptions = ({
 
   return (
       <div ref={ref}>
-          <div className="border-[0.09rem] border-[#D1D5DB] rounded-md p-1 relative">
+          <div className={`border-[0.03rem] ${isDark ? "border-[#4B5563]" : "border-[#D1D5DB]"} rounded-md p-1`}>
               <div className="flex flex-wrap gap-2">
                   {value.map((val, index) => (
                       <div

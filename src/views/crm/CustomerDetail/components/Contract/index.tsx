@@ -109,43 +109,43 @@ const validationSchema = Yup.object().shape({
 //   };
 
 
-const NumberInput = (props: any) => {
-    const [inputValue, setInputValue] = useState<string>(''); // External state for input value
+// const NumberInput = (props: any) => {
+//     const [inputValue, setInputValue] = useState<string>(''); // External state for input value
   
-    const handleInputChange = (newValue: string) => {
-        // Allow only numbers and spaces
-        if (/^[0-9\s]*$/.test(newValue)) {
-            setInputValue(newValue);
-        }
-    };
+//     const handleInputChange = (newValue: string) => {
+//         // Allow only numbers and spaces
+//         if (/^[0-9\s]*$/.test(newValue)) {
+//             setInputValue(newValue);
+//         }
+//     };
   
-    const handleBlur = () => {
-        // Preserve the inputValue when the input loses focus
-        setInputValue((prev) => prev.trim());
-    };
+//     const handleBlur = () => {
+//         // Preserve the inputValue when the input loses focus
+//         setInputValue((prev) => prev.trim());
+//     };
   
-    const handleKeyDown = (event: React.KeyboardEvent) => {
-        if (event.key === 'Enter' && inputValue.trim()) {
-            // Add the value when 'Enter' is pressed
-            if (props.onChange) {
-                props.onChange([...props.value || [], { label: inputValue, value: inputValue }]);
-            }
-            setInputValue(''); // Clear the input field after adding
-        }
-    };
+//     const handleKeyDown = (event: React.KeyboardEvent) => {
+//         if (event.key === 'Enter' && inputValue.trim()) {
+//             // Add the value when 'Enter' is pressed
+//             if (props.onChange) {
+//                 props.onChange([...props.value || [], { label: inputValue, value: inputValue }]);
+//             }
+//             setInputValue(''); // Clear the input field after adding
+//         }
+//     };
   
-    return (
-        <CreatableSelect
-            {...props}
-            isClearable
-            inputValue={inputValue} // Controlled input value
-            onInputChange={handleInputChange}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-            components={makeAnimated()}
-        />
-    );
-};
+//     return (
+//         <CreatableSelect
+//             {...props}
+//             isClearable
+//             inputValue={inputValue} // Controlled input value
+//             onInputChange={handleInputChange}
+//             onBlur={handleBlur}
+//             onKeyDown={handleKeyDown}
+//             components={makeAnimated()}
+//         />
+//     );
+// };
 
   
 
@@ -205,6 +205,22 @@ export const MultiInput = ({
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.target.value;
+
+        if (type === 'number') {
+            console.log(newValue)
+            const sanitizedValue = newValue.replace(/\s/g, '');  // Remove all spaces from the string
+
+            console.log(sanitizedValue)
+            if (validators[type].test(sanitizedValue)) {
+                setInputValue(sanitizedValue);
+            }
+        } else {
+            // For other types, only update input value if it matches the validator
+            if (validators[type].test(newValue)) {
+                setInputValue(newValue);
+            }
+        }
+
         if (type === 'email' || validators[type].test(newValue)) {
             setInputValue(newValue);
         }
@@ -212,7 +228,11 @@ export const MultiInput = ({
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && inputValue.trim()) {
-            const sanitizedValue = inputValue.trim();
+            let sanitizedValue = inputValue.trim();
+
+            if(type === 'number') {
+                sanitizedValue = inputValue.trim().replace(/\s+/g, '');
+            }
             const isValid =
                 sanitizedValue.length >= minLength &&
                 sanitizedValue.length <= maxLength &&
@@ -243,7 +263,7 @@ export const MultiInput = ({
 
     return (
         <div>
-            <div className="border-[0.03rem] border-[#D1D5DB] rounded-md p-1">
+            <div className={`border-[0.03rem] ${isDark ? "border-[#4B5563]" : "border-[#D1D5DB]"} rounded-md p-1`}>
                 <div className="flex flex-wrap gap-2">
                     {value.map((val, index) => (
                         <div

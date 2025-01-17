@@ -1,6 +1,6 @@
 
 import { useMemo, useState, useEffect } from 'react'
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
 import Input from '@/components/ui/Input'
 import Pagination from '@/components/ui/Pagination'
 import {
@@ -26,6 +26,7 @@ import { Loading } from '@/components/shared'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import NoData from '@/views/pages/NoData'
 import formateDate from '@/store/dateformate'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel } from '@mui/material'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -33,7 +34,7 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
     debounce?: number
 }
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
 function DebouncedInput({
     value: initialValue,
@@ -225,7 +226,7 @@ const Filtering = () => {
                 />
             </div>
 
-            <Table>
+            {/* <Table>
                 <THead>
                     {table.getHeaderGroups().map((headerGroup) => (
                         <Tr key={headerGroup.id}>
@@ -291,7 +292,62 @@ const Filtering = () => {
                             )
                         })}
                     </TBody>)}
-            </Table>
+            </Table> */}
+
+            <TableContainer className="max-h-[350px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100" style={{ boxShadow: 'none' }}>
+                <Table stickyHeader>
+                    <TableHead>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id} className='uppercase'>
+                                {headerGroup.headers.map((header) => (
+                                    <TableCell key={header.id} sx={{ fontWeight: "600" }}>
+                                        {header.isPlaceholder ? null : (
+                                            <div
+                                                {...{
+                                                    className: header.column.getCanSort() ? 'cursor-pointer select-none' : 'pointer-events-none',
+                                                    onClick: header.column.getToggleSortingHandler(),
+                                                }}
+                                            >
+                                                {flexRender(header.column.columnDef.header, header.getContext())}
+                                                {header.column.getCanSort() && (
+                                                    <TableSortLabel
+                                                        direction={header.column.getIsSorted() ? 'asc' : 'desc'}
+                                                    />
+                                                )}
+                                            </div>
+                                        )}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        ))}
+                    </TableHead>
+
+                    {loading ? (
+                        <TableRowSkeleton
+                            rows={10}
+                            avatarInColumns={[0]}
+                            columns={columns.length}
+                            avatarProps={{ width: 14, height: 14 }}
+                        />
+                    ) : leadData.length === 0 ? (
+                        <TableRow>
+                            <TableCell colSpan={columns.length}><NoData /></TableCell>
+                        </TableRow>
+                    ) : (
+                        <TableBody>
+                            {table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id} className='cursor-pointer' onClick={() => navigate(`/app/crm/fileManager/leads?lead_id=${row.original.lead_id}&lead_name=${row.original.lead_name}`)} sx={{ '&:hover': { backgroundColor: '#dfedfe' } }}>
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    )}
+                </Table>
+            </TableContainer>
 
             <div className="flex items-center justify-between mt-4">
                 <Pagination

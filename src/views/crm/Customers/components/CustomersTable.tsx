@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from 'react'
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
 import Input from '@/components/ui/Input'
 import Pagination from '@/components/ui/Pagination'
 import {
@@ -25,6 +25,8 @@ import { StatisticCard } from './CustomerStatistic'
 import { BiSolidBellRing } from 'react-icons/bi'
 import { useProjectContext } from '../store/ProjectContext'
 import { Timeout } from 'react-number-format/types/types'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import Sorter from '@/components/ui/Table/Sorter'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -32,7 +34,7 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
     debounce?: number
 }
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+
 
 
 
@@ -136,7 +138,7 @@ const Filtering = () => {
             },
         },
         {
-            header: 'Project Type',
+            header: () => <span >Project Type</span>,
             accessorKey: 'project_type',
             cell: (props) => {
                 const row = props.row.original;
@@ -176,13 +178,13 @@ const Filtering = () => {
                 };
                 return (
                     <div
-                        className='relative inline-block'
+                        className='relative inline-block '
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
                     >
                         <span className='cursor-pointer whitespace-nowrap'>{row.client_name}</span>
                         {isHovered && (
-                            <div className='absolute bottom-0 left-full ml-2 bg-white border border-gray-300 p-2 shadow-lg z-9999 whitespace-nowrap transition-opacity duration-200'>
+                            <div className='absolute bottom-0 left-full ml-2 bg-white border border-gray-300 p-2 shadow-lg z-20 whitespace-nowrap transition-opacity duration-200'>
                                 <p>Client Name: {row.client[0].client_name}</p>
                                 <p>Client Email: {row.client[0].client_email}</p>
                                 <p>Client Contact: {row.client[0].client_contact}</p>
@@ -321,64 +323,68 @@ const Filtering = () => {
                 onChange={(value) => setGlobalFilter(String(value))}
             />
             </div>
-            <Table>
-                <THead>
-                    {table?.getHeaderGroups().map((headerGroup) => (
-                        <Tr key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <Th
-                                        key={header.id}
-                                        colSpan={header.colSpan}
-                                    >
-                                        {header.isPlaceholder ? null : (
-                                            <div
-                                                {...{
-                                                    className:
-                                                        header.column.getCanSort()
-                                                            ? 'cursor-pointer select-none'
-                                                            : 'pointer-events-none',
-                                                    onClick:
-                                                        header.column.getToggleSortingHandler(),
-                                                }}
-                                            >
-                                                {flexRender(
-                                                    header.column.columnDef
-                                                        .header,
-                                                    header.getContext()
-                                                )}
-                                                {header.column.getCanSort() && (
-                                                    <Sorter
-                                                        sort={header.column.getIsSorted()}
-                                                    />
-                                                )}
-                                            </div>
-                                        )}
-                                    </Th>
-                                )
-                            })}
-                        </Tr>
-                    ))}
-                </THead>
-                <TBody>
-                    {table?.getRowModel().rows.map((row) => {
-                        return (
-                            <Tr key={row.id} className=' capitalize cursor-pointer' onClick={()=>navigate(`/app/crm/project-details?project_id=${row.original.project_id}&id=${userId}&type=details`)}>
-                                {row.getVisibleCells().map((cell) => {
+            <TableContainer className="max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100" style={{ boxShadow: 'none'}}>
+                <Table stickyHeader>
+                    <TableHead>
+                        {table?.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => {
                                     return (
-                                        <Td key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
+                                        <TableCell
+                                            key={header.id}
+                                            colSpan={header.colSpan}
+                                            sx={{color:'#6B7280', fontWeight:'600'}}
+                                            className='uppercase'
+                                        >
+                                            {header.isPlaceholder ? null : (
+                                                <div
+                                                    {...{
+                                                        className:
+                                                            header.column.getCanSort()
+                                                                ? 'cursor-pointer select-none'
+                                                                : 'pointer-events-none',
+                                                        onClick:
+                                                            header.column.getToggleSortingHandler(),
+                                                    }}
+                                                >
+                                                    {flexRender(
+                                                        header.column.columnDef
+                                                            .header,
+                                                        header.getContext()
+                                                    )}
+                                                    {header.column.getCanSort() && (
+                                                        <Sorter
+                                                            sort={header.column.getIsSorted()}
+                                                        />
+                                                    )}
+                                                </div>
                                             )}
-                                        </Td>
+                                        </TableCell>
                                     )
                                 })}
-                            </Tr>
-                        )
-                    })}
-                </TBody>
-            </Table>
+                            </TableRow>
+                        ))}
+                    </TableHead>
+                    <TableBody>
+                        {table?.getRowModel().rows.map((row) => {
+                            return (
+                                <TableRow key={row.id} className=' capitalize cursor-pointer' onClick={()=>navigate(`/app/crm/project-details?project_id=${row.original.project_id}&id=${userId}&type=details`)}>
+                                    {row.getVisibleCells().map((cell) => {
+                                        return (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </TableCell>
+                                        )
+                                    })}
+                                </TableRow>
+                            )
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
             <div className="flex items-center justify-between mt-4">
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}

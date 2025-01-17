@@ -15,12 +15,16 @@ const Contract = () => {
   const queryParams = new URLSearchParams(location.search);
   const lead_id = queryParams.get('id')
   const [details, setDetails] = useState<ContractResponseType>();
+  const [loading, setLoading] = useState<any>(true);
+
+  console.log(details?.data)
  useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await apiGetCrmContractDetails(lead_id);
         
         setDetails(response);
+        setLoading(false)
         
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -31,7 +35,7 @@ const Contract = () => {
   return (
     <>
     <div>
-    {details && <ContractDetails data={details.data}/>}
+    {details && <ContractDetails loading={loading} data={details.data}/>}
     </div>
     </>
   )

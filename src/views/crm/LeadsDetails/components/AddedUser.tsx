@@ -27,7 +27,7 @@ import {
 
 } from '@/services/CrmService'
 import NoData from '@/views/pages/NoData'
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
 import {
     useReactTable,
     getCoreRowModel,
@@ -48,6 +48,8 @@ import formateDate from '@/store/dateformate'
 import { ConfirmDialog } from '@/components/shared'
 import { useAppSelector } from '@/store'
 import Assignee from '../../CustomerDetail/Project Progress/Assignee';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import Sorter from '@/components/ui/Table/Sorter';
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -55,7 +57,7 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
     debounce?: number
 }
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
 function DebouncedInput({
     value: initialValue,
@@ -331,77 +333,83 @@ const AddedUser = ({leadData, openDialog3}:any) => {
 
                     </div>
                     {leadData ? (
-                        <div className='h-[13rem] overflow-y-auto'>
-                            <Table>
-                                <THead>
-                                    {table.getHeaderGroups().map((headerGroup) => (
-                                        <Tr key={headerGroup.id}>
-                                            {headerGroup.headers.map((header) => {
-                                                return (
-                                                    <Th
-                                                        key={header.id}
-                                                        colSpan={header.colSpan}
-                                                    >
-                                                        {header.isPlaceholder || header.id === 'actions' ? null : (
-                                                            <div
-                                                                {...{
-                                                                    className:
-                                                                        header.column.getCanSort()
-                                                                            ? 'cursor-pointer select-none'
-                                                                            : '',
-                                                                    onClick:
-                                                                        header.column.getToggleSortingHandler(),
-                                                                }}
-                                                            >
-                                                                {flexRender(
-                                                                    header.column.columnDef
-                                                                        .header,
-                                                                    header.getContext()
-                                                                )}
-                                                                {
-                                                                    <Sorter
-                                                                        sort={header.column.getIsSorted()}
-                                                                    />
-                                                                }
-                                                            </div>
-                                                        )}
-                                                    </Th>
-                                                )
-                                            })}
-                                        </Tr>
-                                    ))}
-                                </THead>
-                                {loading ? <TableRowSkeleton
-                                    rows={5}
-                                    avatarInColumns={[0]}
-                                    columns={3}
-                                    avatarProps={{ width: 14, height: 14 }}
-                                /> :
-                                    (leadData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
-                                        <TBody >
-
-
-
-                                            {table.getRowModel().rows.map((row) => {
-                                                return (
-                                                    <Tr key={row.id}>
-                                                        {row.getVisibleCells().map((cell) => {
-                                                            return (
-                                                                <Td key={cell.id}>
+                        <div className=' overflow-y-auto'>
+                            <TableContainer className='max-h-[400px]  scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100' style={{ boxShadow: 'none'}}>
+                                <Table stickyHeader>
+                                    <TableHead>
+                                        {table.getHeaderGroups().map((headerGroup) => (
+                                            <TableRow key={headerGroup.id} className='uppercase'>
+                                                {headerGroup.headers.map((header) => {
+                                                    return (
+                                                        <TableCell
+                                                            key={header.id}
+                                                            colSpan={header.colSpan}
+                                                            sx={{fontWeight:"600"}}
+                                                        >
+                                                            {header.isPlaceholder || header.id === 'actions' ? null : (
+                                                                <div
+                                                                    {...{
+                                                                        className:
+                                                                            header.column.getCanSort()
+                                                                                ? 'cursor-pointer select-none'
+                                                                                : '',
+                                                                        onClick:
+                                                                            header.column.getToggleSortingHandler(),
+                                                                    }}
+                                                                >
                                                                     {flexRender(
-                                                                        cell.column.columnDef.cell,
-                                                                        cell.getContext()
+                                                                        header.column.columnDef
+                                                                            .header,
+                                                                        header.getContext()
                                                                     )}
-                                                                </Td>
-                                                            )
-                                                        })}
-                                                    </Tr>
-                                                )
-                                            })}
+                                                                    {
+                                                                        <Sorter
+                                                                            sort={header.column.getIsSorted()}
+                                                                        />
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                        </TableCell>
+                                                    )
+                                                })}
+                                            </TableRow>
+                                        ))}
+                                    </TableHead>
+                                    {loading ? <TableRowSkeleton
+                                        rows={5}
+                                        avatarInColumns={[0]}
+                                        columns={3}
+                                        avatarProps={{ width: 14, height: 14 }}
+                                    /> :
+                                        (leadData.length === 0 ? <TableBody>
+                                            <TableRow>
+                                                <TableCell colSpan={columns.length}>
+                                                    <NoData />
+                                                </TableCell>
+                                            </TableRow>
+                                        </TableBody> :
+                                            <TableBody >
+                                                {table.getRowModel().rows.map((row) => {
+                                                    return (
+                                                        <TableRow key={row.id} sx={{'&:hover': { backgroundColor: '#dfedfe' }}}>
+                                                            {row.getVisibleCells().map((cell) => {
+                                                                return (
+                                                                    <TableCell key={cell.id}>
+                                                                        {flexRender(
+                                                                            cell.column.columnDef.cell,
+                                                                            cell.getContext()
+                                                                        )}
+                                                                    </TableCell>
+                                                                )
+                                                            })}
+                                                        </TableRow>
+                                                    )
+                                                })}
 
 
-                                        </TBody>)}
-                            </Table>
+                                            </TableBody>)}
+                                </Table>
+                            </TableContainer>
                         </div>
                     ) : (<NoData />)}
 

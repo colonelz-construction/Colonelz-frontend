@@ -12,7 +12,8 @@ import { apiGetUsers } from '@/services/CrmService';
 import { HiShare } from 'react-icons/hi';
 
 
-import Table from '@/components/ui/Table'
+// import Table from '@/components/ui/Table'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import {
   useReactTable,
   getCoreRowModel,
@@ -33,6 +34,7 @@ import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton';
 import { MdDeleteOutline } from 'react-icons/md';
 import { useRoleContext } from '@/views/crm/Roles/RolesContext';
 import formateDate from '@/store/dateformate';
+import Sorter from '@/components/ui/Table/Sorter';
 
 
 export type FileManagerLeadType = {
@@ -46,7 +48,7 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
   debounce?: number
 }
 
-const { Tr, Th, Td, THead, TBody, Sorter } = Table
+// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
 function DebouncedInput({
   value: initialValue,
@@ -125,13 +127,13 @@ const Index = () => {
   const leadName = queryParams.get('lead_name');
   const folderName = queryParams.get('folder_name');
   const role = localStorage.getItem('role')
-  const org_id : any = localStorage.getItem('orgId')
+  const org_id: any = localStorage.getItem('orgId')
 
   // console.log(leadData)
 
 
   const { roleData } = useRoleContext();
-  const fileUploadAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.file?.create?.includes(`${role}`)
+  const fileUploadAccess = role === 'SUPERADMIN' ? true : roleData?.data?.file?.create?.includes(`${role}`)
   const [users, setUsers] = useState<User[]>([]);
   useEffect(() => {
     const fetchDataAndLog = async () => {
@@ -555,69 +557,72 @@ const Index = () => {
                 onChange={(value) => setGlobalFilter(String(value))}
               />
             </div>
-            <Table>
-              <THead>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <Tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
+            <TableContainer className="max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100" style={{ boxShadow: 'none' }}>
+              <Table stickyHeader>
+                <TableHead>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id} className='uppercase'>
+                      {headerGroup.headers.map((header) => {
+                        return (
+                          <TableCell
+                            key={header.id}
+                            colSpan={header.colSpan}
+                            sx={{ fontWeight: "600" }}
+                          >
+                            {header.isPlaceholder || header.id === 'actions' ? null : (
+                              <div
+                                {...{
+                                  className:
+                                    header.column.getCanSort()
+                                      ? 'cursor-pointer select-none'
+                                      : '',
+                                  onClick:
+                                    header.column.getToggleSortingHandler(),
+                                }}
+                              >
+                                {flexRender(
+                                  header.column.columnDef
+                                    .header,
+                                  header.getContext()
+                                )}
+                                {
+                                  <Sorter
+                                    sort={header.column.getIsSorted()}
+                                  />
+                                }
+                              </div>
+                            )}
+                          </TableCell>
+                        )
+                      })}
+                    </TableRow>
+                  ))}
+                </TableHead>
+                {loading ? <TableRowSkeleton
+                  avatarInColumns={[0]}
+                  columns={columns.length}
+                  avatarProps={{ width: 14, height: 14 }}
+                /> : leadData.length === 0 ? <TableCell colSpan={columns.length}><NoData /></TableCell> :
+                  <TableBody>
+                    {table.getRowModel().rows.map((row) => {
                       return (
-                        <Th
-                          key={header.id}
-                          colSpan={header.colSpan}
-                        >
-                          {header.isPlaceholder || header.id === 'actions' ? null : (
-                            <div
-                              {...{
-                                className:
-                                  header.column.getCanSort()
-                                    ? 'cursor-pointer select-none'
-                                    : '',
-                                onClick:
-                                  header.column.getToggleSortingHandler(),
-                              }}
-                            >
-                              {flexRender(
-                                header.column.columnDef
-                                  .header,
-                                header.getContext()
-                              )}
-                              {
-                                <Sorter
-                                  sort={header.column.getIsSorted()}
-                                />
-                              }
-                            </div>
-                          )}
-                        </Th>
+                        <TableRow key={row.id} sx={{ '&:hover': { backgroundColor: '#dfedfe' } }}>
+                          {row.getVisibleCells().map((cell) => {
+                            return (
+                              <TableCell key={cell.id}>
+                                {flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext()
+                                )}
+                              </TableCell>
+                            )
+                          })}
+                        </TableRow>
                       )
                     })}
-                  </Tr>
-                ))}
-              </THead>
-              {loading ? <TableRowSkeleton
-                avatarInColumns={[0]}
-                columns={columns.length}
-                avatarProps={{ width: 14, height: 14 }}
-              /> : leadData.length === 0 ? <Td colSpan={columns.length}><NoData /></Td> :
-                <TBody>
-                  {table.getRowModel().rows.map((row) => {
-                    return (
-                      <Tr key={row.id}>
-                        {row.getVisibleCells().map((cell) => {
-                          return (
-                            <Td key={cell.id}>
-                              {flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext()
-                              )}
-                            </Td>
-                          )
-                        })}
-                      </Tr>
-                    )
-                  })}
-                </TBody>}
-            </Table>
+                  </TableBody>}
+              </Table>
+            </TableContainer>
 
             <div className="flex items-center justify-between mt-4">
               <Pagination

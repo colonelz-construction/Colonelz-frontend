@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getTemplateData } from '../../../data';
 import { TemplateDataItem } from '../../../type';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Card, Dialog, Notification, toast } from '@/components/ui';
+import { Button, Dialog, Notification, toast } from '@/components/ui';
 import type { MouseEvent } from 'react';
 import YourFormComponent from '../../TemplateForm';
-import Footer from '@/views/crm/FileManager/Footer';
 import { HiTrash } from 'react-icons/hi';
 import { apiDeleteFileManagerFolders } from '@/services/CrmService';
 import { ConfirmDialog, StickyFooter } from '@/components/shared';

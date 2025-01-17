@@ -674,7 +674,7 @@ const AllTask = ({ users }: any) => {
 
 
 
-            <TableContainer  className="max-h-[400px]" style={{ scrollbarWidth: 'none', boxShadow: 'none'}}>
+            <TableContainer  className="max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100" style={{boxShadow: 'none'}}>
                 <Table stickyHeader className='shadow-none border-none' sx={{ textAlign: 'center', color:"#6B7280", border: "0.09rem"}}>
                     <TableHead>
                         {table.getHeaderGroups().map((headerGroup) => (

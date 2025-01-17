@@ -23,6 +23,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import { rankItem } from '@tanstack/match-sorter-utils'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import NoData from '@/views/pages/NoData'
+import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 
 type FormData = {
     user_name: string;
@@ -101,6 +103,7 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 }
 export type FileItemProps = {
     data: FileItem[]
+    loading: any
 }
 export type FileItem = {
     admin_status: string,
@@ -570,7 +573,7 @@ const ContractDetails = (data: FileItemProps) => {
             </div>
             {table.getRowModel().rows.length > 0 ? (
                 <div>
-                    <TableContainer className='max-h-[400px]' style={{ scrollbarWidth: 'none', boxShadow: 'none'}}>
+                    <TableContainer className='max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100' style={{ boxShadow: 'none'}}>
                         <Table stickyHeader>
                             <TableHead>
                                 {table.getHeaderGroups().map((headerGroup) => (
@@ -583,7 +586,28 @@ const ContractDetails = (data: FileItemProps) => {
                                     </TableRow>
                                 ))}
                             </TableHead>
-                            <TableBody>
+                            {
+
+                                loading ? (
+                                                
+                                    <TableRowSkeleton
+                                        avatarInColumns={[0]}
+                                        columns={columns.length}
+                                        avatarProps={{ width: 14, height: 14 }}
+                                    />
+                                        
+                                ) : data?.data.length === 0 ? (
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell colSpan={columns.length}>
+                                                <NoData />
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                ) :
+
+
+                            (<TableBody>
                                 {table.getRowModel().rows.map((row) => (
                                     <TableRow key={row.id} sx={{'&:hover': { backgroundColor: '#dfedfe' }}} >
                                         {row.getVisibleCells().map((cell) => (
@@ -593,7 +617,9 @@ const ContractDetails = (data: FileItemProps) => {
                                         ))}
                                     </TableRow>
                                 ))}
-                            </TableBody>
+                            </TableBody>)
+                            }
+
                         </Table>
                     </TableContainer>
                     <div className="flex items-center justify-between mt-4">

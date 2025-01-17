@@ -351,7 +351,7 @@ const LeadTask = ({ task, users }: any) => {
                 </AuthorityCheck>}
             </div>
             {!loading ? task?.length === 0 ? (<NoData />) : (
-                <TableContainer className='max-h-[400px]' style={{ scrollbarWidth: 'none', boxShadow: 'none'}}>
+                <TableContainer className='max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100' style={{ boxShadow: 'none'}}>
                     <Table stickyHeader>
                         <TableHead>
                             {table.getHeaderGroups().map((headerGroup) => (

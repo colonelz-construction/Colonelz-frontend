@@ -305,16 +305,16 @@ const Project = ({ className }: LeadsProps) => {
             {/* </Table> */}
 
 
-            <TableContainer className="overflow-y-auto shadow-none" style={{ scrollbarWidth: 'none', boxShadow: 'none' }}>
-                <Table>
+            <TableContainer style={{ scrollbarWidth: 'none', boxShadow: 'none'}}>
+                <Table stickyHeader>
                     <TableHead>
-                        <TableRow >
-                            <TableCell className='font-bold' sx={{ backgroundColor: '#f9fafb', color: "#6B7280", fontWeight: "600" }}>Project Name</TableCell>
-                            <TableCell className='font-bold' sx={{ backgroundColor: '#f9fafb', color: "#6B7280", fontWeight: "600" }}>Project Type</TableCell>
-                            <TableCell className='font-bold' sx={{ backgroundColor: '#f9fafb', color: "#6B7280", fontWeight: "600" }}>Client Name</TableCell>
-                            <TableCell className='font-bold' sx={{ backgroundColor: '#f9fafb', color: "#6B7280", fontWeight: "600" }}>Project Status</TableCell>
-                            <TableCell className='font-bold' sx={{ backgroundColor: '#f9fafb', color: "#6B7280", fontWeight: "600" }}>Project Incharge</TableCell>
-                            <TableCell className='font-bold' sx={{ backgroundColor: '#f9fafb', color: "#6B7280", fontWeight: "600" }}>Project End Date</TableCell>
+                        <TableRow  className='uppercase'>
+                            <TableCell sx={{fontWeight:"600"}}>Project Name</TableCell>
+                            <TableCell sx={{fontWeight:"600"}}>Project Type</TableCell>
+                            <TableCell sx={{fontWeight:"600"}}>Client Name</TableCell>
+                            <TableCell sx={{fontWeight:"600"}}>Project Status</TableCell>
+                            <TableCell sx={{fontWeight:"600"}}>Project Incharge</TableCell>
+                            <TableCell sx={{fontWeight:"600"}}>Project End Date</TableCell>
                         </TableRow>
                     </TableHead>
                     {projects.loading ? (<TableRowSkeleton

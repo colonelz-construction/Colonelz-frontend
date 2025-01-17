@@ -294,7 +294,7 @@ const Filtering = () => {
                     </TBody>)}
             </Table> */}
 
-            <TableContainer className="max-h-[350px] overflow-y-auto shadow-none" style={{ scrollbarWidth: 'none', boxShadow: 'none' }}>
+            <TableContainer className="max-h-[350px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100" style={{ boxShadow: 'none' }}>
                 <Table stickyHeader>
                     <TableHead>
                         {table.getHeaderGroups().map((headerGroup) => (

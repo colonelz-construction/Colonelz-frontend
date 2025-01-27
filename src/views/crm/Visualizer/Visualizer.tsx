@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 const ThreeJS360Viewer = () => {
-    const imageUrl = '/Images/bi2.jpg'
+    const imageUrl = '/Images/bi3.jpg'
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

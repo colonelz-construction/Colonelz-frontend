@@ -77,6 +77,8 @@ const priorityOptions = [
     return `${day}-${month}-${year}`;
     }
 
+    console.log(Data)
+
 
     return (
         <div>
@@ -93,10 +95,10 @@ const priorityOptions = [
                         lead_id: Data.lead_id,
                         task_name: Data.task_name,
                         task_description: Data.task_description,
+                        delegation_date: new Date(Data.estimated_task_start_date),
+                        // estimated_task_end_date: new Date(Data.estimated_task_end_date),
                         actual_task_start_date: new Date(Data.actual_task_start_date) ,
                         actual_task_end_date:new Date(Data.actual_task_end_date),
-                        estimated_task_start_date: new Date(Data.estimated_task_start_date),
-                        estimated_task_end_date: new Date(Data.estimated_task_end_date),
                         task_status: statusOptions.find((option)=>option.value===Data.task_status)?.value,  
                         task_priority: priorityOptions.find((option)=>option.value===Data.task_priority)?.value, 
                         task_assignee: Data.task_assignee,
@@ -105,19 +107,19 @@ const priorityOptions = [
                       validationSchema={Yup.object().shape({
                         task_name: Yup.string().required("Task Name is required"),
                       
-                        estimated_task_start_date: Yup.string().required("Estimated Start Date is required"),
-                        estimated_task_end_date: Yup.string().required("Estimated End Date is required").test(
-                            "is-greater",
-                            "End Date must be greater than Start Date",
-                            function (value) {
-                              const { estimated_task_start_date } = this.parent;
-                              if (estimated_task_start_date && value) {
-                                return new Date(value) > new Date(estimated_task_start_date);
-                              }
-                              return true;
-                            }
+                        // estimated_task_start_date: Yup.string().required("Estimated Start Date is required"),
+                        // estimated_task_end_date: Yup.string().required("Estimated End Date is required").test(
+                        //     "is-greater",
+                        //     "End Date must be greater than Start Date",
+                        //     function (value) {
+                        //       const { estimated_task_start_date } = this.parent;
+                        //       if (estimated_task_start_date && value) {
+                        //         return new Date(value) > new Date(estimated_task_start_date);
+                        //       }
+                        //       return true;
+                        //     }
                           
-                        ),
+                        // ),
                         task_status: Yup.string().required("Task Status is required"),
                         task_priority: Yup.string().required("Task Priority is required"),
                         // task_assignee: Yup.string().required("Task Assignee is required"),
@@ -186,11 +188,25 @@ const priorityOptions = [
                                     )}
                                 </Field>
                             </FormItem>
+                            <FormItem label='Delegation Date'
+                             >
+                            <Field name='delegation_date' placeholder='Delegation date'>
+                                {({field}: any) => (
+                                    <DatePicker name='delegation_date'
+                                    value={field.value}
+                                        onChange={(value) => {
+                                            field.onChange({ target: {name: 'delegation_date', value: `${value}`} })
+                                        }}
+                                    />
+                                )}
+                            </Field>
+                            </FormItem>
                             <FormItem label='Actual Start Date'
                              >
                             <Field name='actual_task_start_date' placeholder='Start date'>
                                 {({field}: any) => (
                                     <DatePicker name='actual_task_start_date'
+                                    value={field.value}
                                         onChange={(value) => {
                                             field.onChange({ target: {name: 'actual_task_start_date', value: `${value}`} })
                                         }}
@@ -203,6 +219,7 @@ const priorityOptions = [
                                 <Field name='actual_task_end_date' placeholder='End Date'>
                                     {({field}:any)=>(
                                         <DatePicker name='actual_task_end_date'
+                                        value={field.value}
                                         onChange={(value) => {
                                             field.onChange({ target: {name: 'actual_task_end_date', value: `${value}`} })
                                         }}
@@ -211,7 +228,7 @@ const priorityOptions = [
                                 </Field>
                             </FormItem>
 
-                            <FormItem label='Estimated Start Date'
+                            {/* <FormItem label='Estimated Start Date'
                             asterisk
                             >
                             <Field name='estimated_task_start_date' placeholder='Start date'>
@@ -237,7 +254,7 @@ const priorityOptions = [
                                         />
                                     )}
                                 </Field>
-                            </FormItem>
+                            </FormItem> */}
                             <FormItem label='Report to'
                             
                             invalid={errors.reporter && touched.reporter}   

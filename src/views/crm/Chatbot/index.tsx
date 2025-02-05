@@ -95,7 +95,7 @@ const Index = () => {
     const fetchMail = async (inputValue: string) => {
         try {
             setLoading(true);
-            const response = await fetch(`${chatApiUrl}mail-gen/`, { 
+            const response = await fetch(`${chatApiUrl}mail-gen`, { 
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

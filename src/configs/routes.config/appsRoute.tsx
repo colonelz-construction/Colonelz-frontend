@@ -26,6 +26,21 @@ const appsRoute: Routes = [
         authority: [],
     },
     {
+        key: 'appsCrm.timeline',
+        path: `${APP_PREFIX_PATH}/crm/timeline`,
+        component: lazy(() => import('@/views/crm/Timeline/index')),
+
+        authority: [],
+    },
+    {
+        key: 'appsCrm.timeline',
+        path: `${APP_PREFIX_PATH}/crm/timeline/lead`,
+        component: lazy(() => import('@/views/crm/Timeline/OrderTimeline')),
+
+        authority: [],
+        meta: {},
+    },
+    {
         key: 'appsCrm.ai-chatbot',
         path: `${APP_PREFIX_PATH}/crm/ai-chatbot`,
         component: lazy(() => import('@/views/crm/Chatbot/index')),

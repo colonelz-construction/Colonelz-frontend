@@ -120,6 +120,19 @@ const appsNavigationConfig: NavigationTree[] = [
                 : data?.data?.task?.read ?? [],
         subMenu: [],
     },
+    {
+        key: 'appsCrm.timeline',
+        path: `${APP_PREFIX_PATH}/crm/timeline`,
+        title: 'Timeline',
+        translateKey: 'nav.appsCrm.timeline',
+        icon:'timeline',
+        type: NAV_ITEM_TYPE_ITEM,
+        authority:
+            role === 'SUPERADMIN'
+                ? ['SUPERADMIN']
+                : data?.data?.task?.read ?? [],
+        subMenu: [],
+    },
 ]
 
 export default appsNavigationConfig

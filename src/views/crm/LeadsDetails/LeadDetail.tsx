@@ -376,7 +376,7 @@ const CustomerDetail = () => {
                                 </div>
                             </TabContent>
                             <TabContent value="Contract">
-                                <Contract />
+                                <Contract leadData={leadData} />
                             </TabContent>
 
                             { taskReadAccess &&

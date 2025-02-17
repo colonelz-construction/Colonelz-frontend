@@ -41,7 +41,6 @@ const Index = () => {
         const fetchData = async() => {
             try {
                 const res = await apiGetUserData(localStorage.getItem("userId"))
-                // console.log(res)
              
                 setUser(res?.data?.username)
                 

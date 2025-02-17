@@ -19,17 +19,9 @@ const appsRoute: Routes = [
         authority: [],
     },
     {
-        key: 'appsCrm.visualizer',
-        path: `${APP_PREFIX_PATH}/crm/visualizer`,
-        component: lazy(() => import('@/views/crm/Visualizer/index')),
-
-        authority: [],
-    },
-    {
         key: 'appsCrm.timeline',
         path: `${APP_PREFIX_PATH}/crm/timeline`,
         component: lazy(() => import('@/views/crm/Timeline/index')),
-
         authority: [],
     },
     {
@@ -73,6 +65,13 @@ const appsRoute: Routes = [
         key: 'appsCrm.roles',
         path: `${APP_PREFIX_PATH}/crm/roles/Create`,
         component: lazy(() => import('@/views/crm/Roles/CreateRole')),
+
+        authority: [],
+    },
+    {
+        key: 'appsCrm.visualizer',
+        path: `${APP_PREFIX_PATH}/crm/visualizer`,
+        component: lazy(() => import('@/views/crm/Visualizer/index')),
 
         authority: [],
     },

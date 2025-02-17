@@ -1,8 +1,10 @@
+//Chatbot(index.tsx)
 import { Button } from "@/components/ui/Button";
 import { useContext, useEffect, useRef, useState } from "react";
 import { IoCopyOutline } from "react-icons/io5";
 import { IoCheckmarkDone } from "react-icons/io5";
-import { InputGroup } from "@/components/ui";
+import { FaCircleArrowUp } from "react-icons/fa6";
+import { Dropdown, InputGroup, Tooltip } from "@/components/ui";
 import { UserDetailsContext } from '@/views/Context/userdetailsContext'
 import Input from '@/components/ui/Input'
 import ActionLink from '../../../components/shared/ActionLink';
@@ -10,7 +12,11 @@ import { FaChevronCircleUp } from "react-icons/fa";
 import { GoDotFill } from "react-icons/go";
 import ScrollableFeed from "react-scrollable-feed";
 import { apiGetUserData } from "@/services/CrmService";
+import Tag from '@/components/ui/Tag'
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 const chatApiUrl = import.meta.env.VITE_CHATAPI_URL;
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 
 interface Message {
     text: string;
@@ -21,6 +27,13 @@ const Index = () => {
     const [inputValue, setInputValue] = useState('');
     const [project_id, setProject_id] = useState('');
     const [fileUrl, setFileUrl] = useState<(any)>([null]);
+
+    const [whole, setWhole] = useState<any>('');
+    console.log(whole);
+
+
+    const [queryType, setQueryType] = useState<any>("crm");
+    const [placeHolder, setPlaceHolder] = useState<any>("Ask Anything...");
       
     const [user, setUser] = useState<any>('')
     useEffect(() => {
@@ -28,7 +41,6 @@ const Index = () => {
         const fetchData = async() => {
             try {
                 const res = await apiGetUserData(localStorage.getItem("userId"))
-                // console.log(res)
              
                 setUser(res?.data?.username)
                 
@@ -44,10 +56,13 @@ const Index = () => {
     const data = useContext<any>(UserDetailsContext)
     const [messages, setMessages] = useState<any>([]);
 
+    console.log("messages", messages);
+
     useEffect(() => {
         const greetingMessage: any = [{
             text: `data: {"content":"Hello ${user ? user : "there"}! How can I assist you today?"}`,
             sender: 'bot',
+            type: "crm"
         }]
 
         setMessages(greetingMessage)
@@ -69,7 +84,6 @@ const Index = () => {
         textToCopy = textToCopy.replace(regex2, '').trim();
 
         navigator.clipboard.writeText(textToCopy).then(() => {
-            // console.log('Text copied to clipboard!');
             setCopiedMessageIndex(index);
             setTimeout(() => setCopiedMessageIndex(null), 2000);
         }).catch(err => {
@@ -77,19 +91,16 @@ const Index = () => {
         });
     };
 
-    const fetchData = async (inputValue: string) => {
+    const fetchMail = async (inputValue: string) => {
         try {
             setLoading(true);
-            const response = await fetch(`${chatApiUrl}query/`, { 
+            const response = await fetch(`${chatApiUrl}mail-gen`, { 
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ question: inputValue, org_id, user_id }),
+                body: JSON.stringify({ question: inputValue }),
             });
-
-            // console.log(response)
-
             const reader = response.body?.getReader();
             const decoder = new TextDecoder();
             let accumulatedMessages = "";
@@ -98,53 +109,22 @@ const Index = () => {
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
-                    // Decode the chunk and append to the accumulated message
                     const chunk = decoder.decode(value, { stream: false });
-
-                    // console.log(chunk)
-                    const regex = /"content":"(.*?)"/g;
-
-                            // Use matchAll to find all matches
-                            const matches = Array.from(chunk.matchAll(regex));
-
-                            // Extract the first capture group (the actual content)
-                            const extractedContents = matches.map(match => match[1]);
-
-                            let isCollecting = false;
-                            let result = '';
-                            const popularExtensions = ['txt', '.txt', 'pdf', '.pdf', 'png', '.png', 'jpg', '.jpg', 'jpeg', '.jpeg', 'csv', '.csv', 'doc', '.doc', 'docx', '.docx', 'xls', '.xls', 'xlsx', '.xlsx', 'mp4', '.mp4', 'mp3', '.mp3', 'zip', '.zip', 'rar', '.rar', 'gif', '.gif'];
-
-                            // Iterate through the list
-                            extractedContents.forEach(str => {
-                                str = str.trim();
-                                if (str === ' https' || str === 'https' || str === 'http' || str === 'htt') isCollecting = true; 
-                                if (isCollecting) result += str; 
-                                if (popularExtensions.includes(str)) isCollecting = false; 
-                            });
-
-                            setFileUrl((prevUrls : any) => [...prevUrls, result ? result : null]);
-                            
-                            // console.log(fileUrl)
 
                     accumulatedMessages += chunk;
 
-                    // Only update the latest chunk, without re-rendering all previous words
                     setMessages((prevMessages: any) => {
-                        // Check if the last message is from the user
                         const lastMessage = prevMessages[prevMessages.length - 1];
                         if (lastMessage?.sender === "user") {
                             return [
                                 ...prevMessages,
-                                { text: chunk.trim(), sender: "bot" },
+                                { text: chunk.trim(), sender: "bot", type: "email" },
                             ];
                         } else {
-                            // If the last message is from the bot, append to its text
                             const newMessageText = (lastMessage?.text || "") + chunk;
-
-                            // console.log(newMessageText)
                             return [
                                 ...prevMessages.slice(0, -1), // Remove the last entry
-                                { text: newMessageText.trim(), sender: "bot" }, // Append the new chunk
+                                { text: newMessageText.trim(), sender: "bot", type: "email" }, // Append the new chunk
                             ];
                         }
                     });
@@ -156,21 +136,21 @@ const Index = () => {
                 const newMessageText = (lastMessage?.text || "") + 'responseEnd';
                 return [
                     ...prevMessages.slice(0, -1), // Remove the last entry
-                    { text: newMessageText.trim(), sender: "bot" }, // Append the new chunk
+                    { text: newMessageText.trim(), sender: "bot", type: "email" }, // Append the new chunk
                 ];
             })
 
             if (accumulatedMessages.includes("404: Project not found.")) {
                 setMessages((prevMessages: any) => [
                     ...prevMessages,
-                    { text: `data: {"content":"There is no project with this name"}`, sender: "bot" },
+                    { text: `data: {"content":"There is no project with this name"}`, sender: "bot", type: "email" },
                 ]);
                 return
             }
             if (accumulatedMessages.includes("lead not found")) {
                 setMessages((prevMessages: any) => [
                     ...prevMessages,
-                    { text: 'data: {"content":"There is no Lead with this name"}', sender: "bot" },
+                    { text: 'data: {"content":"There is no Lead with this name"}', sender: "bot", type: "email" },
                 ]);
                 return
             }
@@ -185,7 +165,118 @@ const Index = () => {
             console.error("Error fetching chatbot response:", error);
             setMessages((prevMessages: any) => [
                 ...prevMessages,
-                { text: `data: {"content":"There was some problem communicating with the Ada."}`, sender: "bot" },
+                { text: `data: {"content":"There was some problem communicating with the Ada."}`, sender: "bot", type: "email" },
+            ]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+
+    const fetchData = async (inputValue: string) => {
+        try {
+            setLoading(true);
+            const response = await fetch(`${chatApiUrl}query/`, { 
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ question: inputValue, org_id, user_id }),
+            });
+
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder();
+            let accumulatedMessages = "";
+
+            if (reader) {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    const chunk = decoder.decode(value, { stream: false });
+                    const regex = /"content":"(.*?)"/g;
+                    const matches = Array.from(chunk.matchAll(regex));
+                    const extractedContents = matches.map(match => match[1]);
+
+                    console.log("extractedContents", extractedContents);
+
+                    let isCollecting = false;
+                    let result = '';
+                    const popularExtensions = ['txt', '.txt', 'pdf', '.pdf', 'png', '.png', 'jpg', '.jpg', 'jpeg', '.jpeg', 'csv', '.csv', 'doc', '.doc', 'docx', '.docx', 'xls', '.xls', 'xlsx', '.xlsx', 'mp4', '.mp4', 'mp3', '.mp3', 'zip', '.zip', 'rar', '.rar', 'gif', '.gif'];
+
+                    let tempStr = '';
+                    extractedContents.forEach(str => {
+
+                        tempStr = tempStr + str;
+
+                        str = str.trim();
+                        if (str === ' https' || str === 'https' || str === 'http' || str === 'htt') isCollecting = true; 
+                        if (isCollecting) result += str; 
+                        if (popularExtensions.includes(str)) isCollecting = false; 
+                    });
+
+                    // setWhole(tempStr);
+
+                    setFileUrl((prevUrls : any) => [...prevUrls, result ? result : null]);
+
+                    accumulatedMessages += chunk;
+
+                    setMessages((prevMessages: any) => {
+                        const lastMessage = prevMessages[prevMessages.length - 1];
+                        if (lastMessage?.sender === "user") {
+                            return [
+                                ...prevMessages,
+                                { text: chunk.trim(), sender: "bot", type: "crm" },
+                            ];
+                        } else {
+                            const newMessageText = (lastMessage?.text || "") + chunk;
+
+                            return [
+                                ...prevMessages.slice(0, -1), // Remove the last entry
+                                { text: newMessageText.trim(), sender: "bot", type: "crm" }, // Append the new chunk
+                            ];
+                        }
+                    });
+                }
+            }
+
+            console.log("accumulatedMessages", accumulatedMessages);
+
+            setMessages((prevMessages: any) => {
+                const lastMessage = prevMessages[prevMessages.length - 1];
+                const newMessageText = (lastMessage?.text || "") + 'responseEnd';
+                return [
+                    ...prevMessages.slice(0, -1), // Remove the last entry
+                    { text: newMessageText.trim(), sender: "bot", type: "crm" }, // Append the new chunk
+                ];
+            })
+
+            if (accumulatedMessages.includes("404: Project not found.")) {
+                setMessages((prevMessages: any) => [
+                    ...prevMessages,
+                    { text: `data: {"content":"There is no project with this name"}`, sender: "bot", type: "crm" },
+                ]);
+                return
+            }
+            if (accumulatedMessages.includes("lead not found")) {
+                setMessages((prevMessages: any) => [
+                    ...prevMessages,
+                    { text: 'data: {"content":"There is no Lead with this name"}', sender: "bot", type: "crm" },
+                ]);
+                return
+            }
+
+            const match: any = accumulatedMessages.match(/project_id:(.{11})/);
+            if (match) {
+                const result = match[1]
+                setProject_id(result)
+            }
+
+        } catch (error) {
+            console.error("Error fetching chatbot response:", error);
+            setMessages((prevMessages: any) => [
+                ...prevMessages,
+                { text: `data: {"content":"There was some problem communicating with the Ada."}`, sender: "bot", type: "crm" },
             ]);
         } finally {
             setLoading(false);
@@ -205,7 +296,13 @@ const Index = () => {
             ...prevMessages,
             { text: inputValue, sender: "user" },
         ]);
-        fetchData(inputValue);
+
+        if(queryType === "crm") {
+            fetchData(inputValue);
+
+        } else if(queryType === "email") {
+            fetchMail(inputValue);
+        }
         setInputValue('');
     };
 
@@ -213,9 +310,37 @@ const Index = () => {
         const greetingMessage: any = [{
             text: `data: {"content":"Hello ${user ? user : "there"}! How can I assist you today?"}`,
             sender: 'bot',
+            type: "crm"
         }]
         setMessages(greetingMessage)
     }
+
+
+    const questionTags = [{name : 'crm', state: false, dis: "Ask About CRM", placeHold: "Ask Anything..."},
+                          {name : 'email', state: false, dis : 'Draft Email', placeHold: "Write the Topic..."}, 
+                        //   {name : 'summary', state: false, dis: "Get Summary", placeHold: "Choose the File..."},
+                        ];
+
+    const SearchTag = ({tag}:any) => {
+        const handleTagChange = (tag:any) => {
+            setQueryType(tag.name);
+            setPlaceHolder(tag.placeHold);
+        }
+
+        return <div className="flex">
+                    <div onClick={() => handleTagChange(tag)} className="mr-2 rtl:ml-2 cursor-pointer">
+                        <Tag className={`text-sm ${queryType === tag.name ? 'bg-gray-200 dark:bg-[#354051]' : "bg-white dark:bg-[#1F2937]"}`}>{tag.dis}</Tag>
+                    </div>
+                </div>
+    }
+
+
+    const Toggle = <Tooltip title={
+        <div className="text-[0.6rem]">
+            Example prompt questions
+        </div>
+    }><span className='flex justify-center items-center gap-2 text-lg cursor-pointer'>
+        <span><HiOutlineExclamationCircle /></span></span> </Tooltip>
 
     return (
         <div className="h-full mb-4">
@@ -224,7 +349,7 @@ const Index = () => {
                 <Button size="sm" className="" onClick={handleClear}>Clear</Button>
             </div>
             <form onSubmit={handleSubmit} className="flex flex-col h-full ">
-                <div className="flex flex-col bg-gray-100 dark:bg-[#1F2937] messages flex-1 h-96 overflow-y-auto mb-4 border border-gray-300 rounded-lg p-2">
+                <div className="flex flex-col bg-gray-100 dark:bg-[#1F2937] messages flex-1 h-[23rem] overflow-y-auto mb-4 border border-gray-300 rounded-lg p-2">
                     <ScrollableFeed className="h-full flex flex-col scrollbar-thumb-[#d4d1d1] scrollbar-thin scrollbar-track-transparent pr-6">
                         {messages.map((message: any, index: any) => (
                             <div className={`flex w-full ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
@@ -248,7 +373,6 @@ const Index = () => {
                                     )) :
 
                                         message.text?.split('data: ').filter((line: any) => (!line.includes('project_id:') && !line.includes("lead_id:"))).map((line: any, lineIndex: any, lines: any) => {
-                                            // Use regex to extract project ID if present in the line
                                             const projectIdMatch = message.text.match(/project_id:(.{11})/);
                                             const projectId = projectIdMatch && projectIdMatch[1];
 
@@ -263,19 +387,40 @@ const Index = () => {
                                             const match = line.replace("responseEnd", "").replace("data:", "").match(/"content":"(.*?)"/);
 
                                             let lineShow = ''
+                                            let testShow = ''
+
+                                            // let testStr = '';
+                                            // if(match) {
+                                            //     testStr = `${match[1].replace(/\\n/g, '\n')}`
+                                            // }
+                                            // setWhole((prev:any) => {
+                                            //     return prev + testStr;
+                                            // })
+
+                                            if(match) {
+                                                testShow = `${match[1].replace(/\\n/g, '\n')}`
+                                            }
 
                                             if (match) {
                                                 lineShow = match[1].replace("\\n\\n", "").replace("\\n", "").replace(":\\n", "").replace("**", "")
-                                            }                                           
-
+                                            }
                                             return (
                                                 <span className="" key={lineIndex}>
-                                                    <span className={lineShow == '\\t' ? "ml-4" : ""}>
+                                                    {message.type === 'crm' && <span className={lineShow == '\\t' ? "ml-4" : ""}>
                                                         {lineShow.replace(/["*\n]/g, "").replace("\\t", "").replace("+", "")}
-                                                    </span>
-                                                    {line.includes("\\n") && <br />}
+                                                    </span>}
 
-                                                    {fileUrl[index/2] != null && lineIndex === lines.length - 1 &&
+                                                    {/* {message.type === 'crm' && <div style={{ whiteSpace: "pre-line" }}>
+                                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{whole}</ReactMarkdown>
+                                                    </div>} */}
+
+                                                    {message.type === 'crm' && line.includes("\\n") && <br />}
+
+                                                    {message.type === 'email' && <div style={{ whiteSpace: "pre-line" }}>
+                                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{testShow}</ReactMarkdown>
+                                                    </div>}
+
+                                                    {message.type === 'crm' && fileUrl[index/2] != null && lineIndex === lines.length - 1 &&
                                                         line.includes('responseEnd') && 
                                                         <div className="flex mt-[0.30rem]">
                                                             <div>
@@ -289,7 +434,7 @@ const Index = () => {
                                                     }
 
                                                     {/* For project  Tasks */}
-                                                    {line.includes('responseEnd') && projectId && taskId && projectId != '00000000000' && taskId != '222222222' ? lineIndex === lines.length - 1 && (
+                                                    {message.type === 'crm' && line.includes('responseEnd') && projectId && taskId && projectId != '00000000000' && taskId != '222222222' ? lineIndex === lines.length - 1 && (
                                                         <div className="flex mt-[0.30rem]">
                                                             <div>
                                                                 <ActionLink target="_blank" to={`/app/crm/Projects/TaskDetails?project_id=${projectId}&task=${taskId}`}>
@@ -300,7 +445,7 @@ const Index = () => {
 
                                                         </div>
 
-                                                    ) : line.includes('responseEnd') && projectId && taskId && projectId != '00000000000' && taskId == '222222222' && lineIndex === lines.length - 1 && (
+                                                    ) : message.type === 'crm' &&  line.includes('responseEnd') && projectId && taskId && projectId != '00000000000' && taskId == '222222222' && lineIndex === lines.length - 1 && (
                                                         <div className="flex ">
                                                             <div>
                                                                 <ActionLink target="_blank" to={`/app/crm/project-details?project_id=${projectId}&id=${userId}&type=task`}>
@@ -315,7 +460,7 @@ const Index = () => {
                                                     )}
 
                                                     {/* For lead  Tasks */}
-                                                    {line.includes('responseEnd') && leadId && taskId && leadId != '111111' && taskId != '222222222' ? lineIndex === lines.length - 1 && (
+                                                    {message.type === 'crm' && line.includes('responseEnd') && leadId && taskId && leadId != '111111' && taskId != '222222222' ? lineIndex === lines.length - 1 && (
                                                         <div className="flex mt-[0.30rem]">
                                                             <div>
                                                                 <ActionLink target="_blank" to={`/app/crm/Leads/TaskDetails?lead_id=${leadId}&task=${taskId}`}>
@@ -326,7 +471,7 @@ const Index = () => {
 
                                                         </div>
 
-                                                    ) : line.includes('responseEnd') && leadId && taskId && leadId != '111111' && taskId == '222222222' && lineIndex === lines.length - 1 && (
+                                                    ) : message.type === 'crm' &&  line.includes('responseEnd') && leadId && taskId && leadId != '111111' && taskId == '222222222' && lineIndex === lines.length - 1 && (
                                                         <div className="flex ">
                                                             <div>
                                                                 <ActionLink target="_blank" to={`/app/crm/lead/?id=${leadId}&tab=Tasks`}>
@@ -341,7 +486,7 @@ const Index = () => {
                                                     )}
 
                                                     {/* For open  Tasks */}
-                                                    {line.includes('responseEnd') && !leadId && !projectId && taskId && leadId != '111111' && taskId != '222222222' ? lineIndex === lines.length - 1 && (
+                                                    {message.type === 'crm' && line.includes('responseEnd') && !leadId && !projectId && taskId && leadId != '111111' && taskId != '222222222' ? lineIndex === lines.length - 1 && (
                                                         <div className="flex mt-[0.30rem]">
                                                             <div>
                                                                 <ActionLink target="_blank" to={`/app/crm/Tasks/OpenTaskDetails?task=${taskId}`}>
@@ -352,7 +497,7 @@ const Index = () => {
 
                                                         </div>
 
-                                                    ) : line.includes('responseEnd') && !leadId && !projectId && taskId && leadId != '111111' && taskId == '222222222' && lineIndex === lines.length - 1 && (
+                                                    ) : message.type === 'crm' &&  line.includes('responseEnd') && !leadId && !projectId && taskId && leadId != '111111' && taskId == '222222222' && lineIndex === lines.length - 1 && (
                                                         <div className="flex ">
                                                             <div>
                                                                 <ActionLink target="_blank" to={`/app/crm/taskManager?tab=all`}>
@@ -367,7 +512,7 @@ const Index = () => {
                                                     )}
 
                                                     {/* For Project */}
-                                                    {line.includes('responseEnd') && projectId && !taskId && projectId != '00000000000' ? lineIndex === lines.length - 1 && (
+                                                    {message.type === 'crm' && line.includes('responseEnd') && projectId && !taskId && projectId != '00000000000' ? lineIndex === lines.length - 1 && (
                                                         <div className="flex mt-[0.30rem]">
                                                             <div>
                                                                 <ActionLink target="_blank" to={`/app/crm/project-details?project_id=${projectId}&id=${userId}&type=details`}>
@@ -378,7 +523,7 @@ const Index = () => {
 
                                                         </div>
 
-                                                    ) : line.includes('responseEnd') && projectId && !taskId && projectId == '00000000000' && lineIndex === lines.length - 1 && (
+                                                    ) : message.type === 'crm' &&  line.includes('responseEnd') && projectId && !taskId && projectId == '00000000000' && lineIndex === lines.length - 1 && (
                                                         <div className="flex ">
                                                             <div>
                                                                 <ActionLink target="_blank" to={`/app/crm/projectslist`}>
@@ -391,7 +536,7 @@ const Index = () => {
 
 
                                                     {/* For Leads */}
-                                                    {line.includes('responseEnd') && leadId && !taskId && leadId != '111111' ? lineIndex === lines.length - 1 && (
+                                                    {message.type === 'crm' && line.includes('responseEnd') && leadId && !taskId && leadId != '111111' ? lineIndex === lines.length - 1 && (
                                                         <div className="flex ">
                                                             <div>
                                                                 <ActionLink target="_blank" to={`/app/crm/lead/?id=${leadId}&tab=Details`}>
@@ -401,7 +546,7 @@ const Index = () => {
                                                             </div>
                                                         </div>
 
-                                                    ) : line.includes('responseEnd') && leadId && leadId == '111111' && lineIndex === lines.length - 1 && (
+                                                    ) : message.type === 'crm' &&  line.includes('responseEnd') && leadId && leadId == '111111' && lineIndex === lines.length - 1 && (
                                                         <div className="flex ">
                                                             <div>
                                                                 <ActionLink target="_blank" to={`/app/leads`}>
@@ -423,14 +568,48 @@ const Index = () => {
 
                         {loading && <div className={`relative gap-2 message rounded p-1 mb-2 bg-white dark:bg-[#111827] dark:border-none  px-3 w-[70%] group text-[1.7rem]`}><GoDotFill /></div>}
                     </ScrollableFeed>
-{/* 
-                    <Markdown remarkPlugins={[remarkGfm]}>{test}</Markdown> */}
                  
+                </div>
+
+                <div className="flex items-center mb-4">
+
+                    <div className="flex  items-center">
+                    {questionTags.map((tag:any) => {
+                        return (<div>
+                                <SearchTag tag={tag}/>                        
+                            </div>)
+                    })}
+                    </div>
+
+                    {queryType === "crm" && <div>
+                        <Dropdown renderTitle={Toggle} placement='middle-start-bottom'>
+                          
+
+
+                            <div className="w-[20rem] p-4 flex flex-col gap-2">
+                                <span className="text-[1rem] font-semibold text-gray-500">Some example of prompt questions</span>
+
+                                <div className="flex flex-col gap-1 text-gray-400 text-[0.74rem]">
+                                    <div>{"1. give detials of project <PROJECT_NAME>."}</div>
+                                    <div>{"2. what is project start date?"}</div>
+                                    <div>{"3. give the name of designer."}</div>
+                                    <div>{"4. give details of lead <LEAD_NAME>."}</div>
+                                    <div>{"5. give the all details of mom of project <PROJECT_NAME>."}</div>
+                                    <div>{"6. give details of task <TASK_NAME> of porject <PROJECT_NAME>."}</div>
+                                    <div>{"7. give details of subtask <SUBTASK_NAME> of task <TASK_NAME>."}</div>
+                                    <div>{"8. give the details of all subtasks of project <PROJECT_NAME>."}</div>
+                                    <div>{"9. give details of user <USER_NAME>."}</div>
+
+                                </div>
+                            </div>
+                        </Dropdown>
+                    </div>}
+
                 </div>
 
                 <InputGroup className="bottom-0 border rounded-md border-[#9f9e9e]">
                     <Input
-                        placeholder="Ask anything..."
+                        placeholder={placeHolder}
                         type="text"
                         value={inputValue}
                         onChange={handleChange}
@@ -438,7 +617,7 @@ const Index = () => {
                         autoFocus
                     />
                     <Button
-                        icon={<FaChevronCircleUp className="text-[1.7rem] text-[#9f9e9e]" />}
+                        icon={<FaCircleArrowUp className="text-[1.7rem] text-[#9f9e9e]" />}
                         type='submit'
 
                         className="w-12 border-l-[0.2rem]"

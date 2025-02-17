@@ -45,6 +45,7 @@ type User = {
     role: string
     email: string
     UserId: string
+    access: any
 }
 
 export type UsersResponse = {

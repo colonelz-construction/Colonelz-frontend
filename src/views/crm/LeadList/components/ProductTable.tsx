@@ -150,6 +150,7 @@ const Filtering = () => {
     const [globalFilter, setGlobalFilter] = useState('')
     const navigate = useNavigate()
     const apiData = useLeadContext()
+    console.log(apiData)
     const responseData=apiData
     const totalData = responseData?.length
 
@@ -281,7 +282,7 @@ const Filtering = () => {
                     </TableHead>
 
                     {responseData && responseData?.length <= 0 ? <TableBody>
-                            <TableRow>
+                            <TableRow >
                                 <TableCell colSpan={columns.length}>
                                     <NoData />
                                 </TableCell>
@@ -290,8 +291,10 @@ const Filtering = () => {
 
                     <TableBody>
                         {table.getRowModel().rows.map((row) => {
+                            const hasPendingContract = row.original.hasPendingContract;
+                            
                             return (
-                                <TableRow sx={{'&:hover': { backgroundColor: '#dfedfe' }}} key={row.id} onClick={()=>navigate(`/app/crm/lead/?id=${row.original.lead_id}&tab=Details`)} className=' cursor-pointer'>
+                                <TableRow sx={{backgroundColor: hasPendingContract ? "#CCFBF1": "inherit" ,'&:hover': { backgroundColor: '#dfedfe' }}} key={row.id} onClick={()=>navigate(`/app/crm/lead/?id=${row.original.lead_id}&tab=Details`)} className=' cursor-pointer'>
                                     {row.getVisibleCells().map((cell) => {
                                         return (
                                             <TableCell key={cell.id}>

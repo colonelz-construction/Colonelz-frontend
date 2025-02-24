@@ -18,7 +18,7 @@ import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {  Select, Tooltip } from '@/components/ui'
+import { Select, Tooltip } from '@/components/ui'
 import { ProjectMomItem } from '../store'
 import { apiGetMomData } from '@/services/CrmService'
 import formateDate from '@/store/dateformate'
@@ -78,8 +78,7 @@ function DebouncedInput({
     }, [value])
     return (
         <div className="flex justify-between ">
-
-                <h3>Minutes of Meeting </h3>
+            <h3>Minutes of Meeting </h3>
             <div className="flex items-center mb-4">
                 <Input
                     {...props}
@@ -88,15 +87,15 @@ function DebouncedInput({
                     onChange={(e) => setValue(e.target.value)}
                 />
             </div>
-          
+
         </div>
     )
 }
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    let itemValue:any = row.getValue(columnId);
+    let itemValue: any = row.getValue(columnId);
 
-    
+
     if (columnId === 'meetingDate') {
         itemValue = formateDate(itemValue);
     }
@@ -134,7 +133,7 @@ const Filtering = () => {
                 accessorKey: 'project_name',
                 cell: (props) => {
                     const row = props.row.original
-                    
+
                     return (
                         <span className='cursor-pointer' onClick={() => navigate(`/app/crm/project-details?project_id=${row.project_id}&id=65c32e19e0f36d8e1f30955c&type=mom`)}>{row.project_name}</span>
                     )
@@ -144,38 +143,38 @@ const Filtering = () => {
                 header: 'Client Name',
                 accessorKey: 'client_name',
                 cell: (props) => {
-                  const row = props.row.original
-                  
-                  return (
-                      <span>{row.client_name}</span>
-                  )
-              },
-               
-               
+                    const row = props.row.original
+
+                    return (
+                        <span>{row.client_name}</span>
+                    )
+                },
+
+
             },
             {
                 header: 'Location',
                 accessorKey: 'location',
                 cell: (props) => {
-                  const row = props.row.original
-                  
-                  return (
-                      <span>{row.location}</span>
-                  )
-              },
-              
+                    const row = props.row.original
+
+                    return (
+                        <span>{row.location}</span>
+                    )
+                },
+
             },
             {
                 header: 'Meeting Date',
-                accessorKey: 'meetingDate', 
+                accessorKey: 'meetingDate',
                 cell: (props) => {
-                  const row = props.row.original
-                  const FormattedDate=formateDate(row.meetingDate)
-              
-                  return (
-                      <span>{FormattedDate}</span>
-                  )
-              },
+                    const row = props.row.original
+                    const FormattedDate = formateDate(row.meetingDate)
+
+                    return (
+                        <span>{FormattedDate}</span>
+                    )
+                },
             },
             {
                 header: '',
@@ -186,9 +185,9 @@ const Filtering = () => {
                     const clientName = row.original.client_name
                     return (
                         <div className="">
-                            
-                                
-                                <span className="flex items-center text-lg gap-2 cursor-pointer">
+
+
+                            <span className="flex items-center text-lg gap-2 cursor-pointer">
                                 {
                                     // editAccess&&
                                     <Tooltip title="Add MOM">
@@ -199,13 +198,13 @@ const Filtering = () => {
                                                 )}`,
                                             ]}
                                             authority={
-                                                role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.mom?.create??[]
+                                                role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.mom?.create ?? []
                                             }
                                         >
-                                                <IoIosAddCircleOutline onClick={() => navigate(`/app/crm/project/momform?project_id=${projectId}&client_name=${clientName}`)}/>
-                                                                    
-                                                
-                                        
+                                            <IoIosAddCircleOutline onClick={() => navigate(`/app/crm/project/momform?project_id=${projectId}&client_name=${clientName}`)} />
+
+
+
                                         </AuthorityCheck>
                                     </Tooltip>
                                 }
@@ -214,7 +213,7 @@ const Filtering = () => {
                     )
                 },
             },
-           
+
         ],
         []
     )
@@ -232,7 +231,7 @@ const Filtering = () => {
     const navigate = useNavigate()
 
     const table = useReactTable({
-        data:ordersData,
+        data: ordersData,
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -263,20 +262,20 @@ const Filtering = () => {
     const onSelectChange = (value = 0) => {
         table.setPageSize(Number(value))
     }
-  
+
 
     const filteredRowCount = table.getFilteredRowModel().rows.length
-    
+
     return (
         <>
-         
+
             <DebouncedInput
                 value={globalFilter ?? ''}
                 className="p-2 font-lg shadow border border-block"
                 placeholder="Search ..."
                 onChange={(value) => setGlobalFilter(String(value))}
             />
-            <TableContainer className='max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100' style={{  boxShadow: 'none'}}>
+            <TableContainer className='max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100' style={{ boxShadow: 'none' }}>
                 <Table stickyHeader>
                     <TableHead>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -286,7 +285,7 @@ const Filtering = () => {
                                         <TableCell
                                             key={header.id}
                                             colSpan={header.colSpan}
-                                            sx={{fontWeight:'600'}}
+                                            sx={{ fontWeight: '600' }}
                                         >
                                             {header.isPlaceholder ? null : (
                                                 <div
@@ -317,38 +316,38 @@ const Filtering = () => {
                             </TableRow>
                         ))}
                     </TableHead>
-                    {loading ?<TableRowSkeleton
-                            avatarInColumns={[0]}
-                            columns={columns.length}
-                            avatarProps={{ width: 14, height: 14 }}
-                        /> :
-                    ordersData.length === 0 ? <TableBody>
-                    <TableRow>
-                        <TableCell colSpan={columns.length}>
-                            <NoData />
-                        </TableCell>
-                    </TableRow>
-                </TableBody>:
-                    <TableBody>
-                        {table.getRowModel().rows.map((row) => {  
-                            return (
-                                <TableRow key={row.id} className=' capitalize' sx={{'&:hover': { backgroundColor: '#dfedfe' }}}>
-                                    {row.getVisibleCells().map((cell) => {
-                                        return (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
-                                            </TableCell>
-                                        )
-                                    })}
-                                </TableRow>
-                            )
-                        })}
-                    </TableBody>}
+                    {loading ? <TableRowSkeleton
+                        avatarInColumns={[0]}
+                        columns={columns.length}
+                        avatarProps={{ width: 14, height: 14 }}
+                    /> :
+                        ordersData.length === 0 ? <TableBody>
+                            <TableRow>
+                                <TableCell colSpan={columns.length}>
+                                    <NoData />
+                                </TableCell>
+                            </TableRow>
+                        </TableBody> :
+                            <TableBody>
+                                {table.getRowModel().rows.map((row) => {
+                                    return (
+                                        <TableRow key={row.id} className=' capitalize' sx={{ '&:hover': { backgroundColor: '#dfedfe' } }}>
+                                            {row.getVisibleCells().map((cell) => {
+                                                return (
+                                                    <TableCell key={cell.id}>
+                                                        {flexRender(
+                                                            cell.column.columnDef.cell,
+                                                            cell.getContext()
+                                                        )}
+                                                    </TableCell>
+                                                )
+                                            })}
+                                        </TableRow>
+                                    )
+                                })}
+                            </TableBody>}
                 </Table>
-                </TableContainer>
+            </TableContainer>
             <div className="flex items-center justify-between mt-4">
                 <Pagination
                     pageSize={table.getState().pagination.pageSize}
@@ -369,7 +368,7 @@ const Filtering = () => {
                         onChange={(option) => onSelectChange(option?.value)}
                     />
                 </div>
-            </div>        
+            </div>
         </>
     )
 }

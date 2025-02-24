@@ -207,7 +207,7 @@ export const MultiInput = ({
         const newValue = e.target.value;
 
         if (type === 'number') {
-            console.log(newValue)
+            // console.log(newValue)
             const sanitizedValue = newValue.replace(/\s/g, '');  // Remove all spaces from the string
 
             console.log(sanitizedValue)

@@ -24,6 +24,7 @@ import {
     HiOutlineVariable,
     HiOutlineCode,
 } from 'react-icons/hi'
+import { TbTimelineEventText } from "react-icons/tb";
 
 import { BiTask } from "react-icons/bi";
 import { TbMessageChatbot } from "react-icons/tb";
@@ -70,6 +71,7 @@ const navigationIcon: NavigationIcons = {
     sharedComponentDoc: <HiOutlineShare />,
     utilsDoc: <HiOutlineVariable />,
     changeLog: <HiOutlineCode />,
+    timeline: <TbTimelineEventText />,
 }
 
 export default navigationIcon

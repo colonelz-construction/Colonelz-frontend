@@ -357,7 +357,7 @@ const CustomerDetail = () => {
                             {someAccess &&
                                 <TabNav value="AddedUser" className='flex gap-1'>
                                     <span>{"Assignee "}</span> 
-                                    <span className={leadData?.length == 0 ? `text-red-500` :  ''}> {` (${leadData?.length})`}</span>
+                                    <span className={leadData.filter((lead:any) => lead.role !== "ADMIN" && lead.role !== "Senior Architect")?.length == 0 ? `text-red-500` :  ''}> {` (${leadData.filter((lead:any) => lead.role !== "ADMIN" && lead.role !== "Senior Architect")?.length})`}</span>
                                 </TabNav>}
                         </TabList>
                         <div className="p-4">
@@ -376,7 +376,7 @@ const CustomerDetail = () => {
                                 </div>
                             </TabContent>
                             <TabContent value="Contract">
-                                <Contract />
+                                <Contract leadData={leadData} />
                             </TabContent>
 
                             { taskReadAccess &&

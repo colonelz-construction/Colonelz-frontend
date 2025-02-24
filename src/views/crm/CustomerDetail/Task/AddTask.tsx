@@ -36,7 +36,7 @@ const AddTask = ({project,userData, addButton}:any) => {
 
         const fetchData = async() => {
             const list = await apiGetUsersList(project)
-        setUsers(list.data)
+            setUsers(list.data)
         }
 
         fetchData()
@@ -59,7 +59,7 @@ const priorityOptions = [
   ];
   
   const statusOptions = [
-    { label: "Pending", value: "Pending" },
+    { label: "Pending/Todo", value: "Pending" },
     { label: "In Progress", value: "In Progress" },
     { label: "Cancelled", value: "Cancelled" },
   ];
@@ -88,7 +88,7 @@ const priorityOptions = [
                         estimated_task_end_date: "",
                         actual_task_start_date: "",
                         actual_task_end_date: "",
-                        task_status: "", 
+                        task_status: "Pending", 
                         task_priority: "", 
                         task_assignee: "",
                         reporter: "",
@@ -109,7 +109,7 @@ const priorityOptions = [
                             }
                           
                         ),
-                        task_status: Yup.string().required("Task Status is required"),
+                        // task_status: Yup.string().required("Task Status is required"),
                         task_priority: Yup.string().required("Task Priority is required"),
                         // task_assignee: Yup.string().required("Task Assignee is required"),
                         // reporter: Yup.string().required("Reporter is required"),
@@ -162,7 +162,7 @@ const priorityOptions = [
                             </FormItem>
 
 
-                            <FormItem label='Status'
+                            {/* <FormItem label='Status'
                             asterisk
                             invalid={errors.task_status && touched.task_status}
                             errorMessage='Task Status is required'
@@ -176,7 +176,7 @@ const priorityOptions = [
                                         />
                                     )}
                                 </Field>
-                            </FormItem>
+                            </FormItem> */}
 
 
                             <FormItem label='Actual Start Date'

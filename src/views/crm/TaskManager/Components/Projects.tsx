@@ -227,8 +227,8 @@ function Expanding() {
 
                 const isExpanded = expandedRowIds.includes(row.original.project_id);
 
-                console.log("is", isExpanded)
-                console.log('get', row.getIsExpanded())
+                // console.log("is", isExpanded)
+                // console.log('get', row.getIsExpanded())
                 if (true) {
                     return (
                         <button

@@ -80,7 +80,7 @@ const SubTaskDetails = (Data:any) => {
     const org_id = localStorage.getItem('orgId')
     const role:any = localStorage.getItem('role')
 
-    // console.log(Data.user)
+    // console.log(Data)
     // console.log(Data.data.sub_task_assignee)
 
 
@@ -319,7 +319,7 @@ const SubTaskDetails = (Data:any) => {
                     <TabContent value="tab1">
                     <div className='flex  gap-4 items-center mb-5'>
 
-                      {(Data.data.sub_task_status==='Completed' || Data.data.sub_task_status==='Cancelled') || Data.data.sub_task_status==='Pending' || ((role !== 'SUPERADMIN' && role !== 'ADMIN') && Data.data.sub_task_assignee !== Data.data.username) ?
+                      {(Data.data.sub_task_status==='Completed' || Data.data.sub_task_status==='Cancelled') || Data.data.sub_task_status==='Pending' || ((role !== 'SUPERADMIN' && role !== 'ADMIN') && Data.data.sub_task_assignee !== Data.user.username) ?
 
                       (<><Button className='!rounded-full shadow-md' variant='twoTone' size='sm'disabled ><IoPlayOutline className='font-bold'/></Button>
                       <Button className='!rounded-full shadow-md' variant='twoTone' size='sm'disabled ><PiSquareThin/></Button></>):

@@ -78,7 +78,10 @@ const SubTaskDetails = (Data:any) => {
     const queryParam=new URLSearchParams(location.search);
     const leadId=queryParam.get('lead_id') || ''; 
     const org_id = localStorage.getItem('orgId')
+    const userId = localStorage.getItem('userId')
     const role = localStorage.getItem('role')
+
+    // console.log(Data)
 
     
     const navigate=useNavigate();
@@ -315,7 +318,7 @@ const SubTaskDetails = (Data:any) => {
                     <TabContent value="tab1">
                     <div className='flex  gap-4 items-center mb-5'>
 
-                      {(Data.data.sub_task_status==='Completed' || Data.data.sub_task_status==='Cancelled') || Data.data.sub_task_status==='Pending' || ((role !== 'SUPERADMIN' && role !== 'ADMIN') && Data.data.sub_task_assignee !== Data.data.username)?
+                      {(Data.data.sub_task_status==='Completed' || Data.data.sub_task_status==='Cancelled') || Data.data.sub_task_status==='Pending' || ((role !== 'SUPERADMIN' && role !== 'ADMIN') && Data.data.sub_task_assignee !== Data?.users?.find((u:any) => u.user_id === userId)?.user_name)?
                       
                       (<><Button className='!rounded-full shadow-md' variant='twoTone' size='sm'disabled ><IoPlayOutline className='font-bold'/></Button>
                       <Button className='!rounded-full shadow-md' variant='twoTone' size='sm'disabled ><PiSquareThin/></Button></>):

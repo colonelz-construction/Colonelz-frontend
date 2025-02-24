@@ -29,7 +29,7 @@ const Index = () => {
     const [fileUrl, setFileUrl] = useState<(any)>([null]);
 
     const [whole, setWhole] = useState<any>('');
-    console.log(whole);
+    // console.log(whole);
 
 
     const [queryType, setQueryType] = useState<any>("crm");
@@ -56,7 +56,7 @@ const Index = () => {
     const data = useContext<any>(UserDetailsContext)
     const [messages, setMessages] = useState<any>([]);
 
-    console.log("messages", messages);
+    // console.log("messages", messages);
 
     useEffect(() => {
         const greetingMessage: any = [{
@@ -198,7 +198,7 @@ const Index = () => {
                     const matches = Array.from(chunk.matchAll(regex));
                     const extractedContents = matches.map(match => match[1]);
 
-                    console.log("extractedContents", extractedContents);
+                    // console.log("extractedContents", extractedContents);
 
                     let isCollecting = false;
                     let result = '';
@@ -240,7 +240,7 @@ const Index = () => {
                 }
             }
 
-            console.log("accumulatedMessages", accumulatedMessages);
+            // console.log("accumulatedMessages", accumulatedMessages);
 
             setMessages((prevMessages: any) => {
                 const lastMessage = prevMessages[prevMessages.length - 1];

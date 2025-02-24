@@ -1136,6 +1136,16 @@ export async function apiLeadsAnotherProject(data: any) { // org done
         return response.data
     })
 }
+
+export async function apiGetTestTwoD(data: any) { // org done 
+    return ApiService.fetchData<any>({
+        url: 'admin/testtwod',
+        method: 'post',
+        data,
+    }).then((response) => {
+        return response.data
+    })
+}
 export async function apiGetCrmCreateLead(data: any) { // org done
     return ApiService.fetchData<any>({
         url: 'admin/create/lead/',

@@ -59,7 +59,7 @@ const priorityOptions = [
   
   const statusOptions = [
     { label: "In Progress", value: "In Progress"},
-    { label: "Pending", value: "Pending" },
+    { label: "Pending/Todo", value: "Pending" },
     { label: "Completed", value: "Completed" },
     { label: "Cancelled", value: "Cancelled" },
   ];
@@ -90,7 +90,7 @@ const priorityOptions = [
                         actual_sub_task_end_date: "",
                         estimated_sub_task_start_date: "",
                         estimated_sub_task_end_date: "",
-                        sub_task_status: "", 
+                        sub_task_status: "Pending", 
                         sub_task_priority: "", 
                         sub_task_assignee: "",
                         sub_task_reporter: "",
@@ -110,7 +110,7 @@ const priorityOptions = [
                           
                         
                         ),
-                        sub_task_status: Yup.string().required('Subtask Status is required'),
+                        // sub_task_status: Yup.string().required('Subtask Status is required'),
                         sub_task_priority: Yup.string().required('Subtask Priority is required'),
                         // sub_task_assignee: Yup.string().required('Subtask Assignee is required'),
                         // sub_task_reporter: Yup.string().required('Subtask Reporter is required'),
@@ -164,7 +164,7 @@ const priorityOptions = [
                             </FormItem>
 
 
-                            <FormItem label='Status'
+                            {/* <FormItem label='Status'
                             asterisk
                             invalid={errors.sub_task_status && touched.sub_task_status}
                             errorMessage={errors.sub_task_status}
@@ -178,7 +178,7 @@ const priorityOptions = [
                                         />
                                     )}
                                 </Field>
-                            </FormItem>
+                            </FormItem> */}
 
 
                             <FormItem label='Actual Start Date'

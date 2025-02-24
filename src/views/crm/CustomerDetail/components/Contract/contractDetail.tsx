@@ -147,7 +147,7 @@ function IndeterminateCheckbox({
 const ContractDetails = (data: FileItemProps) => {
     const [rowSelection, setRowSelection] = useState({})
     const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
-    const [dialogIsOpen, setIsOpen] = useState(false)
+    const [dialogIsOpen, setIsOpen] = useState(false) 
     const [loading, setLoading] = useState(false)
     const [remark, setRemark] = useState("");
     const location = useLocation()
@@ -160,8 +160,8 @@ const ContractDetails = (data: FileItemProps) => {
     const [globalFilter, setGlobalFilter] = useState('')
     const org_id:any= localStorage.getItem('orgId')
     const user_id:any= localStorage.getItem('userId')
-    console.log(data.users)
-    // console.log(users)
+    // console.log(data.users)
+    // console.log(data.loading)
 
     
 
@@ -380,7 +380,7 @@ const ContractDetails = (data: FileItemProps) => {
                                             ) : (<div className=''>
 
                                                 <div className=''>
-                                                    Pending for approval from approvar
+                                                    Pending for approval
                                                 </div>
                                                 
                                                 </div>)
@@ -392,9 +392,9 @@ const ContractDetails = (data: FileItemProps) => {
                                                 <div className=''>
 
                                                 <div className='mb-2'>
-                                                    Pending for approval from approvar 
+                                                    Pending for approval 
                                                 </div>
-                                                <ApprovalDailog fileId={fileId}/>
+                                                {/* <ApprovalDailog fileId={fileId}/> */}
                                                 
                                                 </div> 
 
@@ -677,7 +677,7 @@ const ContractDetails = (data: FileItemProps) => {
         const [dialogIsOpen2, setIsOpen2] = useState(false)
         const [loading2, setLoading2] = useState(false)
         const [users, setUsers] = useState<any>([])
-        console.log(users)
+        // console.log(users)
 
         useEffect(() => {
 
@@ -686,7 +686,7 @@ const ContractDetails = (data: FileItemProps) => {
                 (!user.access || (user.access.contract && user.access.contract.includes("update")))
                 
               );
-              console.log(usersWithUpdateContract)
+            //   console.log(usersWithUpdateContract)
           
               const filteredList = usersWithUpdateContract.filter((item:any) => 
                 data.leadData.some((firstItem:any) => firstItem.user_id === item.UserId)
@@ -707,7 +707,7 @@ const ContractDetails = (data: FileItemProps) => {
         }
 
         const contractApproval = async (values:any) => {
-            console.log(values)
+            // console.log(values)
             try {
                 const formData = new FormData() 
                 formData.append('lead_id', leadId)
@@ -825,7 +825,7 @@ const ContractDetails = (data: FileItemProps) => {
                     <Button variant='solid' size='sm' onClick={() => openDialog()} >Share to Client</Button>
                 </div>
             </div>
-            {table.getRowModel().rows.length > 0 ? (
+             
                 <div>
                     <TableContainer className='max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100' style={{ boxShadow: 'none'}}>
                         <Table stickyHeader>
@@ -842,7 +842,7 @@ const ContractDetails = (data: FileItemProps) => {
                             </TableHead>
                             {
 
-                                loading ? (
+                                data.loading ? (
                                                 
                                     <TableRowSkeleton
                                         avatarInColumns={[0]}
@@ -898,10 +898,7 @@ const ContractDetails = (data: FileItemProps) => {
                         </div>
                     </div>
                 </div>
-            ) : (
-                <div style={{ textAlign: 'center' }}>No Contracts for approval</div>
-            )}
-
+            
 
             <Dialog
                 isOpen={dialogIsOpen}

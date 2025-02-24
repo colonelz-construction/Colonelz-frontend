@@ -35,7 +35,7 @@ type Task = {
 
 const EditTask = ({ Data,users,task, projectId }: any) => {
 
-    // console.log(users)
+    // console.log(Data)
 
     
     const [dialogIsOpen, setIsOpen] = useState(false)
@@ -78,7 +78,7 @@ const priorityOptions = [
   ];
   
   const statusOptions = [
-    { label: "Pending", value: "Pending" },
+    { label: "Pending/Todo", value: "Pending" },
     { label: "In Progress", value: "In Progress" },
     { label: "Cancelled", value: "Cancelled" },
   ];
@@ -145,13 +145,14 @@ const priorityOptions = [
                       }
                      onSubmit={async(values, actions) => {
                         setLoading(true)
+                        // console.log(values)
                             const response = await apiGetCrmProjectsTaskUpdate(values)
                             if(response.code===200){
                                 setLoading(false)
                                 toast.push(
                                     <Notification closable type='success' duration={2000}>Task Updated Successfully</Notification>
                                 )
-                                window.location.reload()
+                                // window.location.reload()
                             }
                             else{
                                 setLoading(false)
@@ -197,7 +198,7 @@ const priorityOptions = [
                                 >
                                     {({field}:any)=>(
                                        <Select
-                                       placeholder={Data.task_status}
+                                       placeholder={Data?.task_status === "Pending" ? "Pending/Todo": Data?.task_status}
                                        options={statusOptions}
                                        name='task_status'
                                        onChange={(option) => field.onChange({ target: { name: 'task_status', value: option ? option.value : '' } })}

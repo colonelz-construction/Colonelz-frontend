@@ -41,8 +41,8 @@ const LeadTimeline = () => {
     }));
   };
   const lead = details?.data?.[0];
-  console.log("Lead ", lead?.name);
-  console.log("Timeline Data", timelineData);
+  // console.log("Lead ", lead?.name);
+  // console.log("Timeline Data", timelineData);
   const formatDate = (date: any): any => {
     return date?.toString()?.replace(/:\d{2}\sGMT.*/, "")?.trim();
   };
@@ -102,7 +102,7 @@ const LeadTimeline = () => {
                 </div>
 
                 {expandedItems[index] && (
-                  <div className="mt-2 ml-10">
+                  <div className="mt-2 ml-10 border-[0.09rem] p-4 rounded-lg">
 
                     {item.leadEvents.length > 0 && <span className="font-semibold mt-5 mb-2 text-base">Lead Events</span>}
 

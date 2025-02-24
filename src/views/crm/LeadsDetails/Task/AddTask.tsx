@@ -63,7 +63,7 @@ const priorityOptions = [
   ];
   
   const statusOptions = [
-    { label: "Pending", value: "Pending" },
+    { label: "Pending/Todo", value: "Pending" },
     { label: "In Progress", value: "In Progress" },
     { label: "Cancelled", value: "Cancelled" },
   ];
@@ -92,7 +92,7 @@ const priorityOptions = [
                         // estimated_task_end_date: "",
                         actual_task_start_date: "",
                         actual_task_end_date: "",
-                        task_status: "", 
+                        task_status: "Pending", 
                         task_priority: "", 
                         task_assignee: "",
                         reporter: "",
@@ -100,20 +100,21 @@ const priorityOptions = [
                       validationSchema={Yup.object().shape({
                         task_name: Yup.string().required("Task Name is required"),
                       
-                        // estimated_task_start_date: Yup.string().required("Estimated Start Date is required"),
-                        // estimated_task_end_date: Yup.string().required("Estimated End Date is required").test(
-                        //     "is-greater",
-                        //     "End Date must be greater than Start Date",
-                        //     function (value) {
-                        //       const { estimated_task_start_date } = this.parent;
-                        //       if (estimated_task_start_date && value) {
-                        //         return new Date(value) > new Date(estimated_task_start_date);
-                        //       }
-                        //       return true;
-                        //     }
+                        delegation_date: Yup.string().required("Delegation Date is required"),
+                        actual_task_start_date: Yup.string().required("Actual start Date is required"),
+                        actual_task_end_date: Yup.string().required("Actual End Date is required").test(
+                            "is-greater",
+                            "End Date must be greater than Start Date",
+                            function (value) {
+                              const { actual_task_start_date } = this.parent;
+                              if (actual_task_start_date && value) {
+                                return new Date(value) > new Date(actual_task_start_date);
+                              }
+                              return true;
+                            }
                           
-                        // ),
-                        task_status: Yup.string().required("Task Status is required"),
+                        ),
+                        // task_status: Yup.string().required("Task Status is required"),
                         task_priority: Yup.string().required("Task Priority is required"),
                         // task_assignee: Yup.string().required("Task Assignee is required"),
                         // reporter: Yup.string().required("Reporter is required"),
@@ -166,7 +167,7 @@ const priorityOptions = [
                             </FormItem>
 
 
-                            <FormItem label='Status'
+                            {/* <FormItem label='Status'
                             asterisk
                             invalid={errors.task_status && touched.task_status}
                             errorMessage='Task Status is required'
@@ -180,9 +181,11 @@ const priorityOptions = [
                                         />
                                     )}
                                 </Field>
-                            </FormItem>
+                            </FormItem> */}
 
-                            <FormItem label='Delegation Date'
+                            <FormItem label='Delegation Date' asterisk
+                            invalid={errors.delegation_date && touched.delegation_date}
+                            errorMessage={errors.delegation_date}
                             >
                                 <Field name='delegation_date'  placeholder='Delegation date'>
                                     {({field}:any)=>(
@@ -194,7 +197,9 @@ const priorityOptions = [
                             </FormItem>
 
 
-                            <FormItem label='Actual Start Date'
+                            <FormItem label='Actual Start Date' asterisk
+                            invalid={errors.actual_task_start_date && touched.actual_task_start_date}
+                            errorMessage={errors.actual_task_start_date}
                             >
                                 <Field name='actual_task_start_date'  placeholder='Actual Start date'>
                                     {({field}:any)=>(
@@ -206,7 +211,9 @@ const priorityOptions = [
                             </FormItem>
 
 
-                            <FormItem label='Actual End Date'
+                            <FormItem label='Actual End Date' asterisk
+                            invalid={errors.actual_task_end_date && touched.actual_task_end_date}
+                            errorMessage={errors.actual_task_end_date}
                             
                             
                             >

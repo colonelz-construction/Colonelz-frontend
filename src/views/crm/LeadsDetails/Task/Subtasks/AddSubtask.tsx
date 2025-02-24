@@ -59,7 +59,7 @@ const priorityOptions = [
   
   const statusOptions = [
     { label: "In Progress", value: "In Progress"},
-    { label: "Pending", value: "Pending" },
+    { label: "Pending/Todo", value: "Pending" },
     { label: "Completed", value: "Completed" },
     { label: "Cancelled", value: "Cancelled" },
   ];
@@ -88,7 +88,7 @@ const priorityOptions = [
                         // estimated_sub_task_end_date: "",
                         actual_sub_task_start_date: "",
                         actual_sub_task_end_date: "",
-                        sub_task_status: "", 
+                        sub_task_status: "Pending", 
                         sub_task_priority: "", 
                         sub_task_assignee: "",
                         sub_task_reporter: "",
@@ -97,18 +97,19 @@ const priorityOptions = [
                         sub_task_name: Yup.string().required('Subtask Name is required'),
                        
 
-                        // estimated_sub_task_start_date: Yup.string().required('Estimated Start Date is required'),
-                        // estimated_sub_task_end_date: Yup.string().required('Estimated End Date is required').test(
-                        //     'is-greater',
-                        //     'End date must be greater than start date',
-                        //     function (value) {
-                        //       const { estimated_sub_task_start_date } = this.parent;
-                        //       return new Date(value) > new Date(estimated_sub_task_start_date);
-                        //     }
+                        delegation_date: Yup.string().required('Delegation Date is required'),
+                        actual_sub_task_start_date: Yup.string().required('Actual Start Date is required'),
+                        actual_sub_task_end_date: Yup.string().required('Actual End Date is required').test(
+                            'is-greater',
+                            'End date must be greater than start date',
+                            function (value) {
+                              const { actual_sub_task_start_date } = this.parent;
+                              return new Date(value) > new Date(actual_sub_task_start_date);
+                            }
                           
                         
-                        // ),
-                        sub_task_status: Yup.string().required('Subtask Status is required'),
+                        ),
+                        // sub_task_status: Yup.string().required('Subtask Status is required'),
                         sub_task_priority: Yup.string().required('Subtask Priority is required'),
                         // sub_task_assignee: Yup.string().required('Subtask Assignee is required'),
                         // sub_task_reporter: Yup.string().required('Subtask Reporter is required'),
@@ -162,7 +163,7 @@ const priorityOptions = [
                             </FormItem>
 
 
-                            <FormItem label='Status'
+                            {/* <FormItem label='Status'
                             asterisk
                             invalid={errors.sub_task_status && touched.sub_task_status}
                             errorMessage={errors.sub_task_status}
@@ -176,10 +177,13 @@ const priorityOptions = [
                                         />
                                     )}
                                 </Field>
-                            </FormItem>
+                            </FormItem> */}
 
 
                             <FormItem label='Delegation Date'
+                            asterisk
+                            invalid={errors.delegation_date && touched.delegation_date}
+                            errorMessage={errors.delegation_date}
                            
                             >
                                 <Field name='delegation_date'  placeholder='Delegation date'>
@@ -195,6 +199,9 @@ const priorityOptions = [
                             </FormItem>
 
                             <FormItem label='Actual Start Date'
+                            asterisk
+                            invalid={errors.actual_sub_task_start_date && touched.actual_sub_task_start_date}
+                            errorMessage={errors.actual_sub_task_start_date}
                            
                             >
                                 <Field name='actual_sub_task_start_date'  placeholder='Start date'>
@@ -211,6 +218,9 @@ const priorityOptions = [
 
 
                             <FormItem label='Actual End Date'
+                            asterisk
+                            invalid={errors.actual_sub_task_end_date && touched.actual_sub_task_end_date}
+                            errorMessage={errors.actual_sub_task_end_date}
                             >
                                 <Field name='actual_sub_task_end_date' placeholder='End Date'>
                                     {({field}:any)=>(

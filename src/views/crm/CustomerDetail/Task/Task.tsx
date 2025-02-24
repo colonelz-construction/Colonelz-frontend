@@ -264,7 +264,17 @@ const Filtering = ({ task, users }: Data) => {
             },
             {
                 header: 'Status',
-                accessorKey: 'task_status'
+                accessorKey: 'task_status',
+                cell: ({ row }) => {
+                    const status = row.original.task_status
+                    return (
+                        <span
+                            
+                        >
+                            {status == "Pending" ? "Pending/Todo": status}
+                        </span>
+                    );
+                }
             },
             {
                 header: 'Start Date',

@@ -150,7 +150,7 @@ const Filtering = () => {
     const [globalFilter, setGlobalFilter] = useState('')
     const navigate = useNavigate()
     const apiData = useLeadContext()
-    console.log(apiData)
+    // console.log(apiData)
     const responseData=apiData
     const totalData = responseData?.length
 
@@ -198,7 +198,7 @@ const Filtering = () => {
         []
     )
 
-    console.log(responseData)
+    // console.log(responseData)
 
 
     const table = useReactTable({

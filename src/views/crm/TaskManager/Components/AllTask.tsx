@@ -315,7 +315,7 @@ const AllTask = ({ users }: any) => {
                         </span>
                     </Tooltip>
                 }
-                {moveAccess && row?.type == 'open type' &&
+                {moveAccess && row?.type == 'open' &&
                     <Tooltip title='Move'>
                         <span className={`cursor-pointer py-2  hover:${textTheme}`}>
                             <MoveToDialog users={users} projectData={projects} leadData={apiData} task_id={row.task_id} />
@@ -396,7 +396,7 @@ const AllTask = ({ users }: any) => {
                 cell: (props) => {
                     const row = props.row.original;
                     return (
-                        <div>{row?.task_status}</div>
+                        <div>{row?.task_status === "Pending" ? "Pending/Todo" : row?.task_status}</div>
                     )
                 }
             },
@@ -421,6 +421,7 @@ const AllTask = ({ users }: any) => {
                 accessorKey: 'type',
                 cell: (props) => {
                     const row = props.row.original;
+                    
                     return (
                         <div>{row?.type}</div>
                     )

@@ -659,13 +659,13 @@ const Index = () => {
           >
             Back
           </Button>
-          {
+          {/* {
             folderName?.toLocaleLowerCase() === 'contract' && (
               <Button variant='solid' size='sm' onClick={() => openDialog1()}>
                 Share For Approval
               </Button>
             )
-          }
+          } */}
 
         </div>
       </StickyFooter>

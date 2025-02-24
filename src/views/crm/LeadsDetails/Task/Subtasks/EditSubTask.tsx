@@ -58,7 +58,7 @@ const priorityOptions = [
   
   const statusOptions = [
     { label: "In Progress", value: "In Progress"},
-    { label: "Pending", value: "Pending" },
+    { label: "Pending/Todo", value: "Pending" },
     { label: "Completed", value: "Completed" },
     { label: "Cancelled", value: "Cancelled" },
     { label: "Under Revision", value: "Under Revision" },
@@ -107,17 +107,18 @@ const priorityOptions = [
                         sub_task_name: Yup.string().required('Subtask Name is required'),
                     
 
-                        // estimated_sub_task_start_date: Yup.string().required('Estimated Start Date is required'),
-                        // estimated_sub_task_end_date: Yup.string().required('Estimated End Date is required').test(
-                        //     'is-greater',
-                        //     'End date must be greater than start date',
-                        //     function (value) {
-                        //       const { estimated_sub_task_start_date } = this.parent;
-                        //       return new Date(value) > new Date(estimated_sub_task_start_date);
-                        //     }
-                          
+                        delegation_date: Yup.string().required('Delegation Date is required'),
+                        actual_sub_task_start_date: Yup.string().required('Actual Start Date is required'),
+                        actual_sub_task_end_date: Yup.string().required('Actual End Date is required').test(
+                            'is-greater',
+                            'End date must be greater than start date',
+                            function (value) {
+                                const { actual_sub_task_start_date } = this.parent;
+                                return new Date(value) > new Date(actual_sub_task_start_date);
+                            }
+                            
                         
-                        // ),
+                        ),
                         sub_task_status: Yup.string().required('Subtask Status is required'),
                         sub_task_priority: Yup.string().required('Subtask Priority is required'),
                         // sub_task_assignee: Yup.string().required('Subtask Assignee is required'),
@@ -179,7 +180,7 @@ const priorityOptions = [
                                 <Field name='sub_task_status'  placeholder=''>
                                     {({field}:any)=>(
                                         <Select
-                                        placeholder={Data?.sub_task_status}
+                                        placeholder={Data?.sub_task_status === "Pending" ? "Pending/Todo" : Data?.sub_task_status}
                                         options={statusOptions}
                                         name='sub_task_status'
                                         onChange={(value) => { field.onChange({ target: {name:'sub_task_status', value: value?.value } }) }}

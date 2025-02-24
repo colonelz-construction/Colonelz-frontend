@@ -111,7 +111,7 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 
 const AddedUser = ({leadData, openDialog3}:any) => {
     const { roleData } = useRoleContext()
-    // const [leadData, setLeadData] = useState<any>([])
+    const [data, setData] = useState<any>([])
     const [username, setUsername] = useState<any>()
     const [loading, setLoading] = useState<any>(false)
     const org_id = localStorage.getItem('orgId')
@@ -157,23 +157,14 @@ const AddedUser = ({leadData, openDialog3}:any) => {
         setIsOpen(false)
     }
 
-    // useEffect(() => {
-    //     setLoading(true)
+    useEffect(() => {
+        const filteredLeads = leadData.filter(
+            (lead:any) => lead.role !== "ADMIN" && lead.role !== "Senior Architect"
+          );
 
-    //     const fetchDataAndLog = async () => {
-    //         try {
-    //             const leadData = await apiGetCrmUsersAssociatedToLead(leadId)
-    //             setLeadData(leadData?.data)
-
-
-    //             setLoading(false)
-    //         } catch (error) {
-    //             console.error('Error fetching lead data', error)
-    //         }
-    //     }
-
-    //     fetchDataAndLog()
-    // }, [])
+          setData(filteredLeads)
+        
+    }, [leadData])
     // console.log(leadData)
 
     const removeUser = async (username: string) => {
@@ -216,7 +207,7 @@ const AddedUser = ({leadData, openDialog3}:any) => {
         pageIndex: 0,
         pageSize: 5,
     });
-    const totalData = leadData.length
+    const totalData = data.length
 
     const pageSizeOption = [
         { value: 5, label: '5 / page' },
@@ -268,7 +259,7 @@ const AddedUser = ({leadData, openDialog3}:any) => {
     )
 
     const table = useReactTable({
-        data: leadData,
+        data: data,
         columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -381,7 +372,7 @@ const AddedUser = ({leadData, openDialog3}:any) => {
                                         columns={3}
                                         avatarProps={{ width: 14, height: 14 }}
                                     /> :
-                                        (leadData.length === 0 ? <TableBody>
+                                        (data.length === 0 ? <TableBody>
                                             <TableRow>
                                                 <TableCell colSpan={columns.length}>
                                                     <NoData />

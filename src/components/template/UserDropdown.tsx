@@ -12,6 +12,7 @@ import { UserDetailsContext } from '@/views/Context/userdetailsContext'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import { AuthorityCheck } from '../shared'
 import { FaRegBuilding } from "react-icons/fa";
+import { HiOutlineUsers } from "react-icons/hi2";
 
 type DropdownList = {
     label: string
@@ -54,17 +55,23 @@ const _UserDropdown = ({ className }: CommonProps) => {
 
         },
         {
+            label: "Add User to Lead",
+            path: "/app/crm/addUserToLead",
+            icon: <AiOutlineUserAdd />,
+            authority: role === 'SUPERADMIN' ? ['SUPERADMIN'] : roleData?.data?.addMember?.create
+            
+        },
+        {
             label: "Create User",
             path: "/app/crm/register",
             icon: <AiOutlineUserAdd />,
             authority: role === 'SUPERADMIN' ? ['SUPERADMIN'] : roleData?.data?.user?.create
         },
         {
-            label: "Add User to Lead",
-            path: "/app/crm/addUserToLead",
-            icon: <AiOutlineUserAdd />,
-            authority: role === 'SUPERADMIN' ? ['SUPERADMIN'] : roleData?.data?.addMember?.create
-
+            label: "All Users",
+            path: "/app/crm/profile?type=users",
+            icon: <HiOutlineUsers />,
+            authority: role === 'SUPERADMIN' ? ['SUPERADMIN'] : roleData?.data?.user?.read
         },
 
 

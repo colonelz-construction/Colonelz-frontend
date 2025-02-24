@@ -246,7 +246,12 @@ const Subtasks = ({task,users}:any) => {
          },
          {
             header:'Status',
-            accessorKey:'sub_task_status'
+            accessorKey:'sub_task_status',
+            cell:({row})=>{
+
+                const status = row.original.sub_task_status
+                return <div>{status === "Pending"  ? "Pending/Todo" : status}</div>
+            }
          },
             {
                 header:'Start Date',

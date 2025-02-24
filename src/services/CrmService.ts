@@ -387,6 +387,16 @@ export async function apiGetCrmProjects<T>(org_id: string  | null) { //org done
     })
 }
 
+
+export async function apiGetCrmProjectsByLeadId<T>(lead_id: string  | null) { //org done
+    return ApiService.fetchData<ProjectResponse>({
+        url: `admin/getallByLeadId/project/?id=${localStorage.getItem('userId')}&org_id=${localStorage.getItem('orgId')}&lead_id=${lead_id}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmProjectMakeContract(formData: any) { // not in use
     //Not in use
     return ApiService.fetchData<any>({
@@ -1074,6 +1084,23 @@ export async function apiGetCrmLeads<T>() {  // org done
         return response.data
     })
 }
+export async function apiGetCrmUsersInContractFileApproval<T>(leadId :any) {  // org done
+    return ApiService.fetchData<any>({
+        url: `admin/getfile/approval?org_id=${localStorage.getItem('orgId')}&user_id=${localStorage.getItem('userId')}&lead_id=${leadId}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmTimeline<T>(leadId: any) { //org done
+    return ApiService.fetchData<any>({
+        url: `admin/get/timeline/lead?lead_id=${leadId}&org_id=${localStorage.getItem('orgId')}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
 
 export async function apiGetCrmLeadsDetails<T>(leadId: string | null, org_id: any) { //org done
     return ApiService.fetchData<LeadDetailsResponse>({
@@ -1103,6 +1130,16 @@ export async function apiGetCrmLeadActivity<T>(lead_id: any, page: any) { // org
 export async function apiLeadsAnotherProject(data: any) { // org done
     return ApiService.fetchData<any>({
         url: 'admin/lead/multiple/project',
+        method: 'post',
+        data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetTestTwoD(data: any) { // org done 
+    return ApiService.fetchData<any>({
+        url: 'admin/testtwod',
         method: 'post',
         data,
     }).then((response) => {

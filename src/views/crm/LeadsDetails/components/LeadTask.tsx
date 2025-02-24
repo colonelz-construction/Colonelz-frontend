@@ -130,7 +130,7 @@ const LeadTask = ({ task, users }: any) => {
     const queryParams = new URLSearchParams(location.search);
     const leadId = queryParams.get('id') || '';
     const [loading, setLoading] = useState(true)
-    const [userData, setUserData] = useState<any>(null)
+    
     
     const role = localStorage.getItem('role')
     const { roleData } = useRoleContext()
@@ -146,13 +146,7 @@ const LeadTask = ({ task, users }: any) => {
         }
         TaskData();
     }, [leadId])
-    useEffect(() => {
-        const UserData = async () => {
-            setUserData(users)
-        }
-        UserData();
-
-    }, [leadId])
+    
 
 
 
@@ -164,6 +158,7 @@ const LeadTask = ({ task, users }: any) => {
         const { textTheme } = useThemeClass()
         const { roleData } = useRoleContext()
         const org_id = localStorage.getItem('orgId')
+        const [userData, setUserData] = useState<any>(users)
 
         const data = {
             user_id: localStorage.getItem('userId'),
@@ -173,6 +168,15 @@ const LeadTask = ({ task, users }: any) => {
         const editAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.leadtask?.update?.includes(`${localStorage.getItem('role')}`)
         const deleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.leadtask?.delete?.includes(`${localStorage.getItem('role')}`)
         const [dialogIsOpen, setIsOpen] = useState(false)
+
+        useEffect(() => {
+            const UserData = async () => {
+                const leadData = await apiGetCrmUsersAssociatedToLead(leadId)
+                setUserData(leadData.data)
+            }
+            UserData();
+    
+        }, [leadId, users])
 
         const openDialog = () => {
             setIsOpen(true)
@@ -209,7 +213,7 @@ const LeadTask = ({ task, users }: any) => {
                 {editAccess &&
                     <span
                         className={`cursor-pointer p-2  hover:${textTheme}`}>
-                        <EditTask Data={row} users={users} task={false} />
+                        <EditTask Data={row} users={userData} task={false} />
 
                     </span>
                 }
@@ -269,7 +273,18 @@ const LeadTask = ({ task, users }: any) => {
             },
             {
                 header: 'Status',
-                accessorKey: 'task_status'
+                accessorKey: 'task_status',
+                cell: ({ row }) => {
+                    const navigate = useNavigate();
+                    const leadId = row.original.lead_id
+                    const status = row.original.task_status
+                    return (
+                        <span
+                        >
+                            {status === "Pending" ? "Pending/Todo" : status}
+                        </span>
+                    );
+                }
             },
             {
                 header: 'Start Date',
@@ -293,7 +308,7 @@ const LeadTask = ({ task, users }: any) => {
 
                     const leadId = row.original.lead_id
                 
-                return <ActionColumn leadId={leadId} row={row.original} users={userData} />
+                return <ActionColumn leadId={leadId} row={row.original} users={users} />
             },
             }
 

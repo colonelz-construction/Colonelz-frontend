@@ -8,11 +8,8 @@ import { CiFileOn, CiImageOn } from 'react-icons/ci';
 import { apiDeleteFileManagerFiles, apiGetAllUsersList, apiGetCrmFileManagerCreateLeadFolder, apiGetCrmFileManagerLeads, apiGetCrmFileManagerShareContractFile, apiGetCrmFileManagerShareFiles } from '@/services/CrmService';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
-import { apiGetUsers } from '@/services/CrmService';
 import { HiShare } from 'react-icons/hi';
 
-
-// import Table from '@/components/ui/Table'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import {
   useReactTable,
@@ -28,7 +25,6 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils'
 import type { ColumnDef, FilterFn, ColumnFiltersState } from '@tanstack/react-table'
 import type { InputHTMLAttributes } from 'react'
-import { FaFile } from 'react-icons/fa';
 import NoData from '@/views/pages/NoData';
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton';
 import { MdDeleteOutline } from 'react-icons/md';
@@ -47,8 +43,6 @@ interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
   onChange: (value: string | number) => void
   debounce?: number
 }
-
-// const { Tr, Th, Td, THead, TBody, Sorter } = Table
 
 function DebouncedInput({
   value: initialValue,
@@ -665,13 +659,13 @@ const Index = () => {
           >
             Back
           </Button>
-          {
+          {/* {
             folderName?.toLocaleLowerCase() === 'contract' && (
               <Button variant='solid' size='sm' onClick={() => openDialog1()}>
                 Share For Approval
               </Button>
             )
-          }
+          } */}
 
         </div>
       </StickyFooter>

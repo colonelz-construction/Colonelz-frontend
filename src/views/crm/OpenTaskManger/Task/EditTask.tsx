@@ -56,8 +56,9 @@ const priorityOptions = [
   ];
   
   const statusOptions = [
-    { label: "Pending", value: "Pending" },
+    { label: "Pending/Todo", value: "Pending" },
     { label: "In Progress", value: "In Progress" },
+    { label: "Completed", value: "Completed" },
     { label: "Cancelled", value: "Cancelled" },
   ];
   
@@ -181,7 +182,7 @@ const priorityOptions = [
                                 >
                                     {({field}:any)=>(
                                        <Select
-                                       placeholder={Data.task_status}
+                                       placeholder={Data.task_status === "Pending" ? "Pending/Todo" : Data.task_status}
                                        options={statusOptions}
                                        name='task_status'
                                        onChange={(option) => field.onChange({ target: { name: 'task_status', value: option ? option.value : '' } })}

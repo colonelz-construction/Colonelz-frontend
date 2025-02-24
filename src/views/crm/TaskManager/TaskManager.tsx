@@ -24,7 +24,7 @@ const TaskManager = () => {
   useEffect(() => {
           const fetchData = async () => {
               const res = await apiGetUsers();
-              console.log(res)
+              // console.log(res)
               setUsers(res.data)
           }
   

@@ -157,7 +157,7 @@ const ContractDetails = (data: FileItemProps) => {
     const { roleData } = useRoleContext()
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     // const [users, setUsers] = useState<any>([])
-    const [globalFilter, setGlobalFilter] = useState('')
+    const [globalFilter, setGlobalFilter] = useState('') 
     const org_id:any= localStorage.getItem('orgId')
     const user_id:any= localStorage.getItem('userId')
     // console.log(data.users)
@@ -183,6 +183,32 @@ const ContractDetails = (data: FileItemProps) => {
         
 
     // }, [data.users])
+
+    const [Users, SetUsers] = useState<any>();
+    // console.log(Users)
+
+    useEffect(() => {
+            const fetchData = async () => {
+                const res = await apiGetUsers();
+
+
+                const usersWithUpdateContract = res?.data.filter((user:any) => 
+    
+                    (!user.access || (user.access.contract && user.access.contract.includes("update")))
+                    
+                  );
+                //   console.log(usersWithUpdateContract)
+              
+                  const filteredList = usersWithUpdateContract.filter((item:any) => 
+                    data.leadData.some((firstItem:any) => firstItem.user_id === item.UserId)
+                  );
+        
+                  SetUsers(filteredList)  
+
+                //   console.log(filteredList)
+            }
+            fetchData();
+        }, [data.leadData])
 
 
 
@@ -232,6 +258,170 @@ const ContractDetails = (data: FileItemProps) => {
     const role = localStorage.getItem('role');
 
 
+
+    const ApprovalDailog = (fileId:any,)=> {
+
+        const [dialogIsOpen2, setIsOpen2] = useState(false)
+        const [loading2, setLoading2] = useState(false)
+        const [users, setUsers] = useState<any>([])
+
+        // useEffect(() => {
+        //     const fetchData = async () => {
+        //         const data = await apiGetUsers();
+
+
+        //         const usersWithUpdateContract = data?.data.filter((user:any) => 
+    
+        //             (!user.access || (user.access.contract && user.access.contract.includes("update")))
+                    
+        //           );
+        //         //   console.log(usersWithUpdateContract)
+              
+        //           const filteredList = usersWithUpdateContract.filter((item:any) => 
+        //             fileId.LeadData.some((firstItem:any) => firstItem.user_id === item.UserId)
+        //           );
+        
+        //           setUsers(filteredList)  
+        //     }
+        //     fetchData();
+        // }, [])
+        // console.log(fileId.Users)
+        // console.log(Users)
+
+        // useEffect(() => {
+
+        //     const usersWithUpdateContract = fileId.Users.filter((user:any) => 
+    
+        //         (!user.access || (user.access.contract && user.access.contract.includes("update")))
+                
+        //       );
+        //     //   console.log(usersWithUpdateContract)
+          
+        //       const filteredList = usersWithUpdateContract.filter((item:any) => 
+        //         fileId.LeadData.some((firstItem:any) => firstItem.user_id === item.UserId)
+        //       );
+    
+        //       setUsers(filteredList)
+    
+            
+    
+        // }, [fileId.Users])
+
+        const openDialog2 = () => {
+            setIsOpen2(true)
+        }
+
+        const onDialogClose2 = () => {
+            setIsOpen2(false)
+        }
+
+        const contractApproval = async (values:any) => {
+            // console.log(values)
+            try {
+                const formData = new FormData() 
+                formData.append('lead_id', leadId)
+                formData.append('folder_name', 'Contract')
+                formData.append('file_id', values.file_id)
+                formData.append('userId',values.userId)
+                formData.append('userEmail',values.email)
+                formData.append('type', 'Internal')
+                formData.append('org_id', org_id)
+                formData.append('user_id', user_id)
+    
+                const response = await apiGetCrmFileManagerShareContractFile(formData) 
+                // console.log(response);
+    
+                if (response.code === 200) {
+                    toast.push(
+                    <Notification closable type="success" duration={2000}>
+                        Shared for approval successfully
+                    </Notification>, { placement: 'top-end' }
+                    )
+                    window.location.reload();
+                    
+                }
+                else {
+                    toast.push(
+                    <Notification closable type="danger" duration={2000}>
+                        {response.errorMessage}
+                    </Notification>, { placement: 'top-end' }
+                    )
+                }
+            } catch (error:any) {
+                throw new Error(error);
+                
+            }
+        }
+
+        
+        return (<>
+            <Button variant='solid' size='sm' onClick={() => openDialog2()}>Share for approval</Button>
+            <Dialog
+                isOpen={dialogIsOpen2}
+                onClose={() => {
+                    setLoading2(false);
+                    onDialogClose2();
+                }}
+                onRequestClose={() => {
+                    setLoading2(false);
+                    onDialogClose2();
+                }}
+                className={`pb-3`}>
+                <h3 className='mb-4'>Share For Approval</h3>
+                <Formik
+                    initialValues={{
+                        userId: '',
+                        email: '',
+                        file_id: fileId.fileId,
+                        type: 'Internal',
+                        lead_id: leadId,
+                        folder_name: 'contract',
+                        user_id: localStorage.getItem('userId'),
+                        org_id: localStorage.getItem('orgId'),
+                    }}
+                    validationSchema={Yup.object({
+                        userId: Yup.string().required('UserId is required'),
+                        email: Yup.string().required('Email is required'),
+                    })}
+                    onSubmit={(values, { setSubmitting }) => {
+
+
+                        
+                        // handleSubmit(values);
+                        contractApproval(values)
+                        setSubmitting(false);
+                    }}
+                >
+                    {({setFieldValue, errors, touched }) => {
+                        return (
+                            <div className='max-h-96 overflow-y-auto '>
+                                <Form className='mr-3'>
+                                    <FormItem label='User' asterisk
+                                        invalid={errors.userId && touched.userId}
+                                        errorMessage={errors.userId}
+                                        >
+
+                                            <Select
+                                                options={Users.map((user:any) => ({ value: user.UserId, label: user.username, email: user.email }))}
+                                                onChange={(option:any) => {
+                                                    setFieldValue('userId', option?.value || '')
+                                                    setFieldValue('email', option?.email || '')
+                                                }}
+                                            />
+                                    </FormItem>
+                                   
+                                    <Button className='mt-16' type='submit' block variant='solid' loading={loading2}> {loading2 ? 'Sending' : 'Send'} </Button>
+                                </Form>
+                            </div>)
+                    }}
+                </Formik>
+
+            </Dialog>
+            </>
+        )
+    }
+
+
     
 
     const columns =
@@ -258,8 +448,6 @@ const ContractDetails = (data: FileItemProps) => {
                                     setIsHovered(false);
                                 }, 200);
                             };
-
-                            // console.log(row.original)
                             return (
                                 <div
                                     className='relative inline-block'
@@ -276,7 +464,6 @@ const ContractDetails = (data: FileItemProps) => {
                                     )}
                                 </div>
                             );
-
                         }
                     },
 
@@ -300,9 +487,6 @@ const ContractDetails = (data: FileItemProps) => {
                             const onDialogClose1 = () => {
                                 setIsOpen(false)
                             }
-
-                            // console.log(data.fileIdsForApproval)
-
                             return (
                                 status === 'approved' ? (
                                     <div>Approved</div>
@@ -375,8 +559,6 @@ const ContractDetails = (data: FileItemProps) => {
                                                 </div>
 
                                             </div>
-
-
                                             ) : (<div className=''>
 
                                                 <div className=''>
@@ -393,89 +575,14 @@ const ContractDetails = (data: FileItemProps) => {
 
                                                 <div className='mb-2'>
                                                     Pending for approval 
-                                                </div>
-                                                {/* <ApprovalDailog fileId={fileId}/> */}
-                                                
+                                                </div>                                                
                                                 </div> 
 
                                             )
-
-
                                         )
-
-                                        
-                                        // (role !== 'SUPERADMIN' && !roleData?.data?.contract?.update?.includes(`${role}`)) && !fileIdsForApproval.includes(fileId) ? (
-                                        //     <div>Pending for approval from Admin</div>
-                                        // ) : (role === 'SUPERADMIN' || fileIdsForApproval.includes(fileId)) ? (
-                                        //     <div className='flex gap-1'>
-                                        //         <Button variant='solid' size='sm' onClick={() => Approval(fileId, 'approved')}>{approvalLoading ? "Approving..." : 'Approve'}</Button>
-                                        //         <Button variant='solid' color='red-600' size='sm' onClick={() => openDialog1(fileId)}>Reject</Button>
-                                        //         <Dialog
-                                        //             isOpen={dialogIsOpen}
-                                        //             onClose={onDialogClose1}
-                                        //             onRequestClose={onDialogClose1}
-                                        //         >
-                                        //             <h3 className='mb-4'> Reject Remarks</h3>
-                                        //             <Formik
-                                        //                 initialValues={{ lead_id: leadId, file_id: fileId, status: 'rejected', remark: '', org_id }}
-                                        //                 validationSchema={Yup.object({ remark: Yup.string().required('Required') })}
-                                        //                 onSubmit={async (values, { setSubmitting }) => {
-                                        //                     setSubmitting(true);
-                                        //                     const response = await apiGetCrmProjectShareContractApproval(values);
-                                        //                     setSubmitting(false);
-                                        //                     if (response.code === 200) {
-                                        //                         toast.push(
-                                        //                             <Notification closable type='success' duration={2000}>
-                                        //                                 {response.message}
-                                        //                             </Notification>
-                                        //                         )
-                                        //                         window.location.reload();
-                                        //                     }
-                                        //                     else {
-                                        //                         toast.push(
-                                        //                             <Notification closable type='danger' duration={2000}>
-                                        //                                 {response.errorMessage}
-                                        //                             </Notification>
-                                        //                         )
-                                        //                     }
-
-                                        //                     setSubmitting(false);
-                                        //                 }}
-                                        //             >
-                                        //                 {({ handleSubmit, isSubmitting }) => (
-                                        //                     <Form>
-                                        //                         <FormItem label="Remark">
-                                        //                             <Field name="remark"    >
-                                        //                                 {({ field, form }: any) => (
-                                        //                                     <Input
-                                        //                                         textArea
-                                        //                                         {...field}
-                                        //                                         onChange={
-                                        //                                             (e: React.ChangeEvent<HTMLInputElement>) => {
-                                        //                                                 handleInputChange(e);
-                                        //                                                 form.setFieldValue(field.name, e.target.value);
-                                        //                                             }
-                                        //                                         }
-                                        //                                     />
-                                        //                                 )}
-                                        //                             </Field>
-                                        //                         </FormItem>
-                                        //                         <div className='flex justify-end'>
-                                        //                             <Button type="submit" variant='solid' loading={isSubmitting}>{isSubmitting ? 'Submitting' : 'Submit'}</Button>
-                                        //                         </div>
-                                        //                     </Form>)}
-                                        //             </Formik>
-                                        //         </Dialog>
-                                        //     </div>
-                                        // ) : (
-
-
-                                        // )
                                     ) 
                                     : (
-                                        // <Button variant='solid' size='sm' onClick={() => contractApproval(fileId)}>Share for approval</Button>
-                                        // <Button variant='solid' size='sm' onClick={() => openDialog2()}>Share for approval</Button>
-                                        <ApprovalDailog fileId={fileId}/>
+                                        <ApprovalDailog fileId={fileId} Users={Users} LeadData={data.leadData}/>
                                     )
 
                             )
@@ -517,7 +624,7 @@ const ContractDetails = (data: FileItemProps) => {
                     }] : [])
                 ]
             },
-                [])
+                [Users])
 
     const table = useReactTable({
         data: data?.data.reverse() || [],
@@ -672,145 +779,7 @@ const ContractDetails = (data: FileItemProps) => {
     }, [data.users])
     // console.log(data.users)
 
-    const ApprovalDailog = (fileId:any) => {
-
-        const [dialogIsOpen2, setIsOpen2] = useState(false)
-        const [loading2, setLoading2] = useState(false)
-        const [users, setUsers] = useState<any>([])
-        // console.log(users)
-
-        useEffect(() => {
-
-            const usersWithUpdateContract = data.users.filter((user:any) => 
-    
-                (!user.access || (user.access.contract && user.access.contract.includes("update")))
-                
-              );
-            //   console.log(usersWithUpdateContract)
-          
-              const filteredList = usersWithUpdateContract.filter((item:any) => 
-                data.leadData.some((firstItem:any) => firstItem.user_id === item.UserId)
-              );
-    
-              setUsers(filteredList)
-    
-            
-    
-        }, [data.users])
-
-        const openDialog2 = () => {
-            setIsOpen2(true)
-        }
-
-        const onDialogClose2 = () => {
-            setIsOpen2(false)
-        }
-
-        const contractApproval = async (values:any) => {
-            // console.log(values)
-            try {
-                const formData = new FormData() 
-                formData.append('lead_id', leadId)
-                formData.append('folder_name', 'Contract')
-                formData.append('file_id', values.file_id)
-                formData.append('userId',values.userId)
-                formData.append('userEmail',values.email)
-                formData.append('type', 'Internal')
-                formData.append('org_id', org_id)
-                formData.append('user_id', user_id)
-    
-                const response = await apiGetCrmFileManagerShareContractFile(formData) 
-                // console.log(response);
-    
-                if (response.code === 200) {
-                    toast.push(
-                    <Notification closable type="success" duration={2000}>
-                        Shared for approval successfully
-                    </Notification>, { placement: 'top-end' }
-                    )
-                    window.location.reload();
-                    
-                }
-                else {
-                    toast.push(
-                    <Notification closable type="danger" duration={2000}>
-                        {response.errorMessage}
-                    </Notification>, { placement: 'top-end' }
-                    )
-                }
-            } catch (error:any) {
-                throw new Error(error);
-                
-            }
-        }
-
-        
-        return (<>
-            <Button variant='solid' size='sm' onClick={() => openDialog2()}>Share for approval</Button>
-            <Dialog
-                isOpen={dialogIsOpen2}
-                onClose={() => {
-                    setLoading2(false);
-                    onDialogClose2();
-                }}
-                onRequestClose={() => {
-                    setLoading2(false);
-                    onDialogClose2();
-                }}
-                className={`pb-3`}>
-                <h3 className='mb-4'>Share For Approval</h3>
-                <Formik
-                    initialValues={{
-                        userId: '',
-                        email: '',
-                        file_id: fileId.fileId,
-                        type: 'Internal',
-                        lead_id: leadId,
-                        folder_name: 'contract',
-                        user_id: localStorage.getItem('userId'),
-                        org_id: localStorage.getItem('orgId'),
-                    }}
-                    validationSchema={Yup.object({
-                        userId: Yup.string().required('UserId is required'),
-                        email: Yup.string().required('Email is required'),
-                    })}
-                    onSubmit={(values, { setSubmitting }) => {
-
-
-                        
-                        // handleSubmit(values);
-                        contractApproval(values)
-                        setSubmitting(false);
-                    }}
-                >
-                    {({setFieldValue, errors, touched }) => {
-                        return (
-                            <div className='max-h-96 overflow-y-auto '>
-                                <Form className='mr-3'>
-                                    <FormItem label='User' asterisk
-                                        invalid={errors.userId && touched.userId}
-                                        errorMessage={errors.userId}
-                                        >
-
-                                            <Select
-                                                options={users.map((user:any) => ({ value: user.UserId, label: user.username, email: user.email }))}
-                                                onChange={(option:any) => {
-                                                    setFieldValue('userId', option?.value || '')
-                                                    setFieldValue('email', option?.email || '')
-                                                }}
-                                            />
-                                    </FormItem>
-                                   
-                                    <Button className='mt-16' type='submit' block variant='solid' loading={loading2}> {loading2 ? 'Sending' : 'Send'} </Button>
-                                </Form>
-                            </div>)
-                    }}
-                </Formik>
-
-            </Dialog>
-            </>
-        )
-    }
+  
 
     return (
         <div>

@@ -3,34 +3,17 @@ import { Formik, Field, Form, ErrorMessage, FieldProps } from 'formik';
 import * as Yup from 'yup';
 import { Button, FormItem, Input, Notification, Select, toast } from '@/components/ui';
 import { apiGetBillingData, apiEditBillingData } from '@/services/CrmService';
-
-const apiToken = import.meta.env.VITE_API_TOKEN;
-const userEmail = import.meta.env.VITE_USER_EMAIL;
-const countryUrl = import.meta.env.VITE_COUNTRY_URL;
+import { Country, State, City } from 'country-state-city';
 
 const org_id: any = localStorage.getItem('orgId');
 const userId: any = localStorage.getItem('userId');
 
-interface Country {
-    name: string;
-    alpha2Code: string;
-}
-
-interface State {
-    name: string;
-    state_name: string;
-}
-
-interface City {
-    name: string;
-    city_name: string;
-}
 
 interface FormValues {
     billing_shipping_address: string;
-    city: string;
-    state: string;
     country: string;
+    state: string;
+    city: string;
     zipcode: string;
 }
 
@@ -43,9 +26,14 @@ const validationSchema = Yup.object().shape({
 });
 
 const Address = () => {
-    const [details, setDetails] = useState<any>(null);
-    const [countries, setCountries] = useState<Country[]>([]);
-    const [authToken, setAuthToken] = useState<string | null>(null);
+    const [details, setDetails] = useState<FormValues | null>(null);
+    const [initialValues, setInitialValues] = useState<FormValues>({
+        billing_shipping_address: '',
+        country: '',
+        state: '',
+        city: '',
+        zipcode: '',
+    });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -60,85 +48,33 @@ const Address = () => {
     }, []);
 
     useEffect(() => {
-        const getAuthToken = async () => {
-            try {
-                const response = await fetch(`${countryUrl}api/getaccesstoken`, {
-                    headers: {
-                        "Accept": "application/json",
-                        "api-token": apiToken,
-                        "user-email": userEmail,
-                    },
-                });
-                const data = await response.json();
-                setAuthToken(data.auth_token);
-            } catch (error) {
-                console.error('Error fetching auth token:', error);
-            }
-        };
-
-        getAuthToken();
-    }, []);
-    
-
-    useEffect(() => {
-        const fetchCountries = async () => {
-
-            if (!authToken) return;
-            try {
-                const response = await fetch(`${countryUrl}api/countries/`, {
-                    headers: {
-                        "Authorization": `Bearer ${authToken}`,
-                        "Accept": "application/json",
-                    },
-                });
-                const data = await response.json();
-                    const formattedCountries = data.map((country: any) => ({
-                        name: country.country_name,
-                        alpha2Code: country.country_short_name,
-                    }));
-                    setCountries(formattedCountries);
-            } catch (error) {
-                console.error('Error fetching countries:', error);
-            }
-        };
-        fetchCountries();
-    }, [authToken]);
-    
-    const initialValues: FormValues = {
-        billing_shipping_address: details?.billing_shipping_address || '',
-        country: details?.country || '',
-        city: details?.city || '',
-        state: details?.state || '',
-        zipcode: details?.zipcode || '',
-    };
+        if (details) {
+            setInitialValues({
+                billing_shipping_address: details.billing_shipping_address || '',
+                country: details.country || '',
+                state: details.state || '',
+                city: details.city || '',
+                zipcode: details.zipcode || '',
+            });
+        }
+    }, [details]);
 
     const handleSubmit = async (values: FormValues, { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }) => {
         const formData = new FormData();
-        formData.append('billing_shipping_address', values.billing_shipping_address);
-        formData.append('country', values.country);
-        formData.append('city', values.city);
-        formData.append('state', values.state);
-        formData.append('zipcode', values.zipcode);
-        formData.append('org_id', org_id);
-        formData.append('userId', userId);
+        Object.entries(values).forEach(([key, value]) => formData.append(key, value));
+        formData.append('org_id', org_id || '');
+        formData.append('userId', userId || '');
 
         const response = await apiEditBillingData(formData);
         setSubmitting(false);
 
-        if (response.code === 200) {
-            toast.push(
-                <Notification type='success' duration={2000}>
-                    Details Updated Successfully.
-                </Notification>
-            );
-            window.location.reload();
-        } else {
-            toast.push(
-                <Notification type='danger' duration={2000}>
-                    {response.errorMessage}
-                </Notification>
-            );
-        }
+        toast.push(
+            <Notification type={response.code === 200 ? 'success' : 'danger'} duration={2000}>
+                {response.code === 200 ? 'Details Updated Successfully.' : response.errorMessage}
+            </Notification>
+        );
+
+        if (response.code === 200) window.location.reload();
     };
 
     return (
@@ -149,145 +85,63 @@ const Address = () => {
             enableReinitialize
         >
             {({ setFieldValue, values }) => (
-                <FormContent
-                    countries={countries}
-                    details={details}
-                    setFieldValue={setFieldValue}
-                    values={values}
-                    authToken={authToken}
-                />
+                <FormContent setFieldValue={setFieldValue} values={values} details={details} />
             )}
         </Formik>
     );
 };
 
-const FormContent = ({ countries, details, setFieldValue, values, authToken }: { countries: Country[]; details: any; setFieldValue: (field: string, value: any) => void; values: FormValues; authToken: string | null }) => {
-    const [states, setStates] = useState<State[]>([]);
-    const [cities, setCities] = useState<City[]>([]);
+const FormContent = ({ setFieldValue, values, details }: { setFieldValue: (field: string, value: any) => void; values: FormValues; details: FormValues | null }) => {
+    const [states, setStates] = useState<any[]>([]);
+    const [cities, setCities] = useState<any[]>([]);
 
-    useEffect(() => {
-        if (details && details.country) {
-            const country = countries.find(c => c.name === details.country);
-            if (country) {
-                fetchStates(country.name);
-                setFieldValue('country', country.name);
-            }
-        }
-    }, [details, countries]);
-
-    useEffect(() => {
-        if (details && details.state) {
-            setFieldValue('state', details.state);
-        }
-    }, [details]);
-
-    const fetchStates = async (countryName: string) => {
-        if (!authToken) return;
-        try {
-            const response = await fetch(`${countryUrl}api/states/${countryName}`, {
-                headers: {
-                    "Authorization": `Bearer ${authToken}`,
-                    "Accept": "application/json",
-                },
-            });
-            const data = await response.json();
-            const formattedStates = data.map((state: any) => ({
-                name: state.state_name,
-            }));
-            setStates(formattedStates);
-            
-            const state = data.find((s: State) => s.state_name === details.state);
-                if (state) {
-                    setFieldValue('state', state.state_name);
-                    fetchCities(state.state_name);
-                }
-            
-        } catch (error) {
-            console.error('Error fetching states:', error);
-        }
-    };
-
-    const fetchCities = async (stateName: string) => {
-        
-        if (!authToken) return;
-            try {
-                const response = await fetch(`${countryUrl}api/cities/${stateName}`, {
-                    headers: {
-                        "Authorization": `Bearer ${authToken}`,
-                        "Accept": "application/json",
-                    },
-                });
-                const data = await response.json();
-                    setCities(data);
-                    
-                    const city = data.find((c: City) => c.name === details.city);
-                    if (city) {
-                        setFieldValue('city', city.name);
-                        setFieldValue('zipcode', details.zipcode || '');
-                    }
-                const formattedCities = data.map((city: any) => ({
-                    name: city.city_name,
-                }));
-                setCities(formattedCities);
-            } catch (error) {
-                console.error('Error fetching cities:', error);
-            }
-    };
-
-    const handleCountryChange = async (option: { value: string; label: string } | null) => {
-        setFieldValue('country', option ? option.label : '');
-        setFieldValue('state', '');
-        setFieldValue('city', '');
-
-        if (option) {
-            fetchStates(option.label);
-        }
-    };
-
-    const handleStateChange = async (option: { value: string; label: string } | null) => {
-        setFieldValue('state', option ? option.label : '');
-        setFieldValue('city', '');
-
-        if (option) {
-            fetchCities(option.label);
-            
-        }
-    };
-
-    const countryOptions = countries.map(country => ({
-        value: country.alpha2Code,
+    const countries = Country.getAllCountries().map(country => ({
+        value: country.isoCode,
         label: country.name,
     }));
 
-    const stateOptions = states.map(state => ({
-        value: state.name,
-        label: state.name,
-    }));
+    useEffect(() => {
+        if (values.country) {
+            const statesList = State.getStatesOfCountry(values.country);
+            setStates(statesList);
+            setCities([]);
+            if (!statesList.some(state => state.isoCode === values.state)) {
+                setFieldValue('state', '');
+                setFieldValue('city', '');
+            }
+        } else {
+            setStates([]);
+            setCities([]);
+        }
+    }, [values.country]);
 
-    const cityOptions = cities.map(city => ({
-        value: city.name,
-        label: city.name,
-    }));
+    useEffect(() => {
+        if (values.state) {
+            const citiesList = City.getCitiesOfState(values.country, values.state);
+            setCities(citiesList);
+            if (!citiesList.some(city => city.name === values.city)) {
+                setFieldValue('city', '');
+            }
+        } else {
+            setCities([]);
+        }
+    }, [values.state]);
 
     return (
         <Form>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                <FormItem label="Billing & Shipping Address" >
-                    <Field
-                        component={Input}
-                        type="text"
-                        name="billing_shipping_address"
-                        placeholder="Billing & Shipping Address"
-                    />
+                <FormItem label="Billing & Shipping Address">
+                    <Field component={Input} type="text" name="billing_shipping_address" placeholder="Billing & Shipping Address" />
                     <ErrorMessage name="billing_shipping_address" component="div" className="text-red-600" />
                 </FormItem>
 
-                <FormItem label="Country" >
+                <FormItem label="Country">
                     <Field name="country">
                         {({ field }: FieldProps) => (
                             <Select
-                                options={countryOptions}
-                                onChange={handleCountryChange}                                value={countryOptions.find(option => option.label === field.value) || null}
+                                options={countries}
+                                onChange={(option) => setFieldValue('country', option?.value || '')}
+                                value={countries.find(option => option.value === field.value) || null}
                                 placeholder="Select Country"
                             />
                         )}
@@ -295,48 +149,46 @@ const FormContent = ({ countries, details, setFieldValue, values, authToken }: {
                     <ErrorMessage name="country" component="div" className="text-red-600" />
                 </FormItem>
 
-                <FormItem label="State" >
+                <FormItem label="State">
                     <Field name="state">
                         {({ field }: FieldProps) => (
                             <Select
-                                options={stateOptions}
-                                onChange={handleStateChange}
-                                value={stateOptions.find(option => option.label === field.value) || null}
+                                options={states.map(state => ({ value: state.isoCode, label: state.name }))}
+                                onChange={(option) => {
+                                    setFieldValue('state', option?.value || '');
+                                    setFieldValue('city', '');
+                                }}
+                                value={states.find(state => state.isoCode === field.value) ? { value: field.value, label: states.find(state => state.isoCode === field.value)?.name || '' } : null}
                                 placeholder="Select State"
+                                isDisabled={!values.country}
                             />
                         )}
                     </Field>
                     <ErrorMessage name="state" component="div" className="text-red-600" />
                 </FormItem>
 
-                <FormItem label="City" >
+                <FormItem label="City">
                     <Field name="city">
                         {({ field }: FieldProps) => (
                             <Select
-                                options={cityOptions}
-                                onChange={(option) => {
-                                    setFieldValue('city', option ? option.label : '');
-                                }}
-                                value={cityOptions.find(option => option.label === field.value) || null}
+                                options={cities.map(city => ({ value: city.name, label: city.name }))}
+                                onChange={(option) => setFieldValue('city', option?.value || '')}
+                                value={cities.find(city => city.name === field.value) ? { value: field.value, label: field.value } : null}
                                 placeholder="Select City"
+                                isDisabled={!values.state}
                             />
                         )}
                     </Field>
                     <ErrorMessage name="city" component="div" className="text-red-600" />
                 </FormItem>
 
-                <FormItem label="ZIP Code" >
-                    <Field
-                        component={Input}
-                        type="text"
-                        name="zipcode"
-                        placeholder="ZIP Code"
-                    />
+                <FormItem label="ZIP Code">
+                    <Field component={Input} type="text" name="zipcode" placeholder="ZIP Code" />
                     <ErrorMessage name="zipcode" component="div" className="text-red-600" />
                 </FormItem>
             </div>
 
-            <Button variant='solid' type='submit'>Update</Button>
+            <Button variant="solid" type="submit">Update</Button>
         </Form>
     );
 };

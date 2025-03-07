@@ -108,10 +108,10 @@ const appsNavigationConfig: NavigationTree[] = [
         subMenu: [],
     },
     // {
-    //     key: 'appsCrm.visualizer',
-    //     path: `${APP_PREFIX_PATH}/crm/visualizer`,
+    //     key: 'appsCrm.blueprint',
+    //     path: `${APP_PREFIX_PATH}/crm/blueprint`,
     //     title: '3D Visualizer',
-    //     translateKey: 'nav.appsCrm.visualizer',
+    //     translateKey: 'nav.appsCrm.blueprint',
     //     icon: 'visualizer',
     //     type: NAV_ITEM_TYPE_ITEM,
     //     authority:

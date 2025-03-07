@@ -7,7 +7,7 @@ import YourFormComponent from './LeadForm';
 import { FaFolder, FaRegFolder } from 'react-icons/fa';
 import { useTheme } from '@emotion/react';
 import { AuthorityCheck, ConfirmDialog, StickyFooter } from '@/components/shared';
-import { apiDeleteFileManagerFolders, apiGetCrmFileManagerLeads } from '@/services/CrmService';
+import { apiDeleteFileManagerFolders, apiGetCrmFileManagerDrawingData, apiGetCrmFileManagerLeads } from '@/services/CrmService';
 
 
 import { useMemo } from 'react'
@@ -112,7 +112,12 @@ const Index = () => {
     useEffect(() => {
         const fetchData = async () => {
             const data = await fetchLeadData(leadId);
-            // console.log(data)
+            const res2 = await apiGetCrmFileManagerDrawingData(leadId, '', 'Drawing')
+            console.log(res2.data.DrawingData)
+
+            console.log(data)
+
+
             setLeadData(data);
             setLoading(false);
         };
@@ -149,7 +154,7 @@ const Index = () => {
         const postData = {
             lead_id: leadId,
             folder_name: folder_name,
-            type: "",
+            type: folder_name === "Drawing" ? "Drawing" : '',
             project_id: "",
             org_id
         };
@@ -220,7 +225,15 @@ const Index = () => {
                     )
                 }
             },
-            { header: 'Files', accessorKey: 'total_files' },
+            { header: 'Files', accessorKey: 'total_files',
+                cell: ({ row }) => {
+                    const folder_name = row.original.folder_name
+                    return (
+                        <div>{row.original.total_files}</div>
+                    )
+                }
+
+            },
             {
                 header: 'Modified', accessorKey: 'updated_date', cell: ({ row }) => {
                     const date = row.original.updated_date

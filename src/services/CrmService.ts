@@ -952,6 +952,15 @@ export async function apiGetCrmFileManagerCompanyData<T>() { // org done
     })
 }
 
+export async function apiGetCrmFileManagerDrawingData<T>(lead_id:any, project_id:any, type:any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/getdrawingfile?org_id=${localStorage.getItem('orgId')}&user_id=${localStorage.getItem('userId')}&lead_id=${lead_id}&project_id=${project_id}&type=${type}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmFileManagerArchive<T>(userId: string | null) { // org done
     return ApiService.fetchData<ArchiveResponse>({
         url: `admin/get/archive?user_id=${userId}&org_id=${localStorage.getItem('orgId')}`,
@@ -961,6 +970,15 @@ export async function apiGetCrmFileManagerArchive<T>(userId: string | null) { //
     })
 }
 
+export async function apiGetCrmFileManagerDrawingUpload(Formdata: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/drawingupload',
+        method: 'post',
+        data: Formdata,
+    }).then((response) => {
+        return response.data
+    })
+}
 export async function apiGetCrmFileManagerArchiveRestore(Formdata: any) { // org done
     return ApiService.fetchData<any>({
         url: 'admin/restore/file',

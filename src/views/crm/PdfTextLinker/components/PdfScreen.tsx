@@ -2,21 +2,23 @@ import React, { useState } from "react";
 import { Document, Page } from "react-pdf";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
-const PdfScreen = ({pdfUrl, pdfPages, links, scaleFactor, setWordSelected}:any) => {
+const PdfScreen = ({setFolderName, pdfUrl, pdfPages, links, scaleFactor, setWordSelected}:any) => {
 
   console.log(pdfUrl)
   console.log(links)
 
-    const handleClick = (link:any) => {
+    const handleClick = (obj:any) => {
       setWordSelected(true)
 
-        console.log(link.url);
+      setFolderName(obj.sub_folder_name_first)
+
+        console.log(obj.sub_folder_name_first);
     
     }
 
 
   return (
-    <div className="relative overflow-auto max-w-full max-h-screen border-red-500 border-2">
+    <div className="relative overflow-auto max-w-full max-h-screen rounded-xl border-[0.14rem]">
       {/* <TransformWrapper
        initialScale={1}
        minScale={0.5}
@@ -28,6 +30,7 @@ const PdfScreen = ({pdfUrl, pdfPages, links, scaleFactor, setWordSelected}:any) 
        disablePadding={true} // Removes boundary padding that can cause snapping
     >
       <TransformComponent> */}
+      
         {pdfUrl && (
           <div>
             <Document file={pdfUrl}>
@@ -44,19 +47,18 @@ const PdfScreen = ({pdfUrl, pdfPages, links, scaleFactor, setWordSelected}:any) 
             </Document>
 
             {/* Overlay clickable links */}
-            {links.map((link:any, index:any) => (
+            {links.map((obj:any, index:any) => (
               <span
                 key={index}
-                target= "_blank"
                 // href={link.url}
                 rel="noopener noreferrer"
-                onClick={() => handleClick(link)}
+                onClick={() => handleClick(obj)}
                 className="absolute bg-blue-500 bg-opacity-30 cursor-pointer border-0"
                 style={{
-                  left: `${link.x}px`,
-                  top: `${link.y}px`,
-                  width: `${link.width}px`,
-                  height: `${link.height}px`,
+                  left: `${obj.x}px`,
+                  top: `${obj.y}px`,
+                  width: `${obj.width}px`,
+                  height: `${obj.height}px`,
                 }}
               />
             ))}

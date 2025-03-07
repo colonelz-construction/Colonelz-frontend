@@ -11,7 +11,7 @@ import ActionLink from '../../../components/shared/ActionLink';
 import { FaChevronCircleUp } from "react-icons/fa";
 import { GoDotFill } from "react-icons/go";
 import ScrollableFeed from "react-scrollable-feed";
-import { apiGetUserData } from "@/services/CrmService";
+import { apiGetCrmFileManagerDrawingData, apiGetUserData } from "@/services/CrmService";
 import Tag from '@/components/ui/Tag'
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -41,6 +41,8 @@ const Index = () => {
         const fetchData = async() => {
             try {
                 const res = await apiGetUserData(localStorage.getItem("userId"))
+                const res2 = await apiGetCrmFileManagerDrawingData('700539', '', 'Drawing')
+                console.log(res2)
              
                 setUser(res?.data?.username)
                 

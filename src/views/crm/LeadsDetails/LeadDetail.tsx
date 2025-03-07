@@ -61,6 +61,7 @@ const CustomerDetail = () => {
     const [dialogIsOpen2, setIsOpen2] = useState(false)
     const [dialogIsOpen3, setIsOpen3] = useState(false)
     const [dialogIsOpen4, setIsOpen4] = useState(false)
+    const [dialogIsOpen5, setIsOpen5] = useState(false)
     const [leadData, setLeadData] = useState<any>([])
 
       
@@ -107,6 +108,14 @@ const CustomerDetail = () => {
     const onDialogClose4 = () => {
 
         setIsOpen4(false)
+    }
+    const openDialog5 = () => {
+        setIsOpen5(true)
+    }
+
+    const onDialogClose5 = () => {
+
+        setIsOpen5(false)
     }
 
     // const navigate = useNavigate();
@@ -304,6 +313,22 @@ const CustomerDetail = () => {
                             authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.update ?? []}
                         >
                             <Dropdown.Item eventKey="g" onClick={() => openDialog4()}><div>Inactive Lead</div></Dropdown.Item>
+
+                        </AuthorityCheck>}
+
+                        {lead?.lead_status != "Inactive" && leadUpdateAccess && <AuthorityCheck
+                            userAuthority={[`${localStorage.getItem('role')}`]}
+                            authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.update ?? []}
+                        >
+                            <Dropdown.Item eventKey="h" onClick={
+                                   () => {
+                                    //   openDialog5()
+                                    
+
+                                   }
+
+                               }
+                        ><Link to={`/app/crm/blueprint?lead_id=${myParam}`}>Design View</Link></Dropdown.Item>
 
                         </AuthorityCheck>}
 

@@ -69,9 +69,9 @@ const appsRoute: Routes = [
         authority: [],
     },
     {
-        key: 'appsCrm.visualizer',
-        path: `${APP_PREFIX_PATH}/crm/visualizer`,
-        component: lazy(() => import('@/views/crm/Visualizer/index')),
+        key: 'appsCrm.blueperint',
+        path: `${APP_PREFIX_PATH}/crm/blueprint`,
+        component: lazy(() => import('@/views/crm/PdfTextLinker/index')),
 
         authority: [],
     },
@@ -129,6 +129,26 @@ const appsRoute: Routes = [
         component: lazy(
             () =>
                 import('@/views/crm/FileManager/Components/Lead/Folders/index'),
+        ),
+        authority: [],
+        meta: {},
+    },
+    {
+        key: 'appsCrm.fileManager',
+        path: `${APP_PREFIX_PATH}/crm/fileManager/leads/folder/firstfolder`,
+        component: lazy(
+            () =>
+                import('@/views/crm/FileManager/Components/Lead/Folders/FirstSubFolder/index'),
+        ),
+        authority: [],
+        meta: {},
+    },
+    {
+        key: 'appsCrm.fileManager',
+        path: `${APP_PREFIX_PATH}/crm/fileManager/leads/folder/firstfolder/secondfolder`,
+        component: lazy(
+            () =>
+                import('@/views/crm/FileManager/Components/Lead/Folders/FirstSubFolder/SecondSubFolder/index'),
         ),
         authority: [],
         meta: {},

@@ -4,8 +4,12 @@ import Avatar from "@/components/ui/Avatar";
 import Card from "@/components/ui/Card";
 import { apiGetCrmTimeline, apiGetCrmLeadsDetails } from "@/services/CrmService";
 import useQuery from "@/utils/hooks/useQuery";
-import { MdExpandLess } from "react-icons/md";
 import { MdExpandMore } from "react-icons/md";
+import { MdKeyboardArrowRight } from "react-icons/md";
+import { Button } from "@/components/ui";
+import { StickyFooter } from "@/components/shared";
+import { useNavigate } from "react-router-dom";
+
 
 type leadInterface = {
   username: string,
@@ -33,6 +37,8 @@ const LeadTimeline = () => {
   const [timelineData, setTimelineData] = useState<any | null>(null);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [expandedItems, setExpandedItems] = useState<{ [key: number]: boolean }>({});
+  // console.log(timelineData)
+  const navigate = useNavigate();
 
   const toggleDetails = (index: number) => {
     setExpandedItems((prev) => ({
@@ -78,6 +84,8 @@ const LeadTimeline = () => {
     setExpandedProject(expandedProject === id ? null : id);
   };
 
+  // console.log(timelineData)
+
   const colors = ["bg-green-500", "bg-yellow-500", "bg-purple-500", "bg-red-500", "bg-blue-500"];
   return (
     <>
@@ -95,9 +103,9 @@ const LeadTimeline = () => {
                   className="cursor-pointer font-bold text-lg flex justify-start gap-2 items-center"
                   onClick={() => toggleDetails(index)}
                 >
-                  <span>{expandedItems[index] ? <MdExpandLess /> : <MdExpandMore />}</span>
+                  <span>{expandedItems[index] ? <MdExpandMore /> : <MdKeyboardArrowRight />}</span>
                   <span className="capitalize">
-                    {item?.project_id ? `Project - ${item?.project_id}` : `Lead - ${item?.lead_id}`}
+                    {item?.project_name ? `Project - ${item?.project_name}` : `Lead - ${item?.lead_name}`}
                   </span>
                 </div>
 
@@ -115,7 +123,7 @@ const LeadTimeline = () => {
                             <TimelineAvatar
                               className={`bg-${["green", "yellow", "purple", "orange", "red", "teal"][leadIndex % 6]}-500`}
                             >
-                              {lead?.type ? lead.type.charAt(0).toUpperCase() : "C"}
+                              {lead?.type ? lead.type.charAt(0).toUpperCase() : lead?.message?.match(/\bhas\b\s+(\w)/) && lead?.message?.match(/\bhas\b\s+(\w)/)[1]}
                             </TimelineAvatar>
                           }
                         >
@@ -137,7 +145,7 @@ const LeadTimeline = () => {
                           <TimelineAvatar
                             className={`bg-${["green", "yellow", "purple", "orange", "red", "teal"][leadIndex % 6]}-500`}
                           >
-                            {lead?.type ? lead.type.charAt(0).toUpperCase() : "C"}
+                            {lead?.type ? lead.type.charAt(0).toUpperCase() : lead?.message?.match(/\bhas\b\s+(\w)/) && lead?.message?.match(/\bhas\b\s+(\w)/)[1]}
                           </TimelineAvatar>
                         }
                       >
@@ -157,6 +165,24 @@ const LeadTimeline = () => {
         }
 
       </div >
+
+      <StickyFooter
+        className="-mx-8 px-8 flex items-center justify-between py-4 mt-7"
+        stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+      >
+        <div className="md:flex items-center">
+          <Button
+            size="sm"
+            className="ltr:mr-3 rtl:ml-3"
+            type="button"
+            onClick={() => {
+              navigate('/app/crm/timeline')
+            }}
+          >
+            Back
+          </Button>
+        </div>
+      </StickyFooter>
     </>
   );
 };

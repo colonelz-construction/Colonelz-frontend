@@ -1055,4 +1055,3 @@ const ContractDetails = (data: FileItemProps) => {
 }
 
 export default ContractDetails
-

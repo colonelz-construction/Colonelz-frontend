@@ -86,6 +86,8 @@ const LeadTimeline = () => {
 
   // console.log(timelineData)
 
+  // console.log(timelineData)
+
   const colors = ["bg-green-500", "bg-yellow-500", "bg-purple-500", "bg-red-500", "bg-blue-500"];
   return (
     <>

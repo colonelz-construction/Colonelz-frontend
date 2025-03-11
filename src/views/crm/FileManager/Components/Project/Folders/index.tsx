@@ -13,6 +13,7 @@ import {
     Segment,
     Select,
     Skeleton,
+    Tooltip,
     Upload,
     toast,
 } from '@/components/ui'
@@ -21,8 +22,10 @@ import CreatableSelect from 'react-select/creatable'
 import { CiFileOn, CiImageOn } from 'react-icons/ci'
 import {
     apiDeleteFileManagerFiles,
+    apiDeleteFileManagerFolders,
     apiGetAllUsersList,
     apiGetCrmFileManagerCreateProjectFolder,
+    apiGetCrmFileManagerDrawingData,
     apiGetCrmFileManagerShareFiles,
     apiGetCrmProjectShareQuotation,
 } from '@/services/CrmService'
@@ -54,6 +57,8 @@ import type { InputHTMLAttributes } from 'react'
 import { MdDeleteOutline } from 'react-icons/md';
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import formateDate from '@/store/dateformate'
+import { FaFolder } from 'react-icons/fa'
+import DrawingFolder from './DrawingFolder'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -114,10 +119,11 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 };
 
 const Index = () => {
-    const [leadData, setLeadData] = useState<FileItem[]>([])
+    const [leadData, setLeadData] = useState<any[]>([])
     const [selectedFiles, setSelectedFiles] = useState<string[]>([])
     const [selectedEmails, setSelectedEmails] = useState<string[]>([])
     const [selectedEmailsCc, setSelectedEmailsCc] = useState<string[]>([])
+    const [firstFolderName, setFirstFolderName] = useState<string>('')
     const [selectedEmailsBcc, setSelectedEmailsBcc] = useState<string[]>([])
     // const [selectedType, setSelectedType] = useState('Internal')
     // const [selectedUsername, setSelectedUsername] = useState('')
@@ -179,8 +185,30 @@ const Index = () => {
     const [dialogIsOpen2, setIsOpen2] = useState(false)
     const [dialogIsOpen3, setIsOpen3] = useState(false)
     const [dialogIsOpen4, setIsOpen4] = useState(false)
+    const [dialogIsOpen5, setIsOpen5] = useState(false)
+    const [dialogIsOpen6, setIsOpen6] = useState(false)
     const [fileId, setFileId] = useState<string>('')
+    const [drawingFolders, setDrawingFolders] = useState<any>([])
 
+
+
+    const openDialog6 = (firstFolderName:any) => {
+        setIsOpen6(true)
+        setFirstFolderName(firstFolderName)
+      }
+    
+      const onDialogClose6 = () => {
+        setIsOpen6(false)
+      }
+
+      const openDialog5 = () => {
+        setIsOpen5(true)
+      }
+    
+      const onDialogClose5 = () => {
+    
+        setIsOpen5(false)
+      }
 
     const openDialog = (fileId: string) => {
         setIsOpen(true)
@@ -221,7 +249,50 @@ const Index = () => {
         const fetchDataAndLog = async () => {
             try {
                 const leadData = await fetchProjectData(leadId)
-                // console.log(leadData)
+
+                const res2 = await apiGetCrmFileManagerDrawingData('', leadId, 'Drawing')
+                console.log(res2.data.DrawingData)
+        
+                const data = res2.data.DrawingData
+                console.log(data)
+        
+                const folderMap:any = {};
+        
+                data?.forEach((obj:any) => {
+                    obj.files?.forEach((item:any) => {
+                    const { folder_name, sub_folder_name_first, sub_folder_name_second, updated_date, folder_id, files } = item;
+                
+                    // Initialize folder entry if it doesn't exist
+                    if (!folderMap[sub_folder_name_first]) {
+                        folderMap[sub_folder_name_first] = {
+                        sub_folder_name_first,
+                        sub_folder_name_second: [],
+                        type: 'Folder',
+                        updated_date,
+                        total_files: 0, // Change total_files to total_documents
+                        };
+                    }
+                
+                    // Add subfolder details
+                    folderMap[sub_folder_name_first].sub_folder_name_second.push({
+                        sub_folder_name_second,
+                        files,
+                        updated_date
+                    });
+                    });
+                });
+                
+                // Calculate total_documents for each sub_folder_name_first
+                Object.keys(folderMap).forEach((sub_folder_first) => {
+                    folderMap[sub_folder_first].total_files = data
+                    .flatMap((obj:any) => obj.files || []) // Flatten all files arrays
+                    .filter((item:any) => item.sub_folder_name_first === sub_folder_first).length - 1; // Count matching objects
+                });
+        
+                // Convert folderMap to an array
+                const result = Object.values(folderMap);
+                // console.log(result)
+                setDrawingFolders(result)
 
                 //   setLoading(false)
                 const folderData = leadData
@@ -231,10 +302,16 @@ const Index = () => {
                     (folder: any) => folder.folder_name === folderName,
                 )
 
-                if (selectedFolder) {
-                    setLeadData(selectedFolder.files)
-                    // console.log(selectedFolder.files)
+                if(folderName === "Drawing") {
+                    setLeadData(result)
+          
+                } else  {
+                    if (selectedFolder) {
+                        setLeadData(selectedFolder.files)
+                        // console.log(selectedFolder.files)
+                    }
                 }
+
             } catch (error) {
                 // console.error('Error fetching lead data', error)
             }
@@ -243,6 +320,44 @@ const Index = () => {
         fetchDataAndLog()
     }, [leadId, folderName])
     // console.log(leadData)
+
+    const deleteFolder = async (firstFolderName: string) => {
+              function warn(text: string) {
+                  toast.push(
+                      <Notification closable type="warning" duration={2000}>
+                          {text}
+                      </Notification>, { placement: 'top-center' }
+                  )
+              }
+              if (firstFolderName.length === 0) {
+                  warn('No files selected for deletion.')
+                  return;
+              }
+              const postData = {
+                  folder_name: folderName,
+                  sub_folder_name_first: firstFolderName,
+                  type: folderName === "Drawing" ? "Drawing" : '',
+                  project_id: leadId,
+                  org_id
+              };
+      
+              const response = await apiDeleteFileManagerFolders(postData);
+              if (response.code === 200) {
+                  toast.push(
+                      <Notification closable type="success" duration={2000}>
+                          Folder deleted successfully
+                      </Notification>, { placement: 'top-center' }
+                  )
+                  window.location.reload()
+              }
+              else {
+                  toast.push(
+                      <Notification closable type="danger" duration={2000}>
+                          {response.errorMessage}
+                      </Notification>, { placement: 'top-center' }
+                  )
+              }
+          }
 
     const deleteFiles = async (fileId: string) => {
         selectedFiles.push(fileId)
@@ -414,7 +529,7 @@ const Index = () => {
 
     }
     const getFileIcon = (fileName: string) => {
-        const extension = fileName.split('.').pop()?.toLowerCase()
+        const extension = fileName?.split('.').pop()?.toLowerCase()
         const imageExtensions = [
             'png',
             'jpg',
@@ -439,7 +554,7 @@ const Index = () => {
         }
     }
     const getFileType = (fileName: string) => {
-        const extension = fileName.split('.').pop()?.toLowerCase() || ''
+        const extension = fileName?.split('.').pop()?.toLowerCase() || ''
         const imageExtensions = [
             'png',
             'jpg',
@@ -547,9 +662,79 @@ const Index = () => {
         []
     )
 
+    const columns2 = useMemo<ColumnDef<any>[]>(
+        () => [
+            {
+                header: 'Name', accessorKey: 'sub_folder_name_first'
+                , cell: ({ row }) => {
+                    return (
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <FaFolder />
+                                <a className="font-medium cursor-pointer" onClick={() => navigate(
+                                    `/app/crm/fileManager/projects/folder/firstfolder?project_id=${leadId}&project_name=${ProjectName}&folder_name=Drawing&sub_folder_name_first=${row.original.sub_folder_name_first}`,
+                                )}>
+                                    {row.original.sub_folder_name_first}
+                                </a>
+                            </div>
+                        </div>
+                    )
+                }
+            },
+    
+            {
+                header: 'Type', cell: ({ row }) => {
+                    return (
+                        <div>Folder</div>
+                    )
+                }
+            },
+            { header: 'Files', accessorKey: 'total_files',
+                cell: ({ row }) => {
+                    const folder_name = row.original.folder_name
+                    return (
+                        <div>{row.original.total_files}</div>
+                    )
+                }
+    
+            },
+            {
+                header: 'Modified', accessorKey: 'updated_date', cell: ({ row }) => {
+                    const date = row.original.updated_date
+                    return (
+                        <div>{formateDate(date)}</div>
+                    )
+                }
+            },
+    
+            {
+                header: 'Actions',
+                id: 'actions',
+                cell: ({ row }) => {
+                    const { roleData } = useRoleContext();
+                    return (
+                        <AuthorityCheck
+                            userAuthority={[`${localStorage.getItem('role')}`]}
+                            authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.file?.delete ?? []}
+                        >
+                            <div className=' ml-3 cursor-pointer' onClick={() => openDialog6(row.original.sub_folder_name_first)}>
+                                <Tooltip title="Delete">
+                                    <span className="cursor-pointer">
+                                        <MdDeleteOutline className=' text-xl text-center hover:text-red-500' />
+                                    </span>
+                                </Tooltip>
+                            </div>
+                        </AuthorityCheck>
+                    )
+                }
+            },
+        ],
+        []
+    )
+
     const table = useReactTable({
         data: leadData,
-        columns,
+        columns: folderName === "Drawing" ? columns2 : columns,
         filterFns: {
             fuzzy: fuzzyFilter,
         },
@@ -583,15 +768,17 @@ const Index = () => {
         <div>
             <div className="flex justify-between">
                 <h3 className="mb-5 capitalize">Project-{ProjectName}</h3>
-                {uploadAccess &&
-                    <Button
-                        className=""
-                        size="sm"
-                        variant="solid"
-                        onClick={() => openDialog2()}
-                    >
+                <div className='flex items-center gap-2'>
+                    {folderName !== "Drawing" && uploadAccess &&
+                    <Button className='' size='sm' variant='solid' onClick={() => openDialog2()}>
                         Upload Files
                     </Button>}
+                    {folderName === "Drawing" && uploadAccess &&
+                    <Button className='' size='sm' variant='solid' onClick={() => openDialog5()}>
+                        Upload Folder
+                    </Button>}
+        
+                </div>
             </div>
 
 
@@ -1081,6 +1268,14 @@ const Index = () => {
                 </Formik>
             </Dialog>
 
+            <Dialog
+                isOpen={dialogIsOpen5}
+                onClose={onDialogClose5}
+                onRequestClose={onDialogClose5}
+            >
+                <DrawingFolder />
+            </Dialog>
+
             <ConfirmDialog
                 isOpen={dialogIsOpen3}
                 type="danger"
@@ -1114,6 +1309,19 @@ const Index = () => {
 
 
             </ConfirmDialog>
+
+
+            <ConfirmDialog
+                    isOpen={dialogIsOpen6}
+                    type="danger"
+                    onClose={onDialogClose6}
+                    confirmButtonColor="red-600"
+                    onCancel={onDialogClose6}
+                    onConfirm={() => deleteFolder(firstFolderName)}
+                    title="Delete File"
+                    onRequestClose={onDialogClose6}>
+                    <p> Are you sure you want to delete this Folder? </p>
+                  </ConfirmDialog>
         </div>
     )
 }

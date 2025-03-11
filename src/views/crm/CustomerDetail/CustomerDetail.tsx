@@ -3,7 +3,7 @@ import Container from '@/components/shared/Container'
 import CustomerProfile from './components/CustomerProfile'
 import useQuery from '@/utils/hooks/useQuery'
 import MOM from './components/MOM/Mom'
-import { Skeleton, Tabs } from '@/components/ui'
+import { Button, Skeleton, Tabs } from '@/components/ui'
 import TabList from '@/components/ui/Tabs/TabList'
 import TabNav from '@/components/ui/Tabs/TabNav'
 import TabContent from '@/components/ui/Tabs/TabContent'
@@ -171,7 +171,16 @@ const CustomerDetail = () => {
 
   return (
     <>
-      <h3 className='pb-5 capitalize flex items-center'><span>Project-</span>{loading ? <Skeleton width={100} /> : projectData[0]?.project_name}</h3>
+
+      <span className='flex justify-between'>
+        <h3 className='pb-5 capitalize flex items-center'><span>Project-</span>{loading ? <Skeleton width={100} /> : projectData[0]?.project_name}</h3>
+
+        
+            <Button className='' size='sm' variant='solid' onClick={() => navigate(`/app/crm/projects/blueprint?project_id=${allQueryParams.project_id}`)}>
+              Design View
+            </Button>
+
+      </span>
       <div>
 
 

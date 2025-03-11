@@ -112,8 +112,6 @@ const Index = () => {
     useEffect(() => {
         const fetchData = async () => {
             const data = await fetchLeadData(leadId);
-            const res2 = await apiGetCrmFileManagerDrawingData(leadId, '', 'Drawing')
-            console.log(res2.data.DrawingData)
 
             console.log(data)
 

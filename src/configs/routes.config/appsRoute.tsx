@@ -70,8 +70,15 @@ const appsRoute: Routes = [
     },
     {
         key: 'appsCrm.blueperint',
-        path: `${APP_PREFIX_PATH}/crm/blueprint`,
+        path: `${APP_PREFIX_PATH}/crm/leads/blueprint`,
         component: lazy(() => import('@/views/crm/PdfTextLinker/index')),
+
+        authority: [],
+    },
+    {
+        key: 'appsCrm.blueperint',
+        path: `${APP_PREFIX_PATH}/crm/projects/blueprint`,
+        component: lazy(() => import('@/views/crm/PdfTextLinkerProject/index')),
 
         authority: [],
     },
@@ -145,10 +152,30 @@ const appsRoute: Routes = [
     },
     {
         key: 'appsCrm.fileManager',
+        path: `${APP_PREFIX_PATH}/crm/fileManager/projects/folder/firstfolder`,
+        component: lazy(
+            () =>
+                import('@/views/crm/FileManager/Components/Project/Folders/FirstSubFolder/index'),
+        ),
+        authority: [],
+        meta: {},
+    },
+    {
+        key: 'appsCrm.fileManager',
         path: `${APP_PREFIX_PATH}/crm/fileManager/leads/folder/firstfolder/secondfolder`,
         component: lazy(
             () =>
                 import('@/views/crm/FileManager/Components/Lead/Folders/FirstSubFolder/SecondSubFolder/index'),
+        ),
+        authority: [],
+        meta: {},
+    },
+    {
+        key: 'appsCrm.fileManager',
+        path: `${APP_PREFIX_PATH}/crm/fileManager/projects/folder/firstfolder/secondfolder`,
+        component: lazy(
+            () =>
+                import('@/views/crm/FileManager/Components/Project/Folders/FirstSubFolder/SecondSubFolder/index'),
         ),
         authority: [],
         meta: {},

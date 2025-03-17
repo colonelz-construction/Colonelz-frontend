@@ -55,7 +55,6 @@ const LeadActivity = ({ details }: any) => {
     setError(false); // Reset error state before fetching data
     try {
       const act = await apiGetCrmLeadActivity(leadId, page);
-      console.log(act)
       const newAct = act.data.activities || [];
       setActivityData((prevData) => [...prevData, ...newAct]);
       setHasMore(newAct.length > 0);

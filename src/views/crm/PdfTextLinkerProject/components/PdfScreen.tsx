@@ -4,15 +4,13 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 const PdfScreen = ({setFolderName, pdfUrl, pdfPages, links, scaleFactor, setWordSelected}:any) => {
 
-  console.log(pdfUrl)
-  console.log(links)
+
 
     const handleClick = (obj:any) => {
       setWordSelected(true)
 
       setFolderName(obj.sub_folder_name_first)
 
-        console.log(obj.sub_folder_name_first);
     
     }
 

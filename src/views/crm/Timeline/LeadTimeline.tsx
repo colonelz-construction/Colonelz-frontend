@@ -62,6 +62,7 @@ const LeadTimeline = () => {
       }
       else if (response.code === 404) {
         console.log(`Timeline for Lead ${lead?.name} was not found.`);
+        setLoading(false)
       }
     })
 

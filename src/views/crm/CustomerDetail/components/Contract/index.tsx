@@ -210,7 +210,6 @@ export const MultiInput = ({
             // console.log(newValue)
             const sanitizedValue = newValue.replace(/\s/g, '');  // Remove all spaces from the string
 
-            console.log(sanitizedValue)
             if (validators[type].test(sanitizedValue)) {
                 setInputValue(sanitizedValue);
             }

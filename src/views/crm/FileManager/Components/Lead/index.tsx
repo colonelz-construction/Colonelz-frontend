@@ -113,7 +113,6 @@ const Index = () => {
         const fetchData = async () => {
             const data = await fetchLeadData(leadId);
 
-            console.log(data)
 
 
             setLeadData(data);

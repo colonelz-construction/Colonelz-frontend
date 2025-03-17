@@ -251,10 +251,8 @@ const Index = () => {
                 const leadData = await fetchProjectData(leadId)
 
                 const res2 = await apiGetCrmFileManagerDrawingData('', leadId, 'Drawing')
-                console.log(res2.data.DrawingData)
         
                 const data = res2.data.DrawingData
-                console.log(data)
         
                 const folderMap:any = {};
         

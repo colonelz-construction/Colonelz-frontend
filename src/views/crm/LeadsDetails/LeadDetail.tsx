@@ -328,7 +328,7 @@ const CustomerDetail = () => {
                                    }
 
                                }
-                        ><Link to={`/app/crm/blueprint?lead_id=${myParam}`}>Design View</Link></Dropdown.Item>
+                        ><Link to={`/app/crm/leads/blueprint?lead_id=${myParam}`}>Design View</Link></Dropdown.Item>
 
                         </AuthorityCheck>}
 

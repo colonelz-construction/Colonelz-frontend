@@ -59,7 +59,6 @@ const PdfTextLinker = () => {
     setFolders(folderData)
     
     
-    console.log(folderData)
     
     setSubFolderLoading(true)
 
@@ -73,10 +72,8 @@ const PdfTextLinker = () => {
     const fetchData = async () => {
 
       const res2 = await apiGetCrmFileManagerDrawingData(leadId, '', 'Drawing')
-      console.log(res2.data.DrawingData)
 
       const data2 = res2.data.DrawingData
-      console.log(data)
 
       setData(data2);
 
@@ -99,7 +96,6 @@ const PdfTextLinker = () => {
       const uniqueFolders = Array.from(folderMap.values());
 
 
-      console.log(uniqueFolders);
       setTargetWords(uniqueFolders)
     }
     fetchData()
@@ -110,7 +106,6 @@ const PdfTextLinker = () => {
 
 
   const scaleFactor = 1.5;
-  console.log(pdfUrl)
 
 
 
@@ -124,10 +119,8 @@ const PdfTextLinker = () => {
     const fetchData = async () => {
       const leadData = await apiGetCrmFileManagerLeads(leadId);
       const folderData = leadData?.data
-      console.log(folderData);
 
       const selectedFolder = folderData.find((folder: any) => folder.folder_name?.toLowerCase() === 'blueprint');
-      console.log(selectedFolder)
       if (selectedFolder) {
 
         let options = [];
@@ -253,13 +246,11 @@ const PdfTextLinker = () => {
           //   { sub_folder_name_second: "SIDE TABLE", url: "https://amazon.com" },
           // ];
 
-          console.log(targetWords)
 
           const foundWords = textPositions.filter((item) =>
             targetWords.some(target => target.sub_folder_name_first.toLowerCase() === item.text.toLowerCase())
           );
 
-          console.log(foundWords)
 
           foundWords.forEach((word) => {
             const target = targetWords.find(target => target.sub_folder_name_first.toLowerCase() === word.text.toLowerCase());

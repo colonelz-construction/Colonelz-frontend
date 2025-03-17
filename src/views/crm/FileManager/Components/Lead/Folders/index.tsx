@@ -125,7 +125,6 @@ const Index = () => {
   const role = localStorage.getItem('role')
   const org_id: any = localStorage.getItem('orgId')
 
-  console.log(leadData)
 
 
   const { roleData } = useRoleContext();
@@ -240,7 +239,6 @@ const Index = () => {
       try {
         const leadData = await apiGetCrmFileManagerLeads(leadId);
         const res2 = await apiGetCrmFileManagerDrawingData(leadId, '', 'Drawing')
-        console.log(res2.data.DrawingData)
 
         const data = res2.data.DrawingData
         // console.log(leadData)
@@ -280,7 +278,6 @@ const Index = () => {
 
         // Convert folderMap to an array
         const result = Object.values(folderMap);
-        console.log(result)
         setDrawingFolders(result)
 
 
@@ -658,8 +655,6 @@ const Index = () => {
    
   // const role = localStorage.getItem('role')
 
-  // console.log(folderName, drawingFolders)
-  console.log("leadData", leadData)
 
   const table = useReactTable({
     data:leadData,

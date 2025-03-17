@@ -42,7 +42,6 @@ const Index = () => {
             try {
                 const res = await apiGetUserData(localStorage.getItem("userId"))
                 const res2 = await apiGetCrmFileManagerDrawingData('700539', '', 'Drawing')
-                console.log(res2)
              
                 setUser(res?.data?.username)
                 

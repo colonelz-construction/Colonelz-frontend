@@ -255,10 +255,8 @@ const Index = () => {
 
         // }
         const res2 = await apiGetCrmFileManagerDrawingData('', projectId, 'Drawing')
-        console.log(res2.data.DrawingData)
 
         const data = res2.data.DrawingData
-        console.log(data)
 
         const result = data?.flatMap((obj: any) =>
             obj.files
@@ -272,7 +270,6 @@ const Index = () => {
               )
           ) || [];
           
-        console.log(result)
         // setLeadData(result)
 
 
@@ -644,7 +641,6 @@ const Index = () => {
   // const role = localStorage.getItem('role')
 
   // console.log(folderName, drawingFolders)
-  console.log("leadData", leadData)
 
   const table = useReactTable({
     data:leadData,
@@ -720,7 +716,14 @@ const Index = () => {
                       <span className="mx-2">/</span>
                     </li>
 
-                    <li className="text-gray-500">{folderName}</li>
+                    <li className="text-gray-500">
+                      <Link to={`/app/crm/fileManager/project/folder?project_id=${projectId}&project_name=${projectName}&folder_name=${folderName}`} className="text-blue-600 dark:text-blue-400 hover:underline">{folderName}</Link>
+                    </li>
+                    <li>
+                      <span className="mx-2">/</span>
+                    </li>
+
+                    <li className="text-gray-500">{sub_folder_name_first}</li>
                   </ol>
                 </nav>
               </div>

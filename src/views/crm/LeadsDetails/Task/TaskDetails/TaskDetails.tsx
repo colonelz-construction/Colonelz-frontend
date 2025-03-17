@@ -2,12 +2,13 @@ import { Button, Card, Skeleton } from '@/components/ui'
 import React, { useEffect, useState } from 'react'
 import Subtasks from '../Subtasks/Subtasks'
 import { useLocation } from 'react-router-dom'
-import { apiGetCrmLeadsSingleTaskData, apiGetCrmProjectsSingleTaskData, apiGetCrmUsersAssociatedToLead, apiGetUsersList, apiGetUsersListProject } from '@/services/CrmService'
+import { apiGetCrmLeadsSingleTaskData, apiGetCrmLeadsSingleTaskDataTimer, apiGetCrmProjectsSingleTaskData, apiGetCrmUsersAssociatedToLead, apiGetUsersList, apiGetUsersListProject } from '@/services/CrmService'
 import AddSubTask from '../Subtasks/AddSubtask'
 import EditTask from '../EditTask'
 import NoData from '@/views/pages/NoData'
 import { useNavigate } from 'react-router-dom'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
+import TaskTimer from './TaskTimer'
 
 type CustomerInfoFieldProps = {
     title?: string
@@ -77,11 +78,15 @@ const TaskDetails = () => {
     const leadSubtaskCreateAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.leadtask?.create?.includes(role);
 
     const [taskData, setTaskData] = React.useState<LeadTasks>(tempTasks)
+    const [timerData, setTimerData] = React.useState<any>()
     const [loading, setLoading] = useState(true)
     useEffect(() => {
         const fetchData = async () => {
             const response = await apiGetCrmLeadsSingleTaskData(lead_id, task_id, org_id);
             const list = await apiGetCrmUsersAssociatedToLead(lead_id)
+            const res = await apiGetCrmLeadsSingleTaskDataTimer(lead_id, task_id, org_id);
+
+            setTimerData(res.data)
             setLoading(false)
             setTaskData(response.data[0]);
             setUsers(list.data)
@@ -136,6 +141,9 @@ const TaskDetails = () => {
                         footerBorder={false}
                         headerBorder={false}
                     >
+
+                        {taskData && <TaskTimer data={taskData}/>}
+
                         <CustomerInfoField title='Created On' value={formateDate(taskData.task_createdOn)} />
                         <CustomerInfoField title='Created By' value={taskData.task_createdBy} />
                         <CustomerInfoField title='Name' value={taskData.task_name} />
@@ -159,7 +167,7 @@ const TaskDetails = () => {
 
                     <div className='flex justify-between mb-4 items-center'>
                         <h5>Subtasks</h5>
-                        {leadSubtaskCreateAccess && <AddSubTask users={users} data={taskData} />}
+                        {leadSubtaskCreateAccess && timerData && <AddSubTask showButton={timerData.isrunning} users={users} data={taskData} />}
                     </div>
 
                     <Subtasks task={task_id} users={users} />

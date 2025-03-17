@@ -112,7 +112,7 @@ type Option = {
 }
 
 type ArchiveData = {
-    delete_type: string
+    deleted_type: string
     file_id: string
     lead_id: string
     project_id: string
@@ -129,6 +129,7 @@ type Restore = {
     folder_name: string
     sub_folder_name_first: string
     sub_folder_name_second: string
+    deleted_type: any
 }
 
 // const { Tr, Th, Td, THead, TBody, Sorter } = Table
@@ -147,6 +148,7 @@ const pageSizeOption = [
 const PaginationTable = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState('')
+    const [filesData, setFilesData] = useState<DataItem[]>([])
     const { roleData } = useRoleContext()
     // console.log('RoleData:', roleData);
 
@@ -158,18 +160,18 @@ const PaginationTable = () => {
 
 
 
-    const openDialog2 = (file_id: string, lead_id: string, project_id: string, type: string, folder_name: string, sub_folder_name_first: string, sub_folder_name_second: string, delete_type: string) => {
+    const openDialog2 = (file_id: string, lead_id: string, project_id: string, type: string, folder_name: string, sub_folder_name_first: string, sub_folder_name_second: string, deleted_type: string) => {
         setIsOpen2(true)
-        setDeleteData({ file_id, lead_id, project_id, type, folder_name, sub_folder_name_first, sub_folder_name_second, delete_type })
+        setDeleteData({ file_id, lead_id, project_id, type, folder_name, sub_folder_name_first, sub_folder_name_second, deleted_type })
     }
 
     const onDialogClose2 = () => {
         setIsOpen2(false)
     }
 
-    const openDialog3 = (file_id: string, lead_id: string, project_id: string, type: string, folder_name: string, sub_folder_name_first: string, sub_folder_name_second: string) => {
+    const openDialog3 = (file_id: string, lead_id: string, project_id: string, type: string, folder_name: string, sub_folder_name_first: string, sub_folder_name_second: string, deleted_type:any) => {
         setIsOpen3(true)
-        setRestoreData({ file_id, lead_id, project_id, type, folder_name, sub_folder_name_first, sub_folder_name_second })
+        setRestoreData({ file_id, lead_id, project_id, type, folder_name, sub_folder_name_first, sub_folder_name_second, deleted_type })
     }
 
     const onDialogClose3 = () => {
@@ -189,17 +191,16 @@ const PaginationTable = () => {
 
         const postData = {
             user_id: localStorage.getItem('userId'),
-            file_id: deleteData.file_id,
-            lead_id: deleteData.lead_id,
-            project_id: deleteData.project_id,
-            type: deleteData.type,
+            file_id: deleteData?.file_id,
+            lead_id: deleteData?.lead_id,
+            project_id: deleteData?.project_id,
+            type: deleteData?.type,
             folder_name: deleteData.folder_name,
-            sub_folder_name_first: deleteData.sub_folder_name_first,
-            sub_folder_name_second: deleteData.sub_folder_name_second,
-            delete_type: deleteData.delete_type,
+            sub_folder_name_first: deleteData?.sub_folder_name_first,
+            sub_folder_name_second: deleteData?.sub_folder_name_second,
+            delete_type: (deleteData?.deleted_type === 'folder') ? 'folder' : deleteData?.deleted_type,
             org_id,
         };
-        // console.log(postData);
 
         try {
             const response = await apiGetCrmFileManagerDeleteArchiveFiles(postData);
@@ -222,6 +223,10 @@ const PaginationTable = () => {
     }
 
     const Restore = async () => {
+
+        
+
+        
         const postData = {
             user_id: localStorage.getItem('userId'),
             file_id: restoreData?.file_id,
@@ -231,10 +236,9 @@ const PaginationTable = () => {
             folder_name: restoreData?.folder_name,
             sub_folder_name_first: restoreData?.sub_folder_name_first,
             sub_folder_name_second: restoreData?.sub_folder_name_second,
-            restore_type: restoreData?.file_id ? 'file' : 'folder',
+            restore_type: (restoreData?.deleted_type === 'folder') ? 'folder' : restoreData?.file_id ? 'file' : 'folder',
             org_id,
         }
-        //    console.log('postData',postData);
 
         try {
             const respone = await apiGetCrmFileManagerArchiveRestore(postData);
@@ -276,12 +280,15 @@ const PaginationTable = () => {
                     const project_name = row.original.project_name;
                     const lead_name = row.original.lead_name;
                     const fileName = file && file.fileName;
-                    const folderName = file && file.folder_name;
+                    const folderName = row.original.folder_name;
+                    const subfolderNameFirst = row.original.sub_folder_name_first;
+                    const subfolderNameSecond = row.original.sub_folder_name_second;
                     const subfolderName = file && file.sub_folder_name_second;
+                    const deleted_type = row.original.deleted_type;
                     const navigate = useNavigate()
                     return (
                         <div>
-                            {
+                            { (subfolderNameFirst && !subfolderNameSecond) ?  <div className='  flex items-center gap-2' >{<AiOutlineFolder />}{subfolderNameFirst}</div>:(subfolderNameFirst && subfolderNameSecond && deleted_type==='file' ) ?  <div className='  flex items-center gap-2' >{<AiOutlineFolder />}{fileName}</div> : (subfolderNameFirst && subfolderNameSecond) ?  <div className='  flex items-center gap-2' >{<AiOutlineFolder />}{subfolderNameSecond}</div>:
                                 fileName
                                     ? <a href={file.fileUrl} target="_blank" rel="noopener noreferrer" className=' cursor-pointer text-md flex items-center gap-2'>{<AiOutlineFile />}{fileName}</a>
                                     : <div className='  flex items-center gap-2' >{<AiOutlineFolder />}{folderName || subfolderName}</div>
@@ -295,11 +302,22 @@ const PaginationTable = () => {
                 header: "Location",
                 id: 'location',
                 cell: ({ row }) => {
+
+                    const type = row.original.type
+                    const lead_id = row.original.lead_id
+                    const project_id = row.original.project_id
                     return (
-                        <div className="flex items-center gap-2">
-                            {row.original.lead_name.length > 0 ? `FileManager/Lead/${row.original.lead_name}/${row.original.folder_name}` : row.original.project_name.length > 0 ? `FileManager/Project/${row.original.project_name}/${row.original.folder_name}` :
-                                `FileManager/Company Data/${row.original.folder_name}/${row.original.sub_folder_name_first}/${row.original.sub_folder_name_second}`}
+
+                        <div>
+
+                            {
+                                type === 'Drawing' && lead_id ?  `FileManager/Lead/${row.original?.folder_name}${row.original?.sub_folder_name_first ? `/${row.original?.sub_folder_name_first}` : ''}${row.original?.sub_folder_name_second ? `/${row.original?.sub_folder_name_second}` : ''}`  : type === 'Drawing' && project_id ?  `FileManager/Project/${row.original?.folder_name}${row.original?.sub_folder_name_first ? `/${row.original?.sub_folder_name_first}` : ''}${row.original?.sub_folder_name_second ? `/${row.original?.sub_folder_name_second}` : ''}`  :  <div className="flex items-center gap-2">
+                                {row.original.lead_name?.length > 0 ? `FileManager/Lead/${row.original.lead_name}/${row.original.folder_name}` : row.original.project_name?.length > 0 ? `FileManager/Project/${row.original.project_name}/${row.original.folder_name}` :
+                                    `FileManager/Company Data/${row.original.folder_name}/${row.original.sub_folder_name_first}/${row.original.sub_folder_name_second}`}
+                            </div>
+                            }
                         </div>
+                        
                     )
                 }
             },
@@ -330,14 +348,14 @@ const PaginationTable = () => {
                 accessorKey: 'action',
                 id: 'action',
                 cell: ({ row }) => {
-                    const fileId = row.original.files[0].fileId
+                    const fileId = row.original.files[0]?.fileId
                     const leadId = row.original.lead_id
                     const projectId = row.original.project_id
                     const type = row.original.type
                     const folder_name = row.original.folder_name
                     const sub_folder_name_first = row.original.sub_folder_name_first || '';
                     const sub_folder_name_second = row.original.sub_folder_name_second || '';
-                    const delete_type = row.original.files[0].folder_name ? 'folder' : 'file';
+                    const deleted_type = row.original.deleted_type;
                     const role = localStorage.getItem('role') || '';
                     const { roleData } = useRoleContext();
                     const restoreAccess = role === 'SUPERADMIN' ? true : roleData?.data?.archive?.restore?.includes(role);
@@ -357,6 +375,7 @@ const PaginationTable = () => {
                                         folder_name,
                                         sub_folder_name_first,
                                         sub_folder_name_second,
+                                        deleted_type
                                     )} />
                                 </span>
                             </Tooltip>
@@ -376,7 +395,7 @@ const PaginationTable = () => {
                                                 folder_name,
                                                 sub_folder_name_first,
                                                 sub_folder_name_second,
-                                                delete_type
+                                                deleted_type
                                             )
                                         }
                                     />
@@ -392,7 +411,8 @@ const PaginationTable = () => {
         []
     )
 
-    const [filesData, setFilesData] = useState<DataItem[]>([])
+    
+
     const [loading, setLoading] = useState(true)
     const userId = localStorage.getItem('userId')
     const navigate = useNavigate()
@@ -401,7 +421,6 @@ const PaginationTable = () => {
             const response = await apiGetCrmFileManagerArchive(userId)
             setLoading(false)
             setFilesData(response.data)
-            // console.log(response);
             // console.log(filesData)
         }
         fetchData()
@@ -557,9 +576,9 @@ const PaginationTable = () => {
                     onConfirm={() => deleteArchive(
                         deleteData
                     )}
-                    title={`Delete ${deleteData?.delete_type}`}
+                    title={`Delete ${deleteData?.deleted_type}`}
                     onRequestClose={onDialogClose2}>
-                    <p> Are you sure, delete this {deleteData?.delete_type} permanently? </p>
+                    <p> Are you sure, delete this {deleteData?.deleted_type} permanently? </p>
                 </ConfirmDialog>
                 <ConfirmDialog
                     isOpen={dialogIsOpen3}

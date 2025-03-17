@@ -121,6 +121,7 @@ const Index = () => {
   const queryParams = new URLSearchParams(location.search);
   // const leadId = queryParams.get('lead_id') || '';
   const projectId = queryParams.get('project_id') || '';
+  const leadId = queryParams.get('lead_id') || '';
   const leadName = queryParams.get('lead_name');
   const projectName = queryParams.get('project_name');
   const folderName = queryParams.get('folder_name');
@@ -233,10 +234,8 @@ const Index = () => {
       try {
         // const leadData = await apiGetCrmFileManagerLeads(projectId);
         const res2 = await apiGetCrmFileManagerDrawingData('', projectId, 'Drawing')
-        console.log(res2.data.DrawingData)
 
         const data = res2.data.DrawingData
-        console.log(data)
 
         const res = data?.flatMap((obj:any) => obj.files || [])
             .find((item:any) => 
@@ -246,7 +245,6 @@ const Index = () => {
             ) || null; // Return null if no match is found
         
           
-        console.log(res)
 
         
         // setLeadData(result)
@@ -289,12 +287,45 @@ const Index = () => {
       return;
     }
 
-    const postData = {
+    let postData :any = {
       file_id: selectedFiles,
       folder_name: folderName,
       project_id: projectId,
       org_id,
     };
+
+    if(leadId) {
+      if(folderName === 'Drawing') {
+
+        if(sub_folder_name_first && sub_folder_name_second) {
+          postData = {
+            file_id: selectedFiles,
+            folder_name: folderName,
+            type: 'Drawing',
+            sub_folder_name_first,
+            sub_folder_name_second,
+            lead_id: leadId,
+            org_id,
+          }
+        }
+      }
+    } else if(projectId) { 
+      if(folderName === 'Drawing') {
+
+        if(sub_folder_name_first && sub_folder_name_second) {
+          postData = {
+            file_id: selectedFiles,
+            folder_name: folderName,
+            type: 'Drawing',
+            sub_folder_name_first,
+            sub_folder_name_second,
+            project_id: projectId,
+            org_id,
+          }
+        }
+      }
+    }
+
     try {
       await apiDeleteFileManagerFiles(postData);
       toast.push(
@@ -581,7 +612,6 @@ const Index = () => {
   // const role = localStorage.getItem('role')
 
   // console.log(folderName, drawingFolders)
-  console.log("leadData", leadData)
 
   const table = useReactTable({
     data:leadData,
@@ -644,13 +674,27 @@ const Index = () => {
                       <span className="mx-2">/</span>
                     </li>
                     <li>
-                      <Link to={`/app/crm/fileManager/projects?project_id=${projectId}&project_name=${projectName}`} className="text-blue-600 dark:text-blue-400 hover:underline">{leadName}</Link>
+                      <Link to={`/app/crm/fileManager/projects?project_id=${projectId}&project_name=${projectName}`} className="text-blue-600 dark:text-blue-400 hover:underline">{projectName}</Link>
                     </li>
                     <li>
                       <span className="mx-2">/</span>
                     </li>
 
-                    <li className="text-gray-500">{folderName}</li>
+                    <li className="text-gray-500">
+                      <Link to={`/app/crm/fileManager/project/folder?project_id=${projectId}&project_name=${projectName}&folder_name=${folderName}`} className="text-blue-600 dark:text-blue-400 hover:underline">{folderName}</Link>
+                    </li>
+                    <li>
+                      <span className="mx-2">/</span>
+                    </li>
+
+                    <li className="text-gray-500">
+                      <Link to={`/app/crm/fileManager/projects/folder/firstfolder?project_id=${projectId}&project_name=${projectName}&folder_name=${folderName}&sub_folder_name_first=${sub_folder_name_first}`} className="text-blue-600 dark:text-blue-400 hover:underline">{sub_folder_name_first}</Link>
+                    </li>
+                    <li>
+                      <span className="mx-2">/</span>
+                    </li>
+
+                    <li className="text-gray-500">{sub_folder_name_second}</li>
                   </ol>
                 </nav>
               </div>

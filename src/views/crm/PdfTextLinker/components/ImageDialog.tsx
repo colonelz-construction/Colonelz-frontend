@@ -4,7 +4,6 @@ import "yet-another-react-lightbox/styles.css";
 
 const ImageDialog = ({ dialogIsOpen, onDialogClose, url }: any) => {
 
-    console.log(url)
   return (
     <Lightbox
       plugins={[Zoom]}

@@ -9,6 +9,7 @@ import NoData from '@/views/pages/NoData'
 import { Tasks } from '../store'
 import { useNavigate } from 'react-router-dom'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
+import TaskTimer from './TaskTimer'
 
 export type OpenTasks = {
     task_id: string;
@@ -146,7 +147,10 @@ const TaskDetails = () => {
                         headerClass="p-0"
                         footerBorder={false}
                         headerBorder={false}
-                    >
+                        >
+
+                        {taskData && <TaskTimer data={taskData}/>}
+
                         <CustomerInfoField title='Created On' value={formateDate(taskData.task_createdOn)} />
                         <CustomerInfoField title='Created By' value={taskData.task_createdBy} />
                         <CustomerInfoField title='Name' value={taskData.task_name} />

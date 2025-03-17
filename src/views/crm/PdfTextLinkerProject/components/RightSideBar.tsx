@@ -32,7 +32,6 @@ const RightSideBar: React.FC<ExpandableFolderListProps> = ({ folders }) => {
     const location=useLocation()
     const queryParams=new URLSearchParams(location.search)
 
-    console.log(folders)
 
     const toggleExpand = (folderId: string) => {
         setExpandedFolders((prev) => ({

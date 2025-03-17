@@ -18,6 +18,7 @@ import { CiPause1 } from 'react-icons/ci';
 import { GiSquare } from "react-icons/gi";
 import { apiGetCrmOpenSingleSubTaskDataTimer, apiGetCrmOpenSingleSubTaskTimer, apiGetCrmProjectsSingleSubTaskDataTimer, apiGetCrmProjectsSingleSubTaskTimer } from '@/services/CrmService';
 import { time } from 'console';
+import SubTaskTimer from './SubTaskTimer';
 
 export type TimerResponse = {
   code: number;
@@ -312,19 +313,9 @@ const SubTaskDetails = (Data:any) => {
 
                 <div className="p-4">
                     <TabContent value="tab1">
-                    <div className='flex  gap-4 items-center mb-5'>
 
-                      {(Data.data.sub_task_status==='Completed' || Data.data.sub_task_status==='Cancelled') || Data.data.sub_task_status==='Pending' || ((role !== 'SUPERADMIN' && role !== 'ADMIN') && Data.data.sub_task_assignee !== Data?.users?.find((u:any) => u.UserId === userId)?.username)?
-                      
-                      (<><Button className='!rounded-full shadow-md' variant='twoTone' size='sm'disabled ><IoPlayOutline className='font-bold'/></Button>
-                      <Button className='!rounded-full shadow-md' variant='twoTone' size='sm'disabled ><PiSquareThin/></Button></>):
+                    <SubTaskTimer isShow={Data.isShow} user={Data.user} data={Data.data}/>
 
-                    <><span  className=''  onClick={timerData.isRunning?handlePause:handleStart}>
-                            {timerData.isRunning?<Button className='!rounded-full shadow-md' variant='twoTone' size='sm' ><CiPause1 className='font-bold'/></Button>:<Button className='!rounded-full shadow-md' variant='twoTone' size='sm'><IoPlayOutline className=''/></Button>}</span>
-                                <Button className='!rounded-full shadow-md' variant='twoTone' size='sm' onClick={handleReset} disabled={Data.data.sub_task_status==='Completed'?true:false}><PiSquareThin/></Button></>    }
-                            <h5>{formatTime()}</h5>
-      
-    </div>
                     <CustomerInfoField title="Creator" value={Data.data.sub_task_createdBy} />
                     <CustomerInfoField title="Created On" value={formateDate(Data.data.sub_task_createdOn)} />
                     <div className='p-1'> </div>

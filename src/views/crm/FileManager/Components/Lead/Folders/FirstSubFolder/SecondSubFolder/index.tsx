@@ -232,10 +232,8 @@ const Index = () => {
       try {
         // const leadData = await apiGetCrmFileManagerLeads(leadId);
         const res2 = await apiGetCrmFileManagerDrawingData(leadId, '', 'Drawing')
-        console.log(res2.data.DrawingData)
 
         const data = res2.data.DrawingData
-        console.log(data)
 
         const res = data?.flatMap((obj:any) => obj.files || [])
             .find((item:any) => 
@@ -245,7 +243,6 @@ const Index = () => {
             ) || null; // Return null if no match is found
         
           
-        console.log(res)
 
         
         // setLeadData(result)
@@ -288,12 +285,44 @@ const Index = () => {
       return;
     }
 
-    const postData = {
+    let postData :any = {
       file_id: selectedFiles,
       folder_name: folderName,
       lead_id: leadId,
       org_id,
     };
+
+    if(leadId) {
+      if(folderName === 'Drawing') {
+
+        if(sub_folder_name_first && sub_folder_name_second) {
+          postData = {
+            file_id: selectedFiles,
+            folder_name: folderName,
+            type: 'Drawing',
+            sub_folder_name_first,
+            sub_folder_name_second,
+            lead_id: leadId,
+            org_id,
+          }
+        }
+      }
+    } else if(projectId) { 
+      if(folderName === 'Drawing') {
+
+        if(sub_folder_name_first && sub_folder_name_second) {
+          postData = {
+            file_id: selectedFiles,
+            folder_name: folderName,
+            type: 'Drawing',
+            sub_folder_name_first,
+            sub_folder_name_second,
+            project_id: projectId,
+            org_id,
+          }
+        }
+      }
+    }
     try {
       await apiDeleteFileManagerFiles(postData);
       toast.push(
@@ -580,7 +609,6 @@ const Index = () => {
   // const role = localStorage.getItem('role')
 
   // console.log(folderName, drawingFolders)
-  console.log("leadData", leadData)
 
   const table = useReactTable({
     data:leadData,
@@ -649,7 +677,23 @@ const Index = () => {
                       <span className="mx-2">/</span>
                     </li>
 
-                    <li className="text-gray-500">{folderName}</li>
+                    <li>
+                      <Link to={`/app/crm/fileManager/leads/folder?lead_id=${leadId}&lead_name=${leadName}&folder_name=${folderName}`} className="text-blue-600 dark:text-blue-400 hover:underline">{folderName}</Link>
+                    </li>
+                    <li>
+                      <span className="mx-2">/</span>
+                    </li>
+
+                    <li>
+                      <Link to={`/app/crm/fileManager/leads/folder/firstfolder?lead_id=${leadId}&lead_name=${leadName}&folder_name=${folderName}&sub_folder_name_first=${sub_folder_name_first}`} className="text-blue-600 dark:text-blue-400 hover:underline">{sub_folder_name_first}</Link>
+                    </li>
+                    <li>
+                      <span className="mx-2">/</span>
+                    </li>
+
+                    <li>
+                      {sub_folder_name_second}
+                    </li>
                   </ol>
                 </nav>
               </div>

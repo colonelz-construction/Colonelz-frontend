@@ -27,9 +27,10 @@ export type Task = {
   type Data={
     users:String[]
     data:any
+    showButton:any
   }
 
-const AddSubTask = ({data,users}:Data) => {
+const AddSubTask = ({showButton, data,users}:Data) => {
 
     // console.log(users)
     const [dialogIsOpen, setIsOpen] = useState(false)
@@ -71,7 +72,7 @@ const priorityOptions = [
 
     return (
         <div>
-            <Button onClick={openDialog}  variant='solid' size='sm' className=' rounded-lg'> Add Subtask</Button>
+            <Button onClick={openDialog} disabled={showButton}  variant='solid' size='sm' className=' rounded-lg'> Add Subtask</Button>
             <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
                 <div className="pl-4 ">
                     <h3>Add New Subtask</h3>

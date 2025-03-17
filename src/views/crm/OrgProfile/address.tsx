@@ -10,11 +10,17 @@ const userId: any = localStorage.getItem('userId');
 
 
 interface FormValues {
-    billing_shipping_address: string;
-    country: string;
-    state: string;
-    city: string;
-    zipcode: string;
+    billing_address: string;
+    billing_country: string;
+    billing_state: string;
+    billing_city: string;
+    billing_zipcode: string;
+
+    shipping_address: string;
+    shipping_country: string;
+    shipping_state: string;
+    shipping_city: string;
+    shipping_zipcode: string;
 }
 
 const validationSchema = Yup.object().shape({
@@ -28,11 +34,17 @@ const validationSchema = Yup.object().shape({
 const Address = () => {
     const [details, setDetails] = useState<FormValues | null>(null);
     const [initialValues, setInitialValues] = useState<FormValues>({
-        billing_shipping_address: '',
-        country: '',
-        state: '',
-        city: '',
-        zipcode: '',
+        billing_address: '',
+        billing_country: '',
+        billing_state: '',    
+        billing_city: '',
+        billing_zipcode: '',
+
+        shipping_address: '',
+        shipping_country: '',
+        shipping_state: '',
+        shipping_city: '',
+        shipping_zipcode: '',
     });
 
     useEffect(() => {
@@ -50,11 +62,17 @@ const Address = () => {
     useEffect(() => {
         if (details) {
             setInitialValues({
-                billing_shipping_address: details.billing_shipping_address || '',
-                country: details.country || '',
-                state: details.state || '',
-                city: details.city || '',
-                zipcode: details.zipcode || '',
+                billing_address: details.billing_address || '',
+                billing_country: details.billing_country || '',
+                billing_state: details.billing_state || '',
+                billing_city: details.billing_city || '',
+                billing_zipcode: details.billing_zipcode || '',
+
+                shipping_address: details.shipping_address || '',
+                shipping_country: details.shipping_country || '',
+                shipping_state: details.shipping_state || '',
+                shipping_city: details.shipping_city || '',
+                shipping_zipcode: details.shipping_zipcode || '',
             });
         }
     }, [details]);
@@ -92,8 +110,10 @@ const Address = () => {
 };
 
 const FormContent = ({ setFieldValue, values, details }: { setFieldValue: (field: string, value: any) => void; values: FormValues; details: FormValues | null }) => {
-    const [states, setStates] = useState<any[]>([]);
-    const [cities, setCities] = useState<any[]>([]);
+    const [billingStates, setBillingStates] = useState<any[]>([]);
+    const [billingCities, setBillingCities] = useState<any[]>([]);
+    const [shippingStates, setShippingStates] = useState<any[]>([]);
+    const [shippingCities, setShippingCities] = useState<any[]>([]);
 
     const countries = Country.getAllCountries().map(country => ({
         value: country.isoCode,
@@ -101,90 +121,177 @@ const FormContent = ({ setFieldValue, values, details }: { setFieldValue: (field
     }));
 
     useEffect(() => {
-        if (values.country) {
-            const statesList = State.getStatesOfCountry(values.country);
-            setStates(statesList);
-            setCities([]);
-            if (!statesList.some(state => state.isoCode === values.state)) {
-                setFieldValue('state', '');
-                setFieldValue('city', '');
+        if (values.billing_country) {
+            const statesList = State.getStatesOfCountry(values.billing_country);
+            setBillingStates(statesList);
+            setBillingCities([]);
+            if (!statesList.some(state => state.isoCode === values.billing_state)) {
+                setFieldValue('billing_state', '');
+                setFieldValue('billing_city', '');
             }
         } else {
-            setStates([]);
-            setCities([]);
+            setBillingStates([]);
+            setBillingCities([]);
         }
-    }, [values.country]);
+    }, [values.billing_country]);
 
     useEffect(() => {
-        if (values.state) {
-            const citiesList = City.getCitiesOfState(values.country, values.state);
-            setCities(citiesList);
-            if (!citiesList.some(city => city.name === values.city)) {
-                setFieldValue('city', '');
+        if (values.billing_state) {
+            const citiesList = City.getCitiesOfState(values.billing_country, values.billing_state);
+            setBillingCities(citiesList);
+            if (!citiesList.some(city => city.name === values.billing_city)) {
+                setFieldValue('billing_city', '');
             }
         } else {
-            setCities([]);
+            setBillingCities([]);
         }
-    }, [values.state]);
+    }, [values.billing_state]);
+
+    useEffect(() => {
+        if (values.shipping_country) {
+            const statesList = State.getStatesOfCountry(values.shipping_country);
+            setShippingStates(statesList);
+            setShippingCities([]);
+            if (!statesList.some(state => state.isoCode === values.shipping_state)) {
+                setFieldValue('shipping_state', '');
+                setFieldValue('shipping_city', '');
+            }
+        } else {
+            setShippingStates([]);
+            setShippingCities([]);
+        }
+    }, [values.shipping_country]);
+
+    useEffect(() => {
+        if (values.shipping_state) {
+            const citiesList = City.getCitiesOfState(values.shipping_country, values.shipping_state);
+            setShippingCities(citiesList);
+            if (!citiesList.some(city => city.name === values.shipping_city)) {
+                setFieldValue('shipping_city', '');
+            }
+        } else {
+            setShippingCities([]);
+        }
+    }, [values.shipping_state]);
 
     return (
         <Form>
+            <h4 className='mb-3'>Billing Details</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                <FormItem label="Billing & Shipping Address">
-                    <Field component={Input} type="text" name="billing_shipping_address" placeholder="Billing & Shipping Address" />
-                    <ErrorMessage name="billing_shipping_address" component="div" className="text-red-600" />
+                <FormItem label="Billing Address">
+                    <Field component={Input} type="text" name="billing_address" placeholder="Billing Address" />
+                    <ErrorMessage name="billing_address" component="div" className="text-red-600" />
                 </FormItem>
 
-                <FormItem label="Country">
-                    <Field name="country">
+                <FormItem label="Billing Country">
+                    <Field name="billing_country">
                         {({ field }: FieldProps) => (
                             <Select
                                 options={countries}
-                                onChange={(option) => setFieldValue('country', option?.value || '')}
+                                onChange={(option) => setFieldValue('billing_country', option?.value || '')}
                                 value={countries.find(option => option.value === field.value) || null}
                                 placeholder="Select Country"
                             />
                         )}
                     </Field>
-                    <ErrorMessage name="country" component="div" className="text-red-600" />
+                    <ErrorMessage name="billing_country" component="div" className="text-red-600" />
                 </FormItem>
 
-                <FormItem label="State">
-                    <Field name="state">
+                <FormItem label="Billing State">
+                    <Field name="billing_state">
                         {({ field }: FieldProps) => (
                             <Select
-                                options={states.map(state => ({ value: state.isoCode, label: state.name }))}
+                                options={billingStates.map(state => ({ value: state.isoCode, label: state.name }))}
                                 onChange={(option) => {
-                                    setFieldValue('state', option?.value || '');
-                                    setFieldValue('city', '');
+                                    setFieldValue('billing_state', option?.value || '');
+                                    setFieldValue('billing_city', '');
                                 }}
-                                value={states.find(state => state.isoCode === field.value) ? { value: field.value, label: states.find(state => state.isoCode === field.value)?.name || '' } : null}
+                                value={billingStates.find(state => state.isoCode === field.value) ? { value: field.value, label: billingStates.find(state => state.isoCode === field.value)?.name || '' } : null}
                                 placeholder="Select State"
-                                isDisabled={!values.country}
+                                isDisabled={!values.billing_country}
                             />
                         )}
                     </Field>
-                    <ErrorMessage name="state" component="div" className="text-red-600" />
+                    <ErrorMessage name="billing_state" component="div" className="text-red-600" />
                 </FormItem>
 
-                <FormItem label="City">
-                    <Field name="city">
+                <FormItem label="Billing City">
+                    <Field name="billing_city">
                         {({ field }: FieldProps) => (
                             <Select
-                                options={cities.map(city => ({ value: city.name, label: city.name }))}
-                                onChange={(option) => setFieldValue('city', option?.value || '')}
-                                value={cities.find(city => city.name === field.value) ? { value: field.value, label: field.value } : null}
+                                options={billingCities.map(city => ({ value: city.name, label: city.name }))}
+                                onChange={(option) => setFieldValue('billing_city', option?.value || '')}
+                                value={billingCities.find(city => city.name === field.value) ? { value: field.value, label: field.value } : null}
                                 placeholder="Select City"
-                                isDisabled={!values.state}
+                                isDisabled={!values.billing_state}
                             />
                         )}
                     </Field>
-                    <ErrorMessage name="city" component="div" className="text-red-600" />
+                    <ErrorMessage name="billing_city" component="div" className="text-red-600" />
                 </FormItem>
 
-                <FormItem label="ZIP Code">
-                    <Field component={Input} type="text" name="zipcode" placeholder="ZIP Code" />
-                    <ErrorMessage name="zipcode" component="div" className="text-red-600" />
+                <FormItem label="Billing ZIP Code">
+                    <Field component={Input} type="text" name="billing_zipcode" placeholder="ZIP Code" />
+                    <ErrorMessage name="billing_zipcode" component="div" className="text-red-600" />
+                </FormItem>
+            </div>
+            <h4 className='mb-3'>Shipping Details</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <FormItem label="Shipping Address">
+                    <Field component={Input} type="text" name="shipping_address" placeholder="Shipping Address" />
+                    <ErrorMessage name="shipping_address" component="div" className="text-red-600" />
+                </FormItem>
+
+                <FormItem label="Shipping Country">
+                    <Field name="shipping_country">
+                        {({ field }: FieldProps) => (
+                            <Select
+                                options={countries}
+                                onChange={(option) => setFieldValue('shipping_country', option?.value || '')}
+                                value={countries.find(option => option.value === field.value) || null}
+                                placeholder="Select Country"
+                            />
+                        )}
+                    </Field>
+                    <ErrorMessage name="shipping_country" component="div" className="text-red-600" />
+                </FormItem>
+
+                <FormItem label="Shipping State">
+                    <Field name="shipping_state">
+                        {({ field }: FieldProps) => (
+                            <Select
+                                options={shippingStates.map(state => ({ value: state.isoCode, label: state.name }))}
+                                onChange={(option) => {
+                                    setFieldValue('shipping_state', option?.value || '');
+                                    setFieldValue('shipping_city', '');
+                                }}
+                                value={shippingStates.find(state => state.isoCode === field.value) ? { value: field.value, label: shippingStates.find(state => state.isoCode === field.value)?.name || '' } : null}
+                                placeholder="Select State"
+                                isDisabled={!values.shipping_country}
+                            />
+                        )}
+                    </Field>
+                    <ErrorMessage name="shipping_state" component="div" className="text-red-600" />
+                </FormItem>
+
+                <FormItem label="Shipping City">
+                    <Field name="shipping_city">
+                        {({ field }: FieldProps) => (
+                            <Select
+                                options={shippingCities.map(city => ({ value: city.name, label: city.name }))}
+                                onChange={(option) => setFieldValue('shipping_city', option?.value || '')}
+                                value={shippingCities.find(city => city.name === field.value) ? { value: field.value, label: field.value } : null}
+                                placeholder="Select City"
+                                isDisabled={!values.shipping_state}
+                            />
+                        )}
+                    </Field>
+                    <ErrorMessage name="shipping_city" component="div" className="text-red-600" />
+                </FormItem>
+
+                <FormItem label="Shipping ZIP Code">
+                    <Field component={Input} type="text" name="shipping_zipcode" placeholder="ZIP Code" />
+                    <ErrorMessage name="shipping_zipcode" component="div" className="text-red-600" />
                 </FormItem>
             </div>
 

@@ -4,6 +4,8 @@ import * as Yup from 'yup'
 import { Button, FormItem, Input, Notification, Select, toast } from '@/components/ui'
 import { apiGetOrgData, apiEditOrgData } from '@/services/CrmService'
 import { Country, State, City } from 'country-state-city';
+import { GoPlus} from "react-icons/go";
+import { AiOutlineMinusCircle } from "react-icons/ai";
 const currencyUrl = import.meta.env.VITE_CURRENCY_URL;
 
 const org_id: any = localStorage.getItem('orgId')
@@ -59,7 +61,7 @@ const Primary = () => {
         org_state: '',
         org_country: '',
         org_zipcode: '',
-        });
+    });
     const [file, setFile] = useState<string>('');
     const [typeOptions, setTypeOptions] = useState<CurrencyOption[]>([]);
 
@@ -124,9 +126,9 @@ const Primary = () => {
         }
     }, [details]);
 
-   
 
-    
+
+
 
     const handleSubmit = async (values: FormValues, { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }) => {
         const formData = new FormData();
@@ -182,6 +184,18 @@ const FormContent = ({ setFieldValue, values, file, setFile, typeOptions }: { se
 
     const [fileName, setFileName] = useState<string | undefined>(undefined);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+    const [fields, setFields] = useState(["vat_tax_gst_number"]);
+
+    const addField = () => {
+        if (fields.length < 3) {
+            setFields([...fields, `vat_tax_gst_number_${fields.length + 1}`]);
+        }
+    };
+
+    const removeField = (index: number) => {
+        setFields(fields.filter((_, i) => i !== index));
+    };
 
     const countries = Country.getAllCountries().map(country => ({
         value: country.isoCode,
@@ -314,7 +328,7 @@ const FormContent = ({ setFieldValue, values, file, setFile, typeOptions }: { se
                         />
                     </FormItem>
 
-                    <FormItem label="Vat/Tax No/GST" asterisk>
+                    {/* <FormItem label="Vat/Tax No/GST" asterisk>
                         <Field
                             component={Input}
                             type="text"
@@ -326,6 +340,37 @@ const FormContent = ({ setFieldValue, values, file, setFile, typeOptions }: { se
                             component="div"
                             className=" text-red-600"
                         />
+                    </FormItem> */}
+
+                    <FormItem label="VAT/GST" asterisk>
+                        {fields.map((field, index) => (
+                            <div key={field} className="flex items-center gap-2 mb-2">
+                                <Field
+                                    component={Input}
+                                    type="text"
+                                    name={field}
+                                    placeholder="Vat/Tax No/GST"
+                                    className="flex-1"
+                                />
+                                {index > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => removeField(index)}
+                                    >
+                                        <AiOutlineMinusCircle size={18} />
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                        {fields.length < 3 && (
+                            <button
+                                type="button"
+                                onClick={addField}
+                                className="flex items-center gap-1 text-blue-500 mt-2"
+                            >
+                                <GoPlus size={18} /> Add Another
+                            </button>
+                        )}
                     </FormItem>
 
                     {/* <FormItem label="">

@@ -583,7 +583,7 @@ const Index = () => {
                     </div>
 
                     {queryType === "crm" && <div>
-                        <Dropdown renderTitle={Toggle} placement='middle-start-bottom'>
+                        <Dropdown renderTitle={Toggle} placement='top-center'>
                           
 
 

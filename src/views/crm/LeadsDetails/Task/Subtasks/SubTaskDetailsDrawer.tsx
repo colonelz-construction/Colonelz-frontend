@@ -7,18 +7,8 @@ import { Progress, Tabs } from '@/components/ui';
 import TabList from '@/components/ui/Tabs/TabList';
 import TabNav from '@/components/ui/Tabs/TabNav';
 import TabContent from '@/components/ui/Tabs/TabContent';
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdOutlineAdd } from 'react-icons/md';
-import { AiOutlineEye } from 'react-icons/ai';
-import { BiArrowFromRight } from 'react-icons/bi';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { IoMdSquareOutline } from 'react-icons/io';
-import { IoPlayOutline } from "react-icons/io5";
-import { PiPause, PiSquareThin } from "react-icons/pi";
-import { CiPause1 } from 'react-icons/ci';
-import { GiSquare } from "react-icons/gi";
-import { apiGetCrmLeadsSingleSubTaskDataTimer, apiGetCrmLeadsSingleSubTaskTimer, apiGetCrmProjectsSingleSubTaskDataTimer, apiGetCrmProjectsSingleSubTaskTimer } from '@/services/CrmService';
-import { time } from 'console';
-import SubTaskTimer from './SubtaskTimer';
+import SubTaskTimer from './SubTaskTimer';
 
 export type TimerResponse = {
   code: number;

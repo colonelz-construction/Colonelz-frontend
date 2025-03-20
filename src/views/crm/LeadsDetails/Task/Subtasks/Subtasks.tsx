@@ -28,7 +28,7 @@ import { ConfirmDialog } from '@/components/shared'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import Sorter from '@/components/ui/Table/Sorter'
-import SubTaskTimer from './SubtaskTimer'
+import SubTaskTimer from './SubTaskTimer'
 
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {

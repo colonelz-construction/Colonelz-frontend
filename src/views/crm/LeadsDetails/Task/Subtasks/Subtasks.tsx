@@ -28,6 +28,7 @@ import { ConfirmDialog } from '@/components/shared'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import Sorter from '@/components/ui/Table/Sorter'
+import SubTaskTimer from './SubtaskTimer'
 
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -237,7 +238,7 @@ const Subtasks = ({task,users}:any) => {
             header:'Subtask',
             accessorKey:'sub_task_name',
            cell:({row})=>{
-            return <SubTaskDetails data={row.original} users={users}/>
+            return <SubTaskDetails isShow={true} data={row.original} users={users}/>
            }
          },
          {
@@ -265,6 +266,13 @@ const Subtasks = ({task,users}:any) => {
                 accessorKey:'estimated_sub_task_end_date',
                 cell:({row})=>{
                     return <div>{formateDate(row.original.estimated_sub_task_end_date)}</div>
+                }
+            },
+            {
+                header:'Watch',
+                accessorKey:'',
+                cell:({row})=>{
+                    return (row.original && <SubTaskTimer isShow={false} users={users} data={row.original}/>)
                 }
             },
             {

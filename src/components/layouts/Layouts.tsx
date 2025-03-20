@@ -1,5 +1,6 @@
 import { useMemo, lazy, Suspense } from 'react'
 import Loading from '@/components/shared/Loading'
+import FloatingButton from '../ui/FloatingButton'
 import { useAppSelector } from '@/store'
 import {
     LAYOUT_TYPE_CLASSIC,
@@ -48,7 +49,7 @@ const Layout = () => {
         >
             
             <AppLayout />
-            
+            <FloatingButton/>
         </Suspense>
     )
 }

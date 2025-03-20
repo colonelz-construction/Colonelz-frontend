@@ -40,6 +40,7 @@ const navigationIcon: NavigationIcons = {
     chatbot: <TbMessageChatbot />,
     project: <HiOutlineChartSquareBar />,
     crm: <HiOutlineUserGroup />,
+    visualizer: <HiOutlineUserGroup />,
     salesa: <HiOutlineTrendingUp />,
     dashboard:<MdOutlineDashboard/>,
     task:<BiTask/>,

@@ -23,6 +23,7 @@ export  type DataItem = {
     type: string;
     created_at: string;
     deleted_name : string;
+    deleted_type : any;
   };
   
 export type Response = {

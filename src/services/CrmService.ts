@@ -862,6 +862,36 @@ export async function apiGetCrmProjectsSingleSubTaskTimer(Data: any) { // org do
     })
 }
 
+export async function apiGetCrmProjectsSingleTaskTimer(Data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/update/task/time`,
+        method: 'put',
+        data: Data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmLeadsSingleTaskTimer(Data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/update/leadtask/time`,
+        method: 'put',
+        data: Data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmOpenSingleTaskTimer(Data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/update/opentask/time`,
+        method: 'put',
+        data: Data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmOpenSingleSubTaskTimer(Data: any) { // org done
     return ApiService.fetchData<any>({
         url: `admin/update/opensubtask/time`,
@@ -890,6 +920,44 @@ export async function apiGetCrmProjectsSingleSubTaskDataTimer<T>( // org done
 ) {
     return ApiService.fetchData<TimerResponse>({
         url: `admin/get/subtask/time?project_id=${projectId}&task_id=${taskId}&sub_task_id=${subTaskId}&org_id=${localStorage.getItem('orgId')}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmProjectsSingleTaskDataTimer<T>( // org done
+    projectId: string,
+    taskId: string,
+    org_id: string | null
+) {
+    return ApiService.fetchData<TimerResponse>({
+        url: `admin/get/task/time?project_id=${projectId}&task_id=${taskId}&org_id=${localStorage.getItem('orgId')}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmLeadsSingleTaskDataTimer<T>( // org done
+    leadId: string,
+    taskId: any,
+    org_id: string | null
+) {
+    return ApiService.fetchData<TimerResponse>({
+        url: `admin/get/leadtask/time?lead_id=${leadId}&task_id=${taskId}&org_id=${localStorage.getItem('orgId')}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmOpenSingleTaskDataTimer<T>( // org done
+    taskId: string,
+    org_id: string | null
+) {
+    return ApiService.fetchData<TimerResponse>({
+        url: `admin/get/opentask/time?task_id=${taskId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -952,6 +1020,15 @@ export async function apiGetCrmFileManagerCompanyData<T>() { // org done
     })
 }
 
+export async function apiGetCrmFileManagerDrawingData<T>(lead_id:any, project_id:any, type:any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/getdrawingfile?org_id=${localStorage.getItem('orgId')}&user_id=${localStorage.getItem('userId')}&lead_id=${lead_id}&project_id=${project_id}&type=${type}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmFileManagerArchive<T>(userId: string | null) { // org done
     return ApiService.fetchData<ArchiveResponse>({
         url: `admin/get/archive?user_id=${userId}&org_id=${localStorage.getItem('orgId')}`,
@@ -961,6 +1038,15 @@ export async function apiGetCrmFileManagerArchive<T>(userId: string | null) { //
     })
 }
 
+export async function apiGetCrmFileManagerDrawingUpload(Formdata: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/drawingupload',
+        method: 'post',
+        data: Formdata,
+    }).then((response) => {
+        return response.data
+    })
+}
 export async function apiGetCrmFileManagerArchiveRestore(Formdata: any) { // org done
     return ApiService.fetchData<any>({
         url: 'admin/restore/file',
@@ -1088,6 +1174,50 @@ export async function apiGetCrmUsersInContractFileApproval<T>(leadId :any) {  //
     return ApiService.fetchData<any>({
         url: `admin/getfile/approval?org_id=${localStorage.getItem('orgId')}&user_id=${localStorage.getItem('userId')}&lead_id=${leadId}`,
         method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmMainThreeImage<T>(type:any, img_id:any, lead_id:any, project_id:any) { // org done
+    return ApiService.fetchData<ArchiveResponse>({
+        url: `admin/get/all/mainthreeimage?user_id=${localStorage.getItem('userId')}&org_id=${localStorage.getItem('orgId')}&type=${type}&img_id=${img_id}&project_id=${project_id}&lead_id=${lead_id}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiGetCrmImageById<T>(img_id:any, lead_id:any, project_id:any) { // org done
+    return ApiService.fetchData<ArchiveResponse>({
+        url: `admin/get/threeimage?user_id=${localStorage.getItem('userId')}&org_id=${localStorage.getItem('orgId')}&img_id=${img_id}&project_id=${project_id}&lead_id=${lead_id}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmPanoImagesFileManager<T>(lead_id:any, project_id:any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/get/all/panoimages?user_id=${localStorage.getItem('userId')}&org_id=${localStorage.getItem('orgId')}&lead_id=${lead_id}&project_id=${project_id}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiPostCrmThreeImage(data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/create/threeimage',
+        method: 'post',
+        data: data,
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiDeleteCrmMainImage(data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/delete/mainimage',
+        method: 'delete',
+        data: data,
     }).then((response) => {
         return response.data
     })

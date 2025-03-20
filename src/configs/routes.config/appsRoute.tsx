@@ -33,6 +33,14 @@ const appsRoute: Routes = [
         meta: {},
     },
     {
+        key: 'appsCrm.visualizer',
+        path: `${APP_PREFIX_PATH}/crm/visualizer`,
+        component: lazy(() => import('@/views/crm/Visualizer/Index')),
+
+        authority: [],
+        meta: {},
+    },
+    {
         key: 'appsCrm.ai-chatbot',
         path: `${APP_PREFIX_PATH}/crm/ai-chatbot`,
         component: lazy(() => import('@/views/crm/Chatbot/index')),

@@ -1179,6 +1179,50 @@ export async function apiGetCrmUsersInContractFileApproval<T>(leadId :any) {  //
     })
 }
 
+export async function apiGetCrmMainThreeImage<T>(type:any, img_id:any, lead_id:any, project_id:any) { // org done
+    return ApiService.fetchData<ArchiveResponse>({
+        url: `admin/get/all/mainthreeimage?user_id=${localStorage.getItem('userId')}&org_id=${localStorage.getItem('orgId')}&type=${type}&img_id=${img_id}&project_id=${project_id}&lead_id=${lead_id}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiGetCrmImageById<T>(img_id:any, lead_id:any, project_id:any) { // org done
+    return ApiService.fetchData<ArchiveResponse>({
+        url: `admin/get/threeimage?user_id=${localStorage.getItem('userId')}&org_id=${localStorage.getItem('orgId')}&img_id=${img_id}&project_id=${project_id}&lead_id=${lead_id}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmPanoImagesFileManager<T>(lead_id:any, project_id:any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/get/all/panoimages?user_id=${localStorage.getItem('userId')}&org_id=${localStorage.getItem('orgId')}&lead_id=${lead_id}&project_id=${project_id}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiPostCrmThreeImage(data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/create/threeimage',
+        method: 'post',
+        data: data,
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiDeleteCrmMainImage(data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/delete/mainimage',
+        method: 'delete',
+        data: data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmTimeline<T>(leadId: any) { //org done
     return ApiService.fetchData<any>({
         url: `admin/get/timeline/lead?lead_id=${leadId}&org_id=${localStorage.getItem('orgId')}`,

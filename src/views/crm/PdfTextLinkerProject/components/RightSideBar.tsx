@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
+import  Card  from "@/components/ui/Card";
 import { MdKeyboardArrowRight, MdExpandMore } from "react-icons/md";
-import { ActionLink } from "@/components/shared";
 import { useLocation } from "react-router-dom";
-import { Dialog } from "@/components/ui";
 import ImageDialog from "./ImageDialog";
 
 interface File {

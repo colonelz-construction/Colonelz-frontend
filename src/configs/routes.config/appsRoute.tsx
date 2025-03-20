@@ -35,7 +35,7 @@ const appsRoute: Routes = [
     {
         key: 'appsCrm.visualizer',
         path: `${APP_PREFIX_PATH}/crm/visualizer`,
-        component: lazy(() => import('@/views/crm/Visualizer/Index')),
+        component: lazy(() => import('@/views/crm/Visualizer')),
 
         authority: [],
         meta: {},
@@ -79,14 +79,14 @@ const appsRoute: Routes = [
     {
         key: 'appsCrm.blueperint',
         path: `${APP_PREFIX_PATH}/crm/leads/blueprint`,
-        component: lazy(() => import('@/views/crm/PdfTextLinker/index')),
+        component: lazy(() => import('@/views/crm/PdfTextLinker')),
 
         authority: [],
     },
     {
         key: 'appsCrm.blueperint',
         path: `${APP_PREFIX_PATH}/crm/projects/blueprint`,
-        component: lazy(() => import('@/views/crm/PdfTextLinkerProject/index')),
+        component: lazy(() => import('@/views/crm/PdfTextLinkerProject')),
 
         authority: [],
     },

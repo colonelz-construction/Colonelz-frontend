@@ -420,10 +420,7 @@ const ContractDetails = (data: FileItemProps) => {
             </>
         )
     }
-
     
-
-
     const columns =
         useMemo<ColumnDef<FileItem>[]>
             (() => {

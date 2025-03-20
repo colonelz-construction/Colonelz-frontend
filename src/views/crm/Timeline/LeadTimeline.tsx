@@ -6,6 +6,9 @@ import { apiGetCrmTimeline, apiGetCrmLeadsDetails } from "@/services/CrmService"
 import useQuery from "@/utils/hooks/useQuery";
 import { MdExpandMore } from "react-icons/md";
 import { MdKeyboardArrowRight } from "react-icons/md";
+import { Button } from "@/components/ui";
+import { StickyFooter } from "@/components/shared";
+import { useNavigate } from "react-router-dom";
 
 
 type leadInterface = {
@@ -34,7 +37,8 @@ const LeadTimeline = () => {
   const [timelineData, setTimelineData] = useState<any | null>(null);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [expandedItems, setExpandedItems] = useState<{ [key: number]: boolean }>({});
-  console.log(timelineData)
+  // console.log(timelineData)
+  const navigate = useNavigate();
 
   const toggleDetails = (index: number) => {
     setExpandedItems((prev) => ({
@@ -58,6 +62,7 @@ const LeadTimeline = () => {
       }
       else if (response.code === 404) {
         console.log(`Timeline for Lead ${lead?.name} was not found.`);
+        setLoading(false)
       }
     })
 
@@ -79,6 +84,8 @@ const LeadTimeline = () => {
   const toggleProject = (id: number) => {
     setExpandedProject(expandedProject === id ? null : id);
   };
+
+  // console.log(timelineData)
 
   // console.log(timelineData)
 
@@ -161,6 +168,24 @@ const LeadTimeline = () => {
         }
 
       </div >
+
+      <StickyFooter
+        className="-mx-8 px-8 flex items-center justify-between py-4 mt-7"
+        stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+      >
+        <div className="md:flex items-center">
+          <Button
+            size="sm"
+            className="ltr:mr-3 rtl:ml-3"
+            type="button"
+            onClick={() => {
+              navigate('/app/crm/timeline')
+            }}
+          >
+            Back
+          </Button>
+        </div>
+      </StickyFooter>
     </>
   );
 };

@@ -152,7 +152,7 @@ const priorityOptions = [
                                 toast.push(
                                     <Notification closable type='success' duration={2000}>Task Updated Successfully</Notification>
                                 )
-                                // window.location.reload()
+                                window.location.reload()
                             }
                             else{
                                 setLoading(false)

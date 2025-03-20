@@ -9,6 +9,7 @@ import NoData from '@/views/pages/NoData'
 import { Tasks } from '../../store'
 import { useNavigate } from 'react-router-dom'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
+import TaskTimer from './TaskTimer'
 
 export type TaskDataResponse = {
     code: number;
@@ -58,6 +59,7 @@ const TaskDetails = () => {
     };
 
     const [taskData, setTaskData] = React.useState<any>(tempTasks)
+    // console.log(taskData)
     const [loading, setLoading] = useState(true)
     useEffect(() => {
         const fetchData = async () => {
@@ -117,6 +119,7 @@ const TaskDetails = () => {
                         footerBorder={false}
                         headerBorder={false}
                     >
+                        {taskData && <TaskTimer isShow={true} data={taskData}/>}
                         <CustomerInfoField title='Created On' value={formateDate(taskData.task_createdOn)} />
                         <CustomerInfoField title='Created By' value={taskData.task_createdBy} />
                         <CustomerInfoField title='Name' value={taskData.task_name} />
@@ -136,6 +139,9 @@ const TaskDetails = () => {
                         </div>
                     </Card>
                 </div>
+
+
+                
                 <div className='xl:w-2/3'>
 
                     <div className='flex justify-between mb-4 items-center'>

@@ -232,7 +232,6 @@ const FormContent = ({ setFields, fields, setFieldValue, values, file, setFile, 
         }
     }, [values.org_state]);
 
-    console.log(fields)
 
     const addField = () => {
         setFields([...fields, { name: "", number: "" }]);

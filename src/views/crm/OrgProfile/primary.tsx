@@ -4,12 +4,15 @@ import * as Yup from 'yup'
 import { Button, FormItem, Input, Notification, Select, toast } from '@/components/ui'
 import { apiGetOrgData, apiEditOrgData } from '@/services/CrmService'
 import { Country, State, City } from 'country-state-city';
+import { RxCrossCircled } from "react-icons/rx";
+import { FaPlus } from "react-icons/fa";
 import { GoPlus} from "react-icons/go";
 import { AiOutlineMinusCircle } from "react-icons/ai";
 const currencyUrl = import.meta.env.VITE_CURRENCY_URL;
 
 const org_id: any = localStorage.getItem('orgId')
 const userId: any = localStorage.getItem('userId')
+
 
 interface FormValues {
     organization: string;
@@ -18,7 +21,7 @@ interface FormValues {
     org_phone: string;
     org_website: string;
     currency: string;
-    vat_tax_gst_number: string;
+    vat_tax_gst_number: any;
     org_logo: any;
     org_address: string;
     org_city: string;
@@ -39,7 +42,7 @@ const validationSchema = Yup.object().shape({
     // org_phone: Yup.number()
     //     .required('Contact Number is required'),
     currency: Yup.string().required('Required'),
-    vat_tax_gst_number: Yup.string().required('Required'),
+    // vat_tax_gst_number: Yup.string().required('Required'),
     org_country: Yup.string().required('Required'),
     org_zipcode: Yup.string().required('Required'),
 })
@@ -54,7 +57,7 @@ const Primary = () => {
         org_phone: '',
         org_website: '',
         currency: '',
-        vat_tax_gst_number: '',
+        vat_tax_gst_number: [],
         org_logo: '',
         org_address: '',
         org_city: '',
@@ -64,6 +67,7 @@ const Primary = () => {
     });
     const [file, setFile] = useState<string>('');
     const [typeOptions, setTypeOptions] = useState<CurrencyOption[]>([]);
+    const [fields, setFields] = useState<{ name: string; number: string }[]>([{ name: "", number: "" }]);
 
 
     useEffect(() => {
@@ -99,6 +103,7 @@ const Primary = () => {
                 const response = await apiGetOrgData();
                 setDetails(response.data);
                 setFile(response.data.org_logo)
+                setFields(response.data.vat_tax_gst_number)
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -115,7 +120,7 @@ const Primary = () => {
                 org_phone: details?.org_phone || '',
                 org_website: details?.org_website || '',
                 currency: details?.currency || '',
-                vat_tax_gst_number: details?.vat_tax_gst_number || '',
+                vat_tax_gst_number: details?.vat_tax_gst_number || [{ name: "", number: "" }],
                 org_logo: details?.org_logo || '',
                 org_address: details?.org_address || '',
                 org_city: details?.org_city || '',
@@ -131,13 +136,15 @@ const Primary = () => {
 
 
     const handleSubmit = async (values: FormValues, { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }) => {
+
+       
         const formData = new FormData();
         formData.append('organization', values.organization);
         formData.append('org_email', values.org_email);
         formData.append('email', values.email);
         formData.append('org_phone', values.org_phone);
         formData.append('currency', values.currency);
-        formData.append('vat_tax_gst_number', values.vat_tax_gst_number)
+        formData.append('vat_tax_gst_number', JSON.stringify(fields))
         formData.append('org_website', values.org_website)
         formData.append('org_city', values.org_city)
         formData.append('org_country', values.org_country)
@@ -173,6 +180,8 @@ const Primary = () => {
                         values={values}
                         file={file} setFile={setFile}
                         typeOptions={typeOptions}
+                        fields={fields}
+                        setFields={setFields}
                     />
                 )}
             </Formik>
@@ -180,22 +189,10 @@ const Primary = () => {
     );
 };
 
-const FormContent = ({ setFieldValue, values, file, setFile, typeOptions }: { setFile: (field: string) => void; file: string, setFieldValue: (field: string, value: any) => void; values: FormValues; typeOptions: any }) => {
+const FormContent = ({ setFields, fields, setFieldValue, values, file, setFile, typeOptions }: { fields:{ name: string; number: string }[], setFields:any,  setFile: (field: string) => void; file: string, setFieldValue: (field: string, value: any) => void; values: FormValues; typeOptions: any }) => {
 
     const [fileName, setFileName] = useState<string | undefined>(undefined);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-    const [fields, setFields] = useState(["vat_tax_gst_number"]);
-
-    const addField = () => {
-        if (fields.length < 3) {
-            setFields([...fields, `vat_tax_gst_number_${fields.length + 1}`]);
-        }
-    };
-
-    const removeField = (index: number) => {
-        setFields(fields.filter((_, i) => i !== index));
-    };
 
     const countries = Country.getAllCountries().map(country => ({
         value: country.isoCode,
@@ -235,6 +232,28 @@ const FormContent = ({ setFieldValue, values, file, setFile, typeOptions }: { se
         }
     }, [values.org_state]);
 
+    console.log(fields)
+
+    const addField = () => {
+        setFields([...fields, { name: "", number: "" }]);
+      };
+    
+      const removeField = (index: number) => {
+          const newFields = fields.filter((_, i) => i !== index);
+          setFields(newFields);
+        
+      };
+    
+      const handleChange = (index: number, key: "name" | "number", value: string) => {
+        const newFields = [...fields];
+        newFields[index][key] = value;
+        setFields(newFields);
+    
+        // Clear error if at least one field has values
+        if (newFields.some(field => field.name.trim() !== "" && field.number.trim() !== "")) {
+        }
+      };
+  
 
 
 
@@ -328,49 +347,50 @@ const FormContent = ({ setFieldValue, values, file, setFile, typeOptions }: { se
                         />
                     </FormItem>
 
-                    {/* <FormItem label="Vat/Tax No/GST" asterisk>
-                        <Field
-                            component={Input}
-                            type="text"
-                            name="vat_tax_gst_number"
-                            placeholder="Vat/Tax No/GST"
-                        />
-                        <ErrorMessage
-                            name="type"
-                            component="div"
-                            className=" text-red-600"
-                        />
-                    </FormItem> */}
-
-                    <FormItem label="VAT/GST" asterisk>
+                    <FormItem label="VAT/GST">
+                    <div className="">
                         {fields.map((field, index) => (
-                            <div key={field} className="flex items-center gap-2 mb-2">
-                                <Field
-                                    component={Input}
-                                    type="text"
-                                    name={field}
-                                    placeholder="Vat/Tax No/GST"
-                                    className="flex-1"
-                                />
-                                {index > 0 && (
-                                    <button
-                                        type="button"
-                                        onClick={() => removeField(index)}
-                                    >
-                                        <AiOutlineMinusCircle size={18} />
-                                    </button>
-                                )}
+                            <div key={index} className="flex items-center gap-1">
+                            <Field
+                                component="input"
+                                type="text"
+                                value={field.name}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                handleChange(index, "name", e.target.value)
+                                }
+                                placeholder="Tag"
+                                className="flex-1 border rounded p-2 w-10 mb-1"
+                            />
+                            <Field
+                                component="input"
+                                type="text"
+                                value={field.number}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                handleChange(index, "number", e.target.value)
+                                }
+                                placeholder="Vat/Tax No/GST"
+                                className="flex-1 border rounded p-2 mb-1"
+                            />
+                            {fields.length > 1 && (
+                                <span
+                                className='cursor-pointer ml-2'
+                                // size="icon"
+                                onClick={() => removeField(index)}
+                                >
+                                <RxCrossCircled/>
+                                </span>
+                            )}
                             </div>
                         ))}
-                        {fields.length < 3 && (
-                            <button
-                                type="button"
-                                onClick={addField}
-                                className="flex items-center gap-1 text-blue-500 mt-2"
-                            >
-                                <GoPlus size={18} /> Add Another
-                            </button>
-                        )}
+                        <span className='p-1 cursor-pointer hover:text-gray-400'  onClick={addField}>
+                            <span className='flex gap-1 items-center'>
+                                <GoPlus/> <span>Add More</span>
+
+                            </span>
+                        </span>
+
+                        {/* Debugging: Show the list of values */}
+                        </div>
                     </FormItem>
 
                     {/* <FormItem label="">

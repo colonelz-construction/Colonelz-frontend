@@ -26,11 +26,11 @@ const Report = ({report}:any) => {
     '#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF33A1', '#33FFF5', '#F5FF33', '#FF8C33', '#8C33FF', '#33FF8C'
   ];
   const getColorForTask = (taskName: string) => {
-    const firstLetter = taskName.charAt(0).toUpperCase();
-    const index = firstLetter.charCodeAt(0) % colorPalette.length;
+    const firstLetter = taskName?.charAt(0).toUpperCase();
+    const index = firstLetter?.charCodeAt(0) % colorPalette.length;
     return colorPalette[index];
   };
-  const taskColors = chartData.categories.map(taskName => getColorForTask(taskName));
+  const taskColors = chartData?.categories?.map(taskName => getColorForTask(taskName));
   useEffect(() => {
     const handleResize = () => {
       const updatedWidth = window.innerWidth > 768 ? 500 : window.innerWidth - 40;
@@ -44,8 +44,8 @@ const Report = ({report}:any) => {
   useEffect(() => {
     const fetchData = async () => {
       if (report) {
-        const taskNames = report.data.map((task: TaskData) => task.task_name);
-        const percentages = report.data.map((task: TaskData) => task.percentage);
+        const taskNames = report?.data.map((task: TaskData) => task?.task_name);
+        const percentages = report?.data.map((task: TaskData) => task?.percentage);
         setChartData({
           series: [{ data: percentages }],
           categories: taskNames,
@@ -90,7 +90,7 @@ const Report = ({report}:any) => {
             enabled: false,
           },
           xaxis: {
-            categories: chartData.categories,
+            categories: chartData?.categories,
           },
           yaxis: {
             min: 0,
@@ -103,9 +103,9 @@ const Report = ({report}:any) => {
           },
           
         }}
-        series={chartData.series}
+        series={chartData?.series}
         type="bar"
-        height={chartData.series[0]?.data.length===1? 120:chartData.series[0]?.data.length*75 || 75}
+        height={chartData?.series[0]?.data.length===1? 120:chartData?.series[0]?.data?.length*75 || 75}
         
       />
     </Card>

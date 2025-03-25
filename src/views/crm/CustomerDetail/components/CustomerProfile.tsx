@@ -356,19 +356,19 @@ const CustomerProfile = ({ data,report }: CustomerProfileProps) => {
                         title="Project Incharge"
                         value={data?.designer}
                     />
-                    {data?.project_updated_by && data.project_updated_by.length>0 &&<>
+                    {data?.project_updated_by && data?.project_updated_by.length>0 &&<>
                     <CustomerInfoField
                         title="Updated By"
-                        value={data.project_updated_by.length > 0 ? data.project_updated_by[data.project_updated_by.length-1].username : ""}                    />
+                        value={data?.project_updated_by.length > 0 ? data?.project_updated_by[data?.project_updated_by.length-1].username : ""}                    />
                     <CustomerInfoField
                         title="Updated Date"
-                        value={formatDate(data?.project_updated_by.length>0?data?.project_updated_by[data.project_updated_by.length-1].updated_date:"")}
+                        value={formatDate(data?.project_updated_by.length>0?data?.project_updated_by[data?.project_updated_by.length-1].updated_date:"")}
                     />
                     </>}
                 </div>
                 <div>
                     <p>
-                        <span className='text-gray-700 dark:text-gray-200 font-semibold'>Description: </span>{data.description}
+                        <span className='text-gray-700 dark:text-gray-200 font-semibold'>Description: </span>{data?.description}
                     </p>
                 </div>
             </div>

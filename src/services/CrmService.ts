@@ -487,7 +487,7 @@ export async function apiGetCrmProjectShareQuotationApproval(formData: any) { //
 
 export async function apiGetCrmSingleProjects<T>(projectId: string, org_id: any) { // org done
     return ApiService.fetchData<ProjectResponseType>({
-        url: `admin/getsingle/project/?project_id=${projectId}&id=${userId}&org_id=${localStorage.getItem('orgId')}`,
+        url: `admin/getsingle/project/?project_id=${projectId}&id=${localStorage.getItem('userId')}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data

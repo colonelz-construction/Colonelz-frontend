@@ -8,6 +8,7 @@ import { MdOutlineAdd } from 'react-icons/md'
 import { HiOutlinePencil } from 'react-icons/hi'
 import { useLocation } from 'react-router-dom'
 import * as Yup from 'yup'
+import App from '../../../CustomerDetail/components/MOM/Richtext'
 
 type SubTask = {
     lead_id: string;
@@ -15,9 +16,9 @@ type SubTask = {
     sub_task_id: string;
     sub_task_name: string;
     sub_task_description: string;
-    actual_sub_task_start_date: string;
-    actual_sub_task_end_date: string;
-    estimated_sub_task_start_date: string;
+    // actual_sub_task_start_date: string;
+    // actual_sub_task_end_date: string;
+    // estimated_sub_task_start_date: string;
     estimated_sub_task_end_date: string;
     sub_task_status: string;
     sub_task_priority: string;
@@ -93,10 +94,10 @@ const priorityOptions = [
                         sub_task_id: Data?.sub_task_id,
                         sub_task_name: Data?.sub_task_name,
                         sub_task_description: Data?.sub_task_description,
-                        delegation_date: new Date(Data?.estimated_sub_task_start_date),
-                        // estimated_sub_task_end_date: new Date(Data?.estimated_sub_task_end_date),
-                        actual_sub_task_start_date: new Date(Data?.actual_sub_task_start_date),
-                        actual_sub_task_end_date: new Date(Data?.actual_sub_task_end_date),
+                        // delegation_date: new Date(Data?.estimated_sub_task_start_date),
+                        estimated_sub_task_end_date: new Date(Data?.estimated_sub_task_end_date),
+                        // actual_sub_task_start_date: new Date(Data?.actual_sub_task_start_date),
+                        // actual_sub_task_end_date: new Date(Data?.actual_sub_task_end_date),
                         sub_task_status: Data?.sub_task_status, 
                         sub_task_priority: Data?.sub_task_priority, 
                         sub_task_assignee: Data?.sub_task_assignee,
@@ -107,18 +108,18 @@ const priorityOptions = [
                         sub_task_name: Yup.string().required('Subtask Name is required'),
                     
 
-                        delegation_date: Yup.string().required('Delegation Date is required'),
-                        actual_sub_task_start_date: Yup.string().required('Actual Start Date is required'),
-                        actual_sub_task_end_date: Yup.string().required('Actual End Date is required').test(
-                            'is-greater',
-                            'End date must be greater than start date',
-                            function (value) {
-                                const { actual_sub_task_start_date } = this.parent;
-                                return new Date(value) > new Date(actual_sub_task_start_date);
-                            }
+                        estimated_sub_task_end_date: Yup.string().required('Deadline is required'),
+                        // actual_sub_task_start_date: Yup.string().required('Actual Start Date is required'),
+                        // actual_sub_task_end_date: Yup.string().required('Actual End Date is required').test(
+                        //     'is-greater',
+                        //     'End date must be greater than start date',
+                        //     function (value) {
+                        //         const { actual_sub_task_start_date } = this.parent;
+                        //         return new Date(value) > new Date(actual_sub_task_start_date);
+                        //     }
                             
                         
-                        ),
+                        // ),
                         sub_task_status: Yup.string().required('Subtask Status is required'),
                         sub_task_priority: Yup.string().required('Subtask Priority is required'),
                         // sub_task_assignee: Yup.string().required('Subtask Assignee is required'),
@@ -144,7 +145,7 @@ const priorityOptions = [
                             
                      }}
                      >
-                        {({values, errors, touched}:any) => (
+                        {({values, errors, touched, setFieldValue}:any) => (
                         <Form className=' p-4 max-h-96 overflow-y-auto'>
                             <div className=' grid grid-cols-2 gap-x-5'>
                             <FormItem label='Name'
@@ -190,20 +191,20 @@ const priorityOptions = [
                             </FormItem>
 
 
-                            <FormItem label='Delegation Date'
+                            <FormItem label='Due Date'
                            
                             >
-                                <Field name='delegation_date'  placeholder='Delegation date'>
+                                <Field name='estimated_sub_task_end_date'  placeholder='Due Date'>
                                     {({field}:any)=>(
-                                        <DatePicker name='delegation_date'
+                                        <DatePicker name='estimated_sub_task_end_date'
                                         value={field.value}
-                                        onChange={(value) => { field.onChange({ target: {name:'delegation_date', value: `${value}` } }) }}
+                                        onChange={(value) => { field.onChange({ target: {name:'estimated_sub_task_end_date', value: `${value}` } }) }}
                                         />
                                     )}
                                 </Field>
                             </FormItem>
 
-                            <FormItem label='Actual Start Date'
+                            {/* <FormItem label='Actual Start Date'
                            
                             >
                                 <Field name='actual_sub_task_start_date'  placeholder='Start date'>
@@ -226,7 +227,7 @@ const priorityOptions = [
                                         />
                                     )}
                                 </Field>
-                            </FormItem>
+                            </FormItem> */}
 
                             {/* <FormItem label='Estimated Start Date'
                             asterisk
@@ -294,7 +295,7 @@ const priorityOptions = [
                                 </Field>
                             </FormItem>
                             </div>
-                            <FormItem label='Desription'>
+                            {/* <FormItem label='Desription'>
                                 <Field name='sub_task_description' placeholder='Description'>
                                     {({field}:any)=>{
                                         return (
@@ -303,7 +304,16 @@ const priorityOptions = [
                                         )
                                     }}
                                 </Field>
-                            </FormItem>
+                            </FormItem> */}
+
+                            <App
+                                value={values.sub_task_description}
+                                readOnly={false}
+                                onChange={(value:any) => {
+                                    setFieldValue('sub_task_description', value)
+                                }}
+                                title={'Description:'}
+                            />
                             {values.sub_task_status==='Under Revision' &&
                             <FormItem label='Remarks'>
                                 <Field name='remark' placeholder='Remarks'>

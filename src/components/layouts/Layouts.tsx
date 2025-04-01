@@ -28,6 +28,8 @@ const Layout = () => {
 
     const { authenticated } = useAuth()
 
+    const org_id = localStorage.getItem('orgId');
+
     useDirection()
 
     useLocale()
@@ -49,7 +51,9 @@ const Layout = () => {
         >
             
             <AppLayout />
-            <FloatingButton/>
+
+            {org_id && <FloatingButton/>}
+            
         </Suspense>
     )
 }

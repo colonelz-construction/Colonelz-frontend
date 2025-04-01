@@ -398,7 +398,7 @@ const CustomerDetail = () => {
                                     Contract
                                 </TabNav>}
                                 <TabNav value="Tasks" >
-                                Task Manager
+                                Internal Task Manager
                             </TabNav>
                             {['ADMIN', 'SUPERADMIN'].includes(localStorage.getItem('role') || '') &&
                                 <TabNav value="Activity" >

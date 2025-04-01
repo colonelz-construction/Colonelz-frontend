@@ -8,15 +8,16 @@ import { MdOutlineAdd } from 'react-icons/md'
 import * as Yup from 'yup'
 import { useLocation } from 'react-router-dom'
 import { setUser } from '@/store'
+import App from '../../../CustomerDetail/components/MOM/Richtext'
 
 export type Task = {
     user_id: string;
     lead_id: string;
     sub_task_name: string;
     sub_task_description: string;
-    actual_sub_task_start_date: string; 
-    actual_sub_task_end_date: string; 
-    estimated_sub_task_start_date: string;
+    // actual_sub_task_start_date: string; 
+    // actual_sub_task_end_date: string; 
+    // estimated_sub_task_start_date: string;
     estimated_sub_task_end_date: string;
     sub_task_status: string; 
     sub_task_priority: string; 
@@ -85,10 +86,10 @@ const priorityOptions = [
                         task_id: task_id || '',
                         sub_task_name: "",
                         sub_task_description: "",
-                        delegation_date: "",
-                        // estimated_sub_task_end_date: "",
-                        actual_sub_task_start_date: "",
-                        actual_sub_task_end_date: "",
+                        // delegation_date: "",
+                        estimated_sub_task_end_date: "",
+                        // actual_sub_task_start_date: "",
+                        // actual_sub_task_end_date: "",
                         sub_task_status: "Pending", 
                         sub_task_priority: "", 
                         sub_task_assignee: "",
@@ -98,18 +99,18 @@ const priorityOptions = [
                         sub_task_name: Yup.string().required('Subtask Name is required'),
                        
 
-                        delegation_date: Yup.string().required('Delegation Date is required'),
-                        actual_sub_task_start_date: Yup.string().required('Actual Start Date is required'),
-                        actual_sub_task_end_date: Yup.string().required('Actual End Date is required').test(
-                            'is-greater',
-                            'End date must be greater than start date',
-                            function (value) {
-                              const { actual_sub_task_start_date } = this.parent;
-                              return new Date(value) > new Date(actual_sub_task_start_date);
-                            }
+                        estimated_sub_task_end_date: Yup.string().required('Deadline is required'),
+                        // actual_sub_task_start_date: Yup.string().required('Actual Start Date is required'),
+                        // actual_sub_task_end_date: Yup.string().required('Actual End Date is required').test(
+                        //     'is-greater',
+                        //     'End date must be greater than start date',
+                        //     function (value) {
+                        //       const { actual_sub_task_start_date } = this.parent;
+                        //       return new Date(value) > new Date(actual_sub_task_start_date);
+                        //     }
                           
                         
-                        ),
+                        // ),
                         // sub_task_status: Yup.string().required('Subtask Status is required'),
                         sub_task_priority: Yup.string().required('Subtask Priority is required'),
                         // sub_task_assignee: Yup.string().required('Subtask Assignee is required'),
@@ -133,7 +134,7 @@ const priorityOptions = [
                             }    
                      }}
                      >
-                        {({values, errors, touched}:any)=>(
+                        {({values, errors, touched, setFieldValue}:any)=>(
                         <Form className=' p-4 max-h-96 overflow-y-auto'>
                             <div className=' grid grid-cols-2 gap-x-5'>
 
@@ -181,25 +182,24 @@ const priorityOptions = [
                             </FormItem> */}
 
 
-                            <FormItem label='Delegation Date'
+                            <FormItem label='Due Date'
                             asterisk
-                            invalid={errors.delegation_date && touched.delegation_date}
-                            errorMessage={errors.delegation_date}
+                            invalid={errors.estimated_sub_task_end_date && touched.estimated_sub_task_end_date}
+                            errorMessage={errors.estimated_sub_task_end_date}
                            
                             >
-                                <Field name='delegation_date'  placeholder='Delegation date'>
+                                <Field name='estimated_sub_task_end_date'  placeholder='Due Date'>
                                     {({field}:any)=>(
-                                        <DatePicker name='delegation_date'
+                                        <DatePicker name='estimated_sub_task_end_date'
                                         value={field.value}
-                                        minDate={new Date(data.estimated_task_start_date)}
                                         maxDate={new Date(data.estimated_task_end_date)}
-                                        onChange={(value) => { field.onChange({ target: {name:'delegation_date', value: `${value}` } }) }}
+                                        onChange={(value) => { field.onChange({ target: {name:'estimated_sub_task_end_date', value: `${value}` } }) }}
                                         />
                                     )}
                                 </Field>
                             </FormItem>
 
-                            <FormItem label='Actual Start Date'
+                            {/* <FormItem label='Actual Start Date'
                             asterisk
                             invalid={errors.actual_sub_task_start_date && touched.actual_sub_task_start_date}
                             errorMessage={errors.actual_sub_task_start_date}
@@ -233,7 +233,7 @@ const priorityOptions = [
                                         />
                                     )}
                                 </Field>
-                            </FormItem>
+                            </FormItem> */}
 
                             {/* <FormItem label='Estimated Start Date'
                             asterisk
@@ -303,7 +303,7 @@ const priorityOptions = [
 
 
                             </div>
-                            <FormItem label='Desription'>
+                            {/* <FormItem label='Desription'>
                                 <Field name='sub_task_description' placeholder='Description'>
                                     {({field}:any)=>{
                                         return (
@@ -312,7 +312,16 @@ const priorityOptions = [
                                         )
                                     }}
                                 </Field>
-                            </FormItem>
+                            </FormItem> */}
+                            <App
+                                value={values.sub_task_description}
+                                onChange={(value:any) => {
+                                    setFieldValue('sub_task_description', value)
+                                }}
+
+                                readOnly={false}
+                                title={'Description:'}
+                            />
                             <div className='flex justify-end'>
                                 <Button type='submit' variant='solid' size='sm' loading={loading}>{loading?'Adding':'Add Subtask'}</Button>
                             </div>

@@ -740,6 +740,19 @@ export async function apiGetCrmLeadsSubTaskData<T>( // org done
     })
 }
 
+export async function apiGetCrmLeadsMiniTaskData<T>( // org done
+    leadId: string,
+    taskId: any,
+    org_id: string | null
+) {
+    return ApiService.fetchData<any>({
+        url: `admin/get/all/leadminitask?user_id=${userId}&lead_id=${leadId}&task_id=${taskId}&org_id=${localStorage.getItem('orgId')}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmProjectsAddSubTask(Data: any) { // org done
     return ApiService.fetchData<any>({
         url: 'admin/create/subtask',
@@ -763,6 +776,16 @@ export async function apiGetCrmOpenAddSubTask(Data: any) { // org done
 export async function apiGetCrmLeadsAddSubTask(Data: any) { // org done
     return ApiService.fetchData<any>({
         url: 'admin/create/leadsubtask',
+        method: 'post',
+        data: Data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmLeadsAddMiniTask(Data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/create/leadminitask',
         method: 'post',
         data: Data,
     }).then((response) => {
@@ -822,6 +845,16 @@ export async function apiGetCrmLeadsSubTaskUpdate(task: any) { // org done
     })
 }
 
+export async function apiGetCrmLeadsMiniTaskUpdate(task: any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/update/leadminitask`,
+        method: 'put',
+        data: task,
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetCrmProjectsSubTaskDelete(Data: any) { // org done
     return ApiService.fetchData<any>({
         url: `admin/delete/subtask`,
@@ -845,6 +878,16 @@ export async function apiGetCrmOpenSubTaskDelete(Data: any) { // org done
 export async function apiGetCrmLeadsSubTaskDelete(Data: any) { // org done
     return ApiService.fetchData<any>({
         url: `admin/delete/leadsubtask`,
+        method: 'delete',
+        data: Data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmLeadsMiniTaskDelete(Data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/delete/leadminitask`,
         method: 'delete',
         data: Data,
     }).then((response) => {
@@ -905,6 +948,16 @@ export async function apiGetCrmOpenSingleSubTaskTimer(Data: any) { // org done
 export async function apiGetCrmLeadsSingleSubTaskTimer(Data: any) { // org done
     return ApiService.fetchData<any>({
         url: `admin/update/leadsubtask/time`,
+        method: 'put',
+        data: Data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmLeadsSingleMiniTaskTimer(Data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/update/leadminitask/time`,
         method: 'put',
         data: Data,
     }).then((response) => {
@@ -985,6 +1038,20 @@ export async function apiGetCrmLeadsSingleSubTaskDataTimer<T>( // org done
 ) {
     return ApiService.fetchData<TimerResponse>({
         url: `admin/get/leadsubtask/time?lead_id=${leadId}&task_id=${taskId}&sub_task_id=${subTaskId}&org_id=${localStorage.getItem('orgId')}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmLeadsSingleMiniTaskDataTimer<T>( // org done
+    leadId: string,
+    taskId: string,
+    miniTaskId: string,
+    org_id: string | null
+) {
+    return ApiService.fetchData<TimerResponse>({
+        url: `admin/get/leadminitask/time?lead_id=${leadId}&task_id=${taskId}&mini_task_id=${miniTaskId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data

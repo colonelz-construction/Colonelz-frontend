@@ -346,7 +346,7 @@ const FormContent = ({ setFields, fields, setFieldValue, values, file, setFile, 
                         />
                     </FormItem>
 
-                    <FormItem label="VAT/GST">
+                    <FormItem label="PAN/GST">
                     <div className="">
                         {fields.map((field, index) => (
                             <div key={index} className="flex items-center gap-1">

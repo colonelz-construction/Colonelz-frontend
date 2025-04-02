@@ -7,6 +7,7 @@ import { apiGetCrmProjectsAddTask, apiGetUsersList } from '@/services/CrmService
 import { IoIosAddCircleOutline } from "react-icons/io";
 import * as Yup from 'yup'
 import { AiOutlinePlus } from "react-icons/ai";
+import App from '../../CustomerDetail/components/MOM/Richtext'
 
 
 type Task = {
@@ -14,10 +15,7 @@ type Task = {
     project_id: string;
     task_name: string;
     task_description: string;
-    estimated_task_start_date: string;
     estimated_task_end_date: string;
-    actual_task_start_date: string; 
-    actual_task_end_date: string; 
     task_status: string; 
     task_priority: string; 
     task_assignee: string;
@@ -84,10 +82,7 @@ const priorityOptions = [
                         project_id: project ,
                         task_name: "",
                         task_description: "",
-                        estimated_task_start_date: "",
                         estimated_task_end_date: "",
-                        actual_task_start_date: "",
-                        actual_task_end_date: "",
                         task_status: "Pending", 
                         task_priority: "", 
                         task_assignee: "",
@@ -95,24 +90,8 @@ const priorityOptions = [
                       }}
                       validationSchema={Yup.object().shape({
                         task_name: Yup.string().required("Task Name is required"),
-                      
-                        estimated_task_start_date: Yup.string().required("Estimated Start Date is required"),
-                        estimated_task_end_date: Yup.string().required("Estimated End Date is required").test(
-                            "is-greater",
-                            "End Date must be greater than Start Date",
-                            function (value) {
-                              const { estimated_task_start_date } = this.parent;
-                              if (estimated_task_start_date && value) {
-                                return new Date(value) > new Date(estimated_task_start_date);
-                              }
-                              return true;
-                            }
-                          
-                        ),
-                        // task_status: Yup.string().required("Task Status is required"),
+                        estimated_task_end_date: Yup.string().required("Estimated End Date is required"),
                         task_priority: Yup.string().required("Task Priority is required"),
-                        // task_assignee: Yup.string().required("Task Assignee is required"),
-                        // reporter: Yup.string().required("Reporter is required"),
                       })
                       }
                      onSubmit={async(values, actions) => {
@@ -136,7 +115,7 @@ const priorityOptions = [
                             
                     }
                      >
-                        {({ values, touched, errors,}) => (
+                        {({ values, touched, errors,setFieldValue}) => (
                         <Form className=' p-4 max-h-96 overflow-y-auto'>
                             <div className=' grid grid-cols-2 gap-x-5'>
                             <FormItem label='Name'
@@ -162,69 +141,11 @@ const priorityOptions = [
                             </FormItem>
 
 
-                            {/* <FormItem label='Status'
-                            asterisk
-                            invalid={errors.task_status && touched.task_status}
-                            errorMessage='Task Status is required'
-                            >
-                                <Field name='task_status'  placeholder='Task'>
-                                    {({field}:any)=>(
-                                        <Select
-                                        options={statusOptions}
-                                        name='task_status'
-                                        onChange={(value) => { field.onChange({ target: {name:'task_status', value: value?.value } }) }}
-                                        />
-                                    )}
-                                </Field>
-                            </FormItem> */}
-
-
-                            <FormItem label='Actual Start Date'
-                            >
-                                <Field name='actual_task_start_date'  placeholder='Actual Start date'>
-                                    {({field}:any)=>(
-                                        <DatePicker name='actual_task_start_date'
-                                        onChange={(value) => { field.onChange({ target: {name:'actual_task_start_date', value: `${value}` } }) }}
-                                        />
-                                    )}
-                                </Field>
-                            </FormItem>
-
-
-                            <FormItem label='Actual End Date'
-                            
-                            
-                            >
-                                <Field name='actual_task_end_date' placeholder='End Date'>
-                                    {({field}:any)=>(
-                                        <DatePicker name='actual_task_end_date'
-                                        onChange={(value) => { field.onChange({ target: {name:'actual_task_end_date', value: `${value }`} }) }}
-                                        />
-                                    )}
-                                </Field>
-                            </FormItem>
-
-
-                            <FormItem label='Estimated Start Date'
-                            asterisk
-                            invalid={errors.estimated_task_start_date && touched.estimated_task_start_date}
-                            errorMessage={errors.estimated_task_start_date}
-                            >
-                                <Field name='estimated_task_start_date' placeholder='Start Date'>
-                                    {({field}:any)=>(
-                                        <DatePicker name='estimated_task_start_date'
-                                        onChange={(value) => { field.onChange({ target: {name:'estimated_task_start_date', value: `${value}` } }) }}
-                                        />
-                                    )}
-                                </Field>
-                            </FormItem>
-
-
-                            <FormItem label='Estimated End Date'
+                            <FormItem label='Due Date'
                             asterisk
                             invalid={errors.estimated_task_end_date && touched.estimated_task_end_date}
                             >
-                                <Field name='estimated_task_end_date' placeholder='End Date'>
+                                <Field name='estimated_task_end_date' placeholder='Due Date'>
                                     {({field}:any)=>(
                                         <DatePicker name='estimated_task_end_date'
                                         onChange={(value) => { field.onChange({ target: {name:'estimated_task_end_date', value: `${value}` } }) }}
@@ -268,16 +189,12 @@ const priorityOptions = [
 
 
                             </div>
-                            <FormItem label='Desription'>
-                                <Field name='task_description' placeholder='Task Description'>
-                                    {({field}:any)=>{
-                                        return (
-                                            <Input textArea name='task_description'
-                                            {...field}/>
-                                        )
-                                    }}
-                                </Field>
-                            </FormItem>
+                            <App
+                                value={values.task_description}
+                                onChange={(value:any) => {
+                                    setFieldValue('task_description', value)
+                                }}
+                            />
                             <div className='flex justify-end'>
                                 <Button type='submit' variant='solid' size='sm' loading={loading}>{loading?'Adding':'Add Task'}</Button>
                             </div>

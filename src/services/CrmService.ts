@@ -300,6 +300,16 @@ export async function apiGetUsersList<T>(projectId: string) { // org done
         return response.data
     })
 }
+
+export async function apiGetUsersListOfProject<T>(projectId: string) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/get/userlist/project?project_id=${projectId}&org_id=${localStorage.getItem('orgId')}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function apiGetUsersListProject<T>(projectId: string | null) { // org done
     return ApiService.fetchData<UserList>({
         url: `/admin/get/userlist/project?project_id=${projectId}&org_id=${localStorage.getItem('orgId')}`,
@@ -310,7 +320,7 @@ export async function apiGetUsersListProject<T>(projectId: string | null) { // o
 }
 export async function apiGetAllUsersList<T>() { // org done
     return ApiService.fetchData<UserListResponse>({
-        url: `admin/get/userlist?user_id=${userId}&org_id=${localStorage.getItem('orgId')}`,
+        url: `admin/get/userlist?user_id=${localStorage.getItem('userId')}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -752,6 +762,18 @@ export async function apiGetCrmLeadsMiniTaskData<T>( // org done
         return response.data
     })
 }
+export async function apiGetCrmProjectsMiniTaskData<T>( // org done
+    projectId: string,
+    taskId: any,
+    org_id: string | null
+) {
+    return ApiService.fetchData<any>({
+        url: `admin/get/all/minitask?user_id=${userId}&project_id=${projectId}&task_id=${taskId}&org_id=${localStorage.getItem('orgId')}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
 
 export async function apiGetCrmProjectsAddSubTask(Data: any) { // org done
     return ApiService.fetchData<any>({
@@ -786,6 +808,16 @@ export async function apiGetCrmLeadsAddSubTask(Data: any) { // org done
 export async function apiGetCrmLeadsAddMiniTask(Data: any) { // org done
     return ApiService.fetchData<any>({
         url: 'admin/create/leadminitask',
+        method: 'post',
+        data: Data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmProjectsAddMiniTask(Data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/create/minitask',
         method: 'post',
         data: Data,
     }).then((response) => {
@@ -848,6 +880,17 @@ export async function apiGetCrmLeadsSubTaskUpdate(task: any) { // org done
 export async function apiGetCrmLeadsMiniTaskUpdate(task: any) { // org done
     return ApiService.fetchData<any>({
         url: `admin/update/leadminitask`,
+        method: 'put',
+        data: task,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+
+export async function apiGetCrmProjectsMiniTaskUpdate(task: any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/update/minitask`,
         method: 'put',
         data: task,
     }).then((response) => {
@@ -964,6 +1007,15 @@ export async function apiGetCrmLeadsSingleMiniTaskTimer(Data: any) { // org done
         return response.data
     })
 }
+export async function apiGetCrmProjectsSingleMiniTaskTimer(Data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/update/minitask/time`,
+        method: 'put',
+        data: Data,
+    }).then((response) => {
+        return response.data
+    })
+}
 
 export async function apiGetCrmProjectsSingleSubTaskDataTimer<T>( // org done
     projectId: string,
@@ -981,7 +1033,7 @@ export async function apiGetCrmProjectsSingleSubTaskDataTimer<T>( // org done
 
 export async function apiGetCrmProjectsSingleTaskDataTimer<T>( // org done
     projectId: string,
-    taskId: string,
+    taskId: string |null,
     org_id: string | null
 ) {
     return ApiService.fetchData<TimerResponse>({
@@ -1052,6 +1104,20 @@ export async function apiGetCrmLeadsSingleMiniTaskDataTimer<T>( // org done
 ) {
     return ApiService.fetchData<TimerResponse>({
         url: `admin/get/leadminitask/time?lead_id=${leadId}&task_id=${taskId}&mini_task_id=${miniTaskId}&org_id=${localStorage.getItem('orgId')}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiGetCrmProjectsSingleMiniTaskDataTimer<T>( // org done
+    projectId: string,
+    taskId: string,
+    miniTaskId: string,
+    org_id: string | null
+) {
+    return ApiService.fetchData<TimerResponse>({
+        url: `admin/get/minitask/time?project_id=${projectId}&task_id=${taskId}&mini_task_id=${miniTaskId}&org_id=${localStorage.getItem('orgId')}`,
         method: 'get',
     }).then((response) => {
         return response.data

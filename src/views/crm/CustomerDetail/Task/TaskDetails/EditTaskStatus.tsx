@@ -1,26 +1,23 @@
 import { useEffect, useState } from 'react'
 import { Field, Form, Formik } from 'formik'
 import { FormItem, Notification, Select, toast } from '@/components/ui'
-import { apiGetCrmLeadsMiniTaskUpdate } from '@/services/CrmService'
-import { HiOutlinePencil } from 'react-icons/hi'
+import { apiGetCrmLeadsTaskUpdate, apiGetCrmProjectsTaskUpdate } from '@/services/CrmService'
 import { useLocation } from 'react-router-dom'
 import * as Yup from 'yup'
-import classNames from 'classnames';
 
 type MiniTask = {
     lead_id: string;
     task_id: string;
-    mini_task_id: string;
-    mini_task_name: string;
-    mini_task_description: string;
-    mini_task_note: string;
-    estimated_mini_task_end_date: string;
-    mini_task_status: string;
-    mini_task_priority: string;
-    mini_task_createdOn: string;
-    mini_task_reporter: string;
-    mini_task_createdBy: string;
-    mini_task_assignee: string;
+    task_name: string;
+    task_description: string;
+    task_note: string;
+    estimated_task_end_date: string;
+    task_status: string;
+    task_priority: string;
+    task_createdOn: string;
+    reporter: string;
+    task_createdBy: string;
+    task_assignee: string;
 };
 
 type MinitaskData = {
@@ -28,14 +25,14 @@ type MinitaskData = {
     users: any;
 };
 
-const EditMiniTaskStatus = ({ Data, users }: MinitaskData) => {
+const EditTaskStatus = ({ Data, users }: MinitaskData) => {
     const [loading, setLoading] = useState(false);
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const lead_id = queryParams.get('lead_id');
+    // const lead_id = queryParams.get('lead_id');
+    const project_id = queryParams.get('project_id');
     const org_id = localStorage.getItem('orgId');
     const userId = localStorage.getItem('userId');
-    const role = localStorage.getItem('role');
 
     const statusOptions = [
         { label: "In Progress", value: "In Progress" },
@@ -53,21 +50,20 @@ const EditMiniTaskStatus = ({ Data, users }: MinitaskData) => {
                 initialValues={{
                     user_id: localStorage.getItem('userId') || '',
                     org_id,
-                    lead_id: lead_id || '',
+                    project_id: project_id || '',
                     task_id: Data?.task_id,
-                    mini_task_id: Data?.mini_task_id,
-                    mini_task_name: Data?.mini_task_name,
-                    mini_task_description: Data?.mini_task_description,
-                    mini_task_note: Data?.mini_task_note,
-                    estimated_mini_task_end_date: new Date(Data?.estimated_mini_task_end_date),
-                    mini_task_status: Data?.mini_task_status,
-                    mini_task_priority: Data?.mini_task_priority,
-                    mini_task_assignee: Data?.mini_task_assignee,
-                    mini_task_reporter: Data?.mini_task_reporter,
+                    task_name: Data?.task_name,
+                    task_description: Data?.task_description,
+                    task_note: Data?.task_note,
+                    estimated_task_end_date: new Date(Data?.estimated_task_end_date),
+                    task_status: Data?.task_status,
+                    task_priority: Data?.task_priority,
+                    task_assignee: Data?.task_assignee,
+                    reporter: Data?.reporter,
                     remark: '',
                 }}
                 validationSchema={Yup.object().shape({
-                    mini_task_status: Yup.string().required('Minitask Status is required'),
+                    task_status: Yup.string().required('Task Status is required'),
                 })}
                 onSubmit={() => {}} // No need for a submit action
 
@@ -75,18 +71,18 @@ const EditMiniTaskStatus = ({ Data, users }: MinitaskData) => {
             >
                 {({ values, errors, touched, setFieldValue }) => {
                     // Auto-trigger API when status changes
-                    console.log(values.mini_task_status)
+                    console.log(values.task_status)
                     useEffect(() => {
 
-                        console.log(values.mini_task_status)
-                        if (values.mini_task_status !== Data.mini_task_status) {
+                        console.log(values.task_status)
+                        if (values.task_status !== Data.task_status) {
                             setLoading(true);
-                            apiGetCrmLeadsMiniTaskUpdate(values)
+                            apiGetCrmProjectsTaskUpdate(values)
                                 .then((response) => {
                                     if (response.code === 200) {
                                         toast.push(
                                             <Notification closable type="success" duration={2000}>
-                                                Subtask Updated Successfully
+                                                Task Updated Successfully
                                             </Notification>
                                         );
 
@@ -101,26 +97,26 @@ const EditMiniTaskStatus = ({ Data, users }: MinitaskData) => {
                                 })
                                 .finally(() => setLoading(false));
                         }
-                    }, [values.mini_task_status]);
+                    }, [values.task_status]);
 
                     return (
                         <Form className="">
                             <div className="">
                                 <FormItem
                                     label=""
-                                    invalid={errors.mini_task_status && touched.mini_task_status}
-                                    errorMessage={errors.mini_task_status}
+                                    invalid={errors.task_status && touched.task_status}
+                                    errorMessage={errors.task_status}
                                     className='mb-0 pb-0'
                                 >
-                                    <Field name="mini_task_status">
+                                    <Field name="task_status">
                                         {({ field }: any) => (
                                             <Select
-                                                placeholder={Data?.mini_task_status === "Pending" ? "Pending/Todo" : Data?.mini_task_status}
+                                                placeholder={Data?.task_status === "Pending" ? "Pending/Todo" : Data?.task_status}
                                                 options={statusOptions}
-                                                name="mini_task_status"
-                                                isDisabled={!((role === 'SUPERADMIN' || role === 'ADMIN') || Data.mini_task_assignee === users?.find((u:any) => u.user_id === userId)?.user_name)}
+                                                name="task_status"
+                                                isDisabled={Data.task_assignee !== users?.find((u:any) => u._id === userId)?.username}
                                                 onChange={(value) => {
-                                                    setFieldValue('mini_task_status', value?.value);
+                                                    setFieldValue('task_status', value?.value);
                                                 }}
                                                 menuPortalTarget={document.body} // Ensures dropdown renders at the body level
                                                 styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }} // Prevents dropdown from being hidden
@@ -138,4 +134,4 @@ const EditMiniTaskStatus = ({ Data, users }: MinitaskData) => {
     );
 };
 
-export default EditMiniTaskStatus;
+export default EditTaskStatus;

@@ -245,7 +245,7 @@ const CustomerDetail = () => {
                   <TabNav value="mom" >MOM</TabNav>
                 }
                 {taskAccess &&
-                  <TabNav value="task">Task Manager</TabNav>
+                  <TabNav value="task">Internal Task Manager</TabNav>
                 }
                 <AuthorityCheck
                   userAuthority={[`${localStorage.getItem('role')}`]}

@@ -205,6 +205,8 @@ const Index = () => {
                     const chunk = decoder.decode(value, { stream: false });
  
                     accumulatedMessages += chunk;
+
+                    console.log(chunk)
  
                     setMessages((prevMessages: any) => {
                         const lastMessage = prevMessages[prevMessages.length - 1];
@@ -405,7 +407,7 @@ const Index = () => {
                     const matches = Array.from(chunk.matchAll(regex));
                     const extractedContents = matches.map(match => match[1]);
  
-                    // console.log("extractedContents", extractedContents);
+                    console.log("extractedContents", extractedContents);
  
                     let isCollecting = false;
                     let result = '';
@@ -549,17 +551,7 @@ const Index = () => {
             <form onSubmit={handleSubmit} className="flex flex-col h-full ">
                 <div className="flex flex-col bg-gray-100 dark:bg-[#1F2937] messages flex-1 h-[23rem] overflow-y-auto mb-4 border border-gray-300 rounded-lg p-2">
                     <ScrollableFeed className="h-full flex flex-col scrollbar-thumb-[#d4d1d1] scrollbar-thin scrollbar-track-transparent pr-6">
-                        {queryType === "summary" ? (
-                            <div className="flex flex-col items-center justify-center ">
-                                <FormItem label="File">
-                                    <Upload
-                                        draggable
-                                        onChange={(file) => handleFileChange(file)}
-                                        multiple={false}
-                                    />
-                                </FormItem>
-                            </div>
-                        ) : (
+                        { (
                             messages.map((message: any, index: any) => (
                                 <div className={`flex w-full ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
                                     <div
@@ -579,9 +571,11 @@ const Index = () => {
                                         {" "}
                                         {message.sender === "user" ? message.text.split('data: ').map((line: any, lineIndex: any) => (
                                             <div key={lineIndex} className="flex justify-end"><span>{line}{lineIndex < message.text.split('\n').length - 1 && <br />}</span></div>
-                                        )) :
+                                        )) 
+
+                                           
  
-                                            message.text?.split('data: ').filter((line: any) => (!line.includes('project_id:') && !line.includes("lead_id:"))).map((line: any, lineIndex: any, lines: any) => {
+                                           : message.text?.split('data: ').filter((line: any) => (!line.includes('project_id:') && !line.includes("lead_id:"))).map((line: any, lineIndex: any, lines: any) => {
                                                 const projectIdMatch = message.text.match(/project_id:(.{11})/);
                                                 const projectId = projectIdMatch && projectIdMatch[1];
  
@@ -594,7 +588,15 @@ const Index = () => {
                                                 const userId = localStorage.getItem('userId')
                                                 console.log(line)
  
-                                                const match = line.replace("responseEnd", "").replace("data:", "").match(/"content":"(.*?)"/);
+                                                let match;
+
+                                                if(queryType === 'summary') {
+
+                                                    match = line.match(/{"summary":"Chunk 1:(.*?)"}/s);
+
+                                                } else {
+                                                    match = line.replace("responseEnd", "").replace("data:", "").match(/"content":"(.*?)"/);
+                                                }
  
                                                 let lineShow = ''
                                                 let testShow = ''
@@ -762,7 +764,10 @@ const Index = () => {
                                                         )}
                                                     </span>
                                                 );
-                                            })}
+                                            }
+                                            
+                                            
+                                            )}
  
                                     </div>
  
@@ -813,6 +818,17 @@ const Index = () => {
                 </div>
  
                 <InputGroup className="bottom-0 border rounded-md border-[#9f9e9e]">
+                {queryType === "summary" && (
+                            <div className="flex flex-col items-center justify-center ">
+                                <FormItem label="File">
+                                    <Upload
+                                        draggable
+                                        onChange={(file) => handleFileChange(file)}
+                                        multiple={false}
+                                    />
+                                </FormItem>
+                            </div>
+                        )}
                     <Input
                         placeholder={placeHolder}
                         type="text"

@@ -67,6 +67,7 @@ const TaskTimer = (Data: any) => {
   const projectId = queryParam.get('project_id') || '';
   const taskId = queryParam.get('task') || '';
   const org_id = localStorage.getItem('orgId')
+  const userId = localStorage.getItem('userId')
   const role: any = localStorage.getItem('role')
 
   // console.log(Data)
@@ -294,7 +295,7 @@ const TaskTimer = (Data: any) => {
     <div>
         <div className='flex  gap-4 items-center mb-5'>
 
-          {(Data.isShow) && ((Data.data.task_status === 'Completed' || Data.data.task_status === 'Cancelled') || Data.data.task_status === 'Pending' || ((role !== 'SUPERADMIN' &&   role !== 'ADMIN') && Data.data.task_assignee !== Data.user.username)) ?
+          {(Data.isShow) && ((Data.data.task_status === 'Completed' || Data.data.task_status === 'Cancelled') || Data.data.task_status === 'Pending' || ((role !== 'SUPERADMIN' &&   role !== 'ADMIN') && Data.data.task_assignee !== Data.user?.find((u:any) => u._id === userId)?.username)) ?
 
               (<>
                 <Button className='!rounded-full shadow-md' variant='twoTone' size='sm' disabled ><IoPlayOutline className='font-bold' /></Button>

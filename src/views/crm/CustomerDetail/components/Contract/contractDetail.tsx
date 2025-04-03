@@ -420,10 +420,7 @@ const ContractDetails = (data: FileItemProps) => {
             </>
         )
     }
-
-
     
-
     const columns =
         useMemo<ColumnDef<FileItem>[]>
             (() => {
@@ -582,7 +579,75 @@ const ContractDetails = (data: FileItemProps) => {
                                         )
                                     ) 
                                     : (
+
+                                        <span className=' flex flex-col items-start gap-2'>
+
                                         <ApprovalDailog fileId={fileId} Users={Users} LeadData={data.leadData}/>
+
+                                        { role === 'SUPERADMIN' &&
+                                            
+                                            <div className='flex gap-1'>
+                                                    <Button variant='solid' size='sm' onClick={() => Approval(fileId, 'approved')}>{approvalLoading ? "Approving..." : 'Approve'}</Button>
+                                                    <Button variant='solid' color='red-600' size='sm' onClick={() => openDialog1(fileId)}>Reject</Button>
+                                                    <Dialog
+                                                        isOpen={dialogIsOpen}
+                                                        onClose={onDialogClose1}
+                                                        onRequestClose={onDialogClose1}
+                                                    >
+                                                        <h3 className='mb-4'> Reject Remarks</h3>
+                                                        <Formik
+                                                            initialValues={{ lead_id: leadId, file_id: fileId, status: 'rejected', remark: '', org_id }}
+                                                            validationSchema={Yup.object({ remark: Yup.string().required('Required') })}
+                                                            onSubmit={async (values, { setSubmitting }) => {
+                                                                setSubmitting(true);
+                                                                const response = await apiGetCrmProjectShareContractApproval(values);
+                                                                setSubmitting(false);
+                                                                if (response.code === 200) {
+                                                                    toast.push(
+                                                                        <Notification closable type='success' duration={2000}>
+                                                                            {response.message}
+                                                                        </Notification>
+                                                                    )
+                                                                    window.location.reload();
+                                                                }
+                                                                else {
+                                                                    toast.push(
+                                                                        <Notification closable type='danger' duration={2000}>
+                                                                            {response.errorMessage}
+                                                                        </Notification>
+                                                                    )
+                                                                }
+
+                                                                setSubmitting(false);
+                                                            }}
+                                                        >
+                                                            {({ handleSubmit, isSubmitting }) => (
+                                                                <Form>
+                                                                    <FormItem label="Remark">
+                                                                        <Field name="remark"    >
+                                                                            {({ field, form }: any) => (
+                                                                                <Input
+                                                                                    textArea
+                                                                                    {...field}
+                                                                                    onChange={
+                                                                                        (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                                                            handleInputChange(e);
+                                                                                            form.setFieldValue(field.name, e.target.value);
+                                                                                        }
+                                                                                    }
+                                                                                />
+                                                                            )}
+                                                                        </Field>
+                                                                    </FormItem>
+                                                                    <div className='flex justify-end'>
+                                                                        <Button type="submit" variant='solid' loading={isSubmitting}>{isSubmitting ? 'Submitting' : 'Submit'}</Button>
+                                                                    </div>
+                                                                </Form>)}
+                                                        </Formik>
+                                                    </Dialog>
+                                                </div>}
+
+                                                </span>
                                     )
 
                             )
@@ -624,7 +689,7 @@ const ContractDetails = (data: FileItemProps) => {
                     }] : [])
                 ]
             },
-                [Users])
+                [Users, data])
 
     const table = useReactTable({
         data: data?.data.reverse() || [],
@@ -990,4 +1055,3 @@ const ContractDetails = (data: FileItemProps) => {
 }
 
 export default ContractDetails
-

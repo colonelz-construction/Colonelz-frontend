@@ -1,5 +1,5 @@
 // for Individual Lead
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Container from '@/components/shared/Container'
 import reducer, { getCustomer, useAppDispatch } from './store'
 import { injectReducer } from '@/store'
@@ -61,7 +61,12 @@ const CustomerDetail = () => {
     const [dialogIsOpen2, setIsOpen2] = useState(false)
     const [dialogIsOpen3, setIsOpen3] = useState(false)
     const [dialogIsOpen4, setIsOpen4] = useState(false)
+    const [dialogIsOpen5, setIsOpen5] = useState(false)
     const [leadData, setLeadData] = useState<any>([])
+
+    const [isOpen6, setIsOpen6] = useState(false);
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
       
     
@@ -107,6 +112,14 @@ const CustomerDetail = () => {
     const onDialogClose4 = () => {
 
         setIsOpen4(false)
+    }
+    const openDialog5 = () => {
+        setIsOpen5(true)
+    }
+
+    const onDialogClose5 = () => {
+
+        setIsOpen5(false)
     }
 
     // const navigate = useNavigate();
@@ -195,7 +208,7 @@ const CustomerDetail = () => {
         const fetchData = async () => {
             try {
                 const response = await apiGetCrmLeadsDetails(myParam, org_id);
-                
+
 
                 setLoading(false)
                 setDetails(response);
@@ -206,6 +219,21 @@ const CustomerDetail = () => {
 
         fetchData();
     }, [myParam]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+            buttonRef.current && !buttonRef.current.contains(event.target as Node) &&
+            dropdownRef.current && !dropdownRef.current.contains(event.target as Node)
+            ) {
+            setIsOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
 
     useEffect(() => {
@@ -271,14 +299,14 @@ const CustomerDetail = () => {
 
     const Toggle =
 
-        <Button variant='solid' size='sm' className='flex justify-center items-center gap-2'>
+        <Button variant='solid' size='sm' className='flex justify-center items-center gap-4'>
             <span>Actions</span><span><GoChevronDown /></span></Button>
     return (
         <>
             <div className='flex justify-between'>
-                <h3 className='pb-5'>Lead-{lead?.name || <Skeleton />}</h3>
-                <div>
-                    <Dropdown renderTitle={Toggle} placement='middle-end-top'>
+                <h3 className='pb-5'>Lead-{lead?.lead_details[0].name || <Skeleton />}</h3>
+                <div className=''>
+                    <Dropdown renderTitle={Toggle} placement='middle-end-top' >
                         <AuthorityCheck
                             userAuthority={[`${localStorage.getItem('role')}`]}
                             authority={ role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.update ?? []}
@@ -307,13 +335,37 @@ const CustomerDetail = () => {
 
                         </AuthorityCheck>}
 
-                        {/* {leadAddMemberAccess && <AuthorityCheck
+                        {<AuthorityCheck
                             userAuthority={[`${localStorage.getItem('role')}`]}
-                            authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.addMember?.create ?? []}
+                            authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.read ?? []}
                         >
-                            <Dropdown.Item eventKey="e" onClick={() => openDialog3()}><div>Add User</div></Dropdown.Item>
+                        <Dropdown.Item
+                            eventKey="d"
+                            onMouseEnter={() => setIsOpen6(true)}
+                            onMouseLeave={() => setIsOpen6(false)}
+                           >
+                            <div className="relative">
 
-                        </AuthorityCheck>} */}
+                                <div className='flex gap-3 justify-between items-center'>
+                                    <span>Design View</span>
+                                    <span><GoChevronDown /></span>
+                                </div>
+                                
+                                {isOpen6 && (
+                                <div
+                                    ref={dropdownRef}
+                                    className="absolute left-14 transform -translate-x-full mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg"
+                                >
+                                    <ul className="py-2">
+                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/app/crm/leads/blueprint?lead_id=${myParam}`}>2D View</Link></li>
+                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/app/crm/visualizer?lead_id=${myParam}`}>3D View</Link></li>
+                                    </ul>
+                                </div>
+                                )}
+                            </div>
+                            </Dropdown.Item>                      
+
+                        </AuthorityCheck>}
                     </Dropdown>
                 </div>
             </div>
@@ -346,7 +398,7 @@ const CustomerDetail = () => {
                                     Contract
                                 </TabNav>}
                                 <TabNav value="Tasks" >
-                                Task Manager
+                                Internal Task Manager
                             </TabNav>
                             {['ADMIN', 'SUPERADMIN'].includes(localStorage.getItem('role') || '') &&
                                 <TabNav value="Activity" >

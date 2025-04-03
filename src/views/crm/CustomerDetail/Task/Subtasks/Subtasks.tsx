@@ -30,6 +30,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from
 import Sorter from '@/components/ui/Table/Sorter'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
 import NoData from '@/views/pages/NoData'
+import SubtaskTimer from './SubtaskTimer'
 
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -256,7 +257,9 @@ const Subtasks = ({task,users}:any) => {
             header:'Subtask',
             accessorKey:'sub_task_name',
            cell:({row})=>{
-            return <SubTaskDetails user={user} data={row.original}/>
+
+            
+            return <SubTaskDetails isShow={true} user={user} data={row.original}/>
            }
          },
          {
@@ -271,17 +274,18 @@ const Subtasks = ({task,users}:any) => {
                }
          },
             {
-                header:'Start Date',
-                accessorKey:'estimated_sub_task_start_date',
-                cell:({row})=>{
-                    return <div>{formateDate(row.original.estimated_sub_task_start_date)}</div>
-                }
-            },
-            {
-                header:'End Date',
+                header:'Due Date',
                 accessorKey:'estimated_sub_task_end_date',
                 cell:({row})=>{
                     return <div>{formateDate(row.original.estimated_sub_task_end_date)}</div>
+                }
+            },
+
+            {
+                header:'Watch',
+                accessorKey:'',
+                cell:({row})=>{
+                    return (row.original && <SubtaskTimer isShow={false} user={user} data={row.original}/>)
                 }
             },
             {
@@ -375,7 +379,7 @@ const Subtasks = ({task,users}:any) => {
                             avatarInColumns={[0]}
                             columns={columns.length}
                             avatarProps={{ width: 14, height: 14 }}
-                        />: taskData.length === 0 ? (
+                        />: taskData &&  taskData?.length === 0 ? (
                             <TableBody>
                                 <TableRow>
                                     <TableCell colSpan={columns.length}>

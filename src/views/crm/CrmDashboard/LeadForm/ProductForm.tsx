@@ -34,295 +34,295 @@ interface FormData {
     createdBy: string
     role: string
     date: string | null
-  
+
 }
 
 const LeadForm: React.FC = () => {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
     return (
-       <Formik
-       initialValues={{
-              userId:localStorage.getItem('userId'),
-              org_id: localStorage.getItem('orgId'),
-              name: '',
-              email: '',
-              phone: '',
-              location: '',
-              lead_manager: '',
-              status: null,
-              source: '',
-              content: '',
-              createdBy: 'ADMIN',
-              role: localStorage.getItem('role') || 'ADMIN',
-              date: '',
-       }}
-       validationSchema={Yup.object().shape({
-        name: Yup.string()
-        .matches(/^[A-Za-z\s]+$/, 'Name can only contain letters and spaces')
-        .required('Name is required'),
-            email: Yup.string().email('Must be a valid email').required('Email is required').matches(
-                /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                'Invalid email address'
-              ),
-            phone: Yup.string().required('Phone number is required').length(10, 'Phone number must be exactly 10 digits'),
-            location: Yup.string().required('Location is required'),
-            lead_manager: Yup.string().required('Lead Manager is required'),
-            status: Yup.string().required('Status is required'),
-            date: Yup.string().required('Date is required'),
-         })
-       }
-       onSubmit={
-              async(values) => {
-                setLoading(true)
-
-
-                
-                const response = await apiGetCrmCreateLead(values)
-                // console.log(response)
-                setLoading(false)
-                if (response.code===200){
-                    toast.push(
-                        <Notification type='success' duration={2000}>
-                            Lead Created Successfully
-                        </Notification>
-                    )
-                    navigate('/app/leads')
-                    window.location.reload()
-                }
-                else{
-                    toast.push(
-                        <Notification type='danger' duration={2000}>
-                            {response.errorMessage.length===0?response.message:response.errorMessage}
-                        </Notification>
-                    )
-                }
+        <Formik
+            initialValues={{
+                userId: localStorage.getItem('userId'),
+                org_id: localStorage.getItem('orgId'),
+                name: '',
+                email: '',
+                phone: '',
+                location: '',
+                lead_manager: '',
+                status: null,
+                source: '',
+                content: '',
+                createdBy: 'ADMIN',
+                role: localStorage.getItem('role') || 'ADMIN',
+                date: '',
+            }}
+            validationSchema={Yup.object().shape({
+                name: Yup.string()
+                    .matches(/^[A-Za-z\s]+$/, 'Name can only contain letters and spaces')
+                    .required('Name is required'),
+                email: Yup.string().email('Must be a valid email').required('Email is required').matches(
+                    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    'Invalid email address'
+                ),
+                phone: Yup.string().required('Phone number is required').length(10, 'Phone number must be exactly 10 digits'),
+                location: Yup.string().required('Location is required'),
+                lead_manager: Yup.string().required('Lead Manager is required'),
+                status: Yup.string().required('Status is required'),
+                date: Yup.string().required('Date is required'),
+            })
             }
-       }>
-        {({ errors, touched }) => (<>
-        <Form >
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-5 xl:grid-cols-4'>
-            <FormItem label='Lead Name'
-            asterisk
-            invalid={errors.name && touched.name}
-            errorMessage={errors.name}
-            >
-                <Field
-                name='name'
-                placeholder='Enter lead name'
-                >
-                    {({ field,form }:any) => (
-                        <Input
-                        name='name'
-                        placeholder='Enter lead name'
-                        onChange={(e) => {
-                            form.setFieldValue(field.name, e.target.value)
-                        }}
-                        onKeyDown={(e) => {
-                            const regex = /^[a-zA-Z\s]*$/;
-                            if (!regex.test(e.key)) {
-                                e.preventDefault();
-                            }
-                        }}
-                        />
-                    )}
-                </Field>
-              
-            </FormItem>
+            onSubmit={
+                async (values) => {
+                    setLoading(true)
 
-            <FormItem label='Email'
-            asterisk
-            invalid={errors.email && touched.email}
-            errorMessage={errors.email}
-            >
-                <Field
-                name='email'
-                placeholder='Enter email'
-                >
-                    {({ field,form }:any) => (
-                        <Input
-                        name='email'
-                        placeholder='Enter email'
-                        onChange={(e) => {
-                            form.setFieldValue(field.name, e.target.value)
-                        }}
-                        />
-                    )}
-                </Field>
-            </FormItem>
 
-            <FormItem label='Phone'
-            asterisk
-            invalid={errors.phone && touched.phone}
-            errorMessage={errors.phone}
-            >
-                <Field
-                name='phone'
-                placeholder='Enter Phone'
-                >
-                    {({ field,form }:any) => (
-                       <Input
-                       placeholder='Enter phone'
-                       maxLength={10}
-                       onChange={(e) => {
-                        const value = e.target.value;
-                        if (value.length <= 10 && /^[0-9]*$/.test(value)) {
-                          form.setFieldValue(field.name, value);
-                        }
-                          }}
-                          onKeyPress={(e) => {
-                            const charCode = e.which ? e.which : e.keyCode;
-                            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                              e.preventDefault();
-                            }
-                          }}
-                          />
-                    )}
-                </Field>
-            </FormItem>
 
-            <FormItem label='Location'
-            asterisk
-            invalid={errors.location && touched.location}
-            errorMessage={errors.location}
-            >
-                <Field
-                name='location'
-                placeholder='Enter location'
-                >
-                    {({ field,form }:any) => (
-                        <Input
-                        name='location'
-                        placeholder='Enter location'
-                        onChange={(e) => {
-                            form.setFieldValue(field.name, e.target.value)
-                        }}
-                        />
-                    )}
-                </Field>
-            </FormItem>
+                    const response = await apiGetCrmCreateLead(values)
+                    // console.log(response)
+                    setLoading(false)
+                    if (response.code === 200) {
+                        toast.push(
+                            <Notification type='success' duration={2000}>
+                                Lead Created Successfully
+                            </Notification>
+                        )
+                        navigate('/app/leads')
+                        window.location.reload()
+                    }
+                    else {
+                        toast.push(
+                            <Notification type='danger' duration={2000}>
+                                {response.errorMessage.length === 0 ? response.message : response.errorMessage}
+                            </Notification>
+                        )
+                    }
+                }
+            }>
+            {({ errors, touched }) => (<>
+                <Form >
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-5 xl:grid-cols-4'>
+                        <FormItem label='Lead Name'
+                            asterisk
+                            invalid={errors.name && touched.name}
+                            errorMessage={errors.name}
+                        >
+                            <Field
+                                name='name'
+                                placeholder='Enter lead name'
+                            >
+                                {({ field, form }: any) => (
+                                    <Input
+                                        name='name'
+                                        placeholder='Enter lead name'
+                                        onChange={(e) => {
+                                            form.setFieldValue(field.name, e.target.value)
+                                        }}
+                                        onKeyDown={(e) => {
+                                            const regex = /^[a-zA-Z\s]*$/;
+                                            if (!regex.test(e.key)) {
+                                                e.preventDefault();
+                                            }
+                                        }}
+                                    />
+                                )}
+                            </Field>
 
-            <FormItem label='Lead Manager'
-            asterisk
-            invalid={errors.lead_manager && touched.lead_manager}
-            errorMessage={errors.lead_manager}
-            >
-                <Field
-                name='lead_manager'
-                placeholder='Enter lead manager'
-                >
-                    {({ field,form }:any) => (
-                        <Input
-                        name='lead_manager'
-                        placeholder='Enter lead manager'
-                        onChange={(e) => {
-                            form.setFieldValue(field.name, e.target.value)
-                        }}
-                        />
-                    )}
-                </Field>
-            </FormItem>
+                        </FormItem>
 
-            <FormItem label='Lead Status'
-            asterisk
-            invalid={errors.status && touched.status}
-            errorMessage={errors.status}
-            >
-                <Field
-                name='status'
-                options={options}
-                placeholder='Select status'
-                >
-                    {({ field, form, meta }:any) => (
-                        <Select
-                        name='status'
-                        options={options}
-                        placeholder='Select status'
-                        onChange={(value) => {
-                            form.setFieldValue(field.name, value?.value)
-                        }}
-                        />
-                    )}
-                </Field>
-            </FormItem>
+                        <FormItem label='Email'
+                            asterisk
+                            invalid={errors.email && touched.email}
+                            errorMessage={errors.email}
+                        >
+                            <Field
+                                name='email'
+                                placeholder='Enter email'
+                            >
+                                {({ field, form }: any) => (
+                                    <Input
+                                        name='email'
+                                        placeholder='Enter email'
+                                        onChange={(e) => {
+                                            form.setFieldValue(field.name, e.target.value)
+                                        }}
+                                    />
+                                )}
+                            </Field>
+                        </FormItem>
 
-            <FormItem label='Source'
-            >
-                <Field
-                name='source'
-                component={Input}
-                placeholder='Enter source'
+                        <FormItem label='Phone'
+                            asterisk
+                            invalid={errors.phone && touched.phone}
+                            errorMessage={errors.phone}
+                        >
+                            <Field
+                                name='phone'
+                                placeholder='Enter Phone'
+                            >
+                                {({ field, form }: any) => (
+                                    <Input
+                                        placeholder='Enter phone'
+                                        maxLength={10}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (value.length <= 10 && /^[0-9]*$/.test(value)) {
+                                                form.setFieldValue(field.name, value);
+                                            }
+                                        }}
+                                        onKeyPress={(e) => {
+                                            const charCode = e.which ? e.which : e.keyCode;
+                                            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                                e.preventDefault();
+                                            }
+                                        }}
+                                    />
+                                )}
+                            </Field>
+                        </FormItem>
 
-                />
-            </FormItem>
+                        <FormItem label='Location'
+                            asterisk
+                            invalid={errors.location && touched.location}
+                            errorMessage={errors.location}
+                        >
+                            <Field
+                                name='location'
+                                placeholder='Enter location'
+                            >
+                                {({ field, form }: any) => (
+                                    <Input
+                                        name='location'
+                                        placeholder='Enter location'
+                                        onChange={(e) => {
+                                            form.setFieldValue(field.name, e.target.value)
+                                        }}
+                                    />
+                                )}
+                            </Field>
+                        </FormItem>
 
-       
-            <FormItem label='Created Date'
-            asterisk
-            invalid={errors.date && touched.date}
-            errorMessage={errors.date}
-            >
-                <Field
-                name='date'
-                placeholder='Enter date'
-                >
-                    {({ field ,form}:any) => (
-                        <DateTimepicker
-                        maxDate={new Date()}
-                        onChange={(date) => {
-                         form.setFieldValue(field.name, `${date}`)
-                        }}
-                        />
-                    )}
-                </Field>
-                
-            </FormItem>
-            
+                        <FormItem label='Lead Manager'
+                            asterisk
+                            invalid={errors.lead_manager && touched.lead_manager}
+                            errorMessage={errors.lead_manager}
+                        >
+                            <Field
+                                name='lead_manager'
+                                placeholder='Enter lead manager'
+                            >
+                                {({ field, form }: any) => (
+                                    <Input
+                                        name='lead_manager'
+                                        placeholder='Enter lead manager'
+                                        onChange={(e) => {
+                                            form.setFieldValue(field.name, e.target.value)
+                                        }}
+                                    />
+                                )}
+                            </Field>
+                        </FormItem>
 
-           
+                        <FormItem label='Lead Status'
+                            asterisk
+                            invalid={errors.status && touched.status}
+                            errorMessage={errors.status}
+                        >
+                            <Field
+                                name='status'
+                                options={options}
+                                placeholder='Select status'
+                            >
+                                {({ field, form, meta }: any) => (
+                                    <Select
+                                        name='status'
+                                        options={options}
+                                        placeholder='Select status'
+                                        onChange={(value) => {
+                                            form.setFieldValue(field.name, value?.value)
+                                        }}
+                                    />
+                                )}
+                            </Field>
+                        </FormItem>
 
-            </div>
-            <FormItem label='Content'
-            >
-                <Field
-                name='content'
-                placeholder='Enter content'
-                >
-                    {({ field,form }:any) => (
-                       <RichTextEditor
-                       onChange={(e) => {
-                        form.setFieldValue(field.name, e)
-                          }}
-                          />
-                    )}
-                </Field>
-            </FormItem>
+                        <FormItem label='Source'
+                        >
+                            <Field
+                                name='source'
+                                component={Input}
+                                placeholder='Enter source'
 
-            <StickyFooter
-                className="-mx-8 px-8 flex items-center gap-3 py-4"
-                stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-            >
-                
-                    <Button
-                        size="sm"
-                        className="ltr:mr-3 rtl:ml-3"
-                        type="button"
-                        onClick={() => {
-                            navigate(-1)
-                        }}
+                            />
+                        </FormItem>
+
+
+                        <FormItem label='Created Date'
+                            asterisk
+                            invalid={errors.date && touched.date}
+                            errorMessage={errors.date}
+                        >
+                            <Field
+                                name='date'
+                                placeholder='Enter date'
+                            >
+                                {({ field, form }: any) => (
+                                    <DateTimepicker
+                                        maxDate={new Date()}
+                                        onChange={(date) => {
+                                            form.setFieldValue(field.name, `${date}`)
+                                        }}
+                                    />
+                                )}
+                            </Field>
+
+                        </FormItem>
+
+
+
+
+                    </div>
+                    <FormItem label='Content'
                     >
-                        Discard
-                    </Button>
-                    <Button size="sm" variant="solid" type="submit" loading={loading}>
-                        {loading?'Submitting':'Submit'}
-                    </Button>
-                
-            </StickyFooter>
-        </Form>
-        
-       
-        </>)}
-            </Formik>
+                        <Field
+                            name='content'
+                            placeholder='Enter content'
+                        >
+                            {({ field, form }: any) => (
+                                <RichTextEditor
+                                    onChange={(e) => {
+                                        form.setFieldValue(field.name, e)
+                                    }}
+                                />
+                            )}
+                        </Field>
+                    </FormItem>
+
+                    <StickyFooter
+                        className="-mx-8 px-8 flex items-center gap-3 py-4"
+                        stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                    >
+
+                        <Button
+                            size="sm"
+                            className="ltr:mr-3 rtl:ml-3"
+                            type="button"
+                            onClick={() => {
+                                navigate(-1)
+                            }}
+                        >
+                            Discard
+                        </Button>
+                        <Button size="sm" variant="solid" type="submit" loading={loading}>
+                            {loading ? 'Submitting' : 'Submit'}
+                        </Button>
+
+                    </StickyFooter>
+                </Form>
+
+
+            </>)}
+        </Formik>
     )
 }
 

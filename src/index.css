@@ -9,3 +9,8 @@
     list-style-type: disc;
     margin-left: 20px;
 }
+
+.wx-weekend {
+    background-color: rgba(255, 152, 0, 0.3) !important; /* Light orange */
+  }
+  

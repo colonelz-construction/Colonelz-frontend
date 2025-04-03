@@ -1,5 +1,6 @@
 import { useMemo, lazy, Suspense } from 'react'
 import Loading from '@/components/shared/Loading'
+import FloatingButton from '../ui/FloatingButton'
 import { useAppSelector } from '@/store'
 import {
     LAYOUT_TYPE_CLASSIC,
@@ -27,6 +28,8 @@ const Layout = () => {
 
     const { authenticated } = useAuth()
 
+    const org_id = localStorage.getItem('orgId');
+
     useDirection()
 
     useLocale()
@@ -48,6 +51,8 @@ const Layout = () => {
         >
             
             <AppLayout />
+
+            {org_id && <FloatingButton/>}
             
         </Suspense>
     )

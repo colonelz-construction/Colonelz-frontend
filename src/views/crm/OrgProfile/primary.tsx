@@ -3,30 +3,16 @@ import { Formik, Field, Form, ErrorMessage, FieldProps } from 'formik'
 import * as Yup from 'yup'
 import { Button, FormItem, Input, Notification, Select, toast } from '@/components/ui'
 import { apiGetOrgData, apiEditOrgData } from '@/services/CrmService'
-
-
-const apiToken = import.meta.env.VITE_API_TOKEN;
-const userEmail = import.meta.env.VITE_USER_EMAIL;
+import { Country, State, City } from 'country-state-city';
+import { RxCrossCircled } from "react-icons/rx";
+import { FaPlus } from "react-icons/fa";
+import { GoPlus} from "react-icons/go";
+import { AiOutlineMinusCircle } from "react-icons/ai";
 const currencyUrl = import.meta.env.VITE_CURRENCY_URL;
-const countryUrl = import.meta.env.VITE_COUNTRY_URL;
 
 const org_id: any = localStorage.getItem('orgId')
 const userId: any = localStorage.getItem('userId')
 
-interface Country {
-    name: string;
-    alpha2Code: string;
-}
-
-interface State {
-    name: string;
-    state_name: string;
-}
-
-interface City {
-    name: string;
-    city_name: string;
-}
 
 interface FormValues {
     organization: string;
@@ -35,7 +21,7 @@ interface FormValues {
     org_phone: string;
     org_website: string;
     currency: string;
-    vat_tax_gst_number: string;
+    vat_tax_gst_number: any;
     org_logo: any;
     org_address: string;
     org_city: string;
@@ -56,7 +42,7 @@ const validationSchema = Yup.object().shape({
     // org_phone: Yup.number()
     //     .required('Contact Number is required'),
     currency: Yup.string().required('Required'),
-    vat_tax_gst_number: Yup.string().required('Required'),
+    // vat_tax_gst_number: Yup.string().required('Required'),
     org_country: Yup.string().required('Required'),
     org_zipcode: Yup.string().required('Required'),
 })
@@ -64,10 +50,24 @@ const validationSchema = Yup.object().shape({
 const Primary = () => {
 
     const [details, setDetails] = useState<any>();
-    const [countries, setCountries] = useState<Country[]>([]);
-    const [authToken, setAuthToken] = useState<string | null>(null);
+    const [initialValues, setInitialValues] = useState<FormValues>({
+        organization: '',
+        email: '',
+        org_email: '',
+        org_phone: '',
+        org_website: '',
+        currency: '',
+        vat_tax_gst_number: [],
+        org_logo: '',
+        org_address: '',
+        org_city: '',
+        org_state: '',
+        org_country: '',
+        org_zipcode: '',
+    });
     const [file, setFile] = useState<string>('');
     const [typeOptions, setTypeOptions] = useState<CurrencyOption[]>([]);
+    const [fields, setFields] = useState<{ name: string; number: string }[]>([{ name: "", number: "" }]);
 
 
     useEffect(() => {
@@ -103,6 +103,7 @@ const Primary = () => {
                 const response = await apiGetOrgData();
                 setDetails(response.data);
                 setFile(response.data.org_logo)
+                setFields(response.data.vat_tax_gst_number)
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -111,73 +112,39 @@ const Primary = () => {
     }, [])
 
     useEffect(() => {
-        const getAuthToken = async () => {
-            try {
-                const response = await fetch(`${countryUrl}api/getaccesstoken`, {
-                    headers: {
-                        "Accept": "application/json",
-                        "api-token": apiToken,
-                        "user-email": userEmail,
-                    },
-                });
-                const data = await response.json();
-                setAuthToken(data.auth_token);
-            } catch (error) {
-                console.error('Error fetching auth token:', error);
-            }
-        };
+        if (details) {
+            setInitialValues({
+                organization: details?.organization || '',
+                email: details?.email || '',
+                org_email: details?.org_email || '',
+                org_phone: details?.org_phone || '',
+                org_website: details?.org_website || '',
+                currency: details?.currency || '',
+                vat_tax_gst_number: details?.vat_tax_gst_number || [{ name: "", number: "" }],
+                org_logo: details?.org_logo || '',
+                org_address: details?.org_address || '',
+                org_city: details?.org_city || '',
+                org_state: details?.org_state || '',
+                org_country: details?.org_country || '',
+                org_zipcode: details?.org_zipcode || '',
+            });
+        }
+    }, [details]);
 
-        getAuthToken();
-    }, []);
 
-    useEffect(() => {
-        const fetchCountries = async () => {
-            if (!authToken) return;
-            try {
-                const response = await fetch(`${countryUrl}api/countries/`, {
-                    headers: {
-                        "Authorization": `Bearer ${authToken}`,
-                        "Accept": "application/json",
-                    },
-                });
-                const data = await response.json();
-                    const formattedCountries = data.map((country: any) => ({
-                        name: country.country_name,
-                        alpha2Code: country.country_short_name,
-                    }));
-                    setCountries(formattedCountries);
-               
-            } catch (error) {
-                console.error('Error fetching countries:', error);
-            }
-        };
-        fetchCountries();
-    }, [authToken]);
 
-    const initialValues: FormValues = {
-        organization: details?.organization || '',
-        email: details?.email || '',
-        org_email: details?.org_email || '',
-        org_phone: details?.org_phone || '',
-        org_website: details?.org_website || '',
-        currency: details?.currency || '',
-        vat_tax_gst_number: details?.vat_tax_gst_number || '',
-        org_logo: details?.org_logo || '',
-        org_address: details?.org_address || '',
-        org_city: details?.org_city || '',
-        org_state: details?.org_state || '',
-        org_country: details?.org_country || '',
-        org_zipcode: details?.org_zipcode || '',
-    };
+
 
     const handleSubmit = async (values: FormValues, { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }) => {
+
+       
         const formData = new FormData();
         formData.append('organization', values.organization);
         formData.append('org_email', values.org_email);
         formData.append('email', values.email);
         formData.append('org_phone', values.org_phone);
         formData.append('currency', values.currency);
-        formData.append('vat_tax_gst_number', values.vat_tax_gst_number)
+        formData.append('vat_tax_gst_number', JSON.stringify(fields))
         formData.append('org_website', values.org_website)
         formData.append('org_city', values.org_city)
         formData.append('org_country', values.org_country)
@@ -191,21 +158,13 @@ const Primary = () => {
         const response = await apiEditOrgData(formData);
         setSubmitting(false)
 
-        if (response.code === 200) {
-            toast.push(
-                <Notification type='success' duration={2000}>
-                    Details Updated Succesfully.
-                </Notification>
-            )
-            window.location.reload();
-        }
-        else {
-            toast.push(
-                <Notification type='danger' duration={2000}>
-                    {response.errorMessage}
-                </Notification>
-            )
-        }
+        toast.push(
+            <Notification type={response.code === 200 ? 'success' : 'danger'} duration={2000}>
+                {response.code === 200 ? 'Details Updated Successfully.' : response.errorMessage}
+            </Notification>
+        );
+
+        if (response.code === 200) window.location.reload();
     }
     return (
         <>
@@ -217,13 +176,12 @@ const Primary = () => {
             >
                 {({ setFieldValue, values }) => (
                     <FormContent
-                        countries={countries}
-                        details={details}
                         setFieldValue={setFieldValue}
                         values={values}
                         file={file} setFile={setFile}
-                        authToken={authToken}
                         typeOptions={typeOptions}
+                        fields={fields}
+                        setFields={setFields}
                     />
                 )}
             </Formik>
@@ -231,121 +189,72 @@ const Primary = () => {
     );
 };
 
-const FormContent = ({ countries, details, setFieldValue, values,authToken, file, setFile, typeOptions }: { setFile: (field: string) => void; file: string, countries: Country[]; details: any; setFieldValue: (field: string, value: any) => void; values: FormValues; authToken: string | null, typeOptions:any }) => {
+const FormContent = ({ setFields, fields, setFieldValue, values, file, setFile, typeOptions }: { fields:{ name: string; number: string }[], setFields:any,  setFile: (field: string) => void; file: string, setFieldValue: (field: string, value: any) => void; values: FormValues; typeOptions: any }) => {
 
     const [fileName, setFileName] = useState<string | undefined>(undefined);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
-    
 
-    const [states, setStates] = useState<State[]>([]);
-    const [cities, setCities] = useState<City[]>([]);
-
-
-    
-
-    useEffect(() => {
-        if (details && details.org_country) {
-            const country = countries.find(c => c.name === details.org_country);
-            if (country) {
-                fetchStates(country.name);
-                setFieldValue('org_country', country.name);
-            }
-        }
-    }, [details, countries]);
-
-    useEffect(() => {
-        if (details && details.org_state) {
-            setFieldValue('org_state', details.org_state);
-        }
-    }, [details]);
-
-    const fetchStates = async (countryName: string) => {
-        if (!authToken) return;
-        try {
-            const response = await fetch(`${countryUrl}api/states/${countryName}`, {
-                headers: {
-                    "Authorization": `Bearer ${authToken}`,
-                    "Accept": "application/json",
-                },
-            });
-            const data = await response.json();
-            const formattedStates = data.map((state: any) => ({
-                name: state.state_name,
-            }));
-            setStates(formattedStates);
-
-                const state = data.find((s: State) => s.state_name === details.org_state);
-                if (state) {
-                    setFieldValue('org_state', state.state_name);
-                    fetchCities(state.state_name); // Fetch cities based on the state
-                }
-            
-        } catch (error) {
-            console.error('Error fetching states:', error);
-        }
-    };
-
-    const fetchCities = async (stateName: string) => {
-        if (!authToken) return;
-            try {
-                const response = await fetch(`${countryUrl}api/cities/${stateName}`, {
-                    headers: {
-                        "Authorization": `Bearer ${authToken}`,
-                        "Accept": "application/json",
-                    },
-                });
-                const data = await response.json();
-                    setCities(data);
-
-                    const city = data.find((c: City) => c.name === details.org_city);
-                    if (city) {
-                        setFieldValue('org_city', city.name);
-                        setFieldValue('org_zipcode', details.org_zipcode || '');
-                    }
-                    const formattedCities = data.map((city: any) => ({
-                        name: city.city_name,
-                    }));
-                    setCities(formattedCities);
-            } catch (error) {
-                console.error('Error fetching cities:', error);
-            }
-        }
-
-    const handleCountryChange = async (option: { value: string; label: string } | null) => {
-        setFieldValue('org_country', option ? option.label : '');
-        setFieldValue('org_state', '');
-        setFieldValue('org_city', '');
-
-        if (option) {
-            fetchStates(option.label);
-        }
-    };
-
-    const handleStateChange = async (option: { value: string; label: string } | null) => {
-        setFieldValue('org_state', option ? option.label : '');
-        setFieldValue('org_city', '');
-
-        if (option) {
-            fetchCities(option.value);
-        }
-    };
-
-    const countryOptions = countries.map(country => ({
-        value: country.alpha2Code,
+    const countries = Country.getAllCountries().map(country => ({
+        value: country.isoCode,
         label: country.name,
     }));
 
-    const stateOptions = states.map(state => ({
-        value: state.name,
-        label: state.name,
-    }));
+    const [states, setStates] = useState<any[]>([]);
+    const [cities, setCities] = useState<any[]>([]);
 
-    const cityOptions = cities.map(city => ({
-        value: city.name,
-        label: city.name,
-    }));
 
+
+
+    useEffect(() => {
+        if (values.org_country) {
+            const statesList = State.getStatesOfCountry(values.org_country);
+            setStates(statesList);
+            setCities([]);
+            if (!statesList.some(state => state.isoCode === values.org_state)) {
+                setFieldValue('state', '');
+                setFieldValue('city', '');
+            }
+        } else {
+            setStates([]);
+            setCities([]);
+        }
+    }, [values.org_country]);
+
+    useEffect(() => {
+        if (values.org_state) {
+            const citiesList = City.getCitiesOfState(values.org_country, values.org_state);
+            setCities(citiesList);
+            if (!citiesList.some(city => city.name === values.org_city)) {
+                setFieldValue('city', '');
+            }
+        } else {
+            setCities([]);
+        }
+    }, [values.org_state]);
+
+
+    const addField = () => {
+        setFields([...fields, { name: "", number: "" }]);
+      };
     
+      const removeField = (index: number) => {
+          const newFields = fields.filter((_, i) => i !== index);
+          setFields(newFields);
+        
+      };
+    
+      const handleChange = (index: number, key: "name" | "number", value: string) => {
+        const newFields = [...fields];
+        newFields[index][key] = value;
+        setFields(newFields);
+    
+        // Clear error if at least one field has values
+        if (newFields.some(field => field.name.trim() !== "" && field.number.trim() !== "")) {
+        }
+      };
+  
+
+
 
     return (
         <>
@@ -437,18 +346,50 @@ const FormContent = ({ countries, details, setFieldValue, values,authToken, file
                         />
                     </FormItem>
 
-                    <FormItem label="Vat/Tax No/GST" asterisk>
-                        <Field
-                            component={Input}
-                            type="text"
-                            name="vat_tax_gst_number"
-                            placeholder="Vat/Tax No/GST"
-                        />
-                        <ErrorMessage
-                            name="type"
-                            component="div"
-                            className=" text-red-600"
-                        />
+                    <FormItem label="PAN/GST">
+                    <div className="">
+                        {fields.map((field, index) => (
+                            <div key={index} className="flex items-center gap-1">
+                            <Field
+                                component="input"
+                                type="text"
+                                value={field.name}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                handleChange(index, "name", e.target.value)
+                                }
+                                placeholder="Tag"
+                                className="flex-1 border rounded p-2 w-10 mb-1"
+                            />
+                            <Field
+                                component="input"
+                                type="text"
+                                value={field.number}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                handleChange(index, "number", e.target.value)
+                                }
+                                placeholder="Vat/Tax No/GST"
+                                className="flex-1 border rounded p-2 mb-1"
+                            />
+                            {fields.length > 1 && (
+                                <span
+                                className='cursor-pointer ml-2'
+                                // size="icon"
+                                onClick={() => removeField(index)}
+                                >
+                                <RxCrossCircled/>
+                                </span>
+                            )}
+                            </div>
+                        ))}
+                        <span className='p-1 cursor-pointer hover:text-gray-400'  onClick={addField}>
+                            <span className='flex gap-1 items-center'>
+                                <GoPlus/> <span>Add More</span>
+
+                            </span>
+                        </span>
+
+                        {/* Debugging: Show the list of values */}
+                        </div>
                     </FormItem>
 
                     {/* <FormItem label="">
@@ -576,7 +517,7 @@ const FormContent = ({ countries, details, setFieldValue, values,authToken, file
                             {({ field, form }: FieldProps) => (
                                 <Select
                                     options={typeOptions}
-                                    value={typeOptions.find((option:any) => option.value === field.value)
+                                    value={typeOptions.find((option: any) => option.value === field.value)
                                         // || details?.currency
                                     }
                                     onChange={(option) => {
@@ -611,9 +552,9 @@ const FormContent = ({ countries, details, setFieldValue, values,authToken, file
                         <Field name="org_country">
                             {({ field }: FieldProps) => (
                                 <Select
-                                    options={countryOptions}
-                                    onChange={handleCountryChange}
-                                    value={countryOptions.find(option => option.label === field.value) || null}
+                                    options={countries}
+                                    onChange={(option) => setFieldValue('org_country', option?.value || '')}
+                                    value={countries.find(option => option.value === field.value) || null}
                                     placeholder="Select Country"
                                 />
                             )}
@@ -625,10 +566,14 @@ const FormContent = ({ countries, details, setFieldValue, values,authToken, file
                         <Field name="org_state">
                             {({ field }: FieldProps) => (
                                 <Select
-                                    options={stateOptions}
-                                    onChange={handleStateChange}
-                                    value={stateOptions.find(option => option.label === field.value) || null}
+                                    options={states.map(state => ({ value: state.isoCode, label: state.name }))}
+                                    onChange={(option) => {
+                                        setFieldValue('org_state', option?.value || '');
+                                        setFieldValue('org_city', '');
+                                    }}
+                                    value={states.find(state => state.isoCode === field.value) ? { value: field.value, label: states.find(state => state.isoCode === field.value)?.name || '' } : null}
                                     placeholder="Select State"
+                                    isDisabled={!values.org_country}
                                 />
                             )}
                         </Field>
@@ -639,12 +584,11 @@ const FormContent = ({ countries, details, setFieldValue, values,authToken, file
                         <Field name="org_city">
                             {({ field }: FieldProps) => (
                                 <Select
-                                    options={cityOptions}
-                                    onChange={(option) => {
-                                        setFieldValue('org_city', option ? option.label : '');
-                                    }}
-                                    value={cityOptions.find(option => option.label === field.value) || null}
+                                    options={cities.map(city => ({ value: city.name, label: city.name }))}
+                                    onChange={(option) => setFieldValue('org_city', option?.value || '')}
+                                    value={cities.find(city => city.name === field.value) ? { value: field.value, label: field.value } : null}
                                     placeholder="Select City"
+                                    isDisabled={!values.org_state}
                                 />
                             )}
                         </Field>

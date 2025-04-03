@@ -3,11 +3,11 @@ import Container from '@/components/shared/Container'
 import CustomerProfile from './components/CustomerProfile'
 import useQuery from '@/utils/hooks/useQuery'
 import MOM from './components/MOM/Mom'
-import { Skeleton, Tabs } from '@/components/ui'
+import { Button, Dropdown, Skeleton, Tabs } from '@/components/ui'
 import TabList from '@/components/ui/Tabs/TabList'
 import TabNav from '@/components/ui/Tabs/TabNav'
 import TabContent from '@/components/ui/Tabs/TabContent'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { apiGetCrmProjectsMom, apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList, apiGetUsersListProject } from '@/services/CrmService'
 import Index from './Quotation'
 import Task from './Task/index'
@@ -19,6 +19,8 @@ import { Customer, Data, Tasks } from './store'
 import { FileItemType } from './Quotation/Quotations'
 import Assignee, { UsersResponse } from './Project Progress/Assignee'
 import { update } from 'lodash'
+import { GoChevronDown } from 'react-icons/go'
+import ExexutionTimeline from './Project Progress/ExexutionTimeline'
 
 
 export type QuotationResponseType = {
@@ -168,10 +170,67 @@ const CustomerDetail = () => {
 
     fetchDataAndLog();
   }, [allQueryParams.project_id, taskAccess]);
+  const Toggle =
+  
+          <Button variant='solid' size='sm' className='flex justify-center items-center gap-2'>
+              <span>Design View</span><span><GoChevronDown /></span></Button>
 
   return (
     <>
-      <h3 className='pb-5 capitalize flex items-center'><span>Project-</span>{loading ? <Skeleton width={100} /> : projectData[0]?.project_name}</h3>
+
+      <span className='flex justify-between'>
+        <h3 className='pb-5 capitalize flex items-center'><span>Project-</span>{loading ? <Skeleton width={100} /> : projectData[0]?.project_name}</h3>
+
+            <Dropdown renderTitle={Toggle} placement='middle-end-top' >
+              
+              {<AuthorityCheck
+                  userAuthority={[`${localStorage.getItem('role')}`]}
+                  authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
+              >
+                  <Dropdown.Item eventKey="d"><Link to={`/app/crm/projects/blueprint?project_id=${allQueryParams.project_id}`}>2D View</Link></Dropdown.Item>
+
+              </AuthorityCheck>}
+              {<AuthorityCheck
+                  userAuthority={[`${localStorage.getItem('role')}`]}
+                  authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
+              >
+                  <Dropdown.Item eventKey="g"><Link to={`/app/crm/visualizer?project_id=${allQueryParams.project_id}`}>3D View</Link></Dropdown.Item>
+
+              </AuthorityCheck>}
+
+              {/* {<AuthorityCheck
+                  userAuthority={[`${localStorage.getItem('role')}`]}
+                  authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.read ?? []}
+              >
+              <Dropdown.Item
+                  eventKey="d"
+                  onMouseEnter={() => setIsOpen6(true)}
+                  onMouseLeave={() => setIsOpen6(false)}
+                  >
+                  <div className="relative">
+
+                      <div className='flex gap-3 justify-between items-center'>
+                          <span>Design View</span>
+                          <span><GoChevronDown /></span>
+                      </div>
+                      
+                      {isOpen6 && (
+                      <div
+                          ref={dropdownRef}
+                          className="absolute left-14 transform -translate-x-full mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg"
+                      >
+                          <ul className="py-2">
+                          <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/app/crm/leads/blueprint?lead_id=${myParam}`}>2D View</Link></li>
+                          <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/app/crm/visualizer?lead_id=${myParam}`}>3D View</Link></li>
+                          </ul>
+                      </div>
+                      )}
+                  </div>
+                  </Dropdown.Item>                      
+              </AuthorityCheck>} */}
+          </Dropdown>
+
+      </span>
       <div>
 
 
@@ -187,7 +246,7 @@ const CustomerDetail = () => {
                   <TabNav value="mom" >MOM</TabNav>
                 }
                 {taskAccess &&
-                  <TabNav value="task">Task Manager</TabNav>
+                  <TabNav value="task">Internal Task Manager</TabNav>
                 }
                 <AuthorityCheck
                   userAuthority={[`${localStorage.getItem('role')}`]}
@@ -204,6 +263,10 @@ const CustomerDetail = () => {
                     <span className={data?.length == 0 ? "text-red-500" : ""}>{"("}{data?.length}{")"}</span>
                   </TabNav>
                 }
+
+{/* {
+                  <TabNav value="exectimeline">Execution Timeline</TabNav>
+                } */}
               </>
 
             </TabList>
@@ -233,6 +296,9 @@ const CustomerDetail = () => {
               <TabContent value="assignee">
                 <Assignee data={data} />
               </TabContent>
+              {/* <TabContent value="exectimeline">
+                <ExexutionTimeline />
+              </TabContent> */}
 
             </div>
           </Tabs>}

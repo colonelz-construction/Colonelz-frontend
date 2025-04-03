@@ -23,7 +23,7 @@ const EditLead = ({ details }: any) => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const LeadId = queryParams.get('id') || '';
-  const data = details.data[0];
+  const data = details.data[0]?.lead_details[0];
   const org_id = localStorage.getItem('orgId')
 
 
@@ -45,7 +45,7 @@ const EditLead = ({ details }: any) => {
           lead_id: LeadId,
           lead_name: data.name,
           email: data.email,
-          date: new Date(data.date), // Convert string to Date object
+          date: new Date(data.date),
           phone: data.phone,
           location: data.location,
           source: data.source,

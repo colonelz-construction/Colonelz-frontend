@@ -817,6 +817,17 @@ const Index = () => {
                 )}
 
                 <InputGroup className="bottom-0 border rounded-md border-[#9f9e9e]">
+                {queryType === "summary" && (
+                            <div className="flex flex-col items-center justify-center ">
+                                <FormItem label="File">
+                                    <Upload
+                                        draggable
+                                        onChange={(file) => handleFileChange(file)}
+                                        multiple={false}
+                                    />
+                                </FormItem>
+                            </div>
+                        )}
                     <Input
                         placeholder={placeHolder}
                         type="text"

@@ -277,14 +277,7 @@ const Filtering = ({ task, users }: Data) => {
                 }
             },
             {
-                header: 'Start Date',
-                accessorKey: 'estimated_task_start_date',
-                cell: ({ row }) => {
-                    return <span>{formateDate(row.original.estimated_task_start_date)}</span>
-                }
-            },
-            {
-                header: 'End Date',
+                header: 'Due Date',
                 accessorKey: 'estimated_task_end_date',
                 cell: ({ row }) => {
                     return <span>{formateDate(row.original.estimated_task_end_date)}</span>

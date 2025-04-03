@@ -14,9 +14,6 @@ export type Task = {
     project_id: string;
     sub_task_name: string;
     sub_task_description: string;
-    actual_sub_task_start_date: string; 
-    actual_sub_task_end_date: string; 
-    estimated_sub_task_start_date: string;
     estimated_sub_task_end_date: string;
     sub_task_status: string; 
     sub_task_priority: string; 
@@ -82,9 +79,6 @@ const priorityOptions = [
                         task_id: task_id || '',
                         sub_task_name: "",
                         sub_task_description: "",
-                        actual_sub_task_start_date: "",
-                        actual_sub_task_end_date: "",
-                        estimated_sub_task_start_date: "",
                         estimated_sub_task_end_date: "",
                         sub_task_status: "Pending", 
                         sub_task_priority: "", 
@@ -95,17 +89,7 @@ const priorityOptions = [
                         sub_task_name: Yup.string().required('Subtask Name is required'),
                        
 
-                        estimated_sub_task_start_date: Yup.string().required('Estimated Start Date is required'),
-                        estimated_sub_task_end_date: Yup.string().required('Estimated End Date is required').test(
-                            'is-greater',
-                            'End date must be greater than start date',
-                            function (value) {
-                              const { estimated_sub_task_start_date } = this.parent;
-                              return new Date(value) > new Date(estimated_sub_task_start_date);
-                            }
-                          
-                        
-                        ),
+                        estimated_sub_task_end_date: Yup.string().required('Estimated End Date is required'),
                         // sub_task_status: Yup.string().required('Subtask Status is required'),
                         sub_task_priority: Yup.string().required('Subtask Priority is required'),
                         // sub_task_assignee: Yup.string().required('Subtask Assignee is required'),
@@ -175,51 +159,6 @@ const priorityOptions = [
                                     )}
                                 </Field>
                             </FormItem> */}
-
-
-                            <FormItem label='Actual Start Date'
-                           
-                            >
-                                <Field name='actual_sub_task_start_date'  placeholder='Start date'>
-                                    {({field}:any)=>(
-                                        <DatePicker name='actual_sub_task_start_date'
-                                        minDate={new Date(data.estimated_task_start_date)}
-                                        maxDate={new Date(data.estimated_task_end_date)}
-                                        onChange={(value) => { field.onChange({ target: {name:'actual_sub_task_start_date', value: `${value}` } }) }}
-                                        />
-                                    )}
-                                </Field>
-                            </FormItem>
-
-
-                            <FormItem label='Actual End Date'
-                            >
-                                <Field name='actual_sub_task_end_date' placeholder='End Date'>
-                                    {({field}:any)=>(
-                                        <DatePicker name='actual_sub_task_end_date'
-                                        minDate={new Date(data.estimated_task_start_date)}
-                                        maxDate={new Date(data.estimated_task_end_date)}
-                                        onChange={(value) => { field.onChange({ target: {name:'actual_sub_task_end_date', value: `${value }`} }) }}
-                                        />
-                                    )}
-                                </Field>
-                            </FormItem>
-
-                            <FormItem label='Estimated Start Date'
-                            asterisk
-                            invalid={errors.estimated_sub_task_start_date && touched.estimated_sub_task_start_date}
-                            errorMessage={errors.estimated_sub_task_start_date}
-                            >
-                                <Field name='estimated_sub_task_start_date'  placeholder='Start date'>
-                                    {({field}:any)=>(
-                                        <DatePicker name='estimated_sub_task_start_date'
-                                        minDate={new Date(data.estimated_task_start_date)}
-                                        maxDate={new Date(data.estimated_task_end_date)}
-                                        onChange={(value) => { field.onChange({ target: {name:'estimated_sub_task_start_date', value: `${value}` } }) }}
-                                        />
-                                    )}
-                                </Field>
-                            </FormItem>
 
                             <FormItem label='Estimated End Date'
                             asterisk

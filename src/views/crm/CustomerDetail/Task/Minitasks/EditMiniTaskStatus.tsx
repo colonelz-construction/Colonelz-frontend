@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Field, Form, Formik } from 'formik'
 import { FormItem, Notification, Select, toast } from '@/components/ui'
-import { apiGetCrmLeadsMiniTaskUpdate } from '@/services/CrmService'
+import { apiGetCrmLeadsMiniTaskUpdate, apiGetCrmProjectsMiniTaskUpdate } from '@/services/CrmService'
 import { HiOutlinePencil } from 'react-icons/hi'
 import { useLocation } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -32,7 +32,8 @@ const EditMiniTaskStatus = ({ Data, users }: MinitaskData) => {
     const [loading, setLoading] = useState(false);
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const lead_id = queryParams.get('lead_id');
+    // const lead_id = queryParams.get('lead_id');
+    const project_id = queryParams.get('project_id');
     const org_id = localStorage.getItem('orgId');
     const userId = localStorage.getItem('userId');
     const role = localStorage.getItem('role');
@@ -53,7 +54,7 @@ const EditMiniTaskStatus = ({ Data, users }: MinitaskData) => {
                 initialValues={{
                     user_id: localStorage.getItem('userId') || '',
                     org_id,
-                    lead_id: lead_id || '',
+                    project_id: project_id || '',
                     task_id: Data?.task_id,
                     mini_task_id: Data?.mini_task_id,
                     mini_task_name: Data?.mini_task_name,
@@ -81,7 +82,7 @@ const EditMiniTaskStatus = ({ Data, users }: MinitaskData) => {
                         console.log(values.mini_task_status)
                         if (values.mini_task_status !== Data.mini_task_status) {
                             setLoading(true);
-                            apiGetCrmLeadsMiniTaskUpdate(values)
+                            apiGetCrmProjectsMiniTaskUpdate(values)
                                 .then((response) => {
                                     if (response.code === 200) {
                                         toast.push(

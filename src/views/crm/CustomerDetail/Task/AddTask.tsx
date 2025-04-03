@@ -11,20 +11,17 @@ import * as Yup from 'yup';
 import { AiOutlinePlus } from "react-icons/ai";
 
 
-// type Task = {
-//     user_id: string;
-//     project_id: string;
-//     task_name: string;
-//     task_description: string;
-//     estimated_task_start_date: string;
-//     estimated_task_end_date: string;
-//     actual_task_start_date: string; 
-//     actual_task_end_date: string; 
-//     task_status: string; 
-//     task_priority: string; 
-//     task_assignee: string;
-//     reporter: string;
-//   };
+type Task = {
+    user_id: string;
+    project_id: string;
+    task_name: string;
+    task_description: string;
+    estimated_task_end_date: string;
+    task_status: string; 
+    task_priority: string; 
+    task_assignee: string;
+    reporter: string;
+  };
 
 const AddTask = ({ project, userData, addButton }: any) => {
     const [dialogIsOpen, setIsOpen] = useState(false)
@@ -86,12 +83,9 @@ const AddTask = ({ project, userData, addButton }: any) => {
                         project_id: project,
                         task_name: "",
                         task_description: "",
-                        // estimated_task_start_date: "",
                         estimated_task_end_date: "",
-                        // actual_task_start_date: "",
-                        // actual_task_end_date: "",
-                        task_status: "Pending",
-                        task_priority: "",
+                        task_status: "Pending", 
+                        task_priority: "", 
                         task_assignee: "",
                         reporter: "",
                     }}
@@ -113,11 +107,9 @@ const AddTask = ({ project, userData, addButton }: any) => {
                         ),
                         // task_status: Yup.string().required("Task Status is required"),
                         task_priority: Yup.string().required("Task Priority is required"),
-                        // task_assignee: Yup.string().required("Task Assignee is required"),
-                        // reporter: Yup.string().required("Reporter is required"),
-                    })
-                    }
-                    onSubmit={async (values, actions) => {
+                      })
+                      }
+                     onSubmit={async(values, actions) => {
                         setLoading(true)
                         const response = await apiGetCrmProjectsAddTask(values)
 
@@ -137,8 +129,8 @@ const AddTask = ({ project, userData, addButton }: any) => {
                     }
 
                     }
-                >
-                    {({ values,setFieldValue, touched, errors, }) => (
+                     >
+                        {({ values, touched, errors,setFieldValue}) => (
                         <Form className=' p-4 max-h-96 overflow-y-auto'>
                             <div className=' grid grid-cols-2 gap-x-5'>
                                 <FormItem label='Name'
@@ -164,131 +156,60 @@ const AddTask = ({ project, userData, addButton }: any) => {
                                 </FormItem>
 
 
-                                {/* <FormItem label='Status'
+                            <FormItem label='Due Date'
                             asterisk
-                            invalid={errors.task_status && touched.task_status}
-                            errorMessage='Task Status is required'
+                            invalid={errors.estimated_task_end_date && touched.estimated_task_end_date}
                             >
-                                <Field name='task_status'  placeholder='Task'>
+                                <Field name='estimated_task_end_date' placeholder='Due Date'>
+                                    {({field}:any)=>(
+                                        <DatePicker name='estimated_task_end_date'
+                                        onChange={(value) => { field.onChange({ target: {name:'estimated_task_end_date', value: `${value}` } }) }}
+                                        />
+                                    )}
+                                </Field>
+                                <div className=' text-red-600'>{errors.estimated_task_end_date}</div>
+                            </FormItem>
+                           
+                            <FormItem label='Report to'
+                            
+                            invalid={errors.reporter && touched.reporter}
+                            >
+                                <Field name='reporter' placeholder='Reporting to'>
                                     {({field}:any)=>(
                                         <Select
-                                        options={statusOptions}
-                                        name='task_status'
-                                        onChange={(value) => { field.onChange({ target: {name:'task_status', value: value?.value } }) }}
+                                        options={userOptions}
+                                        name='reporter'
+                                        onChange={(value:any) => { field.onChange({ target: {name:'reporter', value: value?.value } }) }}
                                         />
                                     )}
                                 </Field>
-                            </FormItem> */}
-
-
-                                {/* <FormItem label='Actual Start Date'
-                            >
-                                <Field name='actual_task_start_date'  placeholder='Actual Start date'>
-                                    {({field}:any)=>(
-                                        <DatePicker name='actual_task_start_date'
-                                        onChange={(value) => { field.onChange({ target: {name:'actual_task_start_date', value: `${value}` } }) }}
-                                        />
-                                    )}
-                                </Field>
-                            </FormItem> */}
-
-
-                                {/* <FormItem label='Actual End Date'
-                            
-                            
-                            >
-                                <Field name='actual_task_end_date' placeholder='End Date'>
-                                    {({field}:any)=>(
-                                        <DatePicker name='actual_task_end_date'
-                                        onChange={(value) => { field.onChange({ target: {name:'actual_task_end_date', value: `${value }`} }) }}
-                                        />
-                                    )}
-                                </Field>
-                            </FormItem> */}
-
-
-                                {/* <FormItem label='Estimated Start Date'
+                                <div className=' text-red-600'>{errors.reporter}</div>  
+                            </FormItem>
+                            <FormItem label='Priority'
                             asterisk
-                            invalid={errors.estimated_task_start_date && touched.estimated_task_start_date}
-                            errorMessage={errors.estimated_task_start_date}
+                            invalid={errors.task_priority && touched.task_priority} 
+                            errorMessage={errors.task_priority}
                             >
-                                <Field name='estimated_task_start_date' placeholder='Start Date'>
+                                <Field name='task_priority'  placeholder='Priority'>
                                     {({field}:any)=>(
-                                        <DatePicker name='estimated_task_start_date'
-                                        onChange={(value) => { field.onChange({ target: {name:'estimated_task_start_date', value: `${value}` } }) }}
+                                        <Select
+                                        name='task_priority'
+                                        options={priorityOptions}
+                                        onChange={(value) => { field.onChange({ target: {name:'task_priority', value: value?.value } }) }}
                                         />
-                                    )}
+                                    )}  
+                                        
                                 </Field>
-                            </FormItem> */}
+                            </FormItem>
 
-
-                                <FormItem label='Due Date'
-                                    asterisk
-                                    invalid={errors.estimated_task_end_date && touched.estimated_task_end_date}
-                                >
-                                    <Field name='estimated_task_end_date' placeholder='End Date'>
-                                        {({ field }: any) => (
-                                            <DatePicker name='estimated_task_end_date'
-                                                onChange={(value) => { field.onChange({ target: { name: 'estimated_task_end_date', value: `${value}` } }) }}
-                                            />
-                                        )}
-                                    </Field>
-                                    <div className=' text-red-600'>{errors.estimated_task_end_date}</div>
-                                </FormItem>
-
-                                <FormItem label='Report to'
-
-                                    invalid={errors.reporter && touched.reporter}
-                                >
-                                    <Field name='reporter' placeholder='Reporting to'>
-                                        {({ field }: any) => (
-                                            <Select
-                                                options={userOptions}
-                                                name='reporter'
-                                                onChange={(value: any) => { field.onChange({ target: { name: 'reporter', value: value?.value } }) }}
-                                            />
-                                        )}
-                                    </Field>
-                                    <div className=' text-red-600'>{errors.reporter}</div>
-                                </FormItem>
-                                <FormItem label='Priority'
-                                    asterisk
-                                    invalid={errors.task_priority && touched.task_priority}
-                                    errorMessage={errors.task_priority}
-                                >
-                                    <Field name='task_priority' placeholder='Priority'>
-                                        {({ field }: any) => (
-                                            <Select
-                                                name='task_priority'
-                                                options={priorityOptions}
-                                                onChange={(value) => { field.onChange({ target: { name: 'task_priority', value: value?.value } }) }}
-                                            />
-                                        )}
-
-                                    </Field>
-                                </FormItem>
 
                             </div>
-                            {/* <FormItem label='Desription'>
-                                <Field name='task_description' placeholder='Task Description'>
-                                    {({field}:any)=>{
-                                        return (
-                                            <Input textArea name='task_description'
-                                            {...field}/>
-                                        )
-                                    }}
-                                </Field>
-                            </FormItem> */}
-
-
                             <App
                                 value={values.task_description}
-                                onChange={(value) => {
+                                onChange={(value:any) => {
                                     setFieldValue('task_description', value)
                                 }}
                             />
-
-
                             <div className='flex justify-end'>
                                 <Button type='submit' variant='solid' size='sm' loading={loading}>{loading ? 'Adding' : 'Add Task'}</Button>
                             </div>

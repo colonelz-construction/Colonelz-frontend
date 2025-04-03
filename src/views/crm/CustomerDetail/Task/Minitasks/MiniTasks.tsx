@@ -72,7 +72,7 @@ const MiniTasks: React.FC<TaskListProps> = ({taskData, miniTasks, loading, users
     const CustomerInfoField = ({ title, value }: any) => {
         return (
             <div className='flex gap-1 flex-wrap'>
-                <span className='text-gray-700 font-semibold'>{title}:</span>
+                <span className='text-gray-700  font-semibold'>{title}:</span>
                 {!loading ? value && value.length === 0 ? '-' :
                     <span className="" style={{ overflowWrap: "break-word" }}>
                         {value}
@@ -88,6 +88,8 @@ const MiniTasks: React.FC<TaskListProps> = ({taskData, miniTasks, loading, users
         const year = date.getFullYear();
         return `${day}-${month}-${year}`;
     };
+
+    console.log(users)
 
     return (
         <div className="w-full mt-4 flex flex-col gap-2">
@@ -118,7 +120,9 @@ const MiniTasks: React.FC<TaskListProps> = ({taskData, miniTasks, loading, users
                                 </span>
                         </span>
 
-                        {taskData.task_assignee === users?.find((u:any) => u.user_id === userId)?.user_name && <span className="m-4">
+                        {
+                        taskData.task_assignee === users?.find((u:any) => u._id === userId)?.username && 
+                        <span className="m-4">
                                 <EditMiniTask  Data={task} users={users}/>
                         </span>}
 

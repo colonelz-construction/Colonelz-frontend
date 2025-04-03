@@ -20,6 +20,7 @@ import { FileItemType } from './Quotation/Quotations'
 import Assignee, { UsersResponse } from './Project Progress/Assignee'
 import { update } from 'lodash'
 import { GoChevronDown } from 'react-icons/go'
+import ExexutionTimeline from './Project Progress/ExexutionTimeline'
 
 
 export type QuotationResponseType = {
@@ -262,6 +263,10 @@ const CustomerDetail = () => {
                     <span className={data?.length == 0 ? "text-red-500" : ""}>{"("}{data?.length}{")"}</span>
                   </TabNav>
                 }
+
+{/* {
+                  <TabNav value="exectimeline">Execution Timeline</TabNav>
+                } */}
               </>
 
             </TabList>
@@ -291,6 +296,9 @@ const CustomerDetail = () => {
               <TabContent value="assignee">
                 <Assignee data={data} />
               </TabContent>
+              {/* <TabContent value="exectimeline">
+                <ExexutionTimeline />
+              </TabContent> */}
 
             </div>
           </Tabs>}

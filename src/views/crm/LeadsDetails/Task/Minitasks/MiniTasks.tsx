@@ -72,7 +72,7 @@ const MiniTasks: React.FC<TaskListProps> = ({taskData, miniTasks, loading, users
     const CustomerInfoField = ({ title, value }: any) => {
         return (
             <div className='flex gap-1 flex-wrap'>
-                <span className='text-gray-700 dark:text-gray-200 font-semibold'>{title}:</span>
+                <span className='text-gray-700 font-semibold'>{title}:</span>
                 {!loading ? value && value.length === 0 ? '-' :
                     <span className="" style={{ overflowWrap: "break-word" }}>
                         {value}
@@ -108,7 +108,7 @@ const MiniTasks: React.FC<TaskListProps> = ({taskData, miniTasks, loading, users
                                     <CustomerInfoField title='Due Date' value={formateDate(task.estimated_mini_task_end_date)} />
 
                                     {!expandedRows[task.mini_task_id] && <span className="flex items-center gap-1">
-                                        <span className='text-gray-700 dark:text-gray-200 font-semibold'>Timer:</span>
+                                        <span className='text-gray-700 font-semibold'>Timer:</span>
                                         <span>
                                             <MiniTaskTimer Data={{ data: task, isShow: false, users: users }} />
                                         </span>
@@ -124,7 +124,7 @@ const MiniTasks: React.FC<TaskListProps> = ({taskData, miniTasks, loading, users
 
                     </span>
                     {expandedRows[task.mini_task_id] && (
-                        <div className="p-3 bg-gray-50 border-l-4 border-blue-500 rounded-lg mt-2">
+                        <div className="p-3 bg-gray-50 dark:bg-[#1F2937] border-l-4 border-blue-500 rounded-lg mt-2">
                             <div className={`flex ${!expand ? "flex-col justify-center items-start" : "items-center justify-end"} w-full gap-4 mt-2 mb-2`}>
                                 <MiniTaskTimer Data={{ data: task, isShow: true, users: users }} />
                                 <EditMiniTaskStatus Data={task}  users={users} />

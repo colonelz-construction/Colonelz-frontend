@@ -7,7 +7,7 @@ import { apiGetCrmLeadsAddTask, apiGetCrmProjectsAddTask, apiGetCrmUsersAssociat
 import * as Yup from 'yup'
 import { AiOutlinePlus } from "react-icons/ai";
 import { IoIosAddCircleOutline } from "react-icons/io";
-
+import App from '../../CustomerDetail/components/MOM/Richtext'
 
 type Task = {
     user_id: string;
@@ -88,10 +88,10 @@ const priorityOptions = [
                         lead_id: leadId ,
                         task_name: "",
                         task_description: "",
-                        delegation_date: "",
-                        // estimated_task_end_date: "",
-                        actual_task_start_date: "",
-                        actual_task_end_date: "",
+                        // delegation_date: "",
+                        estimated_task_end_date: "",
+                        // actual_task_start_date: "",
+                        // actual_task_end_date: "",
                         task_status: "Pending", 
                         task_priority: "", 
                         task_assignee: "",
@@ -100,20 +100,20 @@ const priorityOptions = [
                       validationSchema={Yup.object().shape({
                         task_name: Yup.string().required("Task Name is required"),
                       
-                        delegation_date: Yup.string().required("Delegation Date is required"),
-                        actual_task_start_date: Yup.string().required("Actual start Date is required"),
-                        actual_task_end_date: Yup.string().required("Actual End Date is required").test(
-                            "is-greater",
-                            "End Date must be greater than Start Date",
-                            function (value) {
-                              const { actual_task_start_date } = this.parent;
-                              if (actual_task_start_date && value) {
-                                return new Date(value) > new Date(actual_task_start_date);
-                              }
-                              return true;
-                            }
+                        estimated_task_end_date: Yup.string().required("Deadline is required"),
+                        // actual_task_start_date: Yup.string().required("Actual start Date is required"),
+                        // actual_task_end_date: Yup.string().required("Actual End Date is required").test(
+                        //     "is-greater",
+                        //     "End Date must be greater than Start Date",
+                        //     function (value) {
+                        //       const { actual_task_start_date } = this.parent;
+                        //       if (actual_task_start_date && value) {
+                        //         return new Date(value) > new Date(actual_task_start_date);
+                        //       }
+                        //       return true;
+                        //     }
                           
-                        ),
+                        // ),
                         // task_status: Yup.string().required("Task Status is required"),
                         task_priority: Yup.string().required("Task Priority is required"),
                         // task_assignee: Yup.string().required("Task Assignee is required"),
@@ -141,7 +141,7 @@ const priorityOptions = [
                             
                     }
                      >
-                        {({ values, touched, errors,}) => (
+                        {({ values, touched, errors, setFieldValue}) => (
                         <Form className=' p-4 max-h-96 overflow-y-auto'>
                             <div className=' grid grid-cols-2 gap-x-5'>
                             <FormItem label='Name'
@@ -183,21 +183,21 @@ const priorityOptions = [
                                 </Field>
                             </FormItem> */}
 
-                            <FormItem label='Delegation Date' asterisk
-                            invalid={errors.delegation_date && touched.delegation_date}
-                            errorMessage={errors.delegation_date}
+                            <FormItem label='Due Date' asterisk
+                            invalid={errors.estimated_task_end_date && touched.estimated_task_end_date}
+                            errorMessage={errors.estimated_task_end_date}
                             >
-                                <Field name='delegation_date'  placeholder='Delegation date'>
+                                <Field name='estimated_task_end_date'  placeholder='Due Date'>
                                     {({field}:any)=>(
-                                        <DatePicker name='delegation_date'
-                                        onChange={(value) => { field.onChange({ target: {name:'delegation_date', value: `${value}` } }) }}
+                                        <DatePicker name='estimated_task_end_date'
+                                        onChange={(value) => { field.onChange({ target: {name:'estimated_task_end_date', value: `${value}` } }) }}
                                         />
                                     )}
                                 </Field>
                             </FormItem>
 
 
-                            <FormItem label='Actual Start Date' asterisk
+                            {/* <FormItem label='Actual Start Date' asterisk
                             invalid={errors.actual_task_start_date && touched.actual_task_start_date}
                             errorMessage={errors.actual_task_start_date}
                             >
@@ -224,7 +224,7 @@ const priorityOptions = [
                                         />
                                     )}
                                 </Field>
-                            </FormItem>
+                            </FormItem> */}
 
 
                             {/* <FormItem label='Estimated Start Date'
@@ -290,7 +290,7 @@ const priorityOptions = [
 
 
                             </div>
-                            <FormItem label='Desription'>
+                            {/* <FormItem label='Desription'>
                                 <Field name='task_description' placeholder='Description'>
                                     {({field}:any)=>{
                                         return (
@@ -299,7 +299,13 @@ const priorityOptions = [
                                         )
                                     }}
                                 </Field>
-                            </FormItem>
+                            </FormItem> */}
+                            <App
+                                value={values.task_description}
+                                onChange={(value) => {
+                                    setFieldValue('task_description', value)
+                                }}
+                            />
                             <div className='flex justify-end'>
                                 <Button type='submit' variant='solid' size='sm' loading={loading}>{loading?'Adding':'Add Task'}</Button>
                             </div>

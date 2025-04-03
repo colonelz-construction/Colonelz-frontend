@@ -208,7 +208,7 @@ const CustomerDetail = () => {
         const fetchData = async () => {
             try {
                 const response = await apiGetCrmLeadsDetails(myParam, org_id);
-                
+
 
                 setLoading(false)
                 setDetails(response);
@@ -304,7 +304,7 @@ const CustomerDetail = () => {
     return (
         <>
             <div className='flex justify-between'>
-                <h3 className='pb-5'>Lead-{lead?.name || <Skeleton />}</h3>
+                <h3 className='pb-5'>Lead-{lead?.lead_details[0].name || <Skeleton />}</h3>
                 <div className=''>
                     <Dropdown renderTitle={Toggle} placement='middle-end-top' >
                         <AuthorityCheck
@@ -398,7 +398,7 @@ const CustomerDetail = () => {
                                     Contract
                                 </TabNav>}
                                 <TabNav value="Tasks" >
-                                Task Manager
+                                Internal Task Manager
                             </TabNav>
                             {['ADMIN', 'SUPERADMIN'].includes(localStorage.getItem('role') || '') &&
                                 <TabNav value="Activity" >

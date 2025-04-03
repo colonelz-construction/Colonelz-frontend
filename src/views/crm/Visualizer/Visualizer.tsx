@@ -32,7 +32,7 @@ const Visualizer = () => {
 
         const res = await apiGetCrmMainThreeImage('main', '', leadId, projectId);
 
-        console.log(res)
+        // console.log(res)
         setData(res?.data);
         setMainLoading(false);
         

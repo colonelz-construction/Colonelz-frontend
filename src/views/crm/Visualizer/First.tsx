@@ -593,7 +593,7 @@ const Second = ({texture, setTexture, imageUrl, addHotspotMode, onHotspotAdd, te
 
 const First = ({imgIdList, currentImage, setCurrentImage, setImgList}:any) => {
 
-console.log(currentImage)
+// console.log(currentImage)
 
 const queryParams = new URLSearchParams(location.search);
 const leadId = queryParams.get('lead_id') || null;
@@ -619,7 +619,7 @@ useEffect(() => {
       // Append imgId at the end if it exists
       const imgId2 = searchParams.get("imgId");
       if (imgId2) idParams.push(imgId2);
-      console.log(idParams)
+      // console.log(idParams)
 
       setImgList(idParams)
 

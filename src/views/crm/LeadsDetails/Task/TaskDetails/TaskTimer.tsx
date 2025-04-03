@@ -49,6 +49,7 @@ type Remarks = {
 }
 type Data = {
   data: SubTask
+  user: any
 }
 type CustomerInfoFieldProps = {
   title?: string
@@ -69,6 +70,7 @@ const TaskTimer = (Data: any) => {
   const taskId = queryParam.get('task') || '';
   const org_id = localStorage.getItem('orgId')
   const role: any = localStorage.getItem('role')
+  const userId: any = localStorage.getItem('userId')
 
   // console.log(Data)
 
@@ -297,10 +299,7 @@ useEffect(() => {
 
   const res = Data.data;
 
-  if(res.number_of_subtasks != 0) {
-    setToolTipMsg(`This task already has subtasks`)
-
-  } else if(res.task_status === 'Completed' || res.task_status === 'Cancelled') {
+  if(res.task_status === 'Completed' || res.task_status === 'Cancelled') {
     setToolTipMsg(`You can not start a ${res.task_status} task`)
 
   } else if(res.task_status === 'Pending') {
@@ -312,6 +311,9 @@ useEffect(() => {
 
 }, [Data])
 
+console.log(Data.data.task_assignee)
+console.log(Data.user)
+
 
 
 
@@ -319,8 +321,8 @@ useEffect(() => {
     <div>
         <div className='flex  gap-4 items-center mb-5'>
 
-          {(Data.data.number_of_subtasks != 0) ||
- ((Data.data.task_status === 'Completed' || Data.data.task_status === 'Cancelled') || Data.data.task_status === 'Pending' || ((role !== 'SUPERADMIN' &&   role !== 'ADMIN') && Data.data.task_assignee !== Data.user.username)) ?
+          {
+ ((Data.data.task_status === 'Completed' || Data.data.task_status === 'Cancelled') || Data.data.task_status === 'Pending' || ((role !== 'SUPERADMIN' &&   role !== 'ADMIN') && Data.data.task_assignee !== Data.user?.find((u:any) => u.user_id === userId)?.user_name)) ?
 
               (<>
 

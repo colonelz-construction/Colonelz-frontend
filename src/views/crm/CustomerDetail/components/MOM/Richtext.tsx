@@ -5,10 +5,27 @@ import ImageResize from 'quill-image-resize-module-react'
 Quill.register('modules/imageResize', ImageResize)
 interface RichTextEditorProps {
     value: string
-    onChange: (content: string) => void
+    onChange?: (content: string) => void,
+    readOnly?: boolean,
+    title?: String,
+    toolbar?: any,
 }
 
-const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
+
+
+
+
+const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, readOnly = false, title='Remark', toolbar=[
+    [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+    [{ size: [] }],
+    ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
+    [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+    ['link', 'image', 'video'],
+    [{ 'color': [] }, { 'background': [] }],
+    [{ 'align': [] }],
+    [{ 'script': 'sub' }, { 'script': 'super' }],
+    ['clean']
+] }) => {
     // console.log(value)
 
     const parser = new DOMParser();
@@ -26,17 +43,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
 
 
     const modules = {
-        toolbar: [
-            [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
-            [{ size: [] }],
-            ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
-            ['link', 'image', 'video'],
-            [{ 'color': [] }, { 'background': [] }],
-            [{ 'align': [] }],
-            [{ 'script': 'sub' }, { 'script': 'super' }],
-            ['clean']
-        ],
+        toolbar: toolbar,
         imageResize: {
             modules: [ 'Resize', 'DisplaySize','Toolbar'],
             handleStyles: {
@@ -59,13 +66,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
 
     return (
         <div className="rich-text-editor flex flex-col gap-2">
-            <span className='font-semibold'>Remark</span>
+            <span className='font-semibold text-[#374151] capitalize'>{title}</span>
             <ReactQuill
                 value={value}
                 onChange={onChange}
                 modules={modules}
                 formats={formats}
                 theme="snow"
+                readOnly={readOnly}
             />
         </div>
     )

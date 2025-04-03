@@ -36,7 +36,7 @@ const Second = ({setImgList, data, mainLoading, setCurrentImage, currentImage}:a
 
       const res = await apiGetCrmPanoImagesFileManager(leadId, projectId);
 
-      console.log(res.data)
+      // console.log(res.data)
 
       const panoImg = res.data?.files
       setPanoImages(panoImg)

@@ -274,14 +274,7 @@ const Subtasks = ({task,users}:any) => {
                }
          },
             {
-                header:'Start Date',
-                accessorKey:'estimated_sub_task_start_date',
-                cell:({row})=>{
-                    return <div>{formateDate(row.original.estimated_sub_task_start_date)}</div>
-                }
-            },
-            {
-                header:'End Date',
+                header:'Due Date',
                 accessorKey:'estimated_sub_task_end_date',
                 cell:({row})=>{
                     return <div>{formateDate(row.original.estimated_sub_task_end_date)}</div>
@@ -386,7 +379,7 @@ const Subtasks = ({task,users}:any) => {
                             avatarInColumns={[0]}
                             columns={columns.length}
                             avatarProps={{ width: 14, height: 14 }}
-                        />: taskData.length === 0 ? (
+                        />: taskData &&  taskData?.length === 0 ? (
                             <TableBody>
                                 <TableRow>
                                     <TableCell colSpan={columns.length}>

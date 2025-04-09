@@ -10,7 +10,7 @@ import {
     Upload,
     toast,
 } from '@/components/ui'
-import CreatableSelect from 'react-select/creatable' 
+import CreatableSelect from 'react-select/creatable'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { HiOutlineCloudUpload } from 'react-icons/hi'
 
@@ -84,16 +84,15 @@ export const MultiInputOptions = ({
                 sanitizedValue.length <= maxLength &&
                 (type !== 'email' || validators.email.test(sanitizedValue));
 
-            
+
 
             if (!isValid) {
                 setError(
                     errorMessage ||
-                        `Value must be ${
-                            minLength === maxLength
-                                ? `exactly ${minLength}`
-                                : `between ${minLength} and ${maxLength}`
-                        } characters${type === 'email' ? ' and a valid email address' : ''}.`
+                    `Value must be ${minLength === maxLength
+                        ? `exactly ${minLength}`
+                        : `between ${minLength} and ${maxLength}`
+                    } characters${type === 'email' ? ' and a valid email address' : ''}.`
                 );
             } else {
                 setError(null);
@@ -105,12 +104,12 @@ export const MultiInputOptions = ({
     };
 
     const handleRemove = (index: number) => {
-        const newValue = value.filter((_:any, i:any) => i !== index);
+        const newValue = value.filter((_: any, i: any) => i !== index);
         onChange(newValue);
     };
 
     const handleOptionSelect = (option: Option) => {
-        if (!value.some((v:any) => v.value === option.value)) {
+        if (!value.some((v: any) => v.value === option.value)) {
             onChange([...value, option.value]);
         }
         setInputValue('');
@@ -134,7 +133,7 @@ export const MultiInputOptions = ({
         <div ref={ref}>
             <div className={`border-[0.03rem] ${isDark ? "border-[#4B5563]" : "border-[#D1D5DB]"} rounded-md p-1`}>
                 <div className="flex flex-wrap gap-2">
-                    {value.map((val:any, index:any) => (
+                    {value.map((val: any, index: any) => (
                         <div
                             key={index}
                             className="flex items-center gap-1 bg-[#F3F4F6] px-2 py-1 rounded"
@@ -186,115 +185,115 @@ const YourFormComponent = () => {
         client_name: string
     }
     const location = useLocation()
-    const org_id : any = localStorage.getItem('orgId')
+    const org_id: any = localStorage.getItem('orgId')
     const queryParams = new URLSearchParams(location.search)
     const allQueryParams: QueryParams = {
         project_id: queryParams.get('project_id') || '',
         client_name: queryParams.get('client_name') || '',
     }
- 
+
     const clientOptions: Option[] = [
         {
             value: allQueryParams.client_name,
             label: allQueryParams.client_name,
         },
     ]
-   
-const optionsSource = [
+
+    const optionsSource = [
         { value: 'At Office', label: 'At Office' },
         { value: 'At Site', label: 'At Site' },
         { value: 'At Client place', label: 'At Client Place' },
         { value: 'Other', label: 'Other' },
     ]
 
-  
 
-   
+
+
 
     return (
         <div>
             <h3 className='mb-5'>Add MOM</h3>
-            <Formik 
-            initialValues={
-                {
-                    user_id:localStorage.getItem('userId'),
-                    org_id,
-                    client_name: [],
-                    organisor: [],
-                    attendees: [],
-                    meetingDate: '',
-                    location: '',
-                    remark: '',
-                    files: [],
-                    project_id: allQueryParams.project_id,
+            <Formik
+                initialValues={
+                    {
+                        user_id: localStorage.getItem('userId'),
+                        org_id,
+                        client_name: [],
+                        organisor: [],
+                        attendees: [],
+                        meetingDate: '',
+                        location: '',
+                        remark: '',
+                        files: [],
+                        project_id: allQueryParams.project_id,
+                    }
                 }
-            }
-            validationSchema={Yup.object().shape({
-                // client_name: Yup.array().required('Client Name is required'),
-                // organisor: Yup.array().required("Organisor's Name is required"),
-                meetingDate: Yup.string().required('Meeting Date is required'),
-                location: Yup.string().required('Location is required'),
-            })
-            }
-            onSubmit={async(values,{setSubmitting}) => {
-                const formData = new FormData()
-                ;
-
-                // console.log(values.client_name)
-                
-                formData.append('user_id', (values.user_id || ''))
-                formData.append('client_name', JSON.stringify(values.client_name))
-                formData.append('organisor', JSON.stringify(values.organisor))
-                formData.append('attendees', JSON.stringify(values.attendees))
-                formData.append('meetingdate', values.meetingDate)
-                formData.append('location', values.location)
-                formData.append('remark', values.remark)
-                formData.append('org_id', org_id)
-                values.files.forEach((file) => {
-                    formData.append('files', file)
+                validationSchema={Yup.object().shape({
+                    // client_name: Yup.array().required('Client Name is required'),
+                    // organisor: Yup.array().required("Organisor's Name is required"),
+                    meetingDate: Yup.string().required('Meeting Date is required'),
+                    location: Yup.string().required('Location is required'),
                 })
-                formData.append('project_id', values.project_id)
-
-                setSubmitting(true)
-                try{
-                const response = await apiCreateMom(formData)
-                
-                
-           
-                if (response.code === 200) {
-                    setSubmitting(false)
-                    toast.push(
-                        <Notification closable type="success" duration={2000}>
-                            Mom Created Successfully
-                        </Notification>
-                    )
-                    window.location.reload()
-                    navigate(-1)
-                } else {
-                    toast.push(
-                        <Notification closable type="danger" duration={2000}>
-                            {response.errorMessage}
-                        </Notification>
-                    )
                 }
-            } catch (error) {
-                setSubmitting(false)
-                toast.push(
-                    <Notification closable type="success" duration={2000}>
-                        Internal server Error
-                    </Notification>
-                )
-            }
-            }
-            }
+                onSubmit={async (values, { setSubmitting }) => {
+                    const formData = new FormData()
+                        ;
+
+                    // console.log(values.client_name)
+
+                    formData.append('user_id', (values.user_id || ''))
+                    formData.append('client_name', JSON.stringify(values.client_name))
+                    formData.append('organisor', JSON.stringify(values.organisor))
+                    formData.append('attendees', JSON.stringify(values.attendees))
+                    formData.append('meetingdate', values.meetingDate)
+                    formData.append('location', values.location)
+                    formData.append('remark', values.remark)
+                    formData.append('org_id', org_id)
+                    values.files.forEach((file) => {
+                        formData.append('files', file)
+                    })
+                    formData.append('project_id', values.project_id)
+
+                    setSubmitting(true)
+                    try {
+                        const response = await apiCreateMom(formData)
+
+
+
+                        if (response.code === 200) {
+                            setSubmitting(false)
+                            toast.push(
+                                <Notification closable type="success" duration={2000}>
+                                    Mom Created Successfully
+                                </Notification>
+                            )
+                            window.location.reload()
+                            navigate(-1)
+                        } else {
+                            toast.push(
+                                <Notification closable type="danger" duration={2000}>
+                                    {response.errorMessage}
+                                </Notification>
+                            )
+                        }
+                    } catch (error) {
+                        setSubmitting(false)
+                        toast.push(
+                            <Notification closable type="success" duration={2000}>
+                                Internal server Error
+                            </Notification>
+                        )
+                    }
+                }
+                }
             >
-                     {({ errors, setFieldValue,isSubmitting,values }) => (
-                <Form>
-                <FormContainer>
-                    <div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-x-5">
-                    <FormItem label="Client's Name" asterisk>
-                                <Field name="client_name">
-                                    {/* {({ field, form }:any) => (
+                {({ errors, setFieldValue, isSubmitting, values }) => (
+                    <Form>
+                        <FormContainer>
+                            <div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-x-5">
+                                <FormItem label="Client's Name" asterisk>
+                                    <Field name="client_name">
+                                        {/* {({ field, form }:any) => (
                                         <Select
                                             isMulti
                                             componentAs={CreatableSelect}
@@ -305,28 +304,28 @@ const optionsSource = [
                                             }}
                                         />
                                     )} */}
-                                    {({ form }: { form: any }) => (
-                                        <MultiInputOptions
-                                        value={form.values.client_name}
-                                        onChange={(val) => form.setFieldValue('client_name', val)}
-                                        type="text"
-                                        placeholder="Client Name"
-                                        options={clientOptions}
-                                        minLength={3}
-                                        maxLength={60}
-                                        errorMessage="Name must have at least 3 characters."
-                                    />
-                                    )}
-                                </Field>
-                                {errors.client_name && (
-                                    <span className="text-red-500">
-                                        {errors.client_name}
-                                    </span>)}
-                            </FormItem>
-                        <FormItem label="Organised By"
-                        asterisk>
-                            <Field name="organisor">
-                                    {({ form }: { form: any }) => (
+                                        {({ form }: { form: any }) => (
+                                            <MultiInputOptions
+                                                value={form.values.client_name}
+                                                onChange={(val) => form.setFieldValue('client_name', val)}
+                                                type="text"
+                                                placeholder="Client Name"
+                                                options={clientOptions}
+                                                minLength={3}
+                                                maxLength={60}
+                                                errorMessage="Name must have at least 3 characters."
+                                            />
+                                        )}
+                                    </Field>
+                                    {errors.client_name && (
+                                        <span className="text-red-500">
+                                            {errors.client_name}
+                                        </span>)}
+                                </FormItem>
+                                <FormItem label="Organised By"
+                                    asterisk>
+                                    <Field name="organisor">
+                                        {({ form }: { form: any }) => (
                                             <MultiInputOptions
                                                 value={form.values.organisor}
                                                 onChange={(val) => form.setFieldValue('organisor', val)}
@@ -337,18 +336,18 @@ const optionsSource = [
                                                 maxLength={60}
                                                 errorMessage="Name must have at least 3 characters."
                                             />
+                                        )}
+                                    </Field>
+                                    {errors.organisor && (
+                                        <span className="text-red-500">
+                                            {errors.organisor}
+                                        </span>
                                     )}
-                                </Field>
-                            {errors.organisor && (
-                                <span className="text-red-500">
-                                    {errors.organisor}
-                                </span>
-                            )}
-                        </FormItem>
-                       
-                        <FormItem label="Others" >
-                        <Field name="attendees">
-                                    {({ form }: { form: any }) => (
+                                </FormItem>
+
+                                <FormItem label="Others" >
+                                    <Field name="attendees">
+                                        {({ form }: { form: any }) => (
                                             <MultiInputOptions
                                                 value={form.values.attendees}
                                                 onChange={(val) => form.setFieldValue('attendees', val)}
@@ -359,95 +358,91 @@ const optionsSource = [
                                                 maxLength={60}
                                                 errorMessage="Name must have at least 3 characters."
                                             />
+                                        )}
+                                    </Field>
+                                    {
+                                        errors.attendees && (
+                                            <span className="text-red-500">
+                                                {errors.attendees}
+                                            </span>
+                                        )
+                                    }
+                                </FormItem>
+                                <FormItem label="Date" asterisk>
+                                    <DatePicker
+                                        onChange={(date) =>
+                                            setFieldValue('meetingDate', date ? `${date}` : '')
+                                        }
+                                    />
+                                    {errors.meetingDate && (
+                                        <span className="text-red-500">
+                                            {errors.meetingDate}
+                                        </span>
                                     )}
-                                </Field>
-                            {
-                                errors.attendees && (
-                                    <span className="text-red-500">
-                                        {errors.attendees}
-                                    </span>
-                                )
-                            }
-                        </FormItem>
-                        <FormItem label="Date" asterisk>
-                            <DatePicker
-                                onChange={(date) =>
-                                    setFieldValue('meetingDate', date ? `${date}` : '')
-                                }
-                            />
-                            {errors.meetingDate && (
-                                <span className="text-red-500">
-                                    {errors.meetingDate}
-                                </span>
-                            )}
-                        </FormItem>
-                        <FormItem label="Location" asterisk>
-                            <Select
-                                options={optionsSource}
-                                onChange={(selectedOption) =>
-                                    setFieldValue('location', selectedOption?.value)
-                                }
-                            />
-                            {errors.location && (
-                                <span className="text-red-500">
-                                    {errors.location}
-                                </span>
-                            )}
-                        </FormItem>
+                                </FormItem>
+                                <FormItem label="Location" asterisk>
+                                    <Select
+                                        options={optionsSource}
+                                        onChange={(selectedOption) =>
+                                            setFieldValue('location', selectedOption?.value)
+                                        }
+                                    />
+                                    {errors.location && (
+                                        <span className="text-red-500">
+                                            {errors.location}
+                                        </span>
+                                    )}
+                                </FormItem>
 
-                        <FormItem label="File">
-                            <Upload 
-                            multiple
-                            onChange={(files) => {
-                                setFieldValue('files', files)
-                            }}
+                                <FormItem label="File">
+                                    <Upload
+                                        multiple
+                                        onChange={(files) => {
+                                            setFieldValue('files', files)
+                                        }}
+                                    >
+                                        <Button
+                                            variant="solid"
+                                            icon={<HiOutlineCloudUpload />}
+                                            type="button"
+                                            block
+                                        >
+                                            Upload your file
+                                        </Button>
+                                    </Upload>
+                                </FormItem>
+                            </div>
+
+                            <div className='lg:mb-32'>
+
+                                <App
+                                    value={values.remark}
+                                    onChange={(value) => {
+                                        setFieldValue('remark', value)
+                                    }}
+                                />
+                            </div>
+
+
+                            <StickyFooter
+                                className="-mx-8 px-8 flex items-center gap-3 py-4"
+                                stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                             >
-                                <Button
-                                    variant="solid"
-                                    icon={<HiOutlineCloudUpload />}
-                                    type="button"
-                                    block
-                                >
-                                    Upload your file
+
+                                <Button type="submit" className="mr-2" variant="solid" size='sm' loading={isSubmitting}>
+                                    {isSubmitting ? 'Submitting...' : 'Submit'}
                                 </Button>
-                            </Upload>
-                        </FormItem>
-                       
+                                <Button type="submit" onClick={() => navigate(-1)} size='sm'>
+                                    Discard
+                                </Button>
 
-
-                      
-                    </div>
-
-                    <div className='lg:mb-32'>
-                    
-                    <App
-                        value={values.remark}
-                        onChange={(value) => {
-                            setFieldValue('remark', value)
-                        }}
-                    />
-                   </div>
-               
-                
-                <StickyFooter
-         className="-mx-8 px-8 flex items-center gap-3 py-4"
-                stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-        >
-              
-                        <Button type="submit" className="mr-2" variant="solid" size='sm' loading={isSubmitting}>
-                            {isSubmitting ? 'Submitting...' : 'Submit'}
-                        </Button>
-                        <Button type="submit" onClick={() => navigate(-1)} size='sm'>
-                            Discard
-                        </Button>
-
-                    </StickyFooter>
-                    </FormContainer>
+                            </StickyFooter>
+                        </FormContainer>
                     </Form>
                 )}
-                    
-                </Formik>
-                
+
+            </Formik>
+
         </div>
     )
 }

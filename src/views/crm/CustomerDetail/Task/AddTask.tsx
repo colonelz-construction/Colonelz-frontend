@@ -5,9 +5,10 @@ import { Field, Form, Formik, FormikContext } from 'formik'
 import { DatePicker, FormItem, Input, Notification, Select, toast } from '@/components/ui'
 import { apiGetCrmProjectsAddTask, apiGetUsersList } from '@/services/CrmService'
 import { IoIosAddCircleOutline } from "react-icons/io";
-import * as Yup from 'yup'
-import { AiOutlinePlus } from "react-icons/ai";
 import App from '../../CustomerDetail/components/MOM/Richtext'
+import * as Yup from 'yup';
+
+import { AiOutlinePlus } from "react-icons/ai";
 
 
 type Task = {
@@ -22,7 +23,7 @@ type Task = {
     reporter: string;
   };
 
-const AddTask = ({project,userData, addButton}:any) => {
+const AddTask = ({ project, userData, addButton }: any) => {
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const org_id = localStorage.getItem('orgId')
@@ -30,9 +31,9 @@ const AddTask = ({project,userData, addButton}:any) => {
     const [users, setUsers] = useState<any>([]);
     // console.log(users)
 
-    useEffect(()=> {
+    useEffect(() => {
 
-        const fetchData = async() => {
+        const fetchData = async () => {
             const list = await apiGetUsersList(project)
             setUsers(list.data)
         }
@@ -40,46 +41,46 @@ const AddTask = ({project,userData, addButton}:any) => {
         fetchData()
 
     }, [])
-    
-    
-const openDialog = () => {
-    setIsOpen(true)
-}
 
-const onDialogClose = () => {
-    setIsOpen(false)
-}
 
-const priorityOptions = [
-    { label: "Low", value: "Low" },
-    { label: "Medium", value: "Medium" },
-    { label: "High", value: "High" },
-  ];
-  
-  const statusOptions = [
-    { label: "Pending/Todo", value: "Pending" },
-    { label: "In Progress", value: "In Progress" },
-    { label: "Cancelled", value: "Cancelled" },
-  ];
+    const openDialog = () => {
+        setIsOpen(true)
+    }
 
-//   console.log(userData)
-  const userOptions = users?.map((user:any) => ({label: user, value: user}))
+    const onDialogClose = () => {
+        setIsOpen(false)
+    }
 
-//   console.log(userOptions)
+    const priorityOptions = [
+        { label: "Low", value: "Low" },
+        { label: "Medium", value: "Medium" },
+        { label: "High", value: "High" },
+    ];
 
-  return (
+    //   const statusOptions = [
+    //     { label: "Pending/Todo", value: "Pending" },
+    //     { label: "In Progress", value: "In Progress" },
+    //     { label: "Cancelled", value: "Cancelled" },
+    //   ];
+
+    //   console.log(userData)
+    const userOptions = users?.map((user: any) => ({ label: user, value: user }))
+
+    //   console.log(userOptions)
+
+    return (
         <div>
-            {addButton ? <Button onClick={openDialog}  variant='solid' size='sm'>Add Task</Button> : <span onClick={openDialog} className='flex items-center gap-1 cursor-pointer text-[#6B7280] font-semibold text-xl'> <IoIosAddCircleOutline/></span>}
-            
+            {addButton ? <Button onClick={openDialog} variant='solid' size='sm'>Add Task</Button> : <span onClick={openDialog} className='flex items-center gap-1 cursor-pointer text-[#6B7280] font-semibold text-xl'> <IoIosAddCircleOutline /></span>}
+
             <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
                 <div className="pl-4 ">
                     <h3>Add New Task</h3>
                 </div>
-                <Formik 
-                       initialValues={{
+                <Formik
+                    initialValues={{
                         user_id: localStorage.getItem('userId') || '',
                         org_id,
-                        project_id: project ,
+                        project_id: project,
                         task_name: "",
                         task_description: "",
                         estimated_task_end_date: "",
@@ -87,58 +88,72 @@ const priorityOptions = [
                         task_priority: "", 
                         task_assignee: "",
                         reporter: "",
-                      }}
-                      validationSchema={Yup.object().shape({
+                    }}
+                    validationSchema={Yup.object().shape({
                         task_name: Yup.string().required("Task Name is required"),
-                        estimated_task_end_date: Yup.string().required("Estimated End Date is required"),
+
+                        // estimated_task_start_date: Yup.string().required("Estimated Start Date is required"),
+                        estimated_task_end_date: Yup.string().required("Due Date is required").test(
+                            "is-greater",
+                            "End Date must be greater than Start Date",
+                            function (value) {
+                                const { estimated_task_start_date } = this.parent;
+                                if (estimated_task_start_date && value) {
+                                    return new Date(value) > new Date(estimated_task_start_date);
+                                }
+                                return true;
+                            }
+
+                        ),
+                        // task_status: Yup.string().required("Task Status is required"),
                         task_priority: Yup.string().required("Task Priority is required"),
                       })
                       }
                      onSubmit={async(values, actions) => {
                         setLoading(true)
-                            const response = await apiGetCrmProjectsAddTask(values)
-                            
-                            if(response.code===200){
-                                setLoading(false)
-                                toast.push(
-                                    <Notification closable type='success' duration={2000}>Task Added Successfully</Notification>
-                                )
-                                window.location.reload()
-                            }
-                            else{
-                                setLoading(false)
-                                toast.push(
-                                    <Notification closable type='danger' duration={2000}>{response.errorMessage}</Notification>
-                                )
-                            }
+                        const response = await apiGetCrmProjectsAddTask(values)
+
+                        if (response.code === 200) {
+                            setLoading(false)
+                            toast.push(
+                                <Notification closable type='success' duration={2000}>Task Added Successfully</Notification>
+                            )
+                            window.location.reload()
                         }
-                            
+                        else {
+                            setLoading(false)
+                            toast.push(
+                                <Notification closable type='danger' duration={2000}>{response.errorMessage}</Notification>
+                            )
+                        }
+                    }
+
                     }
                      >
                         {({ values, touched, errors,setFieldValue}) => (
                         <Form className=' p-4 max-h-96 overflow-y-auto'>
                             <div className=' grid grid-cols-2 gap-x-5'>
-                            <FormItem label='Name'
-                            asterisk
-                            invalid={errors.task_name && touched.task_name}
-                            errorMessage={errors.task_name}>
-                                <Field name='task_name'  component={Input} placeholder='Name'/>
-                               
-                            </FormItem>
-                            <FormItem label='Assignee'
-                            
-                            invalid={errors.task_assignee && touched.task_assignee}
-                            errorMessage={errors.task_assignee}>
-                                <Field name='task_assignee'  placeholder='Task'>
-                                    {({field}:any)=>(
-                                        <Select
-                                        options={userOptions}
-                                        name='task_assignee'
-                                        onChange={(value:any) => { field.onChange({ target: {name:'task_assignee', value: value?.value } }) }}
-                                        />
-                                    )}
-                                </Field>
-                            </FormItem>
+                                <FormItem label='Name'
+                                    asterisk
+                                    invalid={errors.task_name && touched.task_name}
+                                    errorMessage={errors.task_name}>
+                                    <Field name='task_name' component={Input} placeholder='Name' />
+
+                                </FormItem>
+                                <FormItem label='Assignee'
+
+                                    invalid={errors.task_assignee && touched.task_assignee}
+                                    errorMessage={errors.task_assignee}>
+                                    <Field name='task_assignee' placeholder='Task'>
+                                        {({ field }: any) => (
+                                            <Select
+                                                options={userOptions}
+                                                name='task_assignee'
+                                                onChange={(value: any) => { field.onChange({ target: { name: 'task_assignee', value: value?.value } }) }}
+                                            />
+                                        )}
+                                    </Field>
+                                </FormItem>
 
 
                             <FormItem label='Due Date'
@@ -196,7 +211,7 @@ const priorityOptions = [
                                 }}
                             />
                             <div className='flex justify-end'>
-                                <Button type='submit' variant='solid' size='sm' loading={loading}>{loading?'Adding':'Add Task'}</Button>
+                                <Button type='submit' variant='solid' size='sm' loading={loading}>{loading ? 'Adding' : 'Add Task'}</Button>
                             </div>
                         </Form>)}
                 </Formik>

@@ -3,6 +3,7 @@
   "private": true,
   "version": "2.1.0",
   "scripts": {
+    "preinstall": "mkdir -p node_modules/.bin",
     "dev": "vite",
     "start": "vite",
     "build": "vite build ",

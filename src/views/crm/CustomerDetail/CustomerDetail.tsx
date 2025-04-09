@@ -8,7 +8,7 @@ import TabList from '@/components/ui/Tabs/TabList'
 import TabNav from '@/components/ui/Tabs/TabNav'
 import TabContent from '@/components/ui/Tabs/TabContent'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { apiGetCrmProjectsMom, apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList, apiGetUsersListProject } from '@/services/CrmService'
+import { apiCreateCrmExecTask, apiGetCrmExecutionTask, apiGetCrmProjectsMom, apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList, apiGetUsersListProject } from '@/services/CrmService'
 import Index from './Quotation'
 import Task from './Task/index'
 import Activity from './Project Progress/Activity'
@@ -76,6 +76,7 @@ const CustomerDetail = () => {
   };
   const [details, setDetails] = useState<any | null>(null);
   const [projectData, setProjectData] = useState<any>()
+  const [execData, setExecData] = useState<any>()
   // console.log(projectData)
   const [task, setTaskData] = useState<Tasks[]>([])
   const [data, setData] = useState<any>([])
@@ -100,13 +101,13 @@ const CustomerDetail = () => {
       try {
         const response = await apiGetCrmSingleProjects(allQueryParams.project_id, org_id);
         const Report = await apiGetCrmSingleProjectReport(allQueryParams.project_id, org_id);
-
-
         const list = await apiGetUsersList(allQueryParams.project_id)
+        const exec = await apiGetCrmExecutionTask(allQueryParams.project_id)
 
         // console.log(list)
         const data = response
         setActivity(data.data)
+        setExecData(exec.data)
         setProjectData(data.data)
         setLoading(false);
         setReport(Report)
@@ -248,6 +249,9 @@ const CustomerDetail = () => {
                 {taskAccess &&
                   <TabNav value="task">Internal Task Manager</TabNav>
                 }
+                {
+                  <TabNav value="exectimeline">Execution Timeline</TabNav>
+                }
                 <AuthorityCheck
                   userAuthority={[`${localStorage.getItem('role')}`]}
                   authority={['ADMIN', 'SUPERADMIN']}
@@ -264,9 +268,7 @@ const CustomerDetail = () => {
                   </TabNav>
                 }
 
-{/* {
-                  <TabNav value="exectimeline">Execution Timeline</TabNav>
-                } */}
+                
               </>
 
             </TabList>
@@ -296,9 +298,9 @@ const CustomerDetail = () => {
               <TabContent value="assignee">
                 <Assignee data={data} />
               </TabContent>
-              {/* <TabContent value="exectimeline">
-                <ExexutionTimeline />
-              </TabContent> */}
+              <TabContent value="exectimeline">
+                <ExexutionTimeline execData={execData} />
+              </TabContent>
 
             </div>
           </Tabs>}

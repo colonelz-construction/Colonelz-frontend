@@ -74,7 +74,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data, report }) => {
         setCurrentIndex(prev => (prev === data?.lead_details.length - 1 ? 0 : prev + 1));
     };
 
-    const currentLead = data?.lead_details[currentIndex];
+    const currentLead = data?.lead_details?.length > 0 && data?.lead_details[currentIndex];
     const role = localStorage.getItem('role')
     const [project, setProject] = useState<AddProject>()
     const { roleData } = useRoleContext()
@@ -276,36 +276,36 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data, report }) => {
                                 <hr className="my-4 border-gray-200 dark:border-gray-600" />
                                 <CustomerInfoField
                                     title="Lead Name"
-                                    value={currentLead?.name}
+                                    value={data?.lead_details?.length > 0 ? currentLead?.name : data?.name}
                                 />
                                 <CustomerInfoField
                                     title="Email"
-                                    value={currentLead?.email}
+                                    value={data?.lead_details?.length > 0 ?  currentLead?.email: data?.email}
                                 />
                                 <CustomerInfoField
                                     title="Phone"
-                                    value={currentLead?.phone}
+                                    value={data?.lead_details?.length > 0 ? currentLead?.phone : data?.phone}
                                 />
                                 <CustomerInfoField
                                     title="Location"
-                                    value={currentLead?.location}
+                                    value={data?.lead_details?.length > 0 ? currentLead?.location: data?.location}
                                 />
                                 <CustomerInfoField
                                     title="Lead Manager"
-                                    value={currentLead?.lead_manager}
+                                    value={data?.lead_details?.length > 0 ? currentLead?.lead_manager : data?.lead_manager}
                                 />
                                 <CustomerInfoField
                                     title="Created Date"
-                                    value={currentLead?.date ? new Date(currentLead.date).toLocaleDateString('en-GB', {
+                                    value={(data?.lead_details?.length > 0 && currentLead?.date) ? new Date(currentLead.date).toLocaleDateString('en-GB', {
                                         day: '2-digit',
                                         month: '2-digit',
                                         year: 'numeric'
-                                    }).replace(/\//g, '-') : ''
+                                    }).replace(/\//g, '-') : data?.date
                                     }
                                 />
                                 <CustomerInfoField
                                     title="Source"
-                                    value={currentLead?.source || "NA"}
+                                    value={data?.lead_details?.length > 0 ? currentLead?.source : data?.source || 'NA'}
                                 />
                                 {/* <hr className="my-4 border-gray-200 dark:border-gray-600" /> */}
 

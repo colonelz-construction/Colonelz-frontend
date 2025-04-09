@@ -43,7 +43,7 @@ const Index = () => {
     const [queryType, setQueryType] = useState<any>("crm");
     const [placeHolder, setPlaceHolder] = useState<any>("Ask Anything...");
     const [isFileChosen, setIsFileChosen] = useState<boolean>(true);
-    console.log(formData, "FormData")
+    // console.log(formData, "FormData")
 
     const [user, setUser] = useState<any>('')
     useEffect(() => {
@@ -51,9 +51,7 @@ const Index = () => {
         const fetchData = async () => {
             try {
                 const res = await apiGetUserData(localStorage.getItem("userId"))
-
                 setUser(res?.data?.username)
-
             } catch (error) {
 
             }

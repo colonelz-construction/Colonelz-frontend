@@ -37,13 +37,11 @@ const Index = () => {
         question: '',
         file: [],
     });
-    // console.log(whole);
 
 
     const [queryType, setQueryType] = useState<any>("crm");
     const [placeHolder, setPlaceHolder] = useState<any>("Ask Anything...");
-    const [isFileChosen, setIsFileChosen] = useState<boolean>(true);
-    // console.log(formData, "FormData")
+    const [isFileChosen, setIsFileChosen] = useState<any>(true);
 
     const [user, setUser] = useState<any>('')
     useEffect(() => {

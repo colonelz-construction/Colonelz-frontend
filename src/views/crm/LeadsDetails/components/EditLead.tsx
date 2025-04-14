@@ -23,6 +23,8 @@ const EditLead = ({ details }: any) => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const LeadId = queryParams.get('id') || '';
+
+  console.log(details)
   const data = details.data[0]?.lead_details[0];
   const org_id = localStorage.getItem('orgId')
 
@@ -164,7 +166,6 @@ const EditLead = ({ details }: any) => {
               <Field name='date'>
                 {({ field, form }: any) => (
                   <DateTimepicker
-                  maxDate={new Date()}
                     value={field.value}
                     onChange={(date) => form.setFieldValue('date', date)}
                   />

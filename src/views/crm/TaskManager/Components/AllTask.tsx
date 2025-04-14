@@ -467,15 +467,7 @@ const AllTask = ({ users }: any) => {
                 },
             },
             {
-                header: 'Start Date',
-                accessorKey: 'task_start_date',
-                cell: (props) => {
-                    const row = props.row.original
-                    return formateDate(row?.task_start_date)
-                },
-            },
-            {
-                header: 'End Date',
+                header: 'Due Date',
                 accessorKey: 'task_end_date',
                 cell: (props) => {
                     const row = props.row.original

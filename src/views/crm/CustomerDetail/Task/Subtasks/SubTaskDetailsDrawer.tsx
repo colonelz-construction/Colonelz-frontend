@@ -113,7 +113,7 @@ const SubTaskDetails = (Data: any) => {
         closable={false}
       >
         <div className='flex gap-5 items-center'>
-          <h4 className='p-2'>Subask:{Data.data.sub_task_name}</h4>
+          <h4 className='p-2'>SubTask:{Data.data.sub_task_name}</h4>
         </div>
         <Tabs defaultValue="tab1">
           <TabList>

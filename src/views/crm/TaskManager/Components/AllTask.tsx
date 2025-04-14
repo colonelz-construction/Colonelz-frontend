@@ -467,7 +467,7 @@ const AllTask = ({ users }: any) => {
                 },
             },
             {
-                header: 'End Date',
+                header: 'Due Date',
                 accessorKey: 'task_end_date',
                 cell: (props) => {
                     const row = props.row.original

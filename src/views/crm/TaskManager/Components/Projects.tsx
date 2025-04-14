@@ -356,7 +356,7 @@ function Expanding() {
             accessorKey: 'task_status'
         },
         {
-            header: 'End Date',
+            header: 'Due Date',
             accessorKey: 'estimated_task_end_date',
             cell: ({ row }) => {
                 return <span>{formateDate(row.original.estimated_task_end_date)}</span>

@@ -508,7 +508,7 @@ const FormContent = () => {
                         </FormItem>
                     }
 
-                    <FormItem label="Client Name">
+                    <FormItem label="Client Name (Enter after Typing)">
                         <Field name="client_name">
                             {({ form }: { form: any }) => (
                                 <MultiInput
@@ -528,7 +528,7 @@ const FormContent = () => {
                             className=" text-red-600"
                         />
                     </FormItem>
-                    <FormItem label="Client Phone">
+                    <FormItem label="Client Phone (Enter after Typing)">
                     <Field name="client_phone">
                         {({ form }: { form: any }) => (
                             <MultiInput
@@ -548,7 +548,7 @@ const FormContent = () => {
                             className=" text-red-600"
                         />
                     </FormItem>
-                    <FormItem label="Client Email">
+                    <FormItem label="Client Email (Enter after Typing)">
                         <Field name="client_email">
                             {({ form }: { form: any }) => (
                                 <MultiInput

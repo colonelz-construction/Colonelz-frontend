@@ -304,7 +304,7 @@ const CustomerDetail = () => {
     return (
         <>
             <div className='flex justify-between'>
-                <h3 className='pb-5'>Lead-{lead?.lead_details[0].name || <Skeleton />}</h3>
+                <h3 className='pb-5'>Lead-{lead?.lead_details?.lenght > 0 ? (lead?.lead_details[0].name || <Skeleton />) : (lead?.name || <Skeleton />)}</h3>
                 <div className=''>
                     <Dropdown renderTitle={Toggle} placement='middle-end-top' >
                         <AuthorityCheck

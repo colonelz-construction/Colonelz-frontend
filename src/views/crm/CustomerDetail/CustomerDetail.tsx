@@ -249,9 +249,9 @@ const CustomerDetail = () => {
                 {taskAccess &&
                   <TabNav value="task">Internal Task Manager</TabNav>
                 }
-                {
+                {/* {
                   <TabNav value="exectimeline">Execution Timeline</TabNav>
-                }
+                } */}
                 <AuthorityCheck
                   userAuthority={[`${localStorage.getItem('role')}`]}
                   authority={['ADMIN', 'SUPERADMIN']}
@@ -298,9 +298,9 @@ const CustomerDetail = () => {
               <TabContent value="assignee">
                 <Assignee data={data} />
               </TabContent>
-              <TabContent value="exectimeline">
+              {/* <TabContent value="exectimeline">
                 <ExexutionTimeline execData={execData} />
-              </TabContent>
+              </TabContent> */}
 
             </div>
           </Tabs>}

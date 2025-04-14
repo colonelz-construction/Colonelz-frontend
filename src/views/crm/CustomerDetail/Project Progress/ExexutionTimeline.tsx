@@ -647,12 +647,12 @@ const GanttChart = ({ execData }: any) => {
                 <div className="flex items-center justify-end gap-3">
 
                     <AddExecTask />
-                    <button
+                    {/* <button
                     onClick={handleDownload}
                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                     >
                     Download UI as PNG
-                    </button>
+                    </button> */}
 
                 </div>
 

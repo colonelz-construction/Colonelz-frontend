@@ -123,7 +123,7 @@ const SubTaskDetails = (Data:any) => {
                 <div className="p-4">
                     <TabContent value="tab1">
 
-                    <SubTaskTimer isShow={Data.isShow} user={Data.user} data={Data.data}/>
+                    <SubTaskTimer isShow={Data.isShow} user={Data.users} data={Data.data}/>
 
                     <CustomerInfoField title="Creator" value={Data.data.sub_task_createdBy} />
                     <CustomerInfoField title="Created On" value={formateDate(Data.data.sub_task_createdOn)} />

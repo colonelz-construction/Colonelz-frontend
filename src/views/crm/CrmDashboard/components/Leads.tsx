@@ -119,7 +119,7 @@ const Leads = ({ data = [], className }: any) => {
                   <TableRowSkeleton />
                 </TableCell>
               </TableRow>
-            ) : apiData.length > 0 ? (
+            ) : apiData?.length > 0 ? (
               apiData.slice(0, 5).map((item, index) => {
                 return (
                   <TableRow

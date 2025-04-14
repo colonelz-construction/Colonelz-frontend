@@ -223,7 +223,7 @@ const Index = () => {
                 const lastMessage = prevMessages[prevMessages.length - 1];
                 const newMessageText = (lastMessage?.text || "") + 'responseEnd';
                 return [
-                    ...prevMessages.slice(0, -1), // Remove the last entry
+                    ...prevMessages.slice(0, -1),
                     { text: newMessageText.trim(), sender: "bot", type: "summary" }, // Append the new chunk
                 ];
             })
@@ -545,6 +545,7 @@ const Index = () => {
                 <div className="flex flex-col bg-gray-100 dark:bg-[#1F2937] messages flex-1 h-[23rem] overflow-y-auto border border-gray-300 rounded-lg p-2">
                     <ScrollableFeed className="h-full flex flex-col scrollbar-thumb-[#d4d1d1] scrollbar-thin scrollbar-track-transparent pr-6">
                         {(
+                            console.log(messages, "Messages"),
                             messages.map((message: any, index: any) => (
                                 <div className={`flex w-full ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
                                     <div
@@ -579,14 +580,15 @@ const Index = () => {
                                                 const taskId = taskIdMatch && taskIdMatch[1];
 
                                                 const userId = localStorage.getItem('userId')
-                                                console.log(line)
 
                                                 let match;
-                                                if (queryType === 'summary') {
+                                                if (queryType === "summary") {
+                                                    if(line.includes("responseEnd"))
                                                     match = line.match(/{"summary":"Chunk 1:(.*?)"}/s);
-                                                } else {
+                                                else match = line.replace("responseEnd", "").replace("data:", "").match(/"content":"(.*?)"/);
+                                                  } else {
                                                     match = line.replace("responseEnd", "").replace("data:", "").match(/"content":"(.*?)"/);
-                                                }
+                                                  }
 
                                                 let lineShow = ''
                                                 let testShow = ''

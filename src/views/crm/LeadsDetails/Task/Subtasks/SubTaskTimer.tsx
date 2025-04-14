@@ -280,12 +280,25 @@ const SubTaskTimer = (Data:any) => {
             };
             Submit(submitData);
         };
+
+        useEffect(() => {
+
+          console.log(Data?.user?.find((u:any) => u.user_id !== userId)?.user_name)
+
+        }, [Data, Data?.user])
+
+        console.log(Data.isShow)
+        console.log(Data.user)
+        console.log(((Data.data.sub_task_status==='Completed' || Data.data.sub_task_status==='Cancelled') || Data.data.sub_task_status==='Pending' || (Data.data.sub_task_assignee !== Data?.user?.find((u:any) => u.user_id === userId)?.user_name)))
+        console.log(Data.data.sub_task_assignee) 
+        console.log(Data?.user?.find((u:any) => u.user_id === userId)?.user_name) 
+        console.log(Data.data.sub_task_assignee !== Data?.user?.find((u:any) => u.user_id === userId)?.user_name)
         
           
   return (
     <div className={`flex   items-center ${Data.isShow &&  "gap-4 mb-5"}`}>
 
-                      {Data.isShow && ((Data.data.sub_task_status==='Completed' || Data.data.sub_task_status==='Cancelled') || Data.data.sub_task_status==='Pending' || ((role !== 'SUPERADMIN' && role !== 'ADMIN') && Data.data.sub_task_assignee !== Data?.users?.find((u:any) => u.user_id === userId)?.user_name))?
+                      {Data.isShow && ((Data.data.sub_task_status==='Completed' || Data.data.sub_task_status==='Cancelled') || Data.data.sub_task_status==='Pending' || ( Data.data.sub_task_assignee !== Data?.user?.find((u:any) => u.user_id === userId)?.user_name)) ?
                       
                       (<>
                       <Button className='!rounded-full shadow-md' variant='twoTone' size='sm'disabled ><IoPlayOutline className='font-bold'/></Button>
@@ -293,7 +306,7 @@ const SubTaskTimer = (Data:any) => {
                       <Button className='!rounded-full shadow-md' variant='twoTone' size='sm'disabled ><PiSquareThin/></Button>
                       
                       </>):
-                    Data.isShow &&
+                    Data.isShow && 
                     <><span  className=''  onClick={timerData.isRunning?handlePause:handleStart}>
 
 

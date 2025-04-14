@@ -56,6 +56,8 @@ const Report = ({report}:any) => {
     fetchData();
   }, [report]);
 
+  console.log(report)
+
  
 
   return (

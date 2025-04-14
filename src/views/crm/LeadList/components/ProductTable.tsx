@@ -150,7 +150,7 @@ const Filtering = () => {
     const [globalFilter, setGlobalFilter] = useState('')
     const navigate = useNavigate()
     const apiData = useLeadContext()
-    // console.log(apiData)
+    console.log(apiData)
     const responseData=apiData
     const totalData = responseData?.length
 
@@ -172,6 +172,9 @@ const Filtering = () => {
                 } else {
                     status = row.original.status
                 }
+
+                console.log("dfd", status)
+                console.log("fff", row.original.lead_status)
             
                 return (
                     <span

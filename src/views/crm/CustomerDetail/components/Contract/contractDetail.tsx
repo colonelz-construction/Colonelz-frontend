@@ -149,6 +149,7 @@ const ContractDetails = (data: FileItemProps) => {
     const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
     const [dialogIsOpen, setIsOpen] = useState(false) 
     const [loading, setLoading] = useState(false)
+    const [selected, setSelected] = useState(false)
     const [remark, setRemark] = useState("");
     const location = useLocation()
     const queryParams = new URLSearchParams(location.search)

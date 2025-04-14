@@ -165,9 +165,9 @@ const Assignee = ({data}: any) => {
         }
     }
 
-    const columns = useMemo<ColumnDef<User>[]>(
+    const columns = useMemo<ColumnDef<any>[]>(
         () => [
-            { header: 'Username', accessorKey: 'user_name' },
+            { header: 'Username', accessorKey: 'username' },
             { header: 'Role', accessorKey: 'role' },
             {
                 header: '',
@@ -175,6 +175,7 @@ const Assignee = ({data}: any) => {
                 cell: ({ row }) => {
 
                     const deleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.addMember?.delete?.includes(`${role}`)
+                    console.log(row.original)
                     return (
                         <div className="">
 
@@ -183,7 +184,7 @@ const Assignee = ({data}: any) => {
                                     <p
                                         className=" text-xl hover:text-red-500 cursor-pointer"
                                         onClick={() =>
-                                            openDialog(row.original.user_id, row.original.user_name)
+                                            openDialog(row.original.user_id, row.original.username)
                                         }
                                     >
                                         <HiOutlineUserRemove />
@@ -201,6 +202,8 @@ const Assignee = ({data}: any) => {
     )
 
     const [datas] = useState(() => data)
+
+    console.log(data)
 
     const table = useReactTable({
         data,

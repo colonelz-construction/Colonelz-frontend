@@ -35,7 +35,7 @@ type Task = {
 
 const EditTask = ({ Data,users,task }: any) => {
 
-    // console.log(users)
+    console.log(Data)
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const org_id = localStorage.getItem('orgId')

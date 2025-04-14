@@ -260,7 +260,7 @@ function Expanding() {
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                 >
-                    <span className='whitespace-wrap'>{row.name.length > 13
+                    <span className='whitespace-wrap'>{row?.name?.length > 13
                         ? `${row.name.slice(0, 10)}...`
                         : row.name}</span>
                     {isHovered && (
@@ -343,14 +343,7 @@ function Expanding() {
             accessorKey: 'task_status'
         },
         {
-            header: 'Start Date',
-            accessorKey: 'estimated_task_start_date',
-            cell: ({ row }) => {
-                return <span>{formateDate(row.original.estimated_task_start_date)}</span>
-            }
-        },
-        {
-            header: 'End Date',
+            header: 'Due Date',
             accessorKey: 'estimated_task_end_date',
             cell: ({ row }) => {
                 return <span>{formateDate(row.original.estimated_task_end_date)}</span>

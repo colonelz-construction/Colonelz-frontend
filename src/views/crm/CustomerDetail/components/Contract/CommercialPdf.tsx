@@ -1213,6 +1213,8 @@ actual.
 export const useFormikValues = () => useContext(FormikValuesContext);
 const MyComponent = (data:any) => {
   const org_id : any = localStorage.getItem('orgId')
+
+  console.log(data)
  
   const navigate = useNavigate();
   

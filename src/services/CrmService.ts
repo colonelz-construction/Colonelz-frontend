@@ -1346,6 +1346,112 @@ export async function apiPostCrmThreeImage(data: any) { // org done
         return response.data
     })
 }
+
+export async function apiCreateCrmExecTask(data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/create/project/execution/task',
+        method: 'post',
+        data: data,
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiGetCrmExecutionTask<T>(project_id:any) { // org done
+    return ApiService.fetchData<any>({
+        url: `admin/get/project/execution/tasks?user_id=${localStorage.getItem('userId')}&org_id=${localStorage.getItem('orgId')}&project_id=${project_id}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiUpdateCrmExecTask(data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/update/project/execution/task',
+        method: 'put',
+        data,
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiUpdateCrmExecTaskDetail(data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/update/project/execution/task/details',
+        method: 'put',
+        data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiDeleteCrmExecTask(data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/delete/project/execution/task',
+        method: 'delete',
+        data: data,
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiDeleteCrmExecTaskDetail(data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/delete/project/execution/task/details',
+        method: 'delete',
+        data: data,
+    }).then((response) => {
+        return response.data
+    })
+}
+//----------
+export async function apiCreateCrmExecSubTask(data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/create/project/execution/subtask',
+        method: 'post',
+        data: data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiUpdateCrmExecSubTask(data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/update/project/execution/subtask',
+        method: 'put',
+        data,
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiUpdateCrmExecSubTaskDetail(data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/update/project/execution/subtask/details',
+        method: 'put',
+        data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiDeleteCrmExecSubTask(data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/delete/project/execution/subtask',
+        method: 'delete',
+        data: data,
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiDeleteCrmExecSubTaskDetail(data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/delete/project/execution/subtask/details',
+        method: 'delete',
+        data: data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+
 export async function apiDeleteCrmMainImage(data: any) { // org done
     return ApiService.fetchData<any>({
         url: 'admin/delete/mainimage',

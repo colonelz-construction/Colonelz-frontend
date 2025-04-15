@@ -518,6 +518,7 @@ const Index = () => {
         const handleTagChange = (tag: any) => {
             setQueryType(tag.name);
             setPlaceHolder(tag.placeHold);
+            handleClear();
         }
 
         return <div className="flex">

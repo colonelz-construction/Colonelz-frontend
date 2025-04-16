@@ -229,8 +229,8 @@ const YourFormComponent = () => {
                     }
                 }
                 validationSchema={Yup.object().shape({
-                    // client_name: Yup.array().required('Client Name is required'),
-                    // organisor: Yup.array().required("Organisor's Name is required"),
+                    client_name: Yup.array().min(1, "Client's Name is required"),
+                    organisor: Yup.array().min(1, "Organisor's Name is required"),
                     meetingDate: Yup.string().required('Meeting Date is required'),
                     location: Yup.string().required('Location is required'),
                 })

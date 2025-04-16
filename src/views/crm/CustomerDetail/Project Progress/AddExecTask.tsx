@@ -70,7 +70,7 @@ const AddExecTask = () => {
                     onSubmit={async (values, actions) => {
                         setLoading(true)
                         const val = {...values, color: bgColor }
-                        console.log(val)
+                        // console.log(val)
                         const response = await apiCreateCrmExecTask(val)
                         if (response.code === 200) {
                             setLoading(false)

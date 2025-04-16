@@ -306,7 +306,7 @@ const priorityOptions = [
                                     setFieldValue('task_description', value)
                                 }}
                             />
-                            <div className='flex justify-end'>
+                            <div className='flex justify-end mt-5'>
                                 <Button type='submit' variant='solid' size='sm' loading={loading}>{loading?'Adding':'Add Task'}</Button>
                             </div>
                         </Form>)}

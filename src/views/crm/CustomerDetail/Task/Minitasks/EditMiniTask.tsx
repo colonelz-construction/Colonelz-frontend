@@ -182,7 +182,7 @@ const onDialogClose = () => {
                                     }}
                                 </Field>
                             </FormItem>}
-                            <div className='flex justify-end'>
+                            <div className='flex justify-end mt-5'>
                                 <Button type='submit' variant='solid' size='sm' loading={loading}>{loading?'Updating':'Update Minitask'}</Button>
                             </div>
                         </Form>)}

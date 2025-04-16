@@ -42,7 +42,7 @@ const EditMiniTaskStatus = ({ Data, users }: MinitaskData) => {
         { label: "Pending/Todo", value: "Pending" },
         { label: "Completed", value: "Completed" },
         { label: "Cancelled", value: "Cancelled" },
-        { label: "Under Revision", value: "Under Revision" },
+        // { label: "Under Revision", value: "Under Revision" },
     ];
 
     return (

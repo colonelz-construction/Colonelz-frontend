@@ -63,6 +63,7 @@ const EditLead = ({ details }: any) => {
           location: Yup.string().required('Location is required'),
           source: Yup.string(),
           lead_manager: Yup.string().required('Lead Manager is required'),
+          date: Yup.string().required('Date is required'),
 
         })}
         onSubmit={async (values: any, { setSubmitting }) => {

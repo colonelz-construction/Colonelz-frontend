@@ -125,6 +125,7 @@ const Assignee = ({data}: any) => {
     const query = useQuery()
     const project_id = query.get('project_id')
     const role = localStorage.getItem('role')
+    const user_id = localStorage.getItem('userId')
     const queryParams = new URLSearchParams(location.search);
     const allQueryParams: QueryParams = {
         id: queryParams.get('id') || '',
@@ -175,11 +176,13 @@ const Assignee = ({data}: any) => {
                 cell: ({ row }) => {
 
                     const deleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.addMember?.delete?.includes(`${role}`)
-                    console.log(row.original)
+                    // console.log(row.original)
+
+                    
                     return (
                         <div className="">
 
-                            {deleteAccess && <span className="flex items-center text-lg gap-2">
+                            {(row.original._id !== user_id) && deleteAccess && <span className="flex items-center text-lg gap-2">
                                 <Tooltip title="Remove">
                                     <p
                                         className=" text-xl hover:text-red-500 cursor-pointer"

@@ -23,7 +23,7 @@ const EditExecTask = ({task, dialogIsOpen, setIsOpen, openDialog, onDialogClose}
 
     const task_id=queryParams.get('task')
 
-    console.log(task)
+    // console.log(task)
     
     
     

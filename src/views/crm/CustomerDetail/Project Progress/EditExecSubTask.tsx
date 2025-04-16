@@ -26,7 +26,7 @@ const EditExecSubTask = ({ task, subtask, openDialog, onDialogClose, dialogIsOpe
 
 
 
-    console.log(subtask)
+    // console.log(subtask)
 
     // const openDialog = () => {
     //     setIsOpen(true)
@@ -68,7 +68,7 @@ const EditExecSubTask = ({ task, subtask, openDialog, onDialogClose, dialogIsOpe
                     })}
                     onSubmit={async (values, actions) => {
 
-                        console.log(values)
+                        // console.log(values)
                         setLoading(true)
                         const val = {...values, color: bgColor }
                         const response = await apiUpdateCrmExecSubTask(val)
@@ -140,7 +140,7 @@ const EditExecSubTask = ({ task, subtask, openDialog, onDialogClose, dialogIsOpe
                                     <Field name='color'>
                                         {({ field }: any) =>{
                                         
-                                            console.log(field.value)
+                                            // console.log(field.value)
                                         return (
 
                                             <SelectWithBg onChange={handleChange} placeholder={field.value} />

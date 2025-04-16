@@ -67,11 +67,11 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data, report }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const goToPrevious = () => {
-        setCurrentIndex(prev => (prev === 0 ? data?.lead_details.length - 1 : prev - 1));
+        setCurrentIndex(prev => (prev === 0 ? data?.lead_details?.length - 1 : prev - 1));
     };
 
     const goToNext = () => {
-        setCurrentIndex(prev => (prev === data?.lead_details.length - 1 ? 0 : prev + 1));
+        setCurrentIndex(prev => (prev === data?.lead_details?.length - 1 ? 0 : prev + 1));
     };
 
     const currentLead = data?.lead_details?.length > 0 && data?.lead_details[currentIndex];
@@ -101,7 +101,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data, report }) => {
         return (
             <div className='flex items-center my-3  '>
                 <span className="text-gray-700 dark:text-gray-200 font-semibold" >{title}: </span>
-                {!value ? <Skeleton width={100} /> :
+                {!data ? <Skeleton width={100} /> :
                     <p style={{ overflowWrap: "break-word" }}>
                         {value || '-'}
                     </p>}
@@ -131,7 +131,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data, report }) => {
     //     }
     // }
     return (
-        <div className=" flex flex-col gap-5 lg:flex-row  ">
+        <div className=" flex flex-col gap-5 lg:flex-row">
             {/* <Card className='lg:w-2/5'>
                 <div className="flex flex-col xl:justify-between h-full 2xl:min-w-[360px] mx-auto">
                     <div className="">
@@ -242,85 +242,83 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data, report }) => {
                 </div>
             </Card> */}
 
-          
-                <Card className='lg:w-2/5'>
-                    <div className="flex flex-col xl:justify-between h-full 2xl:min-w-[360px] mx-auto ">
-                        <div className="">
-                            <div className="mb-6">
-                                <div className="flex justify-between items-center">
-                                    <div className='flex flex-row justify-between items-center gap-3'>
-                                    <FaAngleLeft onClick={goToPrevious} />
+
+            <Card className='lg:w-2/5'>
+                <div className="flex flex-col xl:justify-between h-full 2xl:min-w-[360px] mx-auto ">
+                    <div className="">
+                            <div className="flex justify-between items-center">
+                                <div className='flex flex-row justify-between items-center gap-3'>
+                                    {data?.lead_details?.length > 1 && <FaAngleLeft onClick={goToPrevious} />}
                                     <h5>Lead Details</h5>
-                                    <FaAngleRight onClick={goToNext} />
-                                    </div>
-                                    {
-                                createProjectAccess && data?.contract_Status && <>
-                                    {data?.project ?
-                                        <Button onClick={() => openDialog2()} variant='solid'>
-                                            Add Another Project
-                                        </Button> :
-                                        <Button
-                                            variant="solid"
-
-                                            onClick={() =>
-                                                navigate(
-                                                    `/app/crm/lead-project/?id=${myParam}&name=${currentLead?.name}&email=${currentLead?.email}&phone=${currentLead?.phone}&location=${currentLead?.location}`,
-                                                )
-                                            }
-                                        >
-                                            Create Project
-                                        </Button>}
-                                </>}
+                                    {data?.lead_details?.length > 1 && <FaAngleRight onClick={goToNext} />}
                                 </div>
+                                {
+                                    createProjectAccess && data?.contract_Status && <>
+                                        {data?.project ?
+                                            <Button onClick={() => openDialog2()} variant='solid'>
+                                                Add Another Project
+                                            </Button> :
+                                            <Button
+                                                variant="solid"
 
-                                <hr className="my-4 border-gray-200 dark:border-gray-600" />
-                                <CustomerInfoField
-                                    title="Lead Name"
-                                    value={data?.lead_details?.length > 0 ? currentLead?.name : data?.name}
-                                />
-                                <CustomerInfoField
-                                    title="Email"
-                                    value={data?.lead_details?.length > 0 ?  currentLead?.email: data?.email}
-                                />
-                                <CustomerInfoField
-                                    title="Phone"
-                                    value={data?.lead_details?.length > 0 ? currentLead?.phone : data?.phone}
-                                />
-                                <CustomerInfoField
-                                    title="Location"
-                                    value={data?.lead_details?.length > 0 ? currentLead?.location: data?.location}
-                                />
-                                <CustomerInfoField
-                                    title="Lead Manager"
-                                    value={data?.lead_details?.length > 0 ? currentLead?.lead_manager : data?.lead_manager}
-                                />
-                                <CustomerInfoField
-                                    title="Created Date"
-                                    value={(data?.lead_details?.length > 0 && currentLead?.date) ? new Date(currentLead.date).toLocaleDateString('en-GB', {
-                                        day: '2-digit',
-                                        month: '2-digit',
-                                        year: 'numeric'
-                                    }).replace(/\//g, '-') : data?.date
-                                    }
-                                />
-                                <CustomerInfoField
-                                    title="Source"
-                                    value={data?.lead_details?.length > 0 ? currentLead?.source : data?.source || 'NA'}
-                                />
-                                {/* <hr className="my-4 border-gray-200 dark:border-gray-600" /> */}
-
-                                <div className='flex mb-3'>
-                            <p className='text-gray-700 dark:text-gray-200 font-semibold'>Description:</p>
-                            <p className="text-wrap">
-                                <div className="remark-content" dangerouslySetInnerHTML={{
-                                    __html: data?.notes?.[0]?.content || ""
-                                }} />
-                            </p>
-                        </div>
+                                                onClick={() =>
+                                                    navigate(
+                                                        `/app/crm/lead-project/?id=${myParam}&name=${currentLead?.name}&email=${currentLead?.email}&phone=${currentLead?.phone}&location=${currentLead?.location}`,
+                                                    )
+                                                }
+                                            >
+                                                Create Project
+                                            </Button>}
+                                    </>}
                             </div>
-                        </div>
+
+                            {/* <hr className="my-4 border-gray-200 dark:border-gray-600" /> */}
+                            <CustomerInfoField
+                                title="Lead Name"
+                                value={data?.lead_details?.length > 0 ? currentLead?.name : data?.name}
+                            />
+                            <CustomerInfoField
+                                title="Email"
+                                value={data?.lead_details?.length > 0 ? currentLead?.email : data?.email}
+                            />
+                            <CustomerInfoField
+                                title="Phone"
+                                value={data?.lead_details?.length > 0 ? currentLead?.phone : data?.phone}
+                            />
+                            <CustomerInfoField
+                                title="Location"
+                                value={data?.lead_details?.length > 0 ? currentLead?.location : data?.location}
+                            />
+                            <CustomerInfoField
+                                title="Lead Manager"
+                                value={data?.lead_details?.length > 0 ? currentLead?.lead_manager : data?.lead_manager}
+                            />
+                            <CustomerInfoField
+                                title="Created Date"
+                                value={(data?.lead_details?.length > 0 && currentLead?.date) ? new Date(currentLead.date).toLocaleDateString('en-GB', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric'
+                                }).replace(/\//g, '-') : data?.date
+                                }
+                            />
+                            <CustomerInfoField
+                                title="Source"
+                                value={data?.lead_details?.length > 0 ? currentLead?.source : data?.source || 'NA'}
+                            />
+                            {/* <hr className="my-4 border-gray-200 dark:border-gray-600" /> */}
+
+                            <div className='flex mb-3'>
+                                <p className='text-gray-700 dark:text-gray-200 font-semibold'>Description:</p>
+                                <p className="text-wrap">
+                                    <div className="remark-content" dangerouslySetInnerHTML={{
+                                        __html: data?.notes?.[0]?.content || ""
+                                    }} />
+                                </p>
+                            </div>
                     </div>
-                </Card>
+                </div>
+            </Card>
             <Report report={report} />
 
             <Dialog

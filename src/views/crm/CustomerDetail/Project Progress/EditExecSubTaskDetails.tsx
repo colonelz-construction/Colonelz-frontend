@@ -22,7 +22,7 @@ const EditExecSubTaskDetails = ({ task, subtask, detail, openDialog, onDialogClo
 
     // const task_id=queryParams.get('task')
 
-    console.log(detail)
+    // console.log(detail)
 
     const typeOptions = [
         { value: 'In Progress', label: 'In Progress' },
@@ -68,7 +68,7 @@ const EditExecSubTaskDetails = ({ task, subtask, detail, openDialog, onDialogClo
                     })}
                     onSubmit={async (values, actions) => {
 
-                        console.log(values)
+                        // console.log(values)
                         setLoading(true)
                         const val = {...values, detail_color: bgColor }
                         const response = await apiUpdateCrmExecSubTaskDetail(val)

@@ -1403,6 +1403,15 @@ export async function apiDeleteCrmExecTaskDetail(data: any) { // org done
     })
 }
 //----------
+export async function apiDownloadExecChart(data: any) { // org done
+    return ApiService.fetchData<any>({
+        url: 'admin/project/execution/download',
+        method: 'post',
+        data: data,
+    }).then((response) => {
+        return response.data
+    })
+}
 export async function apiCreateCrmExecSubTask(data: any) { // org done
     return ApiService.fetchData<any>({
         url: 'admin/create/project/execution/subtask',

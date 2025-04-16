@@ -101,7 +101,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({ data, report }) => {
         return (
             <div className='flex items-center my-3  '>
                 <span className="text-gray-700 dark:text-gray-200 font-semibold" >{title}: </span>
-                {!value ? <Skeleton width={100} /> :
+                {!data ? <Skeleton width={100} /> :
                     <p style={{ overflowWrap: "break-word" }}>
                         {value || '-'}
                     </p>}

@@ -71,7 +71,7 @@ const AddExecSubTaskDetails = ({ task, subtask, openDialog, onDialogClose, dialo
                     })}
                     onSubmit={async (values, actions) => {
 
-                        console.log(values)
+                        // console.log(values)
                         const val = { ...values, detail_color: bgColor }
                         setLoading(true)
                         const response = await apiUpdateCrmExecSubTask(val)

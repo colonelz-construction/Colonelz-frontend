@@ -62,7 +62,7 @@ const handleChange = (value: string) => {
                       })}
                      onSubmit={async(values, actions) => {
 
-                        console.log(values)
+                        // console.log(values)
 
                         const val = {...values, color: bgColor }
                         setLoading(true)
@@ -130,7 +130,7 @@ const handleChange = (value: string) => {
                             >
                                 <Field name='subtask_name'  component={Input} placeholder='Name'/>
                             </FormItem>
-                            
+
                             <FormItem label="Color" >
                                     <Field name='subtask_type'>
                                         {({ field }: any) => (

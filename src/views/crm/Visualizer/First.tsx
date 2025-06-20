@@ -16,6 +16,7 @@ import { ConfirmDialog } from "@/components/shared";
 import { HiOutlineExclamation } from "react-icons/hi";
 import Loading from "react-loading";
 import Project from "../CrmDashboard/components/Projects";
+import { useCallback } from "react";
 
 const Loader = () => {
   const queryParams = new URLSearchParams(location.search);
@@ -353,19 +354,32 @@ const CameraZoom = ({ zoomTarget, zooming }: any) => {
     return null;  // This component just handles camera zoom animation
   };
 
-const Second = ({texture, setTexture, imageUrl, addHotspotMode, onHotspotAdd, testData, setCurrentView, currentView }:any) => {
+const Second = ({
+  texture,
+  setTexture,
+  imageUrl,
+  addHotspotMode,
+  onHotspotAdd,
+  setCurrentView,
+  currentView
+}: any) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [file, setFile] = useState<any>(null);
   const [name, setName] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [rename, setRename] = useState("");
   const [selectedPoint, setSelectedPoint] = useState<any>(null);
-  const [addThisHp, setAddThisHp] = useState<any>(null);
-  const [panoImages, setPanoImages] = useState<any>([])
-
-  const [zooming, setZooming] = useState(false);  // Track zoom transition state
+  const [panoImages, setPanoImages] = useState<any[]>([]);
+  const [zooming, setZooming] = useState(false);
   const [zoomTarget, setZoomTarget] = useState(1);
+  const [addThisHp, setAddThisHp] = useState<any>(null);
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const cameraRef = useRef<any>(null);
+  const sceneRef = useRef<any>(null);
+  const raycaster = useRef(new THREE.Raycaster());
+  const mouse = useRef(new THREE.Vector2());
+  const pointerDownRef = useRef<{ x: number; y: number } | null>(null);
+  const CLICK_THRESHOLD = 5; // in pixels
 
   const user_id = localStorage.getItem('userId')
   const org_id = localStorage.getItem('orgId')
@@ -373,117 +387,71 @@ const Second = ({texture, setTexture, imageUrl, addHotspotMode, onHotspotAdd, te
   const leadId = queryParams.get('lead_id') || null;
   const projectId = queryParams.get('project_id') || null;
 
-  // useEffect(() => {
-  //   console.log('aaaaaaa')
-  //   const textureLoader = new THREE.TextureLoader();
-  //   textureLoader.load(imageUrl, (loadedTexture:any) => {
-  //     loadedTexture.wrapS = THREE.RepeatWrapping;
-  //     loadedTexture.wrapT = THREE.RepeatWrapping;
-  //     loadedTexture.repeat.x = -1;
-  //     setTexture(loadedTexture);
-  //     console.log('ccccccc')
-  //   });
 
-  //   console.log('bbbbbbbb')
-  // }, [imageUrl]);
+  const handleCanvasClick = useCallback(
+    (event: MouseEvent) => {
+      if (!addHotspotMode || !canvasRef.current || !cameraRef.current || !sceneRef.current) return;
+
+      const rect = canvasRef.current.getBoundingClientRect();
+      mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.current.setFromCamera(mouse.current, cameraRef.current);
+      const intersects = raycaster.current.intersectObjects(sceneRef.current.children, true);
+
+      if (intersects.length > 0) {
+        const point = intersects[0].point;
+        console.log("Clicked on:", point);
+        setSelectedPoint(point);
+        setDialogOpen(true);
+      }
+    },
+    [addHotspotMode]
+  );
+
+  useEffect(() => {
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+
+  const handlePointerDown = (e: PointerEvent) => {
+    pointerDownRef.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handlePointerUp = (e: PointerEvent) => {
+    if (!pointerDownRef.current) return;
+
+    const dx = Math.abs(e.clientX - pointerDownRef.current.x);
+    const dy = Math.abs(e.clientY - pointerDownRef.current.y);
+    const movedTooMuch = dx > CLICK_THRESHOLD || dy > CLICK_THRESHOLD;
+
+    if (!movedTooMuch) {
+      handleCanvasClick(e);
+    }
+
+    pointerDownRef.current = null;
+  };
+
+  canvas.addEventListener("pointerdown", handlePointerDown);
+  canvas.addEventListener("pointerup", handlePointerUp);
+
+  return () => {
+    canvas.removeEventListener("pointerdown", handlePointerDown);
+    canvas.removeEventListener("pointerup", handlePointerUp);
+  };
+}, [handleCanvasClick]);
+
 
   useEffect(() => {
     if (!imageUrl) return;
-  
-    setTexture(null); // Reset texture to force update
-  
-    const textureLoader = new THREE.TextureLoader();
-    const compressImage = (blob, quality = 0.7) => {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.src = URL.createObjectURL(blob);
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-    
-          // Set new dimensions (optional)
-          const MAX_WIDTH = 4096;
-          const scale = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scale;
-    
-          // Draw and compress
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          canvas.toBlob(
-            (compressedBlob) => {
-              resolve(compressedBlob);
-            },
-            "image/webp", // Convert to WebP format
-            quality // Compression quality
-          );
-        };
-        img.onerror = reject;
-      });
-    };
-  
-    // Function to fetch and compress the image
-    const fetchAndCompressImage = async () => {
-      try {
-        console.log("Fetching image for compression...");
-  
-        const response = await fetch(imageUrl);
-        const blob = await response.blob();
-  
-        // Convert to WebP (compressed format)
-        const compressedBlob = await compressImage(blob, 0.4); // 60% quality
-  
-        // Convert to Object URL
-        const compressedUrl = URL.createObjectURL(compressedBlob);
-        console.log("Compressed Image URL:", compressedUrl);
-  
-        // Load compressed texture
-        textureLoader.load(
-          compressedUrl,
-          (loadedTexture) => {
-            loadedTexture.wrapS = THREE.RepeatWrapping;
-            loadedTexture.wrapT = THREE.RepeatWrapping;
-            loadedTexture.repeat.x = -1;
-            setTexture(loadedTexture);
-            console.log("Compressed texture loaded.");
-          },
-          undefined,
-          (error) => {
-            console.error("Error loading compressed texture:", error);
-          }
-        );
-      } catch (error) {
-        console.error("Error fetching or compressing image:", error);
-      }
-    };
-  
-    fetchAndCompressImage();
+
+    const loader = new THREE.TextureLoader();
+    loader.load(imageUrl, (loadedTexture) => {
+      loadedTexture.wrapS = THREE.RepeatWrapping;
+      loadedTexture.wrapT = THREE.RepeatWrapping;
+      loadedTexture.repeat.x = -1;
+      setTexture(loadedTexture);
+    });
   }, [imageUrl]);
-
-  
-
-  useEffect(() => {
-  
-      const fetchData = async () => {
-  
-        const res = await apiGetCrmPanoImagesFileManager(leadId, projectId);
-  
-        const panoImg = res.data?.files
-        setPanoImages(panoImg)
-  
-      }
-      fetchData()
-  
-    }, [leadId, projectId])
-
-  useEffect(() => {
-    setZooming(true);
-    setZoomTarget(1.2);  // Adjust zoom factor as needed
-
-    setTimeout(() => {
-      setZooming(false);
-      setZoomTarget(1);  // Reset zoom to normal
-    }, 1000); // Match this duration with the zoom transition time
-  }, [currentView]);
 
   const handleSubmit = async () => {
     if (!file || !name || !selectedPoint) return;
@@ -501,10 +469,10 @@ const Second = ({texture, setTexture, imageUrl, addHotspotMode, onHotspotAdd, te
       crd: [selectedPoint.x, selectedPoint.y, selectedPoint.z],
       hp: [],
     };
-    
+
     try {
       const res = await apiPostCrmThreeImage(formData);
-      // console.log(res);
+      console.log(res);
       onHotspotAdd(selectedPoint);
       setAddThisHp(formData)
       setDialogOpen(false);
@@ -515,85 +483,177 @@ const Second = ({texture, setTexture, imageUrl, addHotspotMode, onHotspotAdd, te
     } catch (error) {
       console.error("Error adding hotspot:", error);
     }
+
+    // console.log("Submitting:", data);
+
+    // onHotspotAdd(selectedPoint);
+    // setDialogOpen(false);
   };
 
   return (
     <>
-      <Canvas style={{ height: "75vh" }} onClick={(event) => event.stopPropagation()}>
-        {/* <Scene texture={texture} currentView={currentView} setCurrentView={setCurrentView} addHotspotMode={addHotspotMode} onHotspotAdd={onHotspotAdd} testData={testData} /> */}
-        <CameraZoom zoomTarget={zoomTarget} zooming={zooming} />
-        <Scene
-            texture={texture}
-            currentView={currentView}
-            setCurrentView={setCurrentView}
-            addHotspotMode={addHotspotMode}
-            addThisHp={addThisHp}
-            onHotspotAdd={(point) => {
-              setSelectedPoint(point);
-              setDialogOpen(true);
-            }}
-            testData={testData}
-          />
-        {!texture && <Loader />}
+      <Canvas
+        style={{ height: "75vh" }}
+        onCreated={({ gl, camera, scene }) => {
+          canvasRef.current = gl.domElement;
+          cameraRef.current = camera;
+          sceneRef.current = scene;
+        }}
+      >
+        <OrbitControls enableZoom enablePan={false} minDistance={50} maxDistance={100} />
+        <ambientLight />
+        <pointLight position={[10, 10, 10]} />
+        {texture ? (
+          <mesh>
+            <sphereGeometry args={[500, 60, 40]} />
+            <meshBasicMaterial map={texture} side={THREE.DoubleSide} />
+          </mesh>
+        ) : (
+          <Loader />
+        )}
+        {texture &&
+          currentView?.hp?.map((data: any, i: number) => (
+            <Hotspot key={i} data={data} setCurrentView={setCurrentView} />
+          ))}
       </Canvas>
 
       {dialogOpen && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-10">
-        <div className="bg-white p-6 rounded shadow-lg">
-          <h2 className="text-xl font-bold mb-4">Add Hotspot</h2>
-      
-          {/* Dropdown Input */}
-          <label className="block mb-2">
-            Image:
-            <Select
-              options={panoImages.map((files: any) => ({
-                value: files.fileUrl,
-                label: files.fileName,
-              }))}
-              onChange={(selectedOption) => {
-                if (selectedOption) {
-                  setFile(selectedOption.value);
-                  setName(selectedOption.label);
-                }
-              }}
-              className="border p-2 w-full"
-            />
-          </label>
+          <div className="bg-white p-6 rounded shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Add Hotspot</h2>
 
-          <label className="block mb-2">
-            Rename:
-            <Input
-              type="text"
-              onChange={(e) => setRename(e.target.value)}
-              className="border p-2 w-full"
-            />
-        </label>
-      
-          <div className="flex justify-end mt-4">
-            <button
-              onClick={() => setDialogOpen(false)}
-              className="bg-gray-500 text-white px-4 py-2 mr-2 rounded"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Save
-            </button>
+            {/* <label className="block mb-4">
+              Image:
+              <div
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const file = e.dataTransfer.files[0];
+                  if (file) {
+                    setFile(file);
+                    setName(file.name);
+                  }
+                }}
+                className="border border-dashed border-gray-400 rounded p-4 mt-2 text-center cursor-pointer hover:bg-gray-50"
+              >
+                {file ? (
+                  <p className="text-sm text-green-600">Selected: {file.name}</p>
+                ) : (
+                  <>
+                    <p className="text-sm text-gray-600">Drag & drop a file here</p>
+                    <p className="text-sm text-gray-500 my-1">or</p>
+                    <label className="inline-block bg-blue-500 text-white px-3 py-1 rounded cursor-pointer">
+                      Browse
+                      <input
+                        type="file"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setFile(file);
+                            setName(file.name);
+                          }
+                        }}
+                      />
+                    </label>
+                  </>
+                )}
+              </div>
+            </label> */}
+
+            {/* <label className="block mb-2">
+              Rename:
+              <Input
+                type="text"
+                onChange={(e) => setRename(e.target.value)}
+                value={rename}
+              />
+            </label> */}
+
+
+            <label className="block mb-4">
+              Image:
+              <div
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const droppedFile = e.dataTransfer.files[0];
+                  if (droppedFile) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      setFile(reader.result as string); // base64 string
+                      setName(droppedFile.name);
+                    };
+                    reader.readAsDataURL(droppedFile);
+                  }
+                }}
+                className="border border-dashed border-gray-400 rounded p-4 mt-2 text-center cursor-pointer hover:bg-gray-50"
+              >
+                {file ? (
+                  <>
+                    <p className="text-sm text-green-600">Selected: {name}</p>
+                    <img src={file} alt="Preview" className="mt-2 max-h-32 mx-auto" />
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-gray-600">Drag & drop a file here</p>
+                    <p className="text-sm text-gray-500 my-1">or</p>
+                    <label className="inline-block bg-blue-500 text-white px-3 py-1 rounded cursor-pointer">
+                      Browse
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const selectedFile = e.target.files?.[0];
+                          if (selectedFile) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setFile(reader.result as string); // base64 string
+                              setName(selectedFile.name);
+                            };
+                            reader.readAsDataURL(selectedFile);
+                          }
+                        }}
+                      />
+                    </label>
+                  </>
+                )}
+              </div>
+            </label>
+
+            <label className="block mb-2">
+              Rename:
+              <Input
+                type="text"
+                onChange={(e) => setRename(e.target.value)}
+                value={rename}
+              />
+            </label>
+
+
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={() => setDialogOpen(false)}
+                className="bg-gray-500 text-white px-4 py-2 mr-2 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Save
+              </button>
+            </div>
           </div>
         </div>
-      </div>
       )}
-    
     </>
   );
 };
 
 const First = ({imgIdList, currentImage, setCurrentImage, setImgList}:any) => {
-
-// console.log(currentImage)
 
 const queryParams = new URLSearchParams(location.search);
 const leadId = queryParams.get('lead_id') || null;

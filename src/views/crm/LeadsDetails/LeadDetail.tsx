@@ -339,13 +339,12 @@ const CustomerDetail = () => {
                             userAuthority={[`${localStorage.getItem('role')}`]}
                             authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.read ?? []}
                         >
-                        <Dropdown.Item
-                            eventKey="d"
-                            onMouseEnter={() => setIsOpen6(true)}
-                            onMouseLeave={() => setIsOpen6(false)}
-                           >
-                            <div className="relative">
-
+                        <Dropdown.Item eventKey="d">
+                            <div
+                                className="relative"
+                                onMouseEnter={() => setIsOpen6(true)}
+                                onMouseLeave={() => setIsOpen6(false)}
+                            >
                                 <div className='flex gap-3 justify-between items-center'>
                                     <span>Design View</span>
                                     <span><GoChevronDown /></span>
@@ -357,13 +356,13 @@ const CustomerDetail = () => {
                                     className="absolute left-14 transform -translate-x-full mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg"
                                 >
                                     <ul className="py-2">
-                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/app/crm/leads/blueprint?lead_id=${myParam}`}>2D View</Link></li>
-                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/app/crm/visualizer?lead_id=${myParam}`}>3D View</Link></li>
+                                    <Link to={`/app/crm/leads/blueprint?lead_id=${myParam}`}><li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">2D View</li></Link>
+                                    <Link to={`/app/crm/visualizer?lead_id=${myParam}`}><li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">3D View</li></Link>
                                     </ul>
                                 </div>
                                 )}
                             </div>
-                            </Dropdown.Item>                      
+                        </Dropdown.Item>                      
 
                         </AuthorityCheck>}
                     </Dropdown>

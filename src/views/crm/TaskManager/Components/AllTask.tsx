@@ -816,135 +816,37 @@ const AllTask = ({ users }: any) => {
                                             backgroundColor: '#dfedfe',
                                         },
                                     }}
-                                >
-                                    {row.getVisibleCells().map((cell) => {
+                                    onClick={() => {
                                         const taskType = row.original.type
-                                        console.log(taskType)
                                         if (taskType === 'project') {
-                                            if (
-                                                cell.column.id === 'task_name'
-                                            ) {
-                                                return (
-                                                    <TableCell
-                                                        sx={{
-                                                            textAlign: 'center',
-                                                            color: '#6B7280',
-                                                        }}
-                                                        key={cell.id}
-                                                        onClick={() =>
-                                                            navigate(
-                                                                `/app/crm/Projects/TaskDetails?project_id=${row.original.project_id}&task=${row.original.task_id}`,
-                                                            )
-                                                        }
-                                                    >
-                                                        {flexRender(
-                                                            cell.column
-                                                                .columnDef.cell,
-                                                            cell.getContext(),
-                                                        )}
-                                                    </TableCell>
-                                                )
-                                            } else {
-                                                return (
-                                                    <TableCell
-                                                        key={cell.id}
-                                                        sx={{
-                                                            textAlign: 'center',
-                                                            color: '#6B7280',
-                                                        }}
-                                                    >
-                                                        {flexRender(
-                                                            cell.column
-                                                                .columnDef.cell,
-                                                            cell.getContext(),
-                                                        )}
-                                                    </TableCell>
-                                                )
-                                            }
+                                            navigate(
+                                                `/app/crm/Projects/TaskDetails?project_id=${row.original.project_id}&task=${row.original.task_id}`,
+                                            )
                                         } else if (taskType === 'lead') {
-                                            if (
-                                                cell.column.id === 'task_name'
-                                            ) {
-                                                return (
-                                                    <TableCell
-                                                        sx={{
-                                                            textAlign: 'center',
-                                                            color: '#6B7280',
-                                                        }}
-                                                        key={cell.id}
-                                                        onClick={() =>
-                                                            navigate(
-                                                                `/app/crm/Leads/TaskDetails?lead_id=${row.original.lead_id}&task=${row.original.task_id}`,
-                                                            )
-                                                        }
-                                                    >
-                                                        {flexRender(
-                                                            cell.column
-                                                                .columnDef.cell,
-                                                            cell.getContext(),
-                                                        )}
-                                                    </TableCell>
-                                                )
-                                            } else {
-                                                return (
-                                                    <TableCell
-                                                        key={cell.id}
-                                                        sx={{
-                                                            textAlign: 'center',
-                                                            color: '#6B7280',
-                                                        }}
-                                                    >
-                                                        {flexRender(
-                                                            cell.column
-                                                                .columnDef.cell,
-                                                            cell.getContext(),
-                                                        )}
-                                                    </TableCell>
-                                                )
-                                            }
+                                            navigate(
+                                                `/app/crm/Leads/TaskDetails?lead_id=${row.original.lead_id}&task=${row.original.task_id}`,
+                                            )
                                         } else {
-                                            if (
-                                                cell.column.id === 'task_name'
-                                            ) {
-                                                return (
-                                                    <TableCell
-                                                        key={cell.id}
-                                                        onClick={() =>
-                                                            navigate(
-                                                                `/app/crm/Tasks/OpenTaskDetails?task=${row.original.task_id}`,
-                                                            )
-                                                        }
-                                                        sx={{
-                                                            textAlign: 'center',
-                                                            color: '#6B7280',
-                                                        }}
-                                                    >
-                                                        {flexRender(
-                                                            cell.column
-                                                                .columnDef.cell,
-                                                            cell.getContext(),
-                                                        )}
-                                                    </TableCell>
-                                                )
-                                            } else {
-                                                return (
-                                                    <TableCell
-                                                        key={cell.id}
-                                                        sx={{
-                                                            textAlign: 'center',
-                                                            color: '#6B7280',
-                                                        }}
-                                                    >
-                                                        {flexRender(
-                                                            cell.column
-                                                                .columnDef.cell,
-                                                            cell.getContext(),
-                                                        )}
-                                                    </TableCell>
-                                                )
-                                            }
+                                            navigate(
+                                                `/app/crm/Tasks/OpenTaskDetails?task=${row.original.task_id}`,
+                                            )
                                         }
-                                    })}
+                                    }}
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell
+                                            key={cell.id}
+                                            sx={{
+                                                textAlign: 'center',
+                                                color: '#6B7280',
+                                            }}
+                                        >
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext(),
+                                            )}
+                                        </TableCell>
+                                    ))}
                                 </TableRow>
                             ))}
                         </TableBody>

@@ -1520,7 +1520,7 @@ const GanttChart = ({ execData }: any) => {
                                                                     }}
                                                                     onMouseDown={(e) => {
                                                                         // Only start move drag if not clicking on resize handles
-                                                                        if (!e.target.classList.contains('cursor-col-resize')) {
+                                                                        if (!(e.target instanceof HTMLElement) || !e.target.classList.contains('cursor-col-resize')) {
                                                                             handleMoveDragStart(
                                                                                 e,
                                                                                 task.task_id,
@@ -1612,14 +1612,12 @@ const GanttChart = ({ execData }: any) => {
 
                                                                             <span className="text-white cursor-pointer hover:text-blue-500 pl-[0.25rem] interactive-element">
                                                                                 <Dropdown renderTitle={<IoIosOptions className="cursor-pointer" />} placement='bottom-start'>
-                                                                                    <Dropdown.Item eventKey="c" onClick={(e:any) => {
-                                                                                        e.stopPropagation();
+                                                                                    <Dropdown.Item eventKey="c" onClick={() => {
                                                                                         openDialog4(task, subtask, delay);
                                                                                     }}>
                                                                                         <span><MdEdit /></span><div className="text-sm">Edit Details</div>
                                                                                     </Dropdown.Item>
-                                                                                    <Dropdown.Item eventKey="a" onClick={(e:any) => {
-                                                                                        e.stopPropagation();
+                                                                                    <Dropdown.Item eventKey="a" onClick={() => {
                                                                                         openDialog5(task, subtask, delay);
                                                                                     }}>
                                                                                         <span><MdDelete /></span><div className="text-sm">Delete</div>

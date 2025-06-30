@@ -160,6 +160,27 @@ const priorityOptions = [
                                 </Field>
                             </FormItem> */}
 
+                            <FormItem label='Estimated Start Date'
+                            asterisk
+                            invalid={errors.estimated_sub_task_start_date && touched.estimated_sub_task_start_date}
+                            errorMessage={errors.estimated_sub_task_start_date}
+                            >
+                                <Field name='estimated_sub_task_start_date' placeholder='Start Date'>
+                                    {({field}: any) => (
+                                        <DatePicker
+                                            name='estimated_sub_task_start_date'
+                                            minDate={new Date(data.estimated_task_start_date)}
+                                            maxDate={new Date(data.estimated_task_end_date)}
+                                            onChange={(value) => {
+                                                field.onChange({ target: { name: 'estimated_sub_task_start_date', value: `${value}` } })
+                                            }}
+                                        />
+                                    )}
+                                </Field>
+                                <div className='text-red-600'>{errors.estimated_sub_task_start_date}</div>
+                            </FormItem>
+
+
                             <FormItem label='Estimated End Date'
                             asterisk
                             invalid={errors.estimated_sub_task_end_date && touched.estimated_sub_task_end_date}

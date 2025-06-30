@@ -66,7 +66,7 @@ const EditExecTask = ({ task, dialogIsOpen, setIsOpen, openDialog, onDialogClose
                     })}
                     onSubmit={async (values, actions) => {
                         setLoading(true)
-                        const val = { ...values, color: bgColor }
+                        const val = { ...values, color: bgColor || task?.color }
                         const response = await apiUpdateCrmExecTask(val)
                         if (response.code === 200) {
                             setLoading(false)

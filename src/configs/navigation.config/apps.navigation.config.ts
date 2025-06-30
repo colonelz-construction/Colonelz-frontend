@@ -88,7 +88,7 @@ const appsNavigationConfig: NavigationTree[] = [
         key: 'appsCrm.taskManager',
         path: `${APP_PREFIX_PATH}/crm/taskManager`,
         title: 'Task Manager',
-        translateKey: 'nav.appsCrm.taskManager',
+        translateKey: 'Task Manager',
         icon: 'task',
         type: NAV_ITEM_TYPE_ITEM,
         authority:
@@ -111,7 +111,7 @@ const appsNavigationConfig: NavigationTree[] = [
         key: 'appsCrm.timeline',
         path: `${APP_PREFIX_PATH}/crm/timeline`,
         title: 'Timeline',
-        translateKey: 'nav.appsCrm.timeline',
+        translateKey: 'Timeline',
         icon:'timeline',
         type: NAV_ITEM_TYPE_ITEM,
         authority:

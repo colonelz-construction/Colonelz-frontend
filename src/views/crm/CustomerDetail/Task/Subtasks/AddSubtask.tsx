@@ -160,7 +160,7 @@ const priorityOptions = [
                                 </Field>
                             </FormItem> */}
 
-                            <FormItem label='Estimated Start Date'
+                            {/* <FormItem label='Estimated Start Date'
                             asterisk
                             invalid={errors.estimated_sub_task_start_date && touched.estimated_sub_task_start_date}
                             errorMessage={errors.estimated_sub_task_start_date}
@@ -178,7 +178,7 @@ const priorityOptions = [
                                     )}
                                 </Field>
                                 <div className='text-red-600'>{errors.estimated_sub_task_start_date}</div>
-                            </FormItem>
+                            </FormItem> */}
 
 
                             <FormItem label='Estimated End Date'

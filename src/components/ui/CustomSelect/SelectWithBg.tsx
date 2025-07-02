@@ -10,12 +10,14 @@ type Option = {
 type CustomSelectProps = {
   placeholder?: string;
   onChange: (value: string) => void;
+  modalId?: string; // ID of the parent modal to exclude from outside click detection
 };
 
 const SelectWithBg: React.FC<CustomSelectProps> = ({
  
   placeholder = "Select...",
   onChange,
+  modalId,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<Option | any>(null);
@@ -29,14 +31,51 @@ const SelectWithBg: React.FC<CustomSelectProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+      if (!selectRef.current) return;
+      
+      const target = event.target as Node;
+      
+   
+      if (selectRef.current.contains(target)) {
+        return;
       }
+      
+      // Don't close if click is on scrollbar or modal elements
+      if (modalId) {
+        const modalElement = document.querySelector(`[data-modal-id="${modalId}"]`) || 
+                            document.querySelector('.dialog') || 
+                            document.querySelector('[role="dialog"]');
+        
+        if (modalElement && modalElement.contains(target)) {
+          // Check if the click is specifically on form elements or scrollbar
+          const clickedElement = target as Element;
+          
+          // Allow clicks on form inputs, buttons, and other interactive elements
+          if (clickedElement.tagName === 'INPUT' || 
+              clickedElement.tagName === 'BUTTON' || 
+              clickedElement.tagName === 'TEXTAREA' ||
+              clickedElement.closest('input') ||
+              clickedElement.closest('button') ||
+              clickedElement.closest('.react-datepicker') ||
+              clickedElement.closest('[role="button"]')) {
+            setIsOpen(false);
+            return;
+          }
+          
+        
+          return;
+        }
+      }
+      
+      // Close for clicks completely outside the modal
+      setIsOpen(false);
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isOpen, modalId]);
 
   const options = [
         
@@ -72,7 +111,7 @@ const SelectWithBg: React.FC<CustomSelectProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex justify-between items-center w-full focus:border-2 border focus:border- border-[#D1D5DB] text-left px-[0.75rem] py-[0.7rem] rounded-md focus:outline-none"
+        className="flex justify-between items-center w-full focus:border-2 border focus:border- border-[#4B5563] text-left px-[0.75rem] py-[0.7rem] rounded-md focus:outline-none"
       >
         {selected ? (
           <div className="flex items-center gap-2">

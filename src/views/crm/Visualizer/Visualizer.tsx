@@ -7,9 +7,12 @@ import Second from './Second'
 import First from './First'
 import { apiGetCrmMainThreeImage } from '@/services/CrmService'
 import { FaPanorama } from "react-icons/fa6";
+import { Button} from '@/components/ui';
+import { useNavigate } from 'react-router-dom';
+import { IoArrowBackOutline } from "react-icons/io5";
 
 const Visualizer = () => {
-
+  const navigate = useNavigate()
   const [data, setData] = useState<any>([]);
   const [mainLoading, setMainLoading] = useState<any>(false);
 
@@ -49,6 +52,16 @@ const Visualizer = () => {
 
   return (
     <div>
+       <div>
+      <Button
+        variant='solid' size='sm' className='flex justify-center items-center gap-4'
+        onClick={() => navigate(-1)}>
+        <span><IoArrowBackOutline /></span>  <span>Back</span>
+        
+      </Button>
+
+      {/* other content of the page */}
+    </div>
 
       <div className='w-full flex justify-center items-center mb-4 gap-3'>
         <FaPanorama className='text-4xl'/>

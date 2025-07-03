@@ -134,7 +134,7 @@ const AddExecSubTaskDetails = ({ task, subtask, openDialog, onDialogClose, dialo
                     subtask_type: Yup.string().required('Type is required'),
                 })}
                 onSubmit={async (values, actions) => {
-                    const val = { ...values, detail_color: bgColor }
+                    const val = { ...values, detail_color: bgColor || values.color }
                     setLoading(true)
 
                     console.log(val)
@@ -152,7 +152,18 @@ const AddExecSubTaskDetails = ({ task, subtask, openDialog, onDialogClose, dialo
                 {({ values, errors, touched, setFieldValue }) => (
                     <Form className='p-4 max-h-[90vh] overflow-y-auto'>
                         <div className='grid grid-cols-2 gap-x-5'>
-                            <FormItem label='Start Date' asterisk invalid={errors.subtask_start_date && touched.subtask_start_date} errorMessage={errors.subtask_start_date}>
+                            <FormItem
+                                label='Start Date'
+                                asterisk
+                                invalid={typeof errors.subtask_start_date === 'string' && touched.subtask_start_date ? true : undefined}
+                                errorMessage={
+                                    Array.isArray(errors.subtask_start_date)
+                                        ? errors.subtask_start_date.join(', ')
+                                        : typeof errors.subtask_start_date === 'string'
+                                            ? errors.subtask_start_date
+                                            : undefined
+                                }
+                            >
                                 <Field name='subtask_details_start_date'>
                                     {({ field }: any) => (
                                         <DatePicker name='subtask_details_start_date' value={field.value} onChange={(value) => field.onChange({ target: { name: 'subtask_details_start_date', value } })} />

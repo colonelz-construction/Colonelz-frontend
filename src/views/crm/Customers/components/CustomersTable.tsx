@@ -27,16 +27,13 @@ import { useProjectContext } from '../store/ProjectContext'
 import { Timeout } from 'react-number-format/types/types'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import Sorter from '@/components/ui/Table/Sorter'
+import NoData from '@/views/pages/NoData'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
     onChange: (value: string | number) => void
     debounce?: number
 }
-
-
-
-
 
 function DebouncedInput({
     value: initialValue,
@@ -253,9 +250,6 @@ const Filtering = () => {
         debugColumns: false,
     })
     
-
-
-
     const onPaginationChange = (page: number) => {
         table.setPageIndex(page - 1)
     }
@@ -263,7 +257,6 @@ const Filtering = () => {
     const onSelectChange = (value = 0) => {
         table.setPageSize(Number(value))
     }
-
 
     const handleStatusChange = (label: string) => {
         let status: string | string[] = '';
@@ -365,24 +358,34 @@ const Filtering = () => {
                             </TableRow>
                         ))}
                     </TableHead>
-                    <TableBody>
-                        {table?.getRowModel().rows.map((row) => {
-                            return (
-                                <TableRow key={row.id} className=' capitalize cursor-pointer' onClick={()=>navigate(`/app/crm/project-details?project_id=${row.original.project_id}&id=${userId}&type=details`)}>
-                                    {row.getVisibleCells().map((cell) => {
-                                        return (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
-                                            </TableCell>
-                                        )
-                                    })}
-                                </TableRow>
-                            )
-                        })}
-                    </TableBody>
+                    {table?.getRowModel().rows.length > 0 ? (
+                        <TableBody>
+                            {table?.getRowModel().rows.map((row) => {
+                                return (
+                                    <TableRow key={row.id} className=' capitalize cursor-pointer' onClick={()=>navigate(`/app/crm/project-details?project_id=${row.original.project_id}&id=${userId}&type=details`)}>
+                                        {row.getVisibleCells().map((cell) => {
+                                            return (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext()
+                                                    )}
+                                                </TableCell>
+                                            )
+                                        })}
+                                    </TableRow>
+                                )
+                            })}
+                        </TableBody>
+                    ) : (
+                        <TableBody>
+                            <TableRow>
+                                <TableCell colSpan={columns.length} sx={{ textAlign: 'center', padding: '40px' }}>
+                                    <NoData />
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    )}
                 </Table>
             </TableContainer>
             <div className="flex items-center justify-between mt-4">

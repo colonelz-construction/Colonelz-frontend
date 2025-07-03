@@ -512,11 +512,13 @@ function Expanding() {
                         })}
                     </TableBody>
                 ) : (
-                    <TableRow>
-                        <TableCell>
-                            <NoData />
-                        </TableCell>
-                    </TableRow>
+                    <TableBody>
+                        <TableRow>
+                            <TableCell colSpan={outerTableColumns.length} sx={{ textAlign: 'center', padding: '40px' }}>
+                                <NoData />
+                            </TableCell>
+                        </TableRow>
+                    </TableBody>
                 )}
             </Table>
         </TableContainer>

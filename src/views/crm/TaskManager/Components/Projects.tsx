@@ -515,7 +515,7 @@ function Expanding() {
                 ) : (
                     <TableBody>
                         <TableRow>
-                            <TableCell colSpan={3}>
+                            <TableCell colSpan={outerTableColumns.length} sx={{ textAlign: 'center', padding: '40px' }}>
                                 <NoData />
                             </TableCell>
                         </TableRow>

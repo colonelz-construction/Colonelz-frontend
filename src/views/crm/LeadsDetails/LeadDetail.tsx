@@ -31,6 +31,8 @@ export type LeadDetailsResponse = {
     data: Lead[]
 }
 
+
+
 injectReducer('crmCustomerDetails', reducer)
 
 const CustomerDetail = () => {
@@ -67,6 +69,32 @@ const CustomerDetail = () => {
     const [isOpen6, setIsOpen6] = useState(false);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const [closeTimeout, setCloseTimeout] = useState<NodeJS.Timeout | null>(null);
+
+    const handleMouseEnter = () => {
+    if (closeTimeout) {
+        clearTimeout(closeTimeout);
+        setCloseTimeout(null);
+    }
+    setIsOpen6(true);
+};
+
+const handleMouseLeave = () => {
+    const timeout = setTimeout(() => {
+        setIsOpen6(false);
+    }, 300); // 300ms delay - adjust as needed
+    setCloseTimeout(timeout);
+};
+
+// Add cleanup effect
+useEffect(() => {
+    return () => {
+        if (closeTimeout) {
+            clearTimeout(closeTimeout);
+        }
+    };
+}, [closeTimeout]);
+
 
       
     
@@ -121,6 +149,7 @@ const CustomerDetail = () => {
 
         setIsOpen5(false)
     }
+    
 
     // const navigate = useNavigate();
 
@@ -339,31 +368,54 @@ const CustomerDetail = () => {
                             userAuthority={[`${localStorage.getItem('role')}`]}
                             authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.read ?? []}
                         >
-                        <Dropdown.Item
-                            eventKey="d"
-                            onMouseEnter={() => setIsOpen6(true)}
-                            onMouseLeave={() => setIsOpen6(false)}
-                           >
-                            <div className="relative">
+                        <Dropdown.Item eventKey="design">
+                        <div
+                            className="relative"
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            <div className='flex gap-3 justify-between items-center'>
+                                <span>Design View</span>
+                                <span><GoChevronDown /></span>
+                            </div>
 
-                                <div className='flex gap-3 justify-between items-center'>
-                                    <span>Design View</span>
-                                    <span><GoChevronDown /></span>
-                                </div>
-                                
-                                {isOpen6 && (
+                            {isOpen6 && (
                                 <div
                                     ref={dropdownRef}
-                                    className="absolute left-14 transform -translate-x-full mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg"
+                                    className="absolute left-14 transform -translate-x-full mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-50"
+                                    onMouseEnter={handleMouseEnter}
+                                    onMouseLeave={handleMouseLeave}
                                 >
                                     <ul className="py-2">
-                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/app/crm/leads/blueprint?lead_id=${myParam}`}>2D View</Link></li>
-                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/app/crm/visualizer?lead_id=${myParam}`}>3D View</Link></li>
+                                        <li 
+                                            className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                                            onMouseEnter={handleMouseEnter}
+                                        >
+                                            <Link 
+                                                to={`/app/crm/leads/blueprint?lead_id=${myParam}`}
+                                                className="block w-full h-full"
+                                            >
+                                                2D View
+                                            </Link>
+                                        </li>
+                                        <li 
+                                            className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                                            onMouseEnter={handleMouseEnter}
+                                        >
+                                            <Link 
+                                                to={`/app/crm/visualizer?lead_id=${myParam}`}
+                                                className="block w-full h-full"
+                                            >
+                                                3D View
+                                            </Link>
+                                        </li>
                                     </ul>
                                 </div>
-                                )}
-                            </div>
-                            </Dropdown.Item>                      
+                            )}
+                        </div>
+                    </Dropdown.Item>
+
+                     
 
                         </AuthorityCheck>}
                     </Dropdown>

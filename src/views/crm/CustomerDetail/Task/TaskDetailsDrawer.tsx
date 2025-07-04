@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react'
 import Button from '@/components/ui/Button'
 import Drawer from '@/components/ui/Drawer'
@@ -32,20 +31,36 @@ type CustomerInfoFieldProps = {
     title?: string
     value?: any
 }
-const formateDate = (dateString:string) => {
+const formateDate = (dateString: string) => {
+    if (!dateString) return '-';
+    // Debug: print the received start date
+    console.log("Received dateString in formateDate:", dateString);
     const date = new Date(dateString);
-    const day=date.getDate().toString().padStart(2, '0');
-    const month=(date.getMonth() + 1).toString().padStart(2, '0');
-    const year=date.getFullYear();
-    return `${day}-${month}-${year}`;
-    }
+    if (isNaN(date.getTime())) return '-';
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;}
 
-const TaskDetails = (Data:Data) => {
+const TaskDetails = (Data: Data) => {
+    console.log("TaskDetails component rendered with Data:", Data);
+
     const [verticalOpen, setVerticalOpen] = useState(false)
-    const navigate=useNavigate();
+    const navigate = useNavigate();
 
-    
-    
+    // Debug: Print the entire task object received by the component
+    useEffect(() => {
+        console.log("Received Task Data:", Data.data);
+        // Print all date fields for debugging
+        console.log("Received Dates:", {
+            task_createdOn: Data.data.task_createdOn,
+            actual_task_start_date: Data.data.actual_task_start_date,
+            actual_task_end_date: Data.data.actual_task_end_date,
+            estimated_task_start_date: Data.data.estimated_task_start_date,
+            estimated_task_end_date: Data.data.estimated_task_end_date,
+        });
+    }, [Data.data]);
+
     const onVerticalOpen = () => {
         setVerticalOpen(true)
     }

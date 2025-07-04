@@ -50,7 +50,7 @@ type SubTask = {
     sub_task_description: string;
     actual_sub_task_start_date: string;
     actual_sub_task_end_date: string;
-    estimated_sub_task_start_date: string;
+    // estimated_sub_task_start_date: string;
     estimated_sub_task_end_date: string;
     sub_task_status: string;
     sub_task_priority: string;
@@ -254,16 +254,16 @@ const Subtasks = ({task,users}:any) => {
          },
             {
                 header:'Start Date',
-                accessorKey:'estimated_sub_task_start_date',
+                accessorKey:'actual_sub_task_start_date',
                 cell:({row})=>{
-                    return <div>{formateDate(row.original.estimated_sub_task_start_date)}</div>
+                    return <div>{formateDate(row.original.actual_sub_task_start_date)}</div>
                 }
             },
             {
                 header:'End Date',
-                accessorKey:'estimated_sub_task_end_date',
+                accessorKey:'actual_sub_task_end_date',
                 cell:({row})=>{
-                    return <div>{formateDate(row.original.estimated_sub_task_end_date)}</div>
+                    return <div>{formateDate(row.original.actual_sub_task_end_date)}</div>
                 }
             },
             {

@@ -188,14 +188,14 @@ const CustomerDetail = () => {
                   userAuthority={[`${localStorage.getItem('role')}`]}
                   authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
               >
-                  <Dropdown.Item eventKey="d"><Link to={`/app/crm/projects/blueprint?project_id=${allQueryParams.project_id}`}>2D View</Link></Dropdown.Item>
+                  <Link to={`/app/crm/projects/blueprint?project_id=${allQueryParams.project_id}`}><Dropdown.Item eventKey="d">2D View</Dropdown.Item></Link>
 
               </AuthorityCheck>}
               {<AuthorityCheck
                   userAuthority={[`${localStorage.getItem('role')}`]}
                   authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
               >
-                  <Dropdown.Item eventKey="g"><Link to={`/app/crm/visualizer?project_id=${allQueryParams.project_id}`}>3D View</Link></Dropdown.Item>
+                  <Link to={`/app/crm/visualizer?project_id=${allQueryParams.project_id}`}><Dropdown.Item eventKey="g">3D View</Dropdown.Item></Link>
 
               </AuthorityCheck>}
 

@@ -351,25 +351,34 @@ const FormContent = ({ setFields, fields, setFieldValue, values, file, setFile, 
                         {fields.map((field, index) => (
                             <div key={index} className="flex items-center gap-1">
                             <Field
-                                component="input"
-                                type="text"
-                                value={field.name}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            component="input"
+                            type="text"
+                            value={field.name}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                 handleChange(index, "name", e.target.value)
-                                }
-                                placeholder="Tag"
-                                className="flex-1 border rounded p-2 w-10 mb-1"
+                            }
+                            placeholder="Tag"
+                            className="flex-1 border rounded p-2 w-10 mb-1
+                                bg-white text-black border-gray-300
+                                dark:bg-gray-800 dark:text-white dark:border-gray-700
+                                focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-violet-500"
                             />
+
                             <Field
-                                component="input"
-                                type="text"
-                                value={field.number}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            component="input"
+                            type="text"
+                            value={field.number}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                 handleChange(index, "number", e.target.value)
-                                }
-                                placeholder="Vat/Tax No/GST"
-                                className="flex-1 border rounded p-2 mb-1"
+                            }
+                            placeholder="Vat/Tax No/GST"
+                            className="flex-1 border rounded p-2 mb-1
+                                bg-white text-black border-gray-300
+                                dark:bg-gray-800 dark:text-white dark:border-gray-700
+                                focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-violet-500"
                             />
+
+
                             {fields.length > 1 && (
                                 <span
                                 className='cursor-pointer ml-2'

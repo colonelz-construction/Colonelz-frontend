@@ -6,10 +6,13 @@ import PdfScreen from "./components/PdfScreen";
 import RightSideBar from "./components/RightSideBar";
 import { Input, Select } from "@/components/ui";
 import { apiGetCrmFileManagerDrawingData, apiGetCrmFileManagerLeads, apiGetCrmFileManagerProjects } from "@/services/CrmService";
-
+import { Button} from '@/components/ui';
+import { useNavigate } from 'react-router-dom';
+import { IoArrowBackOutline } from "react-icons/io5";
 GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
 const PdfTextLinker = () => {
+  const navigate = useNavigate();
   const [pdfFile, setPdfFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [subFolderLoading, setSubFolderLoading] = useState(false);
@@ -288,7 +291,18 @@ const PdfTextLinker = () => {
   };
 
   return (
+    
     <div style={{ textAlign: "center", padding: "20px" }}>
+      <div>
+            <Button
+              variant='solid' size='sm' className='flex justify-center items-center gap-4'
+              onClick={() => navigate(-1)}>
+              <span><IoArrowBackOutline /></span>  <span>Back</span>
+              
+            </Button>
+      
+            {/* other content of the page */}
+          </div>
       <span className="text-3xl font-bold">Upload or Select a Blueprint PDF</span>
 
       <div className="mt-4">

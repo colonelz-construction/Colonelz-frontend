@@ -17,7 +17,7 @@ export type OpenTasks = {
     task_description: string;
     actual_task_start_date: string;
     actual_task_end_date: string;
-    estimated_task_start_date: string;
+    // estimated_task_start_date: string;
     estimated_task_end_date: string;
     task_status: string;
     task_priority: string;
@@ -59,7 +59,7 @@ const TaskDetails = () => {
         task_description: "",
         actual_task_start_date: "",
         actual_task_end_date: "",
-        estimated_task_start_date: "",
+        // estimated_task_start_date: "",
         estimated_task_end_date: "",
         task_status: "",
         task_priority: "",
@@ -158,7 +158,7 @@ const TaskDetails = () => {
                         <CustomerInfoField title='Priority' value={taskData.task_priority} />
                         <CustomerInfoField title='Actual Start Date' value={taskData.actual_task_start_date ? formateDate(taskData.actual_task_start_date) : "-"} />
                         <CustomerInfoField title='Actual End Date' value={taskData.actual_task_end_date ? formateDate(taskData.actual_task_end_date) : '-'} />
-                        <CustomerInfoField title='Estimated Start Date' value={formateDate(taskData.estimated_task_start_date)} />
+                        {/* <CustomerInfoField title='Estimated Start Date' value={formateDate(taskData.estimated_task_start_date)} /> */}
                         <CustomerInfoField title='Estimated End Date' value={formateDate(taskData.estimated_task_end_date)} />
                         <CustomerInfoField title='Assignee' value={taskData.task_assignee} />
                         <CustomerInfoField title='Reporter' value={taskData.reporter} />

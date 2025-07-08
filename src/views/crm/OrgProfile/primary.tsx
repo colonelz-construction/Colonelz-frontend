@@ -72,9 +72,8 @@ const Primary = () => {
 
     useEffect(() => {
         const fetchCurrencies = async () => {
-            const response = await fetch(`${currencyUrl}v3.1/all`);
+            const response = await fetch(`${currencyUrl}v3.1/all?fields=currencies`);
             const data = await response.json();
-            // console.log(data )
 
             const currencyData: CurrencyOption[] = [];
 

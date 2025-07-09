@@ -15,7 +15,7 @@ type CustomSelectProps = {
 
 const SelectWithBg: React.FC<CustomSelectProps> = ({
  
-  placeholder = "Select...",
+  placeholder = "Default",
   onChange,
   modalId,
 }) => {

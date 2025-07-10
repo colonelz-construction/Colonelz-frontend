@@ -7,6 +7,7 @@ import { apiGetAllUsersList } from '@/services/CrmService';
 import { apiGetCrmProjects } from '@/services/CrmService';
 import { set } from 'lodash';
 import { useRoleContext } from '../Roles/RolesContext';
+import { useNavigate } from 'react-router-dom';
 
 export type ProjectResponse = {
   code: number;
@@ -81,7 +82,7 @@ const Index = () => {
 
   const projectId: any = queryParams.get('project_id')
 
-
+  const navigate = useNavigate();
 
   const Options = rolelist.filter((role) => role !== 'ADMIN' && role !== 'Senior Architect').map((role) => ({ value: role, label: role }));
 
@@ -119,17 +120,15 @@ const Index = () => {
     setLoading(true)
     const response = await apiAddMember(values);
 
-
     setLoading(false)
     if (response?.code === 200) {
-
       toast.push(
         <Notification closable type="success" duration={2000}>
           Member Added Successfully
         </Notification>
-
       )
-
+      // Redirect to project page after success
+      navigate(`/app/crm/project-details?project_id=${values.project_id}&id=${values.id}&type=assignee`);
     }
     else {
       toast.push(

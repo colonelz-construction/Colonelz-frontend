@@ -6,6 +6,7 @@ import { apiAddMember, apiAddMemberToLead } from '@/services/AuthService';
 import { apiGetAllUsersList } from '@/services/CrmService';
 import { apiGetCrmLeads } from '@/services/CrmService';
 import { useRoleContext } from '../Roles/RolesContext';
+import { useNavigate } from 'react-router-dom';
 
 export type LeadResponseType = {
   code: number;
@@ -65,6 +66,7 @@ const Index = () => {
   const [loading,setLoading]=useState(false)
   const {rolelist}=useRoleContext()
   const org_id = localStorage.getItem('orgId')
+  const navigate = useNavigate();
 
   const Options = rolelist.
   filter((role)=>role!=='ADMIN'&&role!=='Senior Architect')
@@ -106,26 +108,23 @@ const Index = () => {
 
   const handleSubmit = async (values: FormValues) => {
     setLoading(true)
-    const response=await apiAddMemberToLead(values);
+    const response = await apiAddMemberToLead(values);
     setLoading(false)
-    if(response.code===200){
-     
+    if (response.code === 200) {
       toast.push(
         <Notification closable type="success" duration={2000}>
-            Member Added Successfully
+          Member Added Successfully
         </Notification>
-    
-     )
-      
+      )
+      // Redirect to lead page after success
+      navigate(`/app/crm/lead/?id=${values.lead_id}&tab=AddedUser`);
     }
-    else{
+    else {
       toast.push(
         <Notification closable type="danger" duration={2000}>
-            {response.errorMessage}
+          {response.errorMessage}
         </Notification>
-    
-     )
-      
+      )
     }
   };
 

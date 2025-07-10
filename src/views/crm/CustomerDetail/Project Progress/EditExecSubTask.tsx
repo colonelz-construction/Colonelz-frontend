@@ -1,50 +1,37 @@
 import { useEffect, useState } from 'react'
 import Button from '@/components/ui/Button'
 import Dialog from '@/components/ui/Dialog'
-import { Field, Form, Formik, FormikContext } from 'formik'
-import { DatePicker, FormItem, Input, Notification, Select, Tooltip, toast } from '@/components/ui'
-import { apiCreateCrmExecSubTask, apiCreateCrmExecTask, apiGetCrmLeadsAddMiniTask, apiGetCrmLeadsAddSubTask, apiGetCrmProjectsAddMiniTask, apiGetCrmProjectsAddSubTask, apiGetCrmProjectsAddTask, apiGetUsersList, apiUpdateCrmExecSubTask } from '@/services/CrmService'
-import { MdOutlineAdd } from 'react-icons/md'
+import { Field, Form, Formik } from 'formik'
+import { DatePicker, FormItem, Input, Notification, toast } from '@/components/ui'
+import { apiUpdateCrmExecSubTask } from '@/services/CrmService'
 import * as Yup from 'yup'
 import { useLocation } from 'react-router-dom'
-import { setUser } from '@/store'
 import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
 
-
 const EditExecSubTask = ({ task, subtask, openDialog, onDialogClose, dialogIsOpen, setIsOpen }: any) => {
-
-    // const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const location = useLocation()
     const queryParams = new URLSearchParams(location.search)
     const project_id = queryParams.get('project_id')
     const org_id = localStorage.getItem('orgId')
-
-    const [bgColor, setBgColor] = useState<any>("");
-
-    // const task_id=queryParams.get('task')
-
-
-
-    // console.log(subtask)
-
-    // const openDialog = () => {
-    //     setIsOpen(true)
-    // }
-
-    // const onDialogClose = () => {
-    //     setIsOpen(false)
-    // }
+    const [bgColor, setBgColor] = useState<any>("")
 
     const handleChange = (value: string) => {
-        setBgColor(value);
-      };
+        setBgColor(value)
+    }
 
-
+    const stopPropagationOnScrollbar = (e: React.MouseEvent<HTMLDivElement>) => {
+        const target = e.currentTarget
+        const isScrollbarClick =
+            target.scrollHeight > target.clientHeight &&
+            e.clientX > target.getBoundingClientRect().right - 20 // adjust for scrollbar width
+        if (isScrollbarClick) {
+            e.stopPropagation()
+        }
+    }
 
     return (
         <div>
-            {/* <Button onClick={openDialog}  variant='solid' size='sm' className=' rounded-lg'> Add Sub Task</Button> */}
             <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
                 <div className="pl-4 ">
                     <h3>Edit SubTask</h3>
@@ -67,10 +54,8 @@ const EditExecSubTask = ({ task, subtask, openDialog, onDialogClose, dialogIsOpe
                         subtask_end_date: Yup.string().required('End Date is required'),
                     })}
                     onSubmit={async (values, actions) => {
-
-                        // console.log(values)
                         setLoading(true)
-                        const val = {...values, color: bgColor }
+                        const val = { ...values, color: bgColor }
                         const response = await apiUpdateCrmExecSubTask(val)
                         if (response.code === 200) {
                             setLoading(false)
@@ -78,8 +63,7 @@ const EditExecSubTask = ({ task, subtask, openDialog, onDialogClose, dialogIsOpe
                                 <Notification closable type='success' duration={2000}>Task Added Successfully</Notification>
                             )
                             window.location.reload()
-                        }
-                        else {
+                        } else {
                             setLoading(false)
                             toast.push(
                                 <Notification closable type='danger' duration={2000}>{response.errorMessage}</Notification>
@@ -88,74 +72,78 @@ const EditExecSubTask = ({ task, subtask, openDialog, onDialogClose, dialogIsOpe
                     }}
                 >
                     {({ values, errors, touched, setFieldValue }: any) => (
-                        <Form className=' p-4 max-h-96 overflow-y-auto'>
-                            <div className=' grid grid-cols-2 gap-x-5'>
+                        <div
+                            className='p-4 max-h-96 overflow-y-auto'
+                            onMouseDown={stopPropagationOnScrollbar}
+                        >
+                            <Form>
+                                <div className='grid grid-cols-2 gap-x-5'>
+                                    <FormItem
+                                        label='Start Date'
+                                        asterisk
+                                        invalid={errors.subtask_start_date && touched.subtask_start_date}
+                                        errorMessage={errors.subtask_start_date}
+                                    >
+                                        <Field name='subtask_start_date' placeholder='Start Date'>
+                                            {({ field }: any) => (
+                                                <DatePicker
+                                                    name='subtask_start_date'
+                                                    value={field.value}
+                                                    onChange={(value) => {
+                                                        field.onChange({ target: { name: 'subtask_start_date', value: `${value}` } })
+                                                    }}
+                                                />
+                                            )}
+                                        </Field>
+                                    </FormItem>
 
+                                    <FormItem
+                                        label='End Date'
+                                        asterisk
+                                        invalid={errors.subtask_end_date && touched.subtask_end_date}
+                                        errorMessage={errors.subtask_end_date}
+                                    >
+                                        <Field name='subtask_end_date' placeholder='End Date'>
+                                            {({ field }: any) => (
+                                                <DatePicker
+                                                    name='subtask_end_date'
+                                                    value={field.value}
+                                                    onChange={(value) => {
+                                                        field.onChange({ target: { name: 'subtask_end_date', value: `${value}` } })
+                                                    }}
+                                                />
+                                            )}
+                                        </Field>
+                                    </FormItem>
 
+                                    <FormItem
+                                        label='Sub Task Name'
+                                        asterisk
+                                        invalid={errors.subtask_name && touched.subtask_name}
+                                        errorMessage={errors.subtask_name}
+                                    >
+                                        <Field name='subtask_name' component={Input} placeholder='Name' />
+                                    </FormItem>
 
-
-
-
-                                <FormItem label='Start Date'
-                                    asterisk
-                                    invalid={errors.subtask_start_date && touched.subtask_start_date}
-                                    errorMessage={errors.subtask_start_date}
-
-                                >
-                                    <Field name='subtask_start_date' placeholder='Start Date'>
-                                        {({ field }: any) => (
-                                            <DatePicker name='subtask_start_date'
-                                                value={field.value}
-                                                onChange={(value) => { field.onChange({ target: { name: 'subtask_start_date', value: `${value}` } }) }}
-                                            />
-                                        )}
-                                    </Field>
-                                </FormItem>
-
-                                <FormItem label='End Date'
-                                    asterisk
-                                    invalid={errors.subtask_end_date && touched.subtask_end_date}
-                                    errorMessage={errors.subtask_end_date}
-
-                                >
-                                    <Field name='subtask_end_date' placeholder='End Date'>
-                                        {({ field }: any) => (
-                                            <DatePicker name='subtask_end_date'
-                                                value={field.value}
-                                                onChange={(value) => { field.onChange({ target: { name: 'subtask_end_date', value: `${value}` } }) }}
-                                            />
-                                        )}
-                                    </Field>
-                                </FormItem>
-
-                                <FormItem label='Sub Task Name'
-                                    asterisk
-                                    invalid={errors.subtask_name && touched.subtask_name}
-                                    errorMessage={errors.subtask_name}
-                                >
-                                    <Field name='subtask_name' component={Input} placeholder='Name' />
-                                </FormItem>
-
-                                <FormItem label="Color" >
-                                    <Field name='color'>
-                                        {({ field }: any) =>{
-                                        
-                                            // console.log(field.value)
-                                        return (
-
-                                            <SelectWithBg onChange={handleChange} placeholder={field.value} />
-
-                                        )}}
-                                    </Field>
-
-                                </FormItem>
-
-
-                            </div>
-                            <div className='flex justify-end'>
-                                <Button type='submit' variant='solid' size='sm' loading={loading}>{loading ? 'Adding' : 'Edit SubTask'}</Button>
-                            </div>
-                        </Form>)}
+                                    <FormItem label="Color">
+                                        <Field name='color'>
+                                            {({ field }: any) => (
+                                                <SelectWithBg
+                                                    onChange={handleChange}
+                                                    placeholder={field.value}
+                                                />
+                                            )}
+                                        </Field>
+                                    </FormItem>
+                                </div>
+                                <div className='flex justify-end'>
+                                    <Button type='submit' variant='solid' size='sm' loading={loading}>
+                                        {loading ? 'Adding' : 'Edit SubTask'}
+                                    </Button>
+                                </div>
+                            </Form>
+                        </div>
+                    )}
                 </Formik>
             </Dialog>
         </div>

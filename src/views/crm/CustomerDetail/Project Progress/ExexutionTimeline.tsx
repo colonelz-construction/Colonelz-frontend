@@ -1187,6 +1187,27 @@ const GanttChart = ({ execData }: any) => {
     };
 
 
+    // Helper to safely sort by date or name
+    const sortByDateOrName = (arr: any, dateKey: string, nameKey: string) => {
+        return [...arr].sort((a, b) => {
+            const dateA = a[dateKey] ? new Date(a[dateKey]).getTime() : 0;
+            const dateB = b[dateKey] ? new Date(b[dateKey]).getTime() : 0;
+            if (dateA !== dateB) return dateA - dateB;
+            // fallback to name if dates are equal or missing
+            if (a[nameKey] && b[nameKey]) return a[nameKey].localeCompare(b[nameKey]);
+            return 0;
+        });
+    };
+
+    // Sort tasks by start_date (or task_name as fallback)
+    const sortedTasks = sortByDateOrName(execData, 'start_date', 'task_name').map(task => ({
+        ...task,
+        // Sort subtasks by sub_task_start_date (or sub_task_name as fallback)
+        subtasks: task.subtasks
+            ? sortByDateOrName(task.subtasks, 'sub_task_start_date', 'sub_task_name')
+            : [],
+    }));
+
     return (
         <div className="w-full p-4 bg-gray-100 rounded-lg">
 
@@ -1238,8 +1259,9 @@ const GanttChart = ({ execData }: any) => {
                 </div>
 
                 <div className="flex overflow-x-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+                    {/* LEFT COLUMN: Task color bar */}
                     <div className="w-2 shrink-0 pr-[0.10rem] h-full sticky left-0 bg-slate-100 z-10">
-                        {execData.map((task: any) => {
+                        {sortedTasks.map((task: any) => {
                             const subtaskCount = task.subtasks?.length || 1;
                             const totalHeight = subtaskCount * 65 + (subtaskCount - 1) * 1;
                             return (
@@ -1253,8 +1275,10 @@ const GanttChart = ({ execData }: any) => {
                             );
                         })}
                     </div>
+
+                    {/* LEFT COLUMN: Task names */}
                     <div className="w-[11.5rem] shrink-0 pr-[0.10rem] h-full sticky left-0 bg-slate-100 z-10">
-                        {execData.map((task: any) => {
+                        {sortedTasks.map((task: any) => {
                             const subtaskCount = task.subtasks?.length || 1;
                             const totalHeight = subtaskCount * 65 + (subtaskCount - 1) * 1;
                             return (
@@ -1293,78 +1317,86 @@ const GanttChart = ({ execData }: any) => {
                         })}
                     </div>
 
+                    {/* LEFT COLUMN: Subtask names */}
                     <div className="w-[22rem] shrink-0 min-h-screen border-r-2 border-slate-500 sticky left-48 bg-slate-100 z-10">
-                        {execData.map((task: any) => {
-                            const subtaskCount = task.subtasks?.length || 0;
-                            const totalHeight = subtaskCount * 65 + (subtaskCount - 1) * 1;
+                        {sortedTasks.map((task: any) => {
+                            const subtaskCount = Math.max(1, task.subtasks?.length || 0);
                             return (
                                 <div
                                     key={`subtask-names-${task.task_id}`}
                                     className="bg-slate-100 mb-2"
-                                    style={{ height: `${totalHeight}px` }}
+                                    style={{ height: `${subtaskCount * 65 + (subtaskCount - 1) * 1}px` }}
                                 >
-                                    {task.subtasks?.map((subtask: any, subIndex: any) => {
-                                        const maxLength = 100;
-                                        let subtask_text = subtask.sub_task_name.length > maxLength
-                                            ? subtask.sub_task_name.slice(0, maxLength - 3) + '...'
-                                            : subtask.sub_task_name;
+                                    {task.subtasks && task.subtasks.length > 0 ? (
+                                        task.subtasks.map((subtask: any, subIndex: any) => {
+                                            const maxLength = 100;
+                                            let subtask_text = subtask.sub_task_name.length > maxLength
+                                                ? subtask.sub_task_name.slice(0, maxLength - 3) + '...'
+                                                : subtask.sub_task_name;
 
 
-                                        return (
-                                            <div
-                                                key={`${subtask.sub_task_id}-${subIndex}-name`}
-                                                className="text-wrap text-md flex items-center justify-between bg-slate-200 capitalize"
-                                                style={{
-                                                    height: '65px',
-                                                    marginTop: subIndex > 0 ? '1px' : '0'
-                                                }}
-                                            >
+                                            return (
+                                                <div
+                                                    key={`${subtask.sub_task_id}-${subIndex}-name`}
+                                                    className="text-wrap text-md flex items-center justify-between bg-slate-200 capitalize"
+                                                    style={{
+                                                        height: '65px',
+                                                        marginTop: subIndex > 0 ? '1px' : '0'
+                                                    }}
+                                                >
 
-                                                <span className="flex h-full w-full justify-between items-center gap-2">
+                                                    <span className="flex h-full w-full justify-between items-center gap-2">
 
 
-                                                    <div className={`w-[4%] h-full bg-${subtask?.color ? subtask?.color : "blue-800"} bg-opacity-60`}>
+                                                        <div className={`w-[4%] h-full bg-${subtask?.color ? subtask?.color : "blue-800"} bg-opacity-60`}>
 
-                                                    </div>
+                                                        </div>
 
-                                                    <span className="flex w-[96%] justify-between items-center">
-                                                        {/* <span className={`font-semibold text-${subtask?.color ? subtask?.color : "blue-800"}`}>{subtask_text}</span> */}
-                                                        <span>
+                                                        <span className="flex w-[96%] justify-between items-center">
+                                                            {/* <span className={`font-semibold text-${subtask?.color ? subtask?.color : "blue-800"}`}>{subtask_text}</span> */}
+                                                            <span>
 
-                                                            <span className={`font-semibold text-${subtask?.color ? subtask?.color : "blue-800"}`}>{subtask_text}</span>
-                                                            <span className={`flex text-[0.5rem] `}>
+                                                                <span className={`font-semibold text-${subtask?.color ? subtask?.color : "blue-800"}`}>{subtask_text}</span>
+                                                                <span className={`flex text-[0.5rem] `}>
 
-                                                                <span>{format(subtask?.sub_task_start_date, "MMM d yyyy")}</span>
-                                                                <span>-</span>
-                                                                <span>{format(subtask?.sub_task_end_date, "MMM d yyyy")}</span>
+                                                                    <span>{format(subtask?.sub_task_start_date, "MMM d yyyy")}</span>
+                                                                    <span>-</span>
+                                                                    <span>{format(subtask?.sub_task_end_date, "MMM d yyyy")}</span>
+                                                                </span>
+
                                                             </span>
+                                                            <span className="flex items-center gap-2  mr-4">
+                                                                <Dropdown renderTitle={<PiDotsThreeVerticalBold className="cursor-pointer font-bold" />} placement='bottom-end' >
 
-                                                        </span>
-                                                        <span className="flex items-center gap-2  mr-4">
-                                                            <Dropdown renderTitle={<PiDotsThreeVerticalBold className="cursor-pointer font-bold" />} placement='bottom-end' >
+                                                                    <Dropdown.Item eventKey="c" onClick={() => openDialog2(task, subtask)}><span><MdEdit /></span><div className="text-sm">Edit Sub Task</div></Dropdown.Item>
+                                                                    <Dropdown.Item eventKey="a" onClick={() => openDialog3(task, subtask, execData)}><span><MdAddCircle /></span><div className="text-sm">Add Details</div></Dropdown.Item>
+                                                                    <Dropdown.Item eventKey="d" onClick={() => openDialog7(task, subtask)}><span><MdDelete /></span><div className="text-sm">Delete</div></Dropdown.Item>
+                                                                    {/* <Dropdown.Item eventKey="b" onClick={() => openDialog2()}><div className="text-sm">Delete</div></Dropdown.Item> */}
 
-                                                                <Dropdown.Item eventKey="c" onClick={() => openDialog2(task, subtask)}><span><MdEdit /></span><div className="text-sm">Edit Sub Task</div></Dropdown.Item>
-                                                                <Dropdown.Item eventKey="a" onClick={() => openDialog3(task, subtask, execData)}><span><MdAddCircle /></span><div className="text-sm">Add Details</div></Dropdown.Item>
-                                                                <Dropdown.Item eventKey="d" onClick={() => openDialog7(task, subtask)}><span><MdDelete /></span><div className="text-sm">Delete</div></Dropdown.Item>
-                                                                {/* <Dropdown.Item eventKey="b" onClick={() => openDialog2()}><div className="text-sm">Delete</div></Dropdown.Item> */}
+                                                                </Dropdown>
 
-                                                            </Dropdown>
+                                                                <div>
+                                                                    <span className="cursor-pointer  hover:text-blue-500" onClick={() => openDialog8(task, subtask)}><IoIosInformationCircleOutline/></span>
+                                                                    
+                                                                </div>
 
-                                                            <div>
-                                                                <span className="cursor-pointer  hover:text-blue-500" onClick={() => openDialog8(task, subtask)}><IoIosInformationCircleOutline/></span>
-                                                                
-                                                            </div>
+                                                            </span>
 
                                                         </span>
 
                                                     </span>
 
-                                                </span>
+                                                </div>
+                                            )
+                                        }
 
-                                            </div>
                                         )
-                                    }
-
+                                    ) : (
+                                        // Render an empty row if no subtasks
+                                        <div
+                                            className="bg-slate-100"
+                                            style={{ height: '65px' }}
+                                        />
                                     )}
                                 </div>
                             );
@@ -1412,7 +1444,7 @@ const GanttChart = ({ execData }: any) => {
                         })}
 
                         <div className="space-y-2 min-w-max min-h-screen relative z-10">
-                            {execData.map((task: any) => {
+                            {sortedTasks.map((task: any) => {
                                 const subtaskCount = task.subtasks?.length || 1;
                                 const totalHeight = subtaskCount * 65 + (subtaskCount - 1) * 1;
 

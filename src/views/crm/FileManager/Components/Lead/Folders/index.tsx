@@ -1089,6 +1089,7 @@ const Index = () => {
                   No files selected for upload
                 </Notification>, { placement: 'top-center' }
               )
+              setFormLoading(false)
             }
             else {
               // console.log(values);

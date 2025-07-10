@@ -87,7 +87,7 @@ const RegisterForm = (props: SignInFormProps) => {
                     }
                 }}
             >
-                {({ touched, errors, isSubmitting }) => (
+                {({ touched, errors, isSubmitting, values }) => (
                     <Form>
                         <FormContainer>
                             <FormItem
@@ -160,6 +160,9 @@ const RegisterForm = (props: SignInFormProps) => {
                                 loading={isSubmitting}
                                 variant="solid"
                                 type="submit"
+                                disabled={
+                                    !values.organization || !values.email 
+                                }
                             >
                                 {isSubmitting ? 'Registering...' : 'Register'}
                             </Button>

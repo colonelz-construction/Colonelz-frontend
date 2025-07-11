@@ -20,7 +20,7 @@ import { FileItemType } from './Quotation/Quotations'
 import Assignee, { UsersResponse } from './Project Progress/Assignee'
 import { update } from 'lodash'
 import { GoChevronDown } from 'react-icons/go'
-// import ExexutionTimeline from './Project Progress/ExexutionTimeline'
+import ExexutionTimeline from './Project Progress/ExexutionTimeline'
 
 
 export type QuotationResponseType = {
@@ -188,14 +188,14 @@ const CustomerDetail = () => {
                   userAuthority={[`${localStorage.getItem('role')}`]}
                   authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
               >
-                  <Dropdown.Item eventKey="d"><Link to={`/app/crm/projects/blueprint?project_id=${allQueryParams.project_id}`}>2D View</Link></Dropdown.Item>
+                  <Link to={`/app/crm/projects/blueprint?project_id=${allQueryParams.project_id}`}><Dropdown.Item eventKey="d">2D View</Dropdown.Item></Link>
 
               </AuthorityCheck>}
               {<AuthorityCheck
                   userAuthority={[`${localStorage.getItem('role')}`]}
                   authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
               >
-                  <Dropdown.Item eventKey="g"><Link to={`/app/crm/visualizer?project_id=${allQueryParams.project_id}`}>3D View</Link></Dropdown.Item>
+                  <Link to={`/app/crm/visualizer?project_id=${allQueryParams.project_id}`}><Dropdown.Item eventKey="g">3D View</Dropdown.Item></Link>
 
               </AuthorityCheck>}
 
@@ -249,9 +249,9 @@ const CustomerDetail = () => {
                 {taskAccess &&
                   <TabNav value="task">Internal Task Manager</TabNav>
                 }
-                {/* {
+                {
                   <TabNav value="exectimeline">Execution Timeline</TabNav>
-                } */}
+                }
                 <AuthorityCheck
                   userAuthority={[`${localStorage.getItem('role')}`]}
                   authority={['ADMIN', 'SUPERADMIN']}
@@ -298,9 +298,9 @@ const CustomerDetail = () => {
               <TabContent value="assignee">
                 <Assignee data={data} />
               </TabContent>
-              {/* <TabContent value="exectimeline">
+              <TabContent value="exectimeline">
                 <ExexutionTimeline execData={execData} />
-              </TabContent> */}
+              </TabContent>
 
             </div>
           </Tabs>}

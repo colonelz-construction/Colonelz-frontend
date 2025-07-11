@@ -1364,6 +1364,16 @@ export async function apiGetCrmExecutionTask<T>(project_id:any) { // org done
         return response.data
     })
 }
+export async function apiGetCrmExecutionSubtaskAffection<T>(project_id:any, task_id:any, subtask_id:any) { // org done
+
+    console.log(task_id, subtask_id)
+    return ApiService.fetchData<any>({
+        url: `admin/get/project/execution/subtask/affections?user_id=${localStorage.getItem('userId')}&org_id=${localStorage.getItem('orgId')}&project_id=${project_id}&task_id=${task_id}&subtask_id=${subtask_id}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
 
 export async function apiUpdateCrmExecTask(data: any) { // org done
     return ApiService.fetchData<any>({

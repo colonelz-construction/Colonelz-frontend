@@ -91,11 +91,6 @@ const AddExecTask = () => {
                         <Form className=' p-4 max-h-96 overflow-y-auto'>
                             <div className=' grid grid-cols-2 gap-x-5'>
 
-
-
-
-
-
                                 <FormItem label='Start Date'
                                     asterisk
                                     invalid={errors.start_date && touched.start_date}
@@ -139,14 +134,10 @@ const AddExecTask = () => {
                                 <FormItem label="Color" >
                                     <Field name='subtask_type'>
                                         {({ field }: any) => (
-
-                                            <SelectWithBg onChange={handleChange} />
-
+                                            <SelectWithBg onChange={handleChange} modalId="add-task-dialog" />
                                         )}
                                     </Field>
-
                                 </FormItem>
-
 
                             </div>
                             <div className='flex justify-end'>

@@ -11,10 +11,15 @@ import { Button} from '@/components/ui';
 import { useNavigate } from 'react-router-dom';
 import { IoArrowBackOutline } from "react-icons/io5";
 
+type DataItem = {
+  img_id: string;
+  [key: string]: any;
+};
+
 const Visualizer = () => {
   const navigate = useNavigate()
-  const [data, setData] = useState<any>([]);
-  const [mainLoading, setMainLoading] = useState<any>(false);
+  const [data, setData] = useState<DataItem[]>([]);
+  const [mainLoading, setMainLoading] = useState<boolean>(false);
 
   const [imgIdList, setImgList] = useState<any>([]);
   // console.log(imgIdList)
@@ -33,13 +38,26 @@ const Visualizer = () => {
 
       try {
 
-        const res = await apiGetCrmMainThreeImage('main', '', leadId, projectId);
+        // Fetch main images
+        const mainRes = await apiGetCrmMainThreeImage('main', '', leadId, projectId);
+        // Fetch hotspot images
+        const hotspotRes = await apiGetCrmMainThreeImage('hp', '', leadId, projectId);
 
-        // console.log(res)
-        setData(res?.data);
+        // Merge and remove duplicates (if any)
+        const mainImages = (mainRes?.data || []) as unknown as DataItem[];
+        const hotspotImages = (hotspotRes?.data || []) as unknown as DataItem[];
+        // Optional: Remove duplicates by img_id
+        const allImagesMap = new Map();
+        ([...mainImages, ...hotspotImages] as DataItem[]).forEach((img: DataItem) => {
+          allImagesMap.set(img.img_id, img);
+        });
+        const allImages = Array.from(allImagesMap.values());
+
+        setData(allImages);
         setMainLoading(false);
         
       } catch (error:any) {
+        setMainLoading(false);
         throw new Error(error);
         
       }

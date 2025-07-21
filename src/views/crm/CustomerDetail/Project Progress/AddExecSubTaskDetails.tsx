@@ -117,7 +117,6 @@ const AddExecSubTaskDetails = ({ task, subtask, openDialog, onDialogClose, dialo
                     subtask_start_date: subtask?.sub_task_start_date,
                     subtask_end_date: subtask?.sub_task_end_date,
                     color: subtask?.color,
-
                     subtask_details_start_date: "",
                     subtask_details_end_date: "",
                     subtask_comment: "",

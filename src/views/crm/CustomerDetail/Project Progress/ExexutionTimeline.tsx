@@ -64,11 +64,17 @@ type TimelineDayView = {
 
 type TimelineOtherView = { label: string; date: Date }[];
 
-const GanttChart = ({ execData }: any) => {
+interface GanttChartProps {
+    execData: any;
+    onRefreshData?: () => void;
+}
+
+const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     const [hoveredDelay, setHoveredDelay] = useState<{ start: Date, end: Date } | null>(null);
     const [view, setView] = useState<"days" | "weeks" | "months" | "years">("days");
     const headerRef = useRef<HTMLDivElement>(null);
     const chartAreaRef = useRef<HTMLDivElement>(null);
+    const [localExecData, setLocalExecData] = useState(execData);
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [dialogIsOpen1, setIsOpen1] = useState(false)
     const [dialogIsOpen2, setIsOpen2] = useState(false)
@@ -88,6 +94,16 @@ const GanttChart = ({ execData }: any) => {
 
     const org_id = localStorage.getItem("orgId")
     // console.log(selectedExecData)
+
+    // Sync local data when prop changes
+    useEffect(() => {
+        setLocalExecData(execData);
+    }, [execData]);
+
+    // Function to update local state instead of reloading
+    const updateLocalExecData = (updatedData: any) => {
+        setLocalExecData(updatedData);
+    };
 
     const openDialog1 = (task: any) => {
         setSelectedTask(task);
@@ -187,6 +203,15 @@ const GanttChart = ({ execData }: any) => {
         setIsOpen(false)
     }
 
+    // Wrapper functions for Add components that don't need parameters
+    const openAddSubTaskDialog = () => {
+        setIsOpen(true)
+    }
+
+    const openAddSubTaskDetailsDialog = () => {
+        setIsOpen3(true)
+    }
+
     //delay drag start------------------------------------------------------
 
     // Add these to your component state
@@ -221,13 +246,77 @@ const GanttChart = ({ execData }: any) => {
 
     // Helper function to find a detail by IDs
     const findDetail = (taskId: string, subtaskId: string, detailId: string) => {
-        const task = execData.find((t: any) => t.task_id === taskId);
+        const task = localExecData.find((t: any) => t.task_id === taskId);
         if (!task) return null;
 
         const subtask = task.subtasks?.find((st: any) => st.sub_task_id === subtaskId);
         if (!subtask) return null;
 
         return subtask.sub_task_details?.find((d: any) => d.subtask_details_id === detailId);
+    };
+
+    // Helper function to update detail in local state
+    const updateDetailInLocalState = (taskId: string, subtaskId: string, detailId: string, updatedDetail: any) => {
+        const newData = localExecData.map((task: any) => {
+            if (task.task_id === taskId) {
+                return {
+                    ...task,
+                    subtasks: task.subtasks?.map((subtask: any) => {
+                        if (subtask.sub_task_id === subtaskId) {
+                            return {
+                                ...subtask,
+                                sub_task_details: subtask.sub_task_details?.map((detail: any) => {
+                                    if (detail.subtask_details_id === detailId) {
+                                        return { ...detail, ...updatedDetail };
+                                    }
+                                    return detail;
+                                })
+                            };
+                        }
+                        return subtask;
+                    })
+                };
+            }
+            return task;
+        });
+        setLocalExecData(newData);
+    };
+
+    // Helper function to update subtask in local state
+    const updateSubtaskInLocalState = (taskId: string, subtaskId: string, updatedSubtask: any) => {
+        const newData = localExecData.map((task: any) => {
+            if (task.task_id === taskId) {
+                return {
+                    ...task,
+                    subtasks: task.subtasks?.map((subtask: any) => {
+                        if (subtask.sub_task_id === subtaskId) {
+                            return { ...subtask, ...updatedSubtask };
+                        }
+                        return subtask;
+                    })
+                };
+            }
+            return task;
+        });
+        setLocalExecData(newData);
+    };
+
+    // Helper function to update task in local state
+    const updateTaskInLocalState = (taskId: string, updatedTask: any) => {
+        const newData = localExecData.map((task: any) => {
+            if (task.task_id === taskId) {
+                return { ...task, ...updatedTask };
+            }
+            return task;
+        });
+        setLocalExecData(newData);
+    };
+
+    // Helper function to handle refreshing data after adding new items
+    const refreshExecData = async () => {
+        if (onRefreshData) {
+            await onRefreshData();
+        }
     };
 
 
@@ -335,17 +424,30 @@ const GanttChart = ({ execData }: any) => {
             console.log(data)
             const response = await apiUpdateCrmExecSubTaskDetail(data)
 
-            // Show success notification
-            toast.push(
-                <Notification closable type="success" duration={2000}>
-                    Dates updated successfully
-                </Notification>,
-                { placement: 'top-end' }
-            );
+            if (response.code === 200) {
+                // Update local state instead of reloading
+                updateDetailInLocalState(dragging.taskId, dragging.subtaskId, dragging.detailId, {
+                    subtask_details_start_date: newStartDate,
+                    subtask_details_end_date: newEndDate
+                });
 
-            // Refresh data
-            window.location.reload();
+                // Show success notification
+                toast.push(
+                    <Notification closable type="success" duration={2000}>
+                        Dates updated successfully
+                    </Notification>,
+                    { placement: 'top-end' }
+                );
+            } else {
+                toast.push(
+                    <Notification closable type="danger" duration={2000}>
+                        Error updating dates: {response.errorMessage || 'Unknown error'}
+                    </Notification>,
+                    { placement: 'top-end' }
+                );
+            }
         } catch (error) {
+            console.error('Error updating dates:', error);
             toast.push(
                 <Notification closable type="danger" duration={2000}>
                     Error updating dates
@@ -414,7 +516,7 @@ const GanttChart = ({ execData }: any) => {
 
     // Helper function to find a subtask by IDs
     const findSubtask = (taskId: string, subtaskId: string) => {
-        const task = execData.find((t: any) => t.task_id === taskId);
+        const task = localExecData.find((t: any) => t.task_id === taskId);
         if (!task) return null;
         return task.subtasks?.find((st: any) => st.sub_task_id === subtaskId);
     };
@@ -517,15 +619,29 @@ const GanttChart = ({ execData }: any) => {
             console.log('Would update subtask with:', data);
             const response = await apiUpdateCrmExecSubTask(data)
 
-            toast.push(
-                <Notification closable type="success" duration={2000}>
-                    Subtask dates updated successfully
-                </Notification>,
-                { placement: 'top-end' }
-            );
+            if (response.code === 200) {
+                // Update local state instead of reloading
+                updateSubtaskInLocalState(subtaskDragging.taskId, subtaskDragging.subtaskId, {
+                    sub_task_start_date: newStartDate,
+                    sub_task_end_date: newEndDate
+                });
 
-            window.location.reload();
+                toast.push(
+                    <Notification closable type="success" duration={2000}>
+                        Subtask dates updated successfully
+                    </Notification>,
+                    { placement: 'top-end' }
+                );
+            } else {
+                toast.push(
+                    <Notification closable type="danger" duration={2000}>
+                        Error updating subtask dates: {response.errorMessage || 'Unknown error'}
+                    </Notification>,
+                    { placement: 'top-end' }
+                );
+            }
         } catch (error) {
+            console.error('Error updating subtask dates:', error);
             toast.push(
                 <Notification closable type="danger" duration={2000}>
                     Error updating subtask dates
@@ -708,15 +824,29 @@ const GanttChart = ({ execData }: any) => {
 
             const response = await apiUpdateCrmExecSubTaskDetail(data);
 
-            toast.push(
-                <Notification closable type="success" duration={2000}>
-                    Delay position updated successfully
-                </Notification>,
-                { placement: 'top-end' }
-            );
+            if (response.code === 200) {
+                // Update local state instead of reloading
+                updateDetailInLocalState(moveDragging.taskId, moveDragging.subtaskId, moveDragging.detailId, {
+                    subtask_details_start_date: newStartDate,
+                    subtask_details_end_date: newEndDate
+                });
 
-            window.location.reload();
+                toast.push(
+                    <Notification closable type="success" duration={2000}>
+                        Delay position updated successfully
+                    </Notification>,
+                    { placement: 'top-end' }
+                );
+            } else {
+                toast.push(
+                    <Notification closable type="danger" duration={2000}>
+                        Error updating delay position: {response.errorMessage || 'Unknown error'}
+                    </Notification>,
+                    { placement: 'top-end' }
+                );
+            }
         } catch (error) {
+            console.error('Error updating delay position:', error);
             toast.push(
                 <Notification closable type="danger" duration={2000}>
                     Error updating delay position
@@ -896,8 +1026,8 @@ const GanttChart = ({ execData }: any) => {
     };
 
 
-    const startDate = getEarliestStartDate(execData);
-    const endDate = getLatestEndDate(execData);
+    const startDate = getEarliestStartDate(localExecData);
+    const endDate = getLatestEndDate(localExecData);
     const dayWidth = view === "days" ? 28 : view === "weeks" ? 30 : view === "months" ? 40 : 60;
 
     const generateTimeline = (): TimelineDayView | TimelineOtherView => {
@@ -964,7 +1094,7 @@ const GanttChart = ({ execData }: any) => {
             return (
                 <>
                     <div className="relative flex border-b border-gray-200">
-                        {daysTimeline.monthHeaders.map(({ month, span }, i) => execData.length > 0 && (
+                        {daysTimeline.monthHeaders.map(({ month, span }, i) => localExecData.length > 0 && (
                             <div
                                 key={`month-${i}`}
                                 className="text-center text-xs font-medium py-1 border-r border-gray-200"
@@ -993,7 +1123,7 @@ const GanttChart = ({ execData }: any) => {
                                     style={{ minWidth: `${dayWidth}px` }}
                                 >
 
-                                    {execData.length > 0 && <div>
+                                    {localExecData.length > 0 && <div>
 
                                         <div>{day}</div>
                                         <div className="text-[0.6rem] opacity-70">{dayName}</div>
@@ -1095,24 +1225,49 @@ const GanttChart = ({ execData }: any) => {
 
             const res = await apiDeleteCrmExecSubTaskDetail(data);
 
+            if (res.code === 200) {
+                // Remove detail from local state
+                const newData = localExecData.map((task: any) => {
+                    if (task.task_id === selectedTask?.task_id) {
+                        return {
+                            ...task,
+                            subtasks: task.subtasks?.map((subtask: any) => {
+                                if (subtask.sub_task_id === selectedSubTask?.sub_task_id) {
+                                    return {
+                                        ...subtask,
+                                        sub_task_details: subtask.sub_task_details?.filter((detail: any) => 
+                                            detail.subtask_details_id !== selectedDetail?.subtask_details_id
+                                        )
+                                    };
+                                }
+                                return subtask;
+                            })
+                        };
+                    }
+                    return task;
+                });
+                setLocalExecData(newData);
 
-            toast.push(
-                <Notification closable type="success" duration={2000}>
-                    Detail deleted successfully
-                </Notification>, { placement: 'top-end' }
-            )
-
-            window.location.reload()
-
-
+                toast.push(
+                    <Notification closable type="success" duration={2000}>
+                        Detail deleted successfully
+                    </Notification>, { placement: 'top-end' }
+                );
+            } else {
+                toast.push(
+                    <Notification closable type="danger" duration={2000}>
+                        Error deleting detail: {res.errorMessage || 'Unknown error'}
+                    </Notification>, { placement: 'top-end' }
+                );
+            }
         } catch (error) {
+            console.error('Error deleting detail:', error);
             toast.push(
                 <Notification closable type="danger" duration={2000}>
                     Error deleting Detail
                 </Notification>, { placement: 'top-end' }
-            )
+            );
         }
-
     }
 
     const handleDeleteSubtask = async () => {
@@ -1128,24 +1283,41 @@ const GanttChart = ({ execData }: any) => {
 
             const res = await apiDeleteCrmExecSubTask(data);
 
+            if (res.code === 200) {
+                // Remove subtask from local state
+                const newData = localExecData.map((task: any) => {
+                    if (task.task_id === selectedTask?.task_id) {
+                        return {
+                            ...task,
+                            subtasks: task.subtasks?.filter((subtask: any) => 
+                                subtask.sub_task_id !== selectedSubTask?.sub_task_id
+                            )
+                        };
+                    }
+                    return task;
+                });
+                setLocalExecData(newData);
 
-            toast.push(
-                <Notification closable type="success" duration={2000}>
-                    Detail deleted successfully
-                </Notification>, { placement: 'top-end' }
-            )
-
-            window.location.reload()
-
-
+                toast.push(
+                    <Notification closable type="success" duration={2000}>
+                        Subtask deleted successfully
+                    </Notification>, { placement: 'top-end' }
+                );
+            } else {
+                toast.push(
+                    <Notification closable type="danger" duration={2000}>
+                        Error deleting subtask: {res.errorMessage || 'Unknown error'}
+                    </Notification>, { placement: 'top-end' }
+                );
+            }
         } catch (error) {
+            console.error('Error deleting subtask:', error);
             toast.push(
                 <Notification closable type="danger" duration={2000}>
-                    Error deleting Detail
+                    Error deleting Subtask
                 </Notification>, { placement: 'top-end' }
-            )
+            );
         }
-
     }
 
     const handleDeleteTask = async () => {
@@ -1160,24 +1332,33 @@ const GanttChart = ({ execData }: any) => {
 
             const res = await apiDeleteCrmExecTask(data);
 
+            if (res.code === 200) {
+                // Remove task from local state
+                const newData = localExecData.filter((task: any) => 
+                    task.task_id !== selectedTask?.task_id
+                );
+                setLocalExecData(newData);
 
-            toast.push(
-                <Notification closable type="success" duration={2000}>
-                    Task deleted successfully
-                </Notification>, { placement: 'top-end' }
-            )
-
-            window.location.reload()
-
-
+                toast.push(
+                    <Notification closable type="success" duration={2000}>
+                        Task deleted successfully
+                    </Notification>, { placement: 'top-end' }
+                );
+            } else {
+                toast.push(
+                    <Notification closable type="danger" duration={2000}>
+                        Error deleting task: {res.errorMessage || 'Unknown error'}
+                    </Notification>, { placement: 'top-end' }
+                );
+            }
         } catch (error) {
+            console.error('Error deleting task:', error);
             toast.push(
                 <Notification closable type="danger" duration={2000}>
                     Error deleting Task
                 </Notification>, { placement: 'top-end' }
-            )
+            );
         }
-
     }
 
 
@@ -1200,7 +1381,7 @@ const GanttChart = ({ execData }: any) => {
     };
 
     // Sort tasks by start_date (or task_name as fallback)
-    const sortedTasks = sortByDateOrName(execData, 'start_date', 'task_name').map(task => ({
+    const sortedTasks = sortByDateOrName(localExecData, 'start_date', 'task_name').map(task => ({
         ...task,
         // Sort subtasks by sub_task_start_date (or sub_task_name as fallback)
         subtasks: task.subtasks
@@ -1229,7 +1410,7 @@ const GanttChart = ({ execData }: any) => {
 
                 <div className="flex items-center justify-end gap-3">
 
-                    <AddExecTask />
+                    <AddExecTask onAddSuccess={refreshExecData} />
                     {/* <button
                     onClick={handleDownload}
                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -1677,11 +1858,35 @@ const GanttChart = ({ execData }: any) => {
                 </div>
             </div>
 
-            <AddExecSubTask task={selectedTask} openDialog={openDialog} onDialogClose={onDialogClose} dialogIsOpen={dialogIsOpen} setIsOpen={setIsOpen} />
-            <EditExecTask task={selectedTask} openDialog={openDialog1} onDialogClose={onDialogClose1} dialogIsOpen={dialogIsOpen1} setIsOpen={setIsOpen1} />
-            <EditExecSubTask task={selectedTask} subtask={selectedSubTask} openDialog={openDialog2} onDialogClose={onDialogClose2} dialogIsOpen={dialogIsOpen2} setIsOpen={setIsOpen2} />
-            <AddExecSubTaskDetails task={selectedTask} subtask={selectedSubTask} openDialog={openDialog3} onDialogClose={onDialogClose3} dialogIsOpen={dialogIsOpen3} setIsOpen={setIsOpen3} />
-            <EditExecSubTaskDetails task={selectedTask} subtask={selectedSubTask} detail={selectedDetail} openDialog={openDialog4} onDialogClose={onDialogClose4} dialogIsOpen={dialogIsOpen4} setIsOpen={setIsOpen4} />
+            <AddExecSubTask task={selectedTask} openDialog={openAddSubTaskDialog} onDialogClose={onDialogClose} dialogIsOpen={dialogIsOpen} setIsOpen={setIsOpen} onAddSuccess={refreshExecData} />
+            <EditExecTask 
+                task={selectedTask} 
+                openDialog={openDialog1} 
+                onDialogClose={onDialogClose1} 
+                dialogIsOpen={dialogIsOpen1} 
+                setIsOpen={setIsOpen1}
+                onUpdateSuccess={updateTaskInLocalState}
+            />
+            <EditExecSubTask 
+                task={selectedTask} 
+                subtask={selectedSubTask} 
+                openDialog={openDialog2} 
+                onDialogClose={onDialogClose2} 
+                dialogIsOpen={dialogIsOpen2} 
+                setIsOpen={setIsOpen2}
+                onUpdateSuccess={updateSubtaskInLocalState}
+            />
+            <AddExecSubTaskDetails task={selectedTask} subtask={selectedSubTask} openDialog={openAddSubTaskDetailsDialog} onDialogClose={onDialogClose3} dialogIsOpen={dialogIsOpen3} setIsOpen={setIsOpen3} onAddSuccess={refreshExecData} />
+            <EditExecSubTaskDetails 
+                task={selectedTask} 
+                subtask={selectedSubTask} 
+                detail={selectedDetail} 
+                openDialog={openDialog4} 
+                onDialogClose={onDialogClose4} 
+                dialogIsOpen={dialogIsOpen4} 
+                setIsOpen={setIsOpen4}
+                onUpdateSuccess={updateDetailInLocalState}
+            />
             <AffectionDetails task={selectedTask} subtask={selectedSubTask} openDialog={openDialog8} onDialogClose={onDialogClose8} dialogIsOpen={dialogIsOpen8} setIsOpen={setIsOpen8} />
             <ConfirmDialog
                 isOpen={dialogIsOpen5}

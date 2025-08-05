@@ -8,7 +8,17 @@ import * as Yup from 'yup'
 import { useLocation } from 'react-router-dom'
 import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
 
-const AddExecSubTaskDetails = ({ task, subtask, openDialog, onDialogClose, dialogIsOpen, setIsOpen }: any) => {
+interface AddExecSubTaskDetailsProps {
+    task: any;
+    subtask: any;
+    openDialog: () => void;
+    onDialogClose: () => void;
+    dialogIsOpen: boolean;
+    setIsOpen: (open: boolean) => void;
+    onAddSuccess?: () => void;
+}
+
+const AddExecSubTaskDetails = ({ task, subtask, openDialog, onDialogClose, dialogIsOpen, setIsOpen, onAddSuccess }: AddExecSubTaskDetailsProps) => {
 
     const [loading, setLoading] = useState(false)
     const location = useLocation()
@@ -141,7 +151,10 @@ const AddExecSubTaskDetails = ({ task, subtask, openDialog, onDialogClose, dialo
                     if (response.code === 200) {
                         setLoading(false)
                         toast.push(<Notification closable type='success' duration={2000}>Task Added Successfully</Notification>)
-                        window.location.reload()
+                        onDialogClose()
+                        if (onAddSuccess) {
+                            onAddSuccess()
+                        }
                     } else {
                         setLoading(false)
                         toast.push(<Notification closable type='danger' duration={2000}>{response.errorMessage}</Notification>)

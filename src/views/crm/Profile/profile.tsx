@@ -61,13 +61,26 @@ const Profile = ({ data }: ProfileProps) => {
         formData.append('user_name', usernameData)
         formData.append('org_id', org_id)
 
-        const response = await addProfilePhoto(formData)
-
-        setAvatarUrl(data?.avatar)
-        toast.push(<Notification title={'Profile updated'} type="success" />, {
-            placement: 'top-center',
-        })
-        window.location.reload()
+        try {
+            const response = await addProfilePhoto(formData)
+            
+            // The avatar URL is already updated in the state from file selection
+            // Just show success message and update localStorage
+            toast.push(<Notification title={'Profile updated successfully'} type="success" duration={3000} closable />, {
+                placement: 'top-center',
+            })
+            
+            // Update localStorage with the new username
+            if (usernameData) {
+                localStorage.setItem('userName', usernameData)
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error)
+            toast.push(<Notification title={'Failed to update profile'} type="danger" duration={3000} closable />, {
+                placement: 'top-center',
+            })
+        }
+        
         setSubmitting(false)
     }
 

@@ -10,8 +10,16 @@ import { useLocation } from 'react-router-dom'
 import { setUser } from '@/store'
 import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
 
+interface AddExecSubTaskProps {
+    task: any;
+    openDialog: () => void;
+    onDialogClose: () => void;
+    dialogIsOpen: boolean;
+    setIsOpen: (open: boolean) => void;
+    onAddSuccess?: () => void;
+}
 
-const AddExecSubTask = ({task, openDialog, onDialogClose, dialogIsOpen, setIsOpen}:any) => {
+const AddExecSubTask = ({task, openDialog, onDialogClose, dialogIsOpen, setIsOpen, onAddSuccess}: AddExecSubTaskProps) => {
 
     // const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -72,7 +80,10 @@ const handleChange = (value: string) => {
                                 toast.push(
                                     <Notification closable type='success' duration={2000}>Task Added Successfully</Notification>
                                 )
-                                window.location.reload()
+                                onDialogClose()
+                                if (onAddSuccess) {
+                                    onAddSuccess()
+                                }
                             }
                             else{
                                 setLoading(false)

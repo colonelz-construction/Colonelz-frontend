@@ -11,7 +11,7 @@ import { setUser } from '@/store'
 import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
 
 
-const EditExecTask = ({ task, dialogIsOpen, setIsOpen, openDialog, onDialogClose }: any) => {
+const EditExecTask = ({ task, dialogIsOpen, setIsOpen, openDialog, onDialogClose, onUpdateSuccess }: any) => {
 
     // const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -71,9 +71,21 @@ const EditExecTask = ({ task, dialogIsOpen, setIsOpen, openDialog, onDialogClose
                         if (response.code === 200) {
                             setLoading(false)
                             toast.push(
-                                <Notification closable type='success' duration={2000}>Task Added Successfully</Notification>
+                                <Notification closable type='success' duration={2000}>Task Updated Successfully</Notification>
                             )
-                            window.location.reload()
+                            
+                            // Call the callback to update parent state instead of reloading
+                            if (onUpdateSuccess) {
+                                onUpdateSuccess(task?.task_id, {
+                                    task_name: values.task_name,
+                                    start_date: values.start_date,
+                                    end_date: values.end_date,
+                                    color: bgColor || task?.color
+                                });
+                            }
+                            
+                            // Close the dialog
+                            onDialogClose()
                         }
                         else {
                             setLoading(false)

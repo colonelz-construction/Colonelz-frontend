@@ -8,13 +8,13 @@ import * as Yup from 'yup'
 import { useLocation } from 'react-router-dom'
 import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
 
-const EditExecSubTask = ({ task, subtask, openDialog, onDialogClose, dialogIsOpen, setIsOpen }: any) => {
+const EditExecSubTask = ({ task, subtask, openDialog, onDialogClose, dialogIsOpen, setIsOpen, onUpdateSuccess }: any) => {
     const [loading, setLoading] = useState(false)
     const location = useLocation()
     const queryParams = new URLSearchParams(location.search)
     const project_id = queryParams.get('project_id')
     const org_id = localStorage.getItem('orgId')
-    const [bgColor, setBgColor] = useState<any>("")
+    const [bgColor, setBgColor] = useState<any>(subtask?.color || "")
 
     const handleChange = (value: string) => {
         setBgColor(value)
@@ -55,14 +55,26 @@ const EditExecSubTask = ({ task, subtask, openDialog, onDialogClose, dialogIsOpe
                     })}
                     onSubmit={async (values, actions) => {
                         setLoading(true)
-                        const val = { ...values, color: bgColor }
+                        const val = { ...values, color: bgColor || values.color }
                         const response = await apiUpdateCrmExecSubTask(val)
                         if (response.code === 200) {
                             setLoading(false)
                             toast.push(
-                                <Notification closable type='success' duration={2000}>Task Added Successfully</Notification>
+                                <Notification closable type='success' duration={2000}>Subtask Updated Successfully</Notification>
                             )
-                            window.location.reload()
+                            
+                            // Call the callback to update parent state instead of reloading
+                            if (onUpdateSuccess) {
+                                onUpdateSuccess(task?.task_id, subtask?.sub_task_id, {
+                                    sub_task_name: values.subtask_name,
+                                    sub_task_start_date: values.subtask_start_date,
+                                    sub_task_end_date: values.subtask_end_date,
+                                    color: bgColor || values.color
+                                });
+                            }
+                            
+                            // Close the dialog
+                            onDialogClose()
                         } else {
                             setLoading(false)
                             toast.push(
@@ -129,8 +141,12 @@ const EditExecSubTask = ({ task, subtask, openDialog, onDialogClose, dialogIsOpe
                                         <Field name='color'>
                                             {({ field }: any) => (
                                                 <SelectWithBg
-                                                    onChange={handleChange}
-                                                    placeholder={field.value}
+                                                    onChange={(value) => {
+                                                        handleChange(value);
+                                                        setFieldValue('color', value);
+                                                    }}
+                                                    value={bgColor || field.value}
+                                                    placeholder={bgColor || field.value || "Select..."}
                                                 />
                                             )}
                                         </Field>

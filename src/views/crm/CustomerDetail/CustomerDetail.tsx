@@ -119,6 +119,16 @@ const CustomerDetail = () => {
     fetchData();
   }, []);
 
+  // Function to refresh execution data
+  const refreshExecData = async () => {
+    try {
+      const exec = await apiGetCrmExecutionTask(allQueryParams.project_id);
+      setExecData(exec.data);
+    } catch (error) {
+      console.error('Error refreshing exec data:', error);
+    }
+  };
+
   useEffect(() => {
     if (!quotationAccess) return;
 
@@ -299,7 +309,7 @@ const CustomerDetail = () => {
                 <Assignee data={data} />
               </TabContent>
               <TabContent value="exectimeline">
-                <ExexutionTimeline execData={execData} />
+                <ExexutionTimeline execData={execData} onRefreshData={refreshExecData} />
               </TabContent>
 
             </div>

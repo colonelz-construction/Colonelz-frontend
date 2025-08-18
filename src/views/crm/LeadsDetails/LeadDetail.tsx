@@ -6,9 +6,9 @@ import { injectReducer } from '@/store'
 import useQuery from '@/utils/hooks/useQuery'
 import { useLocation, useNavigate } from 'react-router-dom';
 import LeadForm from './components/LeadForm'
-import { Button, Card, Dialog, Dropdown, Notification, Skeleton, Steps, Tabs, toast } from '@/components/ui'
 import CustomerProfile from './components/LeadProfile'
-import { apiDeleteInactiveLead, apiGetCrmLeadsDetails, apiGetCrmLeadsTaskData, apiGetCrmLeadsUpdates, apiGetCrmSingleLeadReport, apiGetCrmUsersAssociatedToLead } from '@/services/CrmService'
+import { Button, Card, Dialog, Dropdown, FormItem, Input, Notification, Skeleton, Steps, Tabs, toast } from '@/components/ui'
+import { apiDeleteInactiveLead, apiGetCrmLeadsDetails, apiGetCrmLeadsTaskData, apiGetCrmLeadsUpdates, apiGetCrmSingleLeadReport, apiGetCrmUsersAssociatedToLead, apiLeadsAnotherProject } from '@/services/CrmService'
 import TabList from '@/components/ui/Tabs/TabList'
 import TabNav from '@/components/ui/Tabs/TabNav'
 import TabContent from '@/components/ui/Tabs/TabContent'
@@ -21,10 +21,15 @@ import { Link } from 'react-router-dom'
 import { AuthorityCheck, ConfirmDialog } from '@/components/shared'
 import { useRoleContext } from '../Roles/RolesContext'
 import { Lead } from '../LeadList/store/LeadContext'
-import  AddedUser  from './components/AddedUser'
+import AddedUser from './components/AddedUser'
 import AddUserToLead from './components/AddUserToLead'
 import LeadTask from './components/LeadTask'
 import { fetchData } from '../FileManager/Components/data';
+import { AddProject } from './components/LeadProfile'
+import { Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
+import DateTimepicker from '@/components/ui/DatePicker/DateTimepicker'
+
 
 export type LeadDetailsResponse = {
     code: number;
@@ -54,7 +59,7 @@ const CustomerDetail = () => {
         }
     }
     const urlParams = new URLSearchParams(window.location.search);
-    const myParam = urlParams.get('id');
+    const myParam = urlParams.get('id') || '';
     const [details, setDetails] = useState<any | null>(null);
     const role = localStorage.getItem('role')
     const [loading, setLoading] = useState(true)
@@ -64,40 +69,43 @@ const CustomerDetail = () => {
     const [dialogIsOpen3, setIsOpen3] = useState(false)
     const [dialogIsOpen4, setIsOpen4] = useState(false)
     const [dialogIsOpen5, setIsOpen5] = useState(false)
+    const [isOpen6, setIsOpen6] = useState(false);
+    const [dialogIsOpen7, setIsOpen7] = useState(false)
+    const [project, setProject] = useState<AddProject>()
+
     const [leadData, setLeadData] = useState<any>([])
 
-    const [isOpen6, setIsOpen6] = useState(false);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const [closeTimeout, setCloseTimeout] = useState<NodeJS.Timeout | null>(null);
 
     const handleMouseEnter = () => {
-    if (closeTimeout) {
-        clearTimeout(closeTimeout);
-        setCloseTimeout(null);
-    }
-    setIsOpen6(true);
-};
-
-const handleMouseLeave = () => {
-    const timeout = setTimeout(() => {
-        setIsOpen6(false);
-    }, 300); // 300ms delay - adjust as needed
-    setCloseTimeout(timeout);
-};
-
-// Add cleanup effect
-useEffect(() => {
-    return () => {
         if (closeTimeout) {
             clearTimeout(closeTimeout);
+            setCloseTimeout(null);
         }
+        setIsOpen6(true);
     };
-}, [closeTimeout]);
+
+    const handleMouseLeave = () => {
+        const timeout = setTimeout(() => {
+            setIsOpen6(false);
+        }, 300); // 300ms delay - adjust as needed
+        setCloseTimeout(timeout);
+    };
+
+    // Add cleanup effect
+    useEffect(() => {
+        return () => {
+            if (closeTimeout) {
+                clearTimeout(closeTimeout);
+            }
+        };
+    }, [closeTimeout]);
 
 
-      
-    
+
+
     const [task, setTask] = useState<any>([])
 
     const openDialog1 = () => {
@@ -145,92 +153,100 @@ useEffect(() => {
         setIsOpen5(true)
     }
 
-    const onDialogClose5 = () => {
+    const openDialog7 = () => {
+        setIsOpen7(true)
+        setProject({ lead_id: myParam, user_id: localStorage.getItem('userId'), type: 'true', org_id })
+    }
 
+    const onDialogClose7 = () => {
+        setIsOpen7(false)
+    }
+
+    const onDialogClose5 = () => {
         setIsOpen5(false)
     }
-    
+
 
     // const navigate = useNavigate();
 
     interface QueryParams {
-      type:string
-    
+        type: string
+
     }
     const queryParams = new URLSearchParams(location.search);
 
     const allQueryParams: QueryParams = {
-      type: queryParams.get('tab') || '',
+        type: queryParams.get('tab') || '',
     };
 
-    const handleTabChange = (selectedTab:any) => {
-      const currentUrlParams = new URLSearchParams(location.search);
-      currentUrlParams.set('tab', selectedTab);
-      navigate(`${location.pathname}?${currentUrlParams.toString()}`);
-  };
+    const handleTabChange = (selectedTab: any) => {
+        const currentUrlParams = new URLSearchParams(location.search);
+        currentUrlParams.set('tab', selectedTab);
+        navigate(`${location.pathname}?${currentUrlParams.toString()}`);
+    };
 
-  const inactiveLead = async () => {
+    const inactiveLead = async () => {
 
-    const values :any = {
-        userId: localStorage.getItem('userId') || '',
-        org_id,
-        lead_id: myParam,
-        status: 'Inactive',
-        date: new Date(),
-        content: '',
-        createdBy: 'ADMIN'
-      }
-
-    try {
-
-        const response=await apiGetCrmLeadsUpdates(values)
-        if(response.code===200){
-          
-          toast.push(
-            <Notification type='success' duration={2000} closable>
-              Lead Status Updated Successfully
-            </Notification>
-          )
-          window.location.reload()
+        const values: any = {
+            userId: localStorage.getItem('userId') || '',
+            org_id,
+            lead_id: myParam,
+            status: 'Inactive',
+            date: new Date(),
+            content: '',
+            createdBy: 'ADMIN'
         }
-        else{
-          toast.push(
-            <Notification type='danger' duration={2000} closable>
-              Error Updating Lead
-            </Notification>
-          )
-        }
-        
-    } catch (error:any) {
 
-        console.log(error)
-
-        throw new Error(error)
-        
-    }
-
-    
-
-  }
-
-
-  const org_id = localStorage.getItem('orgId')
-
-  const [report, setReport] = useState<any>([])
-
-  useEffect(() => {
-    const fetchData = async () => {
         try {
-            const Report = await apiGetCrmSingleLeadReport(myParam);
-            setReport(Report)
-            
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            
+
+            const response = await apiGetCrmLeadsUpdates(values)
+            if (response.code === 200) {
+
+                toast.push(
+                    <Notification type='success' duration={2000} closable>
+                        Lead Status Updated Successfully
+                    </Notification>
+                )
+                window.location.reload()
+            }
+            else {
+                toast.push(
+                    <Notification type='danger' duration={2000} closable>
+                        Error Updating Lead
+                    </Notification>
+                )
+            }
+
+        } catch (error: any) {
+
+            console.log(error)
+
+            throw new Error(error)
+
         }
+
+
+
     }
-    fetchData();
-  }, [myParam])
+
+
+    const org_id = localStorage.getItem('orgId')
+
+    const [report, setReport] = useState<any>([])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const Report = await apiGetCrmSingleLeadReport(myParam);
+                setReport(Report)
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+
+            }
+        }
+        fetchData();
+    }, [myParam])
 
 
     useEffect(() => {
@@ -252,10 +268,10 @@ useEffect(() => {
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (
-            buttonRef.current && !buttonRef.current.contains(event.target as Node) &&
-            dropdownRef.current && !dropdownRef.current.contains(event.target as Node)
+                buttonRef.current && !buttonRef.current.contains(event.target as Node) &&
+                dropdownRef.current && !dropdownRef.current.contains(event.target as Node)
             ) {
-            setIsOpen(false);
+                setIsOpen(false);
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -286,17 +302,26 @@ useEffect(() => {
 
         fetchDataAndLog()
     }, [])
-
     const lead = details?.data?.[0];
+    const { roleData } = useRoleContext()
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const goToPrevious = () => {
+        setCurrentIndex(prev => (prev === 0 ? lead?.lead_details?.length - 1 : prev - 1));
+    };
+
+    const goToNext = () => {
+        setCurrentIndex(prev => (prev === lead?.lead_details?.length - 1 ? 0 : prev + 1));
+    };
+    const currentLead = lead?.lead_details?.length > 0 && lead?.lead_details[currentIndex];
+    const createProjectAccess = role === 'SUPERADMIN' ? true : roleData?.data?.project?.create?.includes(`${role}`)
     // console.log(details?.data[0].notes)
     const notes = details?.data[0].notes?.reverse()
     // console.log("reveerse", notes)
-    const { roleData } = useRoleContext()
 
-    const contractAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.contract?.read?.includes(`${role}`)
-    const leadDeleteAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.lead?.delete?.includes(`${role}`)
-    const leadUpdateAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.lead?.update?.includes(`${role}`)
-    const taskReadAccess = role === 'SUPERADMIN' ? true :  roleData?.data?.leadtask?.read?.includes(`${localStorage.getItem('role')}`)
+    const contractAccess = role === 'SUPERADMIN' ? true : roleData?.data?.contract?.read?.includes(`${role}`)
+    const leadDeleteAccess = role === 'SUPERADMIN' ? true : roleData?.data?.lead?.delete?.includes(`${role}`)
+    const leadUpdateAccess = role === 'SUPERADMIN' ? true : roleData?.data?.lead?.update?.includes(`${role}`)
+    const taskReadAccess = role === 'SUPERADMIN' ? true : roleData?.data?.leadtask?.read?.includes(`${localStorage.getItem('role')}`)
 
 
     const handleDeleteInactiveLead = async () => {
@@ -340,7 +365,7 @@ useEffect(() => {
                     <Dropdown renderTitle={Toggle} placement='middle-end-top' >
                         <AuthorityCheck
                             userAuthority={[`${localStorage.getItem('role')}`]}
-                            authority={ role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.update ?? []}
+                            authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.update ?? []}
                         >
                             <Dropdown.Item eventKey="c" onClick={() => openDialog()}><div >Edit Lead</div></Dropdown.Item>
                             <Dropdown.Item eventKey="a" onClick={() => openDialog1()}><div >Add Follow-Up</div></Dropdown.Item>
@@ -355,6 +380,29 @@ useEffect(() => {
                                 </Link>
                             </Dropdown.Item>
                         </AuthorityCheck>
+
+                        <AuthorityCheck
+                            userAuthority={[`${localStorage.getItem('role')}`]}
+                            authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.create ?? []}
+                        >
+                            {
+                                createProjectAccess && lead?.contract_Status && <>
+                                    {lead?.project ? (
+                                        <Dropdown.Item eventKey="a">
+                                            <span onClick={() => openDialog7()}>Add Another Project</span>
+                                        </Dropdown.Item>
+                                    ) : (
+                                        <Dropdown.Item eventKey="b">
+                                            <Link
+                                                to={`/app/crm/lead-project/?id=${myParam}&name=${currentLead?.name}&email=${currentLead?.email}&phone=${currentLead?.phone}&location=${currentLead?.location}`}
+                                            >
+                                                Create Project
+                                            </Link>
+                                        </Dropdown.Item>
+                                    )}
+                                </>}
+                        </AuthorityCheck>
+
                         {lead?.lead_status == "Inactive" && leadDeleteAccess && <AuthorityCheck
                             userAuthority={[`${localStorage.getItem('role')}`]}
                             authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.delete ?? []}
@@ -393,36 +441,50 @@ useEffect(() => {
                             </div>
 
                             {isOpen6 && (
+
                                 <div
-                                    ref={dropdownRef}
-                                    className="absolute left-14 transform -translate-x-full mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-50"
+                                    className="relative"
                                     onMouseEnter={handleMouseEnter}
                                     onMouseLeave={handleMouseLeave}
                                 >
-                                    <ul className="py-2">
-                                        <li 
-                                            className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                                    <div className='flex gap-3 justify-between items-center'>
+                                        <span>Design View</span>
+                                        <span><GoChevronDown /></span>
+                                    </div>
+
+                                    {isOpen6 && (
+                                        <div
+                                            ref={dropdownRef}
+                                            className="absolute left-14 transform -translate-x-full mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-50"
                                             onMouseEnter={handleMouseEnter}
+                                            onMouseLeave={handleMouseLeave}
                                         >
-                                            <Link 
-                                                to={`/app/crm/leads/blueprint?lead_id=${myParam}`}
-                                                className="block w-full h-full"
-                                            >
-                                                2D View
-                                            </Link>
-                                        </li>
-                                        <li 
-                                            className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                                            onMouseEnter={handleMouseEnter}
-                                        >
-                                            <Link 
-                                                to={`/app/crm/visualizer?lead_id=${myParam}`}
-                                                className="block w-full h-full"
-                                            >
-                                                3D View
-                                            </Link>
-                                        </li>
-                                    </ul>
+                                            <ul className="py-2">
+                                                <li
+                                                    className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                                                    onMouseEnter={handleMouseEnter}
+                                                >
+                                                    <Link
+                                                        to={`/app/crm/leads/blueprint?lead_id=${myParam}`}
+                                                        className="block w-full h-full"
+                                                    >
+                                                        2D View
+                                                    </Link>
+                                                </li>
+                                                <li
+                                                    className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                                                    onMouseEnter={handleMouseEnter}
+                                                >
+                                                    <Link
+                                                        to={`/app/crm/visualizer?lead_id=${myParam}`}
+                                                        className="block w-full h-full"
+                                                    >
+                                                        3D View
+                                                    </Link>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -458,71 +520,71 @@ useEffect(() => {
             <div className='w-full'>
                 {/* <CustomerProfile data={lead} /> */}
                 {/* <Card className='w-full h-full' > */}
-                    <Tabs defaultValue={allQueryParams.type} onChange={handleTabChange}>
-                        <TabList>
-                            <TabNav value="Details" >
-                                Details
+                <Tabs defaultValue={allQueryParams.type} onChange={handleTabChange}>
+                    <TabList>
+                        <TabNav value="Details" >
+                            Details
+                        </TabNav>
+                        <TabNav value="Actions" >
+                            Follow-ups
+                        </TabNav>
+                        {contractAccess &&
+                            <TabNav value="Contract" >
+                                Contract
+                            </TabNav>}
+                        <TabNav value="Tasks" >
+                            Internal Task Manager
+                        </TabNav>
+                        {['ADMIN', 'SUPERADMIN'].includes(localStorage.getItem('role') || '') &&
+                            <TabNav value="Activity" >
+                                Lead Activity
                             </TabNav>
-                            <TabNav value="Actions" >
-                                Follow-ups
-                            </TabNav>
-                            {contractAccess &&
-                                <TabNav value="Contract" >
-                                    Contract
-                                </TabNav>}
-                                <TabNav value="Tasks" >
-                                Internal Task Manager
-                            </TabNav>
-                            {['ADMIN', 'SUPERADMIN'].includes(localStorage.getItem('role') || '') &&
-                                <TabNav value="Activity" >
-                                    Lead Activity
-                                </TabNav>
-                            }
+                        }
 
-                            {someAccess &&
-                                <TabNav value="AddedUser" className='flex gap-1'>
-                                    <span>{"Assignee "}</span> 
-                                    <span className={leadData.filter((lead:any) => lead.role !== "ADMIN" && lead.role !== "Senior Architect")?.length == 0 ? `text-red-500` :  ''}> {` (${leadData.filter((lead:any) => lead.role !== "ADMIN" && lead.role !== "Senior Architect")?.length})`}</span>
-                                </TabNav>}
-                        </TabList>
-                        <div className="p-4">
+                        {someAccess &&
+                            <TabNav value="AddedUser" className='flex gap-1'>
+                                <span>{"Assignee "}</span>
+                                <span className={leadData.filter((lead: any) => lead.role !== "ADMIN" && lead.role !== "Senior Architect")?.length == 0 ? `text-red-500` : ''}> {` (${leadData.filter((lead: any) => lead.role !== "ADMIN" && lead.role !== "Senior Architect")?.length})`}</span>
+                            </TabNav>}
+                    </TabList>
+                    <div className="p-4">
 
-                            <TabContent value="Details">
-                                <div className='h-[30rem] overflow-y-auto' style={{ scrollbarWidth: 'none' }}>
+                        <TabContent value="Details">
+                            <div className='h-[30rem] overflow-y-auto' style={{ scrollbarWidth: 'none' }}>
                                 <CustomerProfile data={lead} report={report} />
-                                </div>
-                            </TabContent>
+                            </div>
+                        </TabContent>
 
-                            
-                            <TabContent value="Actions">
-                                <div className='h-[18rem] overflow-y-auto' style={{ scrollbarWidth: 'none' }}>
+
+                        <TabContent value="Actions">
+                            <div className='h-[18rem] overflow-y-auto' style={{ scrollbarWidth: 'none' }}>
 
                                 <FollowDetails details={notes} />
-                                </div>
-                            </TabContent>
-                            <TabContent value="Contract">
-                                <Contract leadData={leadData} />
-                            </TabContent>
+                            </div>
+                        </TabContent>
+                        <TabContent value="Contract">
+                            <Contract leadData={leadData} />
+                        </TabContent>
 
-                            { taskReadAccess &&
+                        {taskReadAccess &&
                             <TabContent value="Tasks">
                                 <div className='h-[18rem] overflow-y-auto' style={{ scrollbarWidth: 'none' }}>
-                                <LeadTask task={task} users={leadData} />
+                                    <LeadTask task={task} users={leadData} />
                                 </div>
                             </TabContent>
 
-                            }
+                        }
 
 
-                            <TabContent value="Activity">
-                                <LeadActivity details={details} />
-                            </TabContent>
+                        <TabContent value="Activity">
+                            <LeadActivity details={details} />
+                        </TabContent>
 
-                            <TabContent value="AddedUser">
-                                <AddedUser leadData={leadData} openDialog3={openDialog3}  />
-                            </TabContent>
-                        </div>
-                    </Tabs>
+                        <TabContent value="AddedUser">
+                            <AddedUser leadData={leadData} openDialog3={openDialog3} />
+                        </TabContent>
+                    </div>
+                </Tabs>
                 {/* </Card> */}
             </div>
 
@@ -595,6 +657,176 @@ useEffect(() => {
                 onRequestClose={onDialogClose4}>
                 <p> Are you sure you want to make this lead Inactive? </p>
             </ConfirmDialog>
+
+            <Dialog
+                isOpen={dialogIsOpen7}
+                onClose={onDialogClose7}
+                onRequestClose={onDialogClose7}
+            >
+                <>
+                    <h3 className='mb-3'>Update Latest Details</h3>
+                    <Formik
+                        initialValues={{
+                            user_id: localStorage.getItem('userId') || '',
+                            org_id,
+                            lead_id: myParam,
+                            lead_name: currentLead?.name,
+                            email: currentLead?.email,
+                            date: new Date(currentLead?.date),
+                            phone: currentLead?.phone,
+                            location: currentLead?.location,
+                            source: currentLead?.source,
+                            lead_manager: currentLead?.lead_manager,
+                        }}
+                        validationSchema={Yup.object().shape({
+                            lead_name: Yup.string().required('Lead Name is required'),
+                            email: Yup.string().email('Invalid email').required('Email is required'),
+                            phone: Yup.string()
+                                .required('Phone is required')
+                                .matches(/^[0-9]*$/, 'Phone number must be numeric')
+                                .length(10, 'Phone number must be exactly 10 digits'),
+                            location: Yup.string().required('Location is required'),
+                            source: Yup.string(),
+                            lead_manager: Yup.string().required('Lead Manager is required'),
+
+                        })}
+                        onSubmit={async (values: any, { setSubmitting }) => {
+                            setSubmitting(true);
+                            console.log(values, "values");
+                            values.date = `${values.date}`;
+                            const submissionData = {
+                                ...values,
+                                lead_id: myParam,
+                                type: 'true',
+                            };
+
+                            const response = await apiLeadsAnotherProject(submissionData);
+                            if (response.code === 200) {
+                                toast.push(
+                                    <Notification type='success' duration={2000} closable>
+                                        Lead Details updated for Another Project
+                                    </Notification>
+                                );
+                                window.location.reload();
+                            } else {
+                                toast.push(
+                                    <Notification type='danger' duration={2000} closable>
+                                        Some Error Occured
+                                    </Notification>
+                                );
+                            }
+                            setSubmitting(false);
+                        }}
+                    >
+                        {({ values, isSubmitting, errors, touched }: any) => (
+                            <Form className='max-h-96 overflow-y-auto'>
+                                <FormItem label='Lead Name'
+                                    asterisk={true}
+                                    invalid={errors.lead_name && touched.lead_name}
+                                    errorMessage={errors.lead_name}
+
+                                >
+                                    <Field component={Input} name='lead_name' placeholder='Enter Lead Name' />
+                                </FormItem>
+
+                                <FormItem label='Email'
+                                    asterisk={true}
+                                    invalid={errors.email && touched.email}
+                                    errorMessage={errors.email}
+                                >
+                                    <Field component={Input} name='email' placeholder='Enter Email' />
+                                </FormItem>
+
+                                <FormItem label='Phone'
+                                    asterisk
+                                    invalid={errors.phone && touched.phone}
+                                    errorMessage={errors.phone}
+                                >
+                                    <Field name='phone' placeholder=''>
+                                        {({ field, form }: any) => (
+                                            <Input
+                                                maxLength={10}
+                                                value={field.value}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    if (value.length <= 10 && /^[0-9]*$/.test(value)) {
+                                                        form.setFieldValue(field.name, value);
+                                                    }
+                                                }}
+                                                onKeyPress={(e) => {
+                                                    const charCode = e.which ? e.which : e.keyCode;
+                                                    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
+                                            />
+                                        )}
+                                    </Field>
+                                </FormItem>
+
+                                <FormItem label='Location'
+                                    asterisk
+                                    invalid={errors.location && touched.location}
+                                    errorMessage={errors.location}
+                                >
+                                    <Field component={Input} name='location' placeholder='Enter location' />
+                                </FormItem>
+
+                                <FormItem label='Source'
+
+                                // invalid={errors.source && touched.source}
+                                // errorMessage={errors.source}
+                                >
+                                    <Field component={Input} name='source' placeholder='Enter Source' />
+                                </FormItem>
+
+                                <FormItem
+                                    label='Lead Manager'
+                                    asterisk
+                                    invalid={errors.lead_manager && touched.lead_manager}
+                                    errorMessage={errors.lead_manager}
+                                >
+                                    <Field name='lead_manager' placeholder='Enter lead manager'>
+                                        {({ field, form }: any) => (
+                                            <Input
+                                                {...field}
+                                                value={field.value}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    // Regex to allow only letters and spaces
+                                                    if (/^[A-Za-z\s]*$/.test(value)) {
+                                                        form.setFieldValue(field.name, value);
+                                                    }
+                                                }}
+                                            />
+                                        )}
+                                    </Field>
+                                </FormItem>
+
+                                <FormItem label='Created Date'
+                                    asterisk
+                                    invalid={errors.date && touched.date}
+                                    errorMessage={errors.date}
+                                >
+                                    <Field name='date'>
+                                        {({ field, form }: any) => (
+                                            <DateTimepicker
+                                                maxDate={new Date()}
+                                                value={field.value}
+                                                onChange={(date) => form.setFieldValue('date', date)}
+                                            />
+                                        )}
+                                    </Field>
+                                </FormItem>
+
+                                <Button variant='solid' block loading={isSubmitting} type='submit'>
+                                    {isSubmitting ? 'Submitting...' : 'Submit'}
+                                </Button>
+                            </Form>
+                        )}
+                    </Formik>
+                </>
+            </Dialog>
 
 
         </>

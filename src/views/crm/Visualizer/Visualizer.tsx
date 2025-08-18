@@ -1,6 +1,3 @@
-//visualizer.tsx
-
-
 
 import React, { useEffect, useState } from 'react'
 import Second from './Second'
@@ -31,15 +28,20 @@ const Visualizer = () => {
   const [currentImage, setCurrentImage] = useState<any>({});
   // console.log(currentImage)
 
+  console.log("set data from visualizer : ", data);
+
   useEffect(() => {
 
     const fetchData = async() => {
       setMainLoading(true);
-
       try {
+        const res = await apiGetCrmMainThreeImage('main', '', leadId, projectId);
+        console.log("project id and leadid : ", res);
+        setData(res?.data);
+
 
         // Fetch main images
-        const mainRes = await apiGetCrmMainThreeImage('main', '', leadId, projectId);
+        {/* const mainRes = await apiGetCrmMainThreeImage('main', '', leadId, projectId);
         // Fetch hotspot images
         const hotspotRes = await apiGetCrmMainThreeImage('hp', '', leadId, projectId);
 
@@ -54,16 +56,14 @@ const Visualizer = () => {
         const allImages = Array.from(allImagesMap.values());
 
         setData(allImages);
+*/}
         setMainLoading(false);
         
       } catch (error:any) {
         setMainLoading(false);
         throw new Error(error);
-        
       }
-
     }
-
     fetchData();
 
   }, [leadId, projectId])
@@ -88,7 +88,6 @@ const Visualizer = () => {
       </div>
 
       <div className='border-b-[0.12rem] mb-3'></div>
-  
 
       <div className='flex gap-2'>
         

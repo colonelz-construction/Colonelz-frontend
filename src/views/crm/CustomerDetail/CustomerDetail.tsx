@@ -20,7 +20,13 @@ import { FileItemType } from './Quotation/Quotations'
 import Assignee, { UsersResponse } from './Project Progress/Assignee'
 import { update } from 'lodash'
 import { GoChevronDown } from 'react-icons/go'
+
+import PdfTextLinker from '../PdfTextLinkerProject'
+import Visualizer from '../Visualizer/Visualizer'
+// import ExexutionTimeline from './Project Progress/ExexutionTimeline'
+
 import ExexutionTimeline from './Project Progress/ExexutionTimeline'
+
 
 
 export type QuotationResponseType = {
@@ -181,8 +187,8 @@ const CustomerDetail = () => {
 
     fetchDataAndLog();
   }, [allQueryParams.project_id, taskAccess]);
+
   const Toggle =
-  
           <Button variant='solid' size='sm' className='flex justify-center items-center gap-2'>
               <span>Design View</span><span><GoChevronDown /></span></Button>
 
@@ -241,7 +247,8 @@ const CustomerDetail = () => {
               </AuthorityCheck>} */}
           </Dropdown>
 
-      </span>
+
+   </span>
       <div>
 
 
@@ -277,8 +284,34 @@ const CustomerDetail = () => {
                     <span className={data?.length == 0 ? "text-red-500" : ""}>{"("}{data?.length}{")"}</span>
                   </TabNav>
                 }
+                {
+                  <TabNav value="2dview" className='flex gap-1'>
+                    <AuthorityCheck
+                    userAuthority={[`${localStorage.getItem('role')}`]}
+                    authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
+                   >
+                      {/* <Link to={`/app/crm/projects/blueprint?project_id=${allQueryParams.project_id}`}> */}
+                      2D View
+                    {/* </Link> */}
 
-                
+                   </AuthorityCheck>
+                  </TabNav>
+                }
+                {
+                  <TabNav value="3dview" className='flex gap-1'>
+                    <AuthorityCheck
+                        userAuthority={[`${localStorage.getItem('role')}`]}
+                        authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
+                    >
+                        {/* <Dropdown.Item eventKey="g">*/}
+                          {/* <Link to={`/app/crm/visualizer?project_id=${allQueryParams.project_id}`}> */}
+                          3D View
+                          {/* </Link> */}
+                        {/* </Dropdown.Item> */}
+
+                    </AuthorityCheck>
+                  </TabNav>
+                }
               </>
 
             </TabList>
@@ -308,8 +341,15 @@ const CustomerDetail = () => {
               <TabContent value="assignee">
                 <Assignee data={data} />
               </TabContent>
-              <TabContent value="exectimeline">
+               <TabContent value="exectimeline">
                 <ExexutionTimeline execData={execData} onRefreshData={refreshExecData} />
+              </TabContent>
+
+              <TabContent value="2dview">
+                <PdfTextLinker/>
+              </TabContent>
+              <TabContent value="3dview">
+                <Visualizer/> 
               </TabContent>
 
             </div>

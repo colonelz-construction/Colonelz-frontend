@@ -352,9 +352,11 @@ const CustomerDetail = () => {
     }
 
     const Toggle =
-
         <Button variant='solid' size='sm' className='flex justify-center items-center gap-4'>
-            <span>Actions</span><span><GoChevronDown /></span></Button>
+            <span>Actions</span>
+            <span><GoChevronDown /></span>
+        </Button>
+
     return (
         <>
             <div className='flex justify-between'>
@@ -372,7 +374,11 @@ const CustomerDetail = () => {
                             userAuthority={[`${localStorage.getItem('role')}`]}
                             authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.contract?.create ?? []}
                         >
-                            <Dropdown.Item eventKey="b"><Link to={`/app/crm/contract?lead_id=${myParam}`}>Create Contract</Link></Dropdown.Item>
+                            <Dropdown.Item eventKey="b">
+                                <Link to={`/app/crm/contract?lead_id=${myParam}`}>
+                                Create Contract
+                                </Link>
+                            </Dropdown.Item>
                         </AuthorityCheck>
 
                         <AuthorityCheck
@@ -416,7 +422,26 @@ const CustomerDetail = () => {
                             userAuthority={[`${localStorage.getItem('role')}`]}
                             authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.read ?? []}
                         >
-                            <Dropdown.Item eventKey="design">
+
+                            <Dropdown.Item
+                                eventKey="d"
+                            >
+                               <Link to={`/app/crm/leads/blueprint?lead_id=${myParam}`}>2D View</Link>
+                            </Dropdown.Item>                      
+
+                          {/*                         <Dropdown.Item eventKey="design">
+                        <div
+                            className="relative"
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            <div className='flex gap-3 justify-between items-center'>
+                                <span>Design View</span>
+                                <span><GoChevronDown /></span>
+                            </div>
+
+                            {isOpen6 && (
+
                                 <div
                                     className="relative"
                                     onMouseEnter={handleMouseEnter}
@@ -461,10 +486,20 @@ const CustomerDetail = () => {
                                         </div>
                                     )}
                                 </div>
+                            )}
+                        </div>
+                    </Dropdown.Item> */}
+
+
+                        </AuthorityCheck>}
+
+                        {<AuthorityCheck
+                            userAuthority={[`${localStorage.getItem('role')}`]}
+                            authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.read ?? []}
+                        >
+                            <Dropdown.Item eventKey="h">
+                                <Link to={`/app/crm/visualizer?lead_id=${myParam}`}>3D View</Link>
                             </Dropdown.Item>
-
-
-
                         </AuthorityCheck>}
                     </Dropdown>
                 </div>

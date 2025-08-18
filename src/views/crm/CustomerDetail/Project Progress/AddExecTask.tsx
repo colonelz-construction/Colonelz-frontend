@@ -11,8 +11,11 @@ import { setUser } from '@/store'
 import { ColorLevel } from '../../../../@types/theme';
 import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
 
+interface AddExecTaskProps {
+    onAddSuccess?: () => void;
+}
 
-const AddExecTask = () => {
+const AddExecTask = ({ onAddSuccess }: AddExecTaskProps) => {
 
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -77,7 +80,10 @@ const AddExecTask = () => {
                             toast.push(
                                 <Notification closable type='success' duration={2000}>Task Added Successfully</Notification>
                             )
-                            window.location.reload()
+                            onDialogClose()
+                            if (onAddSuccess) {
+                                onAddSuccess()
+                            }
                         }
                         else {
                             setLoading(false)
@@ -90,11 +96,6 @@ const AddExecTask = () => {
                     {({ values, errors, touched, setFieldValue }: any) => (
                         <Form className=' p-4 max-h-96 overflow-y-auto'>
                             <div className=' grid grid-cols-2 gap-x-5'>
-
-
-
-
-
 
                                 <FormItem label='Start Date'
                                     asterisk
@@ -139,14 +140,10 @@ const AddExecTask = () => {
                                 <FormItem label="Color" >
                                     <Field name='subtask_type'>
                                         {({ field }: any) => (
-
-                                            <SelectWithBg onChange={handleChange} />
-
+                                            <SelectWithBg onChange={handleChange} modalId="add-task-dialog" />
                                         )}
                                     </Field>
-
                                 </FormItem>
-
 
                             </div>
                             <div className='flex justify-end'>

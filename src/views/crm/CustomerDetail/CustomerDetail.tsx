@@ -20,9 +20,13 @@ import { FileItemType } from './Quotation/Quotations'
 import Assignee, { UsersResponse } from './Project Progress/Assignee'
 import { update } from 'lodash'
 import { GoChevronDown } from 'react-icons/go'
+
 import PdfTextLinker from '../PdfTextLinkerProject'
 import Visualizer from '../Visualizer/Visualizer'
 // import ExexutionTimeline from './Project Progress/ExexutionTimeline'
+
+import ExexutionTimeline from './Project Progress/ExexutionTimeline'
+
 
 
 export type QuotationResponseType = {
@@ -121,6 +125,16 @@ const CustomerDetail = () => {
     fetchData();
   }, []);
 
+  // Function to refresh execution data
+  const refreshExecData = async () => {
+    try {
+      const exec = await apiGetCrmExecutionTask(allQueryParams.project_id);
+      setExecData(exec.data);
+    } catch (error) {
+      console.error('Error refreshing exec data:', error);
+    }
+  };
+
   useEffect(() => {
     if (!quotationAccess) return;
 
@@ -183,7 +197,58 @@ const CustomerDetail = () => {
 
       <span className='flex justify-between'>
         <h3 className='pb-5 capitalize flex items-center'><span>Project-</span>{loading ? <Skeleton width={100} /> : projectData[0]?.project_name}</h3>
-      </span>
+
+            <Dropdown renderTitle={Toggle} placement='middle-end-top' >
+              
+              {<AuthorityCheck
+                  userAuthority={[`${localStorage.getItem('role')}`]}
+                  authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
+              >
+                  <Link to={`/app/crm/projects/blueprint?project_id=${allQueryParams.project_id}`}><Dropdown.Item eventKey="d">2D View</Dropdown.Item></Link>
+
+              </AuthorityCheck>}
+              {<AuthorityCheck
+                  userAuthority={[`${localStorage.getItem('role')}`]}
+                  authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
+              >
+                  <Link to={`/app/crm/visualizer?project_id=${allQueryParams.project_id}`}><Dropdown.Item eventKey="g">3D View</Dropdown.Item></Link>
+
+              </AuthorityCheck>}
+
+              {/* {<AuthorityCheck
+                  userAuthority={[`${localStorage.getItem('role')}`]}
+                  authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.read ?? []}
+              >
+              <Dropdown.Item
+                  eventKey="d"
+                  onMouseEnter={() => setIsOpen6(true)}
+                  onMouseLeave={() => setIsOpen6(false)}
+                  >
+                  <div className="relative">
+
+                      <div className='flex gap-3 justify-between items-center'>
+                          <span>Design View</span>
+                          <span><GoChevronDown /></span>
+                      </div>
+                      
+                      {isOpen6 && (
+                      <div
+                          ref={dropdownRef}
+                          className="absolute left-14 transform -translate-x-full mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg"
+                      >
+                          <ul className="py-2">
+                          <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/app/crm/leads/blueprint?lead_id=${myParam}`}>2D View</Link></li>
+                          <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/app/crm/visualizer?lead_id=${myParam}`}>3D View</Link></li>
+                          </ul>
+                      </div>
+                      )}
+                  </div>
+                  </Dropdown.Item>                      
+              </AuthorityCheck>} */}
+          </Dropdown>
+
+
+   </span>
       <div>
 
 
@@ -201,9 +266,9 @@ const CustomerDetail = () => {
                 {taskAccess &&
                   <TabNav value="task">Internal Task Manager</TabNav>
                 }
-                {/* {
+                {
                   <TabNav value="exectimeline">Execution Timeline</TabNav>
-                } */}
+                }
                 <AuthorityCheck
                   userAuthority={[`${localStorage.getItem('role')}`]}
                   authority={['ADMIN', 'SUPERADMIN']}
@@ -276,12 +341,17 @@ const CustomerDetail = () => {
               <TabContent value="assignee">
                 <Assignee data={data} />
               </TabContent>
+               <TabContent value="exectimeline">
+                <ExexutionTimeline execData={execData} onRefreshData={refreshExecData} />
+              </TabContent>
+
               <TabContent value="2dview">
                 <PdfTextLinker/>
               </TabContent>
               <TabContent value="3dview">
                 <Visualizer/> 
               </TabContent>
+
             </div>
           </Tabs>}
       </div>

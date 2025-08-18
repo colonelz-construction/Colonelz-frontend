@@ -14,7 +14,7 @@ type Task = {
     task_description: string;
    actual_task_start_date: string;
     actual_task_end_date: string;
-    estimated_task_start_date: string;
+    // estimated_task_start_date: string;
     estimated_task_end_date: string; 
     task_status: string; 
     task_priority: string; 
@@ -99,7 +99,7 @@ const priorityOptions = [
                         task_description: Data.task_description,
                         actual_task_start_date: new Date(Data.actual_task_start_date) ,
                         actual_task_end_date:new Date(Data.actual_task_end_date),
-                        estimated_task_start_date: new Date(Data.estimated_task_start_date),
+                        // estimated_task_start_date: new Date(Data.estimated_task_start_date),
                         estimated_task_end_date: new Date(Data.estimated_task_end_date),
                         task_status: statusOptions.find((option)=>option.value===Data.task_status)?.value,  
                         task_priority: priorityOptions.find((option)=>option.value===Data.task_priority)?.value, 
@@ -109,7 +109,7 @@ const priorityOptions = [
                       validationSchema={Yup.object().shape({
                         task_name: Yup.string().required("Task Name is required"),
                       
-                        estimated_task_start_date: Yup.string().required("Estimated Start Date is required"),
+                        // estimated_task_start_date: Yup.string().required("Estimated Start Date is required"),
                         estimated_task_end_date: Yup.string().required("Estimated End Date is required").test(
                             "is-greater",
                             "End Date must be greater than Start Date",
@@ -215,7 +215,7 @@ const priorityOptions = [
                                 </Field>
                             </FormItem>
 
-                            <FormItem label='Estimated Start Date'
+                            {/* <FormItem label='Estimated Start Date'
                             asterisk
                             >
                             <Field name='estimated_task_start_date' placeholder='Start date'>
@@ -228,7 +228,7 @@ const priorityOptions = [
                                     />
                                 )}
                             </Field>
-                            </FormItem>
+                            </FormItem> */}
                             <FormItem label='Estimated End Date'
                             asterisk>
                                 <Field name='estimated_task_end_date' placeholder='End Date'>

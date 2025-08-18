@@ -74,7 +74,7 @@ export type Tasks = {
     task_description: string
     actual_task_start_date: string
     actual_task_end_date: string
-    estimated_task_start_date: string
+    // estimated_task_start_date: string
     estimated_task_end_date: string
     task_status: string
     task_priority: string
@@ -203,7 +203,7 @@ const AllTask = ({ users }: any) => {
     const [filterTask, setFilterTask] = useState<any>(filterTaskObj)
     const [filterCheck, setFilterCheck] = useState<any>(filterCheckObj)
     // console.log(filterTask)
-
+    
     useEffect(() => {
         const fetchData = async () => {
             const response = await apiGetAllTasksDetails(filterTask)
@@ -330,6 +330,7 @@ const AllTask = ({ users }: any) => {
                 )
             }
         }
+        console.log('moveAccess:', moveAccess, 'row.type:', row?.type);
 
         return (
             <div className={`flex justify-between text-lg gap-5`}>
@@ -342,11 +343,9 @@ const AllTask = ({ users }: any) => {
                         </span>
                     </Tooltip>
                 )}
-                {moveAccess && row?.type == 'open' && (
+                {moveAccess && (
                     <Tooltip title="Move">
-                        <span
-                            className={`cursor-pointer py-2  hover:${textTheme}`}
-                        >
+                        <span className={`cursor-pointer py-2  hover:${textTheme}`}>
                             <MoveToDialog
                                 users={users}
                                 projectData={projects}
@@ -811,139 +810,58 @@ const AllTask = ({ users }: any) => {
                                     sx={{
                                         textAlign: 'center',
                                         color: '#6B7280',
-                                        cursor: 'pointer',
-                                        '&:hover': {
-                                            backgroundColor: '#dfedfe',
-                                        },
                                     }}
                                 >
                                     {row.getVisibleCells().map((cell) => {
-                                        const taskType = row.original.type
-                                        console.log(taskType)
-                                        if (taskType === 'project') {
-                                            if (
-                                                cell.column.id === 'task_name'
-                                            ) {
-                                                return (
-                                                    <TableCell
-                                                        sx={{
-                                                            textAlign: 'center',
-                                                            color: '#6B7280',
-                                                        }}
-                                                        key={cell.id}
-                                                        onClick={() =>
-                                                            navigate(
-                                                                `/app/crm/Projects/TaskDetails?project_id=${row.original.project_id}&task=${row.original.task_id}`,
-                                                            )
-                                                        }
-                                                    >
-                                                        {flexRender(
-                                                            cell.column
-                                                                .columnDef.cell,
-                                                            cell.getContext(),
-                                                        )}
-                                                    </TableCell>
-                                                )
-                                            } else {
-                                                return (
-                                                    <TableCell
-                                                        key={cell.id}
-                                                        sx={{
-                                                            textAlign: 'center',
-                                                            color: '#6B7280',
-                                                        }}
-                                                    >
-                                                        {flexRender(
-                                                            cell.column
-                                                                .columnDef.cell,
-                                                            cell.getContext(),
-                                                        )}
-                                                    </TableCell>
-                                                )
-                                            }
-                                        } else if (taskType === 'lead') {
-                                            if (
-                                                cell.column.id === 'task_name'
-                                            ) {
-                                                return (
-                                                    <TableCell
-                                                        sx={{
-                                                            textAlign: 'center',
-                                                            color: '#6B7280',
-                                                        }}
-                                                        key={cell.id}
-                                                        onClick={() =>
-                                                            navigate(
-                                                                `/app/crm/Leads/TaskDetails?lead_id=${row.original.lead_id}&task=${row.original.task_id}`,
-                                                            )
-                                                        }
-                                                    >
-                                                        {flexRender(
-                                                            cell.column
-                                                                .columnDef.cell,
-                                                            cell.getContext(),
-                                                        )}
-                                                    </TableCell>
-                                                )
-                                            } else {
-                                                return (
-                                                    <TableCell
-                                                        key={cell.id}
-                                                        sx={{
-                                                            textAlign: 'center',
-                                                            color: '#6B7280',
-                                                        }}
-                                                    >
-                                                        {flexRender(
-                                                            cell.column
-                                                                .columnDef.cell,
-                                                            cell.getContext(),
-                                                        )}
-                                                    </TableCell>
-                                                )
-                                            }
-                                        } else {
-                                            if (
-                                                cell.column.id === 'task_name'
-                                            ) {
-                                                return (
-                                                    <TableCell
-                                                        key={cell.id}
-                                                        onClick={() =>
-                                                            navigate(
-                                                                `/app/crm/Tasks/OpenTaskDetails?task=${row.original.task_id}`,
-                                                            )
-                                                        }
-                                                        sx={{
-                                                            textAlign: 'center',
-                                                            color: '#6B7280',
-                                                        }}
-                                                    >
-                                                        {flexRender(
-                                                            cell.column
-                                                                .columnDef.cell,
-                                                            cell.getContext(),
-                                                        )}
-                                                    </TableCell>
-                                                )
-                                            } else {
-                                                return (
-                                                    <TableCell
-                                                        key={cell.id}
-                                                        sx={{
-                                                            textAlign: 'center',
-                                                            color: '#6B7280',
-                                                        }}
-                                                    >
-                                                        {flexRender(
-                                                            cell.column
-                                                                .columnDef.cell,
-                                                            cell.getContext(),
-                                                        )}
-                                                    </TableCell>
-                                                )
-                                            }
-                                        }
+                                        // Only these columns should be clickable
+                                        const clickableColumns = [
+                                            'task_name',
+                                            'task_priority',
+                                            'task_status',
+                                            'task_assignee',
+                                            'type',
+                                            'name',
+                                        ]
+                                        const isClickable = clickableColumns.includes(
+                                            cell.column.id,
+                                        )
+
+                                        return (
+                                            <TableCell
+                                                key={cell.id}
+                                                sx={{
+                                                    textAlign: 'center',
+                                                    color: '#6B7280',
+                                                    cursor: isClickable ? 'pointer' : 'default',
+                                                    '&:hover': isClickable ? { backgroundColor: '#dfedfe' } : {},
+                                                }}
+                                                onClick={
+                                                    isClickable
+                                                        ? () => {
+                                                              const taskType = row.original.type
+                                                              if (taskType === 'project') {
+                                                                  navigate(
+                                                                      `/app/crm/Projects/TaskDetails?project_id=${row.original.project_id}&task=${row.original.task_id}`,
+                                                                  )
+                                                              } else if (taskType === 'lead') {
+                                                                  navigate(
+                                                                      `/app/crm/Leads/TaskDetails?lead_id=${row.original.lead_id}&task=${row.original.task_id}`,
+                                                                  )
+                                                              } else {
+                                                                  navigate(
+                                                                      `/app/crm/Tasks/OpenTaskDetails?task=${row.original.task_id}`,
+                                                                  )
+                                                              }
+                                                          }
+                                                        : undefined
+                                                }
+                                            >
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext(),
+                                                )}
+                                            </TableCell>
+                                        )
                                     })}
                                 </TableRow>
                             ))}

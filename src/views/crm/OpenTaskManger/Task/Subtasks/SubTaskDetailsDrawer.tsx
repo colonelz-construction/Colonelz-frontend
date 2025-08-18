@@ -42,7 +42,7 @@ type SubTask = {
     sub_task_description: string;
     actual_sub_task_start_date: string;
     actual_sub_task_end_date: string;
-    estimated_sub_task_start_date: string;
+    // estimated_sub_task_start_date: string;
     estimated_sub_task_end_date: string;
     sub_task_status: string;
     sub_task_priority: string;
@@ -324,7 +324,7 @@ const SubTaskDetails = (Data:any) => {
                     <CustomerInfoField title="Priority" value={(Data.data.sub_task_priority)} />
                     <CustomerInfoField title="Start Date" value={Data.data.actual_sub_task_start_date?formateDate(Data.data.actual_sub_task_start_date):'-'} />
                     <CustomerInfoField title="End Date" value={Data.data.actual_sub_task_end_date?formateDate(Data.data.actual_sub_task_end_date):'-'} />
-                    <CustomerInfoField title="Estimated Start Date" value={formateDate(Data.data.estimated_sub_task_start_date)} />
+                    {/* <CustomerInfoField title="Estimated Start Date" value={formateDate(Data.data.estimated_sub_task_start_date)} /> */}
                     <CustomerInfoField title="Estimated End Date" value={formateDate(Data.data.estimated_sub_task_end_date)} />
                     <CustomerInfoField title="Reporter" value={(Data.data.sub_task_reporter)} />
                     <CustomerInfoField title="Assignee" value={(Data.data.sub_task_assignee)} />

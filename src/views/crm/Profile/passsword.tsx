@@ -74,6 +74,10 @@ const Password = ({ data }: { data?: LoginHistory[] }) => {
             toast.push(<Notification title={'Password updated'} type="success" closable duration={3000} />, {
                 placement: 'top-end',
             });
+        } else if (response.code===400) {
+            toast.push(<Notification title={'New Password cannot be the same as Old one'} type="warning" closable duration={3000} />, {
+                placement: 'top-end',
+            });
         } else {
             toast.push(<Notification title={'Error updating password'} type="danger" closable duration={3000} />, {
                 placement: 'top-center',

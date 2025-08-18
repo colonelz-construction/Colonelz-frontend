@@ -376,8 +376,10 @@ const Second = ({
   const [rename, setRename] = useState("");
   const [selectedPoint, setSelectedPoint] = useState<any>(null);
   const [panoImages, setPanoImages] = useState<any[]>([]);
-  const [zooming, setZooming] = useState(false);
-  const [zoomTarget, setZoomTarget] = useState(1);
+  const [uploadSource, setUploadSource] = useState<'local' | 'uploaded'>('local');
+  const [flattenedImages, setFlattenedImages] = useState<any[]>([]);
+  const [selectedUploadedImage, setSelectedUploadedImage] = useState<any>(null);
+  // Add this missing state
   const [addThisHp, setAddThisHp] = useState<any>(null);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -460,8 +462,31 @@ const Second = ({
     });
   }, [imageUrl]);
 
+  // Load flattened images when dialog opens
+  useEffect(() => {
+    if (dialogOpen) {
+      const stored = localStorage.getItem('flattenedImages');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        console.log('Flattened images from localStorage:', parsed);
+        setFlattenedImages(parsed);
+      }
+    }
+  }, [dialogOpen]);
+
   const handleSubmit = async () => {
-    if (!file || !name || !selectedPoint) return;
+    if (!selectedPoint) return;
+    
+    let imageUrl = file;
+    let imageName = name;
+    
+    // If using uploaded image, get the URL and name from selected image
+    if (uploadSource === 'uploaded' && selectedUploadedImage) {
+      imageUrl = selectedUploadedImage.url;
+      imageName = rename || selectedUploadedImage.name;
+    } else if (uploadSource === 'local' && (!file || !name)) {
+      return; // Local upload requires file and name
+    }
 
     const formData = {
       org_id: org_id,
@@ -470,8 +495,8 @@ const Second = ({
       project_id: projectId? projectId : null,
       type: 'hp',
       main_img_id: currentView.img_id,
-      url: file,
-      name: name,
+      url: imageUrl,
+      name: imageName,
       rename: rename,
       crd: [selectedPoint.x, selectedPoint.y, selectedPoint.z],
       hp: [],
@@ -481,15 +506,26 @@ const Second = ({
       const res = await apiPostCrmThreeImage(formData);
       console.log(res);
       onHotspotAdd(selectedPoint);
-      setAddThisHp(formData)
+      setAddThisHp(formData); // Now this will work
       setDialogOpen(false);
-
+      // Reset form
+      setFile(null);
+      setName("");
+      setRename("");
+      setSelectedPoint(null);
+      setSelectedUploadedImage(null);
       window.location.reload();
-
-      
     } catch (error) {
       console.error("Error adding hotspot:", error);
     }
+  };
+
+  // Reset form when switching upload source
+  const handleUploadSourceChange = (source: 'local' | 'uploaded') => {
+    setUploadSource(source);
+    setFile(null);
+    setName("");
+    setSelectedUploadedImage(null);
   };
 
   return (
@@ -525,8 +561,10 @@ const Second = ({
 
       {dialogOpen && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-10">
-          <div className="bg-white p-6 rounded shadow-lg">
+          <div className="bg-white p-6 rounded shadow-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">Add Hotspot</h2>
+
+        {/*
             <label className="block mb-4">
               Image:
               <div
@@ -569,14 +607,136 @@ const Second = ({
                               setName(selectedFile.name);
                             };
                             reader.readAsDataURL(selectedFile);
-                          }
+                          }/*}
+
+            {/* Upload Source Selection */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2">Image Source:</label>
+              <div className="flex gap-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="uploadSource"
+                    value="local"
+                    checked={uploadSource === 'local'}
+                    onChange={() => handleUploadSourceChange('local')}
+                    className="mr-2"
+                  />
+                  Browse Local
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="uploadSource"
+                    value="uploaded"
+                    checked={uploadSource === 'uploaded'}
+                    onChange={() => handleUploadSourceChange('uploaded')}
+                    className="mr-2"
+                  />
+                  Browse Uploaded Images
+                </label>
+              </div>
+            </div>
+
+            {/* Local Upload */}
+            {uploadSource === 'local' && (
+              <label className="block mb-4">
+                Image:
+                <div
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const droppedFile = e.dataTransfer.files[0];
+                    if (droppedFile) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setFile(reader.result as string);
+                        setName(droppedFile.name);
+                      };
+                      reader.readAsDataURL(droppedFile);
+                    }
+                  }}
+                  className="border border-dashed border-gray-400 rounded p-4 mt-2 text-center cursor-pointer hover:bg-gray-50"
+                >
+                  {file ? (
+                    <>
+                      <p className="text-sm text-green-600">Selected: {name}</p>
+                      <img src={file} alt="Preview" className="mt-2 max-h-32 mx-auto" />
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm text-gray-600">Drag & drop a file here</p>
+                      <p className="text-sm text-gray-500 my-1">or</p>
+                      <label className="inline-block bg-blue-500 text-white px-3 py-1 rounded cursor-pointer">
+                        Browse
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const selectedFile = e.target.files?.[0];
+                            if (selectedFile) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setFile(reader.result as string);
+                                setName(selectedFile.name);
+                              };
+                              reader.readAsDataURL(selectedFile);
+                            }
+                          }}
+                        />
+                      </label>
+                    </>
+                  )}
+                </div>
+              </label>
+            )}
+
+            {/* Uploaded Images Selection */}
+            {uploadSource === 'uploaded' && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2">Select from Uploaded Images:</label>
+                <div className="border rounded p-2 max-h-40 overflow-y-auto">
+                  {flattenedImages.length > 0 ? (
+                    flattenedImages.map((image: any) => (
+                      <div
+                        key={image.img_id}
+                        onClick={() => {
+                          setSelectedUploadedImage(image);
+                          setName(image.name);
+
                         }}
-                      />
-                    </label>
-                  </>
+                        className={`flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100 rounded ${
+                          selectedUploadedImage?.img_id === image.img_id ? 'bg-blue-100' : ''
+                        }`}
+                      >
+                        <img
+                          src={image.url}
+                          alt={image.name}
+                          className="w-12 h-12 object-cover rounded"
+                        />
+                        <div>
+                          <p className="text-sm font-medium">{image.name}</p>
+                          <p className="text-xs text-gray-500">Type: {image.type}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500">No uploaded images found</p>
+                  )}
+                </div>
+                {selectedUploadedImage && (
+                  <div className="mt-2">
+                    <p className="text-sm text-green-600">Selected: {selectedUploadedImage.name}</p>
+                    <img
+                      src={selectedUploadedImage.url}
+                      alt="Preview"
+                      className="mt-2 max-h-32 mx-auto rounded"
+                    />
+                  </div>
                 )}
               </div>
-            </label>
+            )}
 
             <label className="block mb-2">
               Rename:
@@ -584,9 +744,9 @@ const Second = ({
                 type="text"
                 onChange={(e) => setRename(e.target.value)}
                 value={rename}
+                placeholder={uploadSource === 'uploaded' ? selectedUploadedImage?.name : name}
               />
             </label>
-
 
             <div className="flex justify-end mt-4">
               <button
@@ -597,7 +757,11 @@ const Second = ({
               </button>
               <button
                 onClick={handleSubmit}
-                className="bg-blue-500 text-white px-4 py-2 rounded"
+                disabled={
+                  (uploadSource === 'local' && (!file || !name)) ||
+                  (uploadSource === 'uploaded' && !selectedUploadedImage)
+                }
+                className="bg-blue-500 text-white px-4 py-2 rounded disabled:bg-gray-300"
               >
                 Save
               </button>
@@ -712,43 +876,47 @@ useEffect(() => {
   };
 
   return (
-
-      <div className="w-[70%] relative">
-
-        <div className='flex  text-white px-4 py-2 rounded z-10'>
-
+    <div className="w-[70%] relative">
+      <div className='flex text-white px-4 py-2 rounded z-10'>
         {imgId &&
           imgIdList?.map((imgId:any, idx:any) => {
-
-            return <span>
+            return <span key={imgId}>
               <span onClick={() => handleTagClick(imgId)} className={`py-1 px-2 rounded-lg cursor-pointer ${currentImage?.img_id === imgId ? "bg-purple-600" : "bg-purple-400"}`}>{imgId}</span>
-
               {idx != imgIdList?.length-1 && <span className="text-purple-600">{"->"}</span>}
             </span>
-
-
           })
         }
-
-        </div>
-
-          {addHotspotMode && (
-            <div className="absolute inset-0 mt-[2.24rem] bg-black bg-opacity-50 z-10  pointer-events-none" />
-          )}
-
-      
-          {texture && <button
-            onClick={() => setAddHotspotMode(!addHotspotMode)}
-            className="absolute top-12 right-4 bg-blue-500 text-white px-4 py-2 rounded z-10"
-          >
-            {addHotspotMode ? "Stop Adding Hotspots" : "Add Hotspot"}
-          </button>}
-
-          
-
-        <Second texture={texture} setTexture={setTexture} imageUrl={currentView?.url} currentView={currentView} setCurrentView={setCurrentView} testData={testData} addHotspotMode={addHotspotMode} onHotspotAdd={handleHotspotAdd} />
       </div>
-    
+
+      {/* Only show overlay when addHotspotMode is true */}
+      {addHotspotMode && (
+        <div className="absolute inset-0 mt-[2.24rem] bg-black bg-opacity-30 z-5 pointer-events-none">
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-lg z-10 pointer-events-auto">
+            Click on the image to add a hotspot
+          </div>
+        </div>
+      )}
+
+      {texture && (
+        <button
+          onClick={() => setAddHotspotMode(!addHotspotMode)}
+          className="absolute top-12 right-4 bg-blue-500 text-white px-4 py-2 rounded z-10"
+        >
+          {addHotspotMode ? "Stop Adding Hotspots" : "Add Hotspot"}
+        </button>
+      )}
+
+      <Second 
+        texture={texture} 
+        setTexture={setTexture} 
+        imageUrl={currentView?.url} 
+        currentView={currentView} 
+        setCurrentView={setCurrentView} 
+        testData={testData} 
+        addHotspotMode={addHotspotMode} 
+        onHotspotAdd={handleHotspotAdd} 
+      />
+    </div>
   );
 };
 

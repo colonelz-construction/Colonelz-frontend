@@ -1,4 +1,3 @@
-
 import {
   Button,
   Dialog,
@@ -50,11 +49,28 @@ const Second = ({ setImgList, data, mainLoading, setCurrentImage, currentImage }
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await apiGetCrmPanoImagesFileManager(leadId, projectId);
-      setPanoImages(res.data?.files || []);
+      // Fetch main images (with nested hp)
+      const mainRes = await apiGetCrmPanoImagesFileManager(leadId, projectId);
+      const mainImages = mainRes.data?.files || [];
+
+      // Helper to recursively collect all images (main + hp)
+      const collectImages = (images: any[]): any[] => {
+        let result: any[] = [];
+        images.forEach(img => {
+          result.push(img);
+          if (img.hp && img.hp.length > 0) {
+            result = result.concat(collectImages(img.hp));
+          }
+        });
+        return result;
+      };
+
+      const allImages = collectImages(mainImages);
+      setPanoImages(allImages);
+      setImgList(allImages); // If you want to update the parent list as well
     };
     fetchData();
-  }, [leadId, projectId]);
+  }, [leadId, projectId, setImgList]);
 
   const openDialog = () => setIsOpen(true);
   const onDialogClose = () => setIsOpen(false);
@@ -187,6 +203,25 @@ const Second = ({ setImgList, data, mainLoading, setCurrentImage, currentImage }
     }
   };
 
+  // Helper function to flatten images (main + hp)
+  const flattenImages = (images: any[]): any[] => {
+    let result: any[] = [];
+    images.forEach(img => {
+      result.push(img); // Add main image
+      if (img.hp && img.hp.length > 0) {
+        result = result.concat(flattenImages(img.hp)); // Add hp images recursively
+      }
+    });
+    return result;
+  };
+
+  // Flatten the data to include both main and hp images
+  const allImages = data ? flattenImages(data) : [];
+  
+  // Console log to see the data
+  console.log("Original data:", data);
+  console.log("Flattened images:", allImages);
+
   return (
     <>
       <div className="w-[30%] border rounded-lg p-2">
@@ -196,6 +231,7 @@ const Second = ({ setImgList, data, mainLoading, setCurrentImage, currentImage }
               Import Image
             </Button>
           </div>
+
 
         {mainLoading ? 
         (
@@ -214,18 +250,31 @@ const Second = ({ setImgList, data, mainLoading, setCurrentImage, currentImage }
                   }`}
                 >
                   {/* <div onClick={() => handleClick(image)}> */}
+
+                  {/* <div className="flex flex-col gap-2 mt-4 max-h-[30rem] overflow-y-auto">
+            {allImages?.map((image: any) => (
+              <div key={image.img_id} onClick={() => handleClick(image)}>
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`flex justify-between p-2 w-full items-center border rounded-md capitalize cursor-pointer ${
+                      image?.img_id === imgId ? "bg-gray-100 font-[600]" : ""
+                    }`}
+                  >*/}
+
                     <span>{image?.name}</span>
-                  {/* </div> */}
-                  <div className="ml-3 cursor-pointer" onClick={() => openDialog2(image?.img_id)}>
-                    <Tooltip title="Delete">
-                      <span className="cursor-pointer">
-                        <MdDeleteOutline className="text-xl hover:text-red-500" />
-                      </span>
-                    </Tooltip>
+                    <div className="ml-3 cursor-pointer" onClick={(e) => {
+                      e.stopPropagation();
+                      openDialog2(image?.img_id);
+                    }}>
+                      <Tooltip title="Delete">
+                        <span className="cursor-pointer">
+                          <MdDeleteOutline className="text-xl hover:text-red-500" />
+                        </span>
+                      </Tooltip>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
             ))}
           </div>)}
 

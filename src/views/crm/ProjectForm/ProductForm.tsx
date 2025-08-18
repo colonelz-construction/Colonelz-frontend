@@ -420,7 +420,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
         onFileRemove={(files) =>form.setFieldValue(field.name, files)}>
           <Button variant="solid" icon={<HiOutlineCloudUpload />} type='button' block>
                         Upload your file
-                    </Button>
+          </Button>
         </Upload>
     );
   }}

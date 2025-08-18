@@ -298,9 +298,11 @@ const CustomerDetail = () => {
     }
 
     const Toggle =
-
         <Button variant='solid' size='sm' className='flex justify-center items-center gap-4'>
-            <span>Actions</span><span><GoChevronDown /></span></Button>
+            <span>Actions</span>
+            <span><GoChevronDown /></span>
+        </Button>
+
     return (
         <>
             <div className='flex justify-between'>
@@ -318,7 +320,11 @@ const CustomerDetail = () => {
                             userAuthority={[`${localStorage.getItem('role')}`]}
                             authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.contract?.create ?? []}
                         >
-                            <Dropdown.Item eventKey="b"><Link to={`/app/crm/contract?lead_id=${myParam}`}>Create Contract</Link></Dropdown.Item>
+                            <Dropdown.Item eventKey="b">
+                                <Link to={`/app/crm/contract?lead_id=${myParam}`}>
+                                Create Contract
+                                </Link>
+                            </Dropdown.Item>
                         </AuthorityCheck>
                         {lead?.lead_status == "Inactive" && leadDeleteAccess && <AuthorityCheck
                             userAuthority={[`${localStorage.getItem('role')}`]}
@@ -339,32 +345,21 @@ const CustomerDetail = () => {
                             userAuthority={[`${localStorage.getItem('role')}`]}
                             authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.read ?? []}
                         >
-                        <Dropdown.Item
-                            eventKey="d"
-                            onMouseEnter={() => setIsOpen6(true)}
-                            onMouseLeave={() => setIsOpen6(false)}
-                           >
-                            <div className="relative">
-
-                                <div className='flex gap-3 justify-between items-center'>
-                                    <span>Design View</span>
-                                    <span><GoChevronDown /></span>
-                                </div>
-                                
-                                {isOpen6 && (
-                                <div
-                                    ref={dropdownRef}
-                                    className="absolute left-14 transform -translate-x-full mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg"
-                                >
-                                    <ul className="py-2">
-                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/app/crm/leads/blueprint?lead_id=${myParam}`}>2D View</Link></li>
-                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/app/crm/visualizer?lead_id=${myParam}`}>3D View</Link></li>
-                                    </ul>
-                                </div>
-                                )}
-                            </div>
+                            <Dropdown.Item
+                                eventKey="d"
+                            >
+                               <Link to={`/app/crm/leads/blueprint?lead_id=${myParam}`}>2D View</Link>
                             </Dropdown.Item>                      
 
+                        </AuthorityCheck>}
+
+                        {<AuthorityCheck
+                            userAuthority={[`${localStorage.getItem('role')}`]}
+                            authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.read ?? []}
+                        >
+                            <Dropdown.Item eventKey="h">
+                                <Link to={`/app/crm/visualizer?lead_id=${myParam}`}>3D View</Link>
+                            </Dropdown.Item>
                         </AuthorityCheck>}
                     </Dropdown>
                 </div>

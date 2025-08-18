@@ -156,29 +156,32 @@ const Hotspot = ({ data, setCurrentView }) => {
         
       }
     }
-  
-  const position = new THREE.Vector3(data?.crd[0], data?.crd[1], data?.crd[2]);
+
+  const position = new THREE.Vector3(
+    data?.crd?.[0] ?? 0,
+    data?.crd?.[1] ?? 0,
+    data?.crd?.[2] ?? 0
+  );
 
   const handleClick = () => {
     setCurrentView(data);
+    // setCurrentImage(data);
     const updatedParams = new URLSearchParams(searchParams);
-
     // Get the current mainId
     const prevMainId = updatedParams.get("imgId");
-
     // Set the new mainId
     updatedParams.set("imgId", data.img_id);
-
     // If there was a previous mainId, append it in order
     if (prevMainId) {
       const paramIndex = updatedParams.size; // Get next index (1-based)
+      console.log("param index : ",updatedParams.size)
       updatedParams.set(paramIndex.toString(), prevMainId);
     }
     setSearchParams(updatedParams);
   };
 
-  return (
 
+  return (
     <>
     <group position={position}>
       {/* Eccentric Sphere */}
@@ -327,7 +330,11 @@ const Scene = ({ texture, addThisHp, addHotspotMode, onHotspotAdd, testData, set
           </mesh>
         )}
         {hpLoading && texture && hotspots && hotspots?.map((data: any, index: any) => (
-            <Hotspot key={index} data={data} setCurrentView={setCurrentView} />
+            <Hotspot 
+            key={index}
+            data={data}
+            setCurrentView={setCurrentView}
+            />
         ))}
       </group>
     </>
@@ -483,11 +490,6 @@ const Second = ({
     } catch (error) {
       console.error("Error adding hotspot:", error);
     }
-
-    // console.log("Submitting:", data);
-
-    // onHotspotAdd(selectedPoint);
-    // setDialogOpen(false);
   };
 
   return (
@@ -513,7 +515,11 @@ const Second = ({
         )}
         {texture &&
           currentView?.hp?.map((data: any, i: number) => (
-            <Hotspot key={i} data={data} setCurrentView={setCurrentView} />
+            <Hotspot 
+            key={i}
+            data={data} 
+            setCurrentView={setCurrentView} 
+            />
           ))}
       </Canvas>
 
@@ -521,56 +527,6 @@ const Second = ({
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-10">
           <div className="bg-white p-6 rounded shadow-lg">
             <h2 className="text-xl font-bold mb-4">Add Hotspot</h2>
-
-            {/* <label className="block mb-4">
-              Image:
-              <div
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  const file = e.dataTransfer.files[0];
-                  if (file) {
-                    setFile(file);
-                    setName(file.name);
-                  }
-                }}
-                className="border border-dashed border-gray-400 rounded p-4 mt-2 text-center cursor-pointer hover:bg-gray-50"
-              >
-                {file ? (
-                  <p className="text-sm text-green-600">Selected: {file.name}</p>
-                ) : (
-                  <>
-                    <p className="text-sm text-gray-600">Drag & drop a file here</p>
-                    <p className="text-sm text-gray-500 my-1">or</p>
-                    <label className="inline-block bg-blue-500 text-white px-3 py-1 rounded cursor-pointer">
-                      Browse
-                      <input
-                        type="file"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            setFile(file);
-                            setName(file.name);
-                          }
-                        }}
-                      />
-                    </label>
-                  </>
-                )}
-              </div>
-            </label> */}
-
-            {/* <label className="block mb-2">
-              Rename:
-              <Input
-                type="text"
-                onChange={(e) => setRename(e.target.value)}
-                value={rename}
-              />
-            </label> */}
-
-
             <label className="block mb-4">
               Image:
               <div
@@ -668,38 +624,41 @@ useEffect(() => {
   const fetchData = async () => {
     const res = await apiGetCrmImageById(imgId, leadId, projectId)
 
+    console.log("image by id resposne :",res);
     const paramEntries = Array.from(searchParams.entries());
 
       // Filter out imgId and lead_id
       const idParams = paramEntries
-        .filter(([key]) => key !== "imgId" && key !== "lead_id" && key !== "project_id") // Exclude lead_id
+        .filter(([key]) => key !== "imgId" && key !== "lead_id" && key !== "project_id" && key !== "type") // Exclude lead_id
         .sort(([a], [b]) => Number(a) - Number(b)) // Sort numerically
         .map(([, value]) => value);
 
       // Append imgId at the end if it exists
       const imgId2 = searchParams.get("imgId");
       if (imgId2) idParams.push(imgId2);
-      // console.log(idParams)
-
+      console.log("id params ",idParams)
+      console.log("imgIdList", imgIdList)
       setImgList(idParams)
-
-        setTestData(res?.data[0])
-        setCurrentImage(res?.data[0])
+        setTestData(res?.data?.[0])
+        setCurrentImage(res?.data?.[0])
       };
 
   fetchData();
 }, [imgId]);
 
 
-
-
   const [currentView, setCurrentView] = useState<any>({});
 
+  console.log("current view : ", currentView);
   useEffect(() => {
 
     setCurrentView(currentImage);
 
   }, [currentImage])
+
+ console.log("test data from first :",testData);
+ console.log("current image : ",currentImage);
+
   const [addHotspotMode, setAddHotspotMode] = useState<any>(false);
   const [hotspots, setHotspots] = useState<any>([]);
 
@@ -708,6 +667,7 @@ useEffect(() => {
   };
 
   const handleTagClick = (clickedImgId: string) => {
+    console.log("Clicked imgId:", clickedImgId);
     setImgList((prev: string[]) => {
       const index = prev.indexOf(clickedImgId);
       return index !== -1 ? prev.slice(0, index + 1) : [...prev, clickedImgId];
@@ -721,8 +681,8 @@ useEffect(() => {
     if(leadId) {
       updatedParams2.set("lead_id", leadId);
     } else if(projectId) {
-
-      updatedParams2.set("project_id", projectId);
+      updatedParams2.set("project_id", projectId)
+      updatedParams2.set("type","3dview")
     }
   
     let indexedParams: { index: number; value: string }[] = [...updatedParams.entries()]

@@ -281,10 +281,7 @@ const PdfTextLinker = () => {
     } catch (error) {
       console.error("Error processing PDF:", error);
       alert("Failed to process PDF. Please try again.");
-    } 
-    // finally {
-    //   setLoading(false);
-    // }
+    }
   };
 
   return (

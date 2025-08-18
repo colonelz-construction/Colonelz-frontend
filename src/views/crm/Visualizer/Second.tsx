@@ -18,6 +18,7 @@ import { useSearchParams, useLocation } from "react-router-dom";
 import { ConfirmDialog } from "@/components/shared";
 import { MdDeleteOutline } from "react-icons/md";
 import * as Yup from "yup";
+import { CircularProgress } from "@mui/material";
 
 const Second = ({ setImgList, data, mainLoading, setCurrentImage, currentImage }: any) => {
   const location = useLocation();
@@ -97,9 +98,11 @@ const Second = ({ setImgList, data, mainLoading, setCurrentImage, currentImage }
   const handleClick = (image: any) => {
     setImgList([]);
     setCurrentImage(image);
+    console.log("first image clicked", image);
     const updatedParams = new URLSearchParams();
     if (leadId) updatedParams.set("lead_id", leadId);
     if (projectId) updatedParams.set("project_id", projectId);
+    updatedParams.set("type", "3dview");
     updatedParams.set("imgId", image.img_id);
     setSearchParams(updatedParams);
   };
@@ -194,7 +197,14 @@ const Second = ({ setImgList, data, mainLoading, setCurrentImage, currentImage }
             </Button>
           </div>
 
-          <div className="flex flex-col gap-2 mt-4 max-h-[30rem] overflow-y-auto">
+        {mainLoading ? 
+        (
+          <div className="flex justify-center mt-6">
+          <CircularProgress/>
+          </div>
+        )
+        :
+          (<div className="flex flex-col gap-2 mt-4 max-h-[30rem] overflow-y-auto">
             {data?.map((image: any) => (
             <div onClick={() => handleClick(image)}>
               <div key={image.img_id} className="flex items-center gap-2">
@@ -217,7 +227,8 @@ const Second = ({ setImgList, data, mainLoading, setCurrentImage, currentImage }
               </div>
             </div>
             ))}
-          </div>
+          </div>)}
+
         </div>
       </div>
 

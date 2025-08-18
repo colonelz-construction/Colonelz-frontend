@@ -392,17 +392,17 @@ const styles = StyleSheet.create({
   }
 });
 
-function formatCurrency(amount:any) {
+function formatCurrency(amount: any) {
   let numStr = amount.toString();
-  
+
   let lastThree = numStr.slice(-3);
-  
+
   let otherDigits = numStr.slice(0, -3);
-  
+
   if (otherDigits.length > 0) {
-      otherDigits = otherDigits.replace(/\B(?=(\d{2})+(?!\d))/g, ",");
+    otherDigits = otherDigits.replace(/\B(?=(\d{2})+(?!\d))/g, ",");
   }
-  
+
   return otherDigits.length > 0 ? otherDigits + ',' + lastThree : lastThree;
 }
 
@@ -446,13 +446,13 @@ function numberToWordsString(number: number) {
 // Helper function to convert numbers to words
 function numberToWords(number: number): string {
   const ones = [
-    '', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 
-    'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 
+    '', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
+    'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',
     'seventeen', 'eighteen', 'nineteen'
   ];
 
   const tens = [
-    '', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 
+    '', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy',
     'eighty', 'ninety'
   ];
 
@@ -1358,6 +1358,8 @@ const MyComponent = (data: any) => {
     formData.append('user_id', localStorage.getItem('userId') || '');
     formData.append('file', blob, `${data.data.file_name}.pdf`);
     formData.append('org_id', org_id);
+    formData.append('project_name', data.data.project_name);
+    formData.append('project_type', data.data.project_type);
 
     const response = await addcontractinfileManager(formData);
 
@@ -1369,7 +1371,7 @@ const MyComponent = (data: any) => {
         </Notification>
       )
       navigate(`/app/crm/lead/?id=${data.data.lead_id}&tab=Contract`)
-      
+
     }
     else {
       toast.push(

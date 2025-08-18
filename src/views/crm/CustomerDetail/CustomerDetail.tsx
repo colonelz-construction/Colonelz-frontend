@@ -189,8 +189,8 @@ const CustomerDetail = () => {
   }, [allQueryParams.project_id, taskAccess]);
 
   const Toggle =
-          <Button variant='solid' size='sm' className='flex justify-center items-center gap-2'>
-              <span>Design View</span><span><GoChevronDown /></span></Button>
+    <Button variant='solid' size='sm' className='flex justify-center items-center gap-2'>
+      <span>Design View</span><span><GoChevronDown /></span></Button>
 
   return (
     <>
@@ -198,7 +198,7 @@ const CustomerDetail = () => {
       <span className='flex justify-between'>
         <h3 className='pb-5 capitalize flex items-center'><span>Project-</span>{loading ? <Skeleton width={100} /> : projectData[0]?.project_name}</h3>
 
-            <Dropdown renderTitle={Toggle} placement='middle-end-top' >
+        {/* <Dropdown renderTitle={Toggle} placement='middle-end-top' >
               
               {<AuthorityCheck
                   userAuthority={[`${localStorage.getItem('role')}`]}
@@ -244,11 +244,11 @@ const CustomerDetail = () => {
                       )}
                   </div>
                   </Dropdown.Item>                      
-              </AuthorityCheck>} */}
-          </Dropdown>
+              </AuthorityCheck>}
+          </Dropdown> */}
 
 
-   </span>
+      </span>
       <div>
 
 
@@ -287,27 +287,27 @@ const CustomerDetail = () => {
                 {
                   <TabNav value="2dview" className='flex gap-1'>
                     <AuthorityCheck
-                    userAuthority={[`${localStorage.getItem('role')}`]}
-                    authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
-                   >
+                      userAuthority={[`${localStorage.getItem('role')}`]}
+                      authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
+                    >
                       {/* <Link to={`/app/crm/projects/blueprint?project_id=${allQueryParams.project_id}`}> */}
                       2D View
-                    {/* </Link> */}
+                      {/* </Link> */}
 
-                   </AuthorityCheck>
+                    </AuthorityCheck>
                   </TabNav>
                 }
                 {
                   <TabNav value="3dview" className='flex gap-1'>
                     <AuthorityCheck
-                        userAuthority={[`${localStorage.getItem('role')}`]}
-                        authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
+                      userAuthority={[`${localStorage.getItem('role')}`]}
+                      authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
                     >
-                        {/* <Dropdown.Item eventKey="g">*/}
-                          {/* <Link to={`/app/crm/visualizer?project_id=${allQueryParams.project_id}`}> */}
-                          3D View
-                          {/* </Link> */}
-                        {/* </Dropdown.Item> */}
+                      {/* <Dropdown.Item eventKey="g">*/}
+                      {/* <Link to={`/app/crm/visualizer?project_id=${allQueryParams.project_id}`}> */}
+                      3D View
+                      {/* </Link> */}
+                      {/* </Dropdown.Item> */}
 
                     </AuthorityCheck>
                   </TabNav>
@@ -341,15 +341,15 @@ const CustomerDetail = () => {
               <TabContent value="assignee">
                 <Assignee data={data} />
               </TabContent>
-               <TabContent value="exectimeline">
+              <TabContent value="exectimeline">
                 <ExexutionTimeline execData={execData} onRefreshData={refreshExecData} />
               </TabContent>
 
               <TabContent value="2dview">
-                <PdfTextLinker/>
+                <PdfTextLinker />
               </TabContent>
               <TabContent value="3dview">
-                <Visualizer/> 
+                <Visualizer />
               </TabContent>
 
             </div>

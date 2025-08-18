@@ -74,6 +74,8 @@ const CustomerDetail = () => {
     const [project, setProject] = useState<AddProject>()
 
     const [leadData, setLeadData] = useState<any>([])
+    console.log(leadData, 'leadData');
+
 
     const buttonRef = useRef<HTMLButtonElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -253,8 +255,6 @@ const CustomerDetail = () => {
         const fetchData = async () => {
             try {
                 const response = await apiGetCrmLeadsDetails(myParam, org_id);
-
-
                 setLoading(false)
                 setDetails(response);
             } catch (error) {
@@ -292,7 +292,6 @@ const CustomerDetail = () => {
 
                 // console.log(leadData)
                 setLeadData(leadData?.data)
-
 
                 setLoading(false)
             } catch (error) {
@@ -376,7 +375,7 @@ const CustomerDetail = () => {
                         >
                             <Dropdown.Item eventKey="b">
                                 <Link to={`/app/crm/contract?lead_id=${myParam}`}>
-                                Create Contract
+                                    Create Contract
                                 </Link>
                             </Dropdown.Item>
                         </AuthorityCheck>
@@ -426,10 +425,10 @@ const CustomerDetail = () => {
                             <Dropdown.Item
                                 eventKey="d"
                             >
-                               <Link to={`/app/crm/leads/blueprint?lead_id=${myParam}`}>2D View</Link>
-                            </Dropdown.Item>                      
+                                <Link to={`/app/crm/leads/blueprint?lead_id=${myParam}`}>2D View</Link>
+                            </Dropdown.Item>
 
-                          {/*                         <Dropdown.Item eventKey="design">
+                            {/*                         <Dropdown.Item eventKey="design">
                         <div
                             className="relative"
                             onMouseEnter={handleMouseEnter}

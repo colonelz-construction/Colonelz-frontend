@@ -109,15 +109,21 @@ export type FileItemProps = {
     fileIdsForApproval: any
     leadData: any
 }
+
+type FilesTemp = {
+    fileUrl: string,
+}
 export type FileItem = {
     admin_status: string,
     client_status: string,
     file_name: string,
-    files: Files[],
+    files: FilesTemp[],
     itemId: string,
     remark: string,
     createdAt: string,
     _id: string
+    project_name: string
+    project_type: string
 }
 type Files = {
     fileUrl: string,
@@ -147,7 +153,7 @@ function IndeterminateCheckbox({
 
 
 const ContractDetails = (data: FileItemProps) => {
-    console.log("data : ",data)
+    console.log("data : ", data)
     const [rowSelection, setRowSelection] = useState({})
     const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
     const [dialogIsOpen, setIsOpen] = useState(false)
@@ -677,7 +683,7 @@ const ContractDetails = (data: FileItemProps) => {
 
                             return (<>
                                 {admin_status === 'rejected' &&
-                                    <div><Button size='sm' variant='solid' onClick={() => openDialog()}>Remark</Button></div>}
+                                    <div><Button size='sm' variant='solid' onClick={() => openDialog()}>View Remarks</Button></div>}
                                 <Dialog
                                     isOpen={dialogIsOpen}
                                     onClose={onDialogClose}

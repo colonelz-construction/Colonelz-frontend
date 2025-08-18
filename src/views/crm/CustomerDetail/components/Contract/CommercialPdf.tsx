@@ -1227,6 +1227,8 @@ const MyComponent = (data:any) => {
     formData.append('user_id', localStorage.getItem('userId') || '');
     formData.append('file', blob, `${data.data.file_name}.pdf`);
     formData.append('org_id', org_id);
+    formData.append('project_name', data.data.project_name);
+    formData.append('project_type', data.data.project_type);
   
     const response = await addcontractinfileManager(formData);
     setIsLoading(false);

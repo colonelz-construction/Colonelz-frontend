@@ -7,6 +7,7 @@ import { apiGetCrmContractDetails, apiGetCrmCreateLeadToProject } from '@/servic
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { HiOutlineCloudUpload } from 'react-icons/hi';
+import { FileItem } from '../../crm/CustomerDetail/components/Contract/contractDetail';
 
 interface ContractData {
   _id: string;
@@ -69,8 +70,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const org_id = localStorage.getItem('orgId');
-  const [prefillData, setPrefillData] = useState<ContractData | null>(null);
-  console.log(prefillData, 'prefillData final');
+  const [prefillData, setPrefillData] = useState<FileItem | null>(null);
 
   // Create an object to store and map the query parameters
   const allQueryParams: QueryParams = {
@@ -94,24 +94,38 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
     { value: 'design & execution', label: 'Design & Execution' },
   ];
 
-  // Utility function to filter and sort data with proper typing
-  const filterAndSortData = (data: any): ContractData[] => {
+  function getLatestContract(contracts:FileItem[]) {
+    if (!Array.isArray(contracts) || contracts.length === 0) return null;
 
-    console.log(data, 'data1');
-    const filteredData = data
-      .filter((item: any) => item.admin_status !== 'rejected' && item.createdAt)
-      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    // filter out rejected
+    const validContracts = contracts.filter(c => c.admin_status !== "rejected");
+    if (validContracts.length === 0) return null;
 
-    console.log(filteredData, 'filteredData');
+    let latest = validContracts[0];
+    let latestTime = getObjectIdTimestamp(latest._id);
 
-    return filteredData;
-  };
+    for (let i = 1; i < validContracts.length; i++) {
+      const currentTime = getObjectIdTimestamp(validContracts[i]._id);
+      if (currentTime > latestTime) {
+        latest = validContracts[i];
+        latestTime = currentTime;
+      }
+    }
+
+    return latest;
+  }
+
+  function getObjectIdTimestamp(id:string) {
+    const timestamp = parseInt(id.substring(0, 8), 16);
+    return new Date(timestamp * 1000);
+  }
+
 
   const getPrefilled = async () => {
     try {
       const response = await apiGetCrmContractDetails(allQueryParams.id);
-      const filteredData = filterAndSortData(response.data);
-      setPrefillData(filteredData[0] || null);
+      const latestContract = getLatestContract(response?.data)
+      setPrefillData(latestContract);
     } catch (error) {
       console.error('Error fetching data:', error);
       setPrefillData(null);
@@ -126,6 +140,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
     <div>
       <div className="flex justify-between items-center max-sm:flex-col mb-6"></div>
       <Formik
+        enableReinitialize
         initialValues={{
           lead_id: allQueryParams.id,
           org_id: org_id,
@@ -137,7 +152,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
           designer: '',
           project_budget: '',
           project_status: '',
-          project_type: '', // Prefill project_type
+          project_type: prefillData?.project_type, // Prefill project_type
           project_start_date: '',
           timeline_date: '',
           contract: [], // Initialize as empty File array
@@ -276,7 +291,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
                     <Input
                       type="text"
                       placeholder="Project Name"
-                      // value={field.value}
+                      value={field.value}
                       onChange={(e) => form.setFieldValue(field.name, e.target.value)}
                     />
                   )}
@@ -371,7 +386,7 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
                   {({ field, form }: any) => (
                     <Select
                       options={projectTypeOptions}
-                      // value={projectTypeOptions.find((option) => option.value === field.value)}
+                      value={projectTypeOptions.find((option) => option.value === field.value)}
                       onChange={(option) => form.setFieldValue(field.name, option?.value)}
                     />
                   )}

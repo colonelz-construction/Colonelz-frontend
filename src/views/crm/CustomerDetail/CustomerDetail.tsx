@@ -328,7 +328,6 @@ const CustomerDetail = () => {
               <TabContent value="mom">
                 <MOM data={details} />
               </TabContent>
-
               <TabContent value="task">
                 <Task task={task} users={users} />
               </TabContent>
@@ -344,7 +343,6 @@ const CustomerDetail = () => {
               <TabContent value="exectimeline">
                 <ExexutionTimeline execData={execData} onRefreshData={refreshExecData} />
               </TabContent>
-
               <TabContent value="2dview">
                 <PdfTextLinker />
               </TabContent>

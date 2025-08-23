@@ -9,8 +9,8 @@ import { useLocation } from 'react-router-dom';
 
 type DataItem = {
     img_id: string;
+    hp?: any[];
     [key: string]: any;
-    // hp:any;
 };
 
 const PublicVisualizer = () => {
@@ -18,8 +18,11 @@ const PublicVisualizer = () => {
     const queryParams = new URLSearchParams(location.search);
     const leadId = queryParams.get('lead_id') || '';
     const projectId = queryParams.get('project_id') || '';
-    const orgId = queryParams.get('org_id') || '';
-    const userId = queryParams.get('user_id') || '';
+    const [orgId] = useState(() => queryParams.get('org_id') || '');
+    const [userId] = useState(() => queryParams.get('user_id') || '');
+
+    console.log("org id : ",orgId)
+    console.log("user id : ",userId)
 
     const [data, setData] = useState<DataItem[]>([]);
     const [mainLoading, setMainLoading] = useState<boolean>(false);
@@ -36,7 +39,6 @@ const PublicVisualizer = () => {
             setMainLoading(true);
 
             try {
-
                 // Fetch main images
                 const mainRes = await apiGetCrmMainThreeImagePublic('main', '', leadId, projectId, orgId, userId);
                 // Fetch hotspot images

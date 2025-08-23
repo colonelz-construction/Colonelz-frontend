@@ -569,12 +569,12 @@ const Index = () => {
         header: 'Actions', accessorKey: 'actions',
         cell: ({ row }) => {
           return <div className='flex items-center gap-2'>
-            {/* <AuthorityCheck
+            <AuthorityCheck
               userAuthority={[`${role}`]}
               authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.file?.delete ?? []}
             >
               <MdDeleteOutline className='text-xl cursor-pointer hover:text-red-500' onClick={() => openDialog3(row.original.fileId)} />
-            </AuthorityCheck> */}
+            </AuthorityCheck>
             <HiShare className='text-xl cursor-pointer' onClick={() => openDialog(row.original.fileId)} />
           </div>
         }

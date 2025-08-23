@@ -81,8 +81,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     const [selectedSubTask, setSelectedSubTask] = useState<any>({});
     const [selectedDetail, setSelectedDetail] = useState<any>({});
     const [selectedExecData, setSelectedExecData] = useState<any>([]);
-    const [taskStartDate,setTaskStartDate] = useState();
-    const [taskEndDate,setTaskEndDate] = useState();
     const cardRef = useRef<any>(null);
     const queryParams = new URLSearchParams(location.search);
     const project_id = queryParams.get('project_id')
@@ -115,7 +113,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     }
 
     const onDialogClose2 = () => {
-
         setIsOpen2(false)
     }
 
@@ -304,8 +301,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
             onRefreshData();
         }
     };
-
-
 
     // Add these functions to your component
     const handleDragStart = (
@@ -532,8 +527,40 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     };
 
     // Separate handler for subtask drag movement
+    // const handleSubtaskDragMove = (e: MouseEvent) => {
+    //     console.log("subtask dragging : ",subtaskDragging);
+    //     if (!subtaskDragging.type || !subtaskDragging.startX || !subtaskDragging.taskId || !subtaskDragging.subtaskId) return;
+
+    //     const deltaX = e.clientX - subtaskDragging.startX;
+    //     const deltaDays = Math.round(deltaX / dayWidth);
+
+    //     if (deltaDays === 0) return;
+
+    //     if (subtaskDragging.type === 'left') {
+    //         const newStartDate = addDays(subtaskDragging.originalStartDate as Date, deltaDays);
+    //         if (newStartDate < (subtaskTempDates.end || subtaskDragging.originalEndDate as Date)) {
+    //             setSubtaskTempDates({
+    //                 start: newStartDate,
+    //                 end: subtaskTempDates.end || subtaskDragging.originalEndDate
+    //             });
+    //         }
+    //     } else {
+    //         const newEndDate = addDays(subtaskDragging.originalEndDate as Date, deltaDays);
+    //         if (newEndDate > (subtaskTempDates.start || subtaskDragging.originalStartDate as Date)) {
+    //             setSubtaskTempDates({
+    //                 start: subtaskTempDates.start || subtaskDragging.originalStartDate,
+    //                 end: newEndDate
+    //             });
+    //         }
+    //     }
+    // };
+
     const handleSubtaskDragMove = (e: MouseEvent) => {
-        console.log("subtask dragging : ",subtaskDragging);
+        // Get parent task dates
+        const task = localExecData.find((t: any) => t.task_id === subtaskDragging.taskId);
+        const taskStart = safeParseDate(task?.start_date);
+        const taskEnd = safeParseDate(task?.end_date);
+
         if (!subtaskDragging.type || !subtaskDragging.startX || !subtaskDragging.taskId || !subtaskDragging.subtaskId) return;
 
         const deltaX = e.clientX - subtaskDragging.startX;
@@ -542,7 +569,13 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
         if (deltaDays === 0) return;
 
         if (subtaskDragging.type === 'left') {
-            const newStartDate = addDays(subtaskDragging.originalStartDate as Date, deltaDays);
+            let newStartDate = addDays(subtaskDragging.originalStartDate as Date, deltaDays);
+
+            // clamp inside parent task
+            if (newStartDate < taskStart) {
+                newStartDate = taskStart;
+            }
+
             if (newStartDate < (subtaskTempDates.end || subtaskDragging.originalEndDate as Date)) {
                 setSubtaskTempDates({
                     start: newStartDate,
@@ -550,7 +583,13 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                 });
             }
         } else {
-            const newEndDate = addDays(subtaskDragging.originalEndDate as Date, deltaDays);
+            let newEndDate = addDays(subtaskDragging.originalEndDate as Date, deltaDays);
+
+            // clamp inside parent task
+            if (newEndDate > taskEnd) {
+                newEndDate = taskEnd;
+            }
+
             if (newEndDate > (subtaskTempDates.start || subtaskDragging.originalStartDate as Date)) {
                 setSubtaskTempDates({
                     start: subtaskTempDates.start || subtaskDragging.originalStartDate,
@@ -558,7 +597,8 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                 });
             }
         }
-    };
+
+    }
 
     // Separate handler for subtask drag end
     const handleSubtaskDragEnd = async () => {
@@ -619,21 +659,21 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                     { placement: 'top-end' }
                 );
             } else {
+                    toast.push(
+                        <Notification closable type="info" duration={2000}>
+                            Subtask must remain within the start and end dates of its parent task!
+                        </Notification>,
+                        { placement: 'top-end' }
+                    );
+            }
+        } catch (error) {
+                console.error('Error updating subtask dates:', error);
                 toast.push(
                     <Notification closable type="danger" duration={2000}>
-                        Error updating subtask dates: {response.errorMessage || 'Unknown error'}
+                        Error updating subtask dates
                     </Notification>,
                     { placement: 'top-end' }
                 );
-            }
-        } catch (error) {
-            console.error('Error updating subtask dates:', error);
-            toast.push(
-                <Notification closable type="danger" duration={2000}>
-                    Error updating subtask dates
-                </Notification>,
-                { placement: 'top-end' }
-            );
         } finally {
             setSubtaskDragging({
                 type: null,
@@ -867,10 +907,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
             };
         }
     }, [moveDragging, moveTempDates]);
-
-
-
-
 
     //move delay drag end ----------------------------------------------------------
 
@@ -1613,7 +1649,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                             }}
                                         />
                                         {task.subtasks?.map((subtask: any, subIndex: any) => {
-
                                             const isDraggingThis = subtaskDragging.subtaskId === subtask.sub_task_id;
                                             const startDate = isDraggingThis && subtaskTempDates.start ? subtaskTempDates.start : safeParseDate(subtask.sub_task_start_date);
                                             const endDate = isDraggingThis && subtaskTempDates.end ? subtaskTempDates.end : safeParseDate(subtask.sub_task_end_date);

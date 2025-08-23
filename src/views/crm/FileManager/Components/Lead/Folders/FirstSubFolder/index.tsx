@@ -5,7 +5,7 @@ import { Button, Dialog, FormItem, Input, Notification, Pagination, Select, Tool
 import { AuthorityCheck, ConfirmDialog, RichTextEditor, StickyFooter } from '@/components/shared';
 import CreatableSelect from 'react-select/creatable';
 import { CiFileOn, CiImageOn } from 'react-icons/ci';
-import { apiDeleteFileManagerFiles, apiDeleteFileManagerFolders, apiGetAllUsersList, apiGetCrmFileManagerCreateLeadFolder, apiGetCrmFileManagerDrawingData, apiGetCrmFileManagerLeads, apiGetCrmFileManagerShareContractFile, apiGetCrmFileManagerShareFiles } from '@/services/CrmService';
+import { apiDeleteFileManagerFiles, apiDeleteFileManagerFolders, apiGetAllUsersList, apiGetCrmFileManagerCreateLeadFolder, apiGetCrmFileManagerDrawingData, apiGetCrmFileManagerShareContractFile, apiGetCrmFileManagerShareFiles } from '@/services/CrmService';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 import { HiShare } from 'react-icons/hi';
@@ -126,9 +126,6 @@ const Index = () => {
   const role = localStorage.getItem('role')
   const org_id: any = localStorage.getItem('orgId')
 
-  // console.log(leadData)
-
-
   const { roleData } = useRoleContext();
   const fileUploadAccess = role === 'SUPERADMIN' ? true : roleData?.data?.file?.create?.includes(`${role}`)
   const [users, setUsers] = useState<User[]>([]);
@@ -239,21 +236,6 @@ const Index = () => {
   useEffect(() => {
     const fetchDataAndLog = async () => {
       try {
-        // if(sub_folder_name_first?.toLowerCase() === 'blueprint') {
-        //     const leadData = await apiGetCrmFileManagerLeads(leadId);
-        //     const folderData = leadData?.data
-        //     console.log(folderData);
-
-        //     const selectedFolder = folderData.find((folder: any) => folder.sub_folder_name_first?.toLowerCase() === 'blueprint');
-        //     if (selectedFolder) {
-        //         setLeadData(selectedFolder.files);
-        //         // console.log(selectedFolder.files);
-        //         return;
-        //     }
-
-        //     return;
-
-        // }
         const res2 = await apiGetCrmFileManagerDrawingData(leadId, '', 'Drawing')
 
         const data = res2.data.DrawingData
@@ -269,18 +251,8 @@ const Index = () => {
                   : []
               )
           ) || [];
-          
-        // setLeadData(result)
-
-
-
 
         setLoading(false)
-        // const folderData = leadData?.data
-        // console.log(folderData);
-
-        // const selectedFolder = folderData.find((folder: any) => folder.folder_name === folderName);
-
         if(folderName === "Drawing") {
           setLeadData(result)
         }
@@ -293,8 +265,6 @@ const Index = () => {
 
     fetchDataAndLog();
   }, [leadId, folderName]);
-
-  // console.log(leadData);
 
    const deleteFolder = async (secondFolderName: string) => {
             function warn(text: string) {
@@ -406,7 +376,6 @@ const Index = () => {
     setShareLoading(false)
     onDialogClose()
     const responseData = await response.json();
-    // console.log('Files shared successfully:', responseData);
     setSelectedFiles([]);
     setSelectedEmails([]);
     setSelectedEmailsCc([]);
@@ -429,9 +398,6 @@ const Index = () => {
       return
     }
     ShareFiles()
-
-
-
 
     function warn(text: string) {
       toast.push(
@@ -555,12 +521,12 @@ const Index = () => {
         header: 'Actions', accessorKey: 'actions',
         cell: ({ row }) => {
           return <div className='flex items-center gap-2'>
-            {/* <AuthorityCheck
+            <AuthorityCheck
               userAuthority={[`${role}`]}
               authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.file?.delete ?? []}
             >
               <MdDeleteOutline className='text-xl cursor-pointer hover:text-red-500' onClick={() => openDialog3(row.original.fileId)} />
-            </AuthorityCheck> */}
+            </AuthorityCheck>
             <HiShare className='text-xl cursor-pointer' onClick={() => openDialog(row.original.fileId)} />
           </div>
         }

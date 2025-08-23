@@ -11,17 +11,13 @@ import {
     addYears,
     startOfWeek,
 } from "date-fns";
-// import { Tooltip } from "@/components/ui/tooltip";
-import { Button, Dialog, Dropdown, Notification, toast } from "@/components/ui";
+import { Dropdown, Notification, toast } from "@/components/ui";
 import AddExecTask from "./AddExecTask";
 import AddExecSubTask from "./AddExecSubTask";
 import AddExecSubTaskDetails from "./AddExecSubTaskDetails";
 import { PiDotsThreeVerticalBold } from "react-icons/pi";
 import EditExecTask from "./EditExecTask";
 import EditExecSubTask from "./EditExecSubTask";
-import { toPng } from "html-to-image";
-import jsPDF from "jspdf";
-import { PiDotsThreeVerticalDuotone } from "react-icons/pi";
 import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 import { IoIosOptions } from "react-icons/io";
 import EditExecSubTaskDetails from "./EditExecSubTaskDetails";
@@ -37,10 +33,7 @@ import { followCursor } from "tippy.js";
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/dist/backdrop.css'; // Optional for animations
 import 'tippy.js/animations/shift-away.css';
-import axios from "axios";
 import AffectionDetails from "./AffectionDetails";
-
-
 
 interface Delay {
     name: string;
@@ -88,12 +81,12 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     const [selectedSubTask, setSelectedSubTask] = useState<any>({});
     const [selectedDetail, setSelectedDetail] = useState<any>({});
     const [selectedExecData, setSelectedExecData] = useState<any>([]);
+    const [taskStartDate,setTaskStartDate] = useState();
+    const [taskEndDate,setTaskEndDate] = useState();
     const cardRef = useRef<any>(null);
     const queryParams = new URLSearchParams(location.search);
     const project_id = queryParams.get('project_id')
-
     const org_id = localStorage.getItem("orgId")
-    // console.log(selectedExecData)
 
     // Sync local data when prop changes
     useEffect(() => {
@@ -134,7 +127,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     }
 
     const onDialogClose4 = () => {
-
         setIsOpen4(false)
     }
 
@@ -146,7 +138,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     }
 
     const onDialogClose5 = () => {
-
         setIsOpen5(false)
     }
     const openDialog6 = (task: any) => {
@@ -155,7 +146,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     }
 
     const onDialogClose6 = () => {
-
         setIsOpen6(false)
     }
 
@@ -166,7 +156,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     }
 
     const onDialogClose7 = () => {
-
         setIsOpen7(false)
     }
 
@@ -177,7 +166,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     }
 
     const onDialogClose8 = () => {
-
         setIsOpen8(false)
     }
 
@@ -189,7 +177,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     }
 
     const onDialogClose3 = () => {
-
         setIsOpen3(false)
     }
 
@@ -199,7 +186,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     }
 
     const onDialogClose = () => {
-
         setIsOpen(false)
     }
 
@@ -313,9 +299,9 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     };
 
     // Helper function to handle refreshing data after adding new items
-    const refreshExecData = async () => {
+    const refreshExecData = () => {
         if (onRefreshData) {
-            await onRefreshData();
+            onRefreshData();
         }
     };
 
@@ -415,7 +401,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                 subtask_details_start_date: newStartDate,
                 subtask_details_end_date: newEndDate,
                 subtask_details_id: dragging?.detailId,
-
                 subtask_comment: dragging?.subtask_comment,
                 subtask_type: dragging?.subtask_type,
                 color: dragging?.color,
@@ -548,6 +533,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
 
     // Separate handler for subtask drag movement
     const handleSubtaskDragMove = (e: MouseEvent) => {
+        console.log("subtask dragging : ",subtaskDragging);
         if (!subtaskDragging.type || !subtaskDragging.startX || !subtaskDragging.taskId || !subtaskDragging.subtaskId) return;
 
         const deltaX = e.clientX - subtaskDragging.startX;
@@ -609,10 +595,8 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                 subtask_id: subtaskDragging.subtaskId,
                 subtask_start_date: newStartDate,
                 subtask_end_date: newEndDate,
-
                 subtask_name: subtaskDragging?.subtask_name,
                 color: subtaskDragging?.color
-
                 // Include other necessary fields
             };
 
@@ -625,6 +609,8 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                     sub_task_start_date: newStartDate,
                     sub_task_end_date: newEndDate
                 });
+                // after update again get updated data
+                refreshExecData()
 
                 toast.push(
                     <Notification closable type="success" duration={2000}>
@@ -662,7 +648,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
             setSubtaskTempDates({ start: null, end: null });
         }
     };
-
 
     // Add to your existing useEffect hooks
     useEffect(() => {
@@ -791,22 +776,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
             const newEndDate = moveTempDates.end || moveDragging.originalEndDate;
 
             if (!newStartDate || !newEndDate) return;
-
-            //   const data = {
-            //     user_id: localStorage.getItem('userId') || '',
-            //     org_id,
-            //     project_id: project_id || '',
-            //     task_id: dragging?.taskId,
-            //     subtask_id: dragging?.subtaskId,
-            //     subtask_details_start_date: newStartDate,
-            //     subtask_details_end_date: newEndDate,
-            //     subtask_details_id: dragging?.detailId,
-
-            //     subtask_comment: dragging?.subtask_comment,
-            //     subtask_type: dragging?.subtask_type,
-            //     color: dragging?.color,
-            // }
-
             const data = {
                 user_id: localStorage.getItem('userId') || '',
                 org_id,
@@ -830,6 +799,8 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                     subtask_details_start_date: newStartDate,
                     subtask_details_end_date: newEndDate
                 });
+                // after update again get updated data
+                refreshExecData()
 
                 toast.push(
                     <Notification closable type="success" duration={2000}>
@@ -867,6 +838,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
             setMoveTempDates({ start: null, end: null });
         }
     };
+
     const handleClick = (e: React.MouseEvent) => {
         // If timer exists, it means this is a click (not a drag)
         if (dragStartTimer) {
@@ -1361,12 +1333,9 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
         }
     }
 
-
-
     const handleDownload = async () => {
 
     };
-
 
     // Helper to safely sort by date or name
     const sortByDateOrName = (arr: any, dateKey: string, nameKey: string) => {

@@ -222,7 +222,8 @@ const Index = () => {
                     )
                 }
             },
-            { header: 'Files', accessorKey: 'total_files',
+            {
+                header: 'Files', accessorKey: 'total_files',
                 cell: ({ row }) => {
                     const folder_name = row.original.folder_name
                     return (

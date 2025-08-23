@@ -8,7 +8,6 @@ import {
     useReactTable,
     FilterFn
 } from '@tanstack/react-table'
-// import Table from '@/components/ui/Table'
 import Checkbox from '@/components/ui/Checkbox'
 import type { ChangeEvent, InputHTMLAttributes } from 'react'
 import type { CheckboxProps } from '@/components/ui/Checkbox'
@@ -17,7 +16,7 @@ import { Button, Dialog, FormItem, Input, Notification, Select, Upload, toast } 
 import Pagination from '@/components/ui/Pagination'
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
-import { apiGetCrmFileManagerShareContractFile, apiGetCrmProjectShareContractApproval, apiGetCrmProjectShareQuotation, apiGetCrmProjectShareQuotationApproval, apiGetCrmUsersInContractFileApproval, apiGetUsers } from '@/services/CrmService'
+import { apiGetCrmFileManagerCreateLeadFolder, apiGetCrmFileManagerDrawingUpload, apiGetCrmFileManagerShareContractFile, apiGetCrmProjectShareContractApproval, apiGetCrmProjectShareQuotation, apiGetCrmProjectShareQuotationApproval, apiGetCrmUsersInContractFileApproval, apiGetUsers } from '@/services/CrmService'
 import { use } from 'i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
@@ -25,6 +24,7 @@ import { rankItem } from '@tanstack/match-sorter-utils'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import NoData from '@/views/pages/NoData'
 import TableRowSkeleton from '@/components/shared/loaders/TableRowSkeleton'
+import formateDate from '@/store/dateformate'; 
 
 type FormData = {
     user_name: string;
@@ -36,8 +36,6 @@ type FormData = {
     type: string;
 };
 
-
-
 type CheckBoxChangeEvent = ChangeEvent<HTMLInputElement>
 
 interface IndeterminateCheckboxProps extends Omit<CheckboxProps, 'onChange'> {
@@ -46,9 +44,6 @@ interface IndeterminateCheckboxProps extends Omit<CheckboxProps, 'onChange'> {
     onCheckBoxChange?: (event: CheckBoxChangeEvent) => void;
     onIndeterminateCheckBoxChange?: (event: CheckBoxChangeEvent) => void;
 }
-
-// const { Tr, Th, Td, THead, TBody } = Table
-
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
     onChange: (value: string | number) => void
@@ -105,18 +100,22 @@ export type FileItemProps = {
     data: FileItem[]
     loading: any
     users: any
-    fileIdsForApproval:any
-    leadData:any
+    fileIdsForApproval: any
+    leadData: any
 }
+
 export type FileItem = {
     admin_status: string,
     client_status: string,
     file_name: string,
-    files: Files[],
+    files: File[],
     itemId: string,
     remark: string,
     _id: string
+    project_name: string
+    project_type: string
 }
+
 type Files = {
     fileUrl: string,
     date: string;
@@ -147,73 +146,52 @@ function IndeterminateCheckbox({
 const ContractDetails = (data: FileItemProps) => {
     const [rowSelection, setRowSelection] = useState({})
     const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
-    const [dialogIsOpen, setIsOpen] = useState(false) 
+    const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [selected, setSelected] = useState(false)
     const [remark, setRemark] = useState("");
     const location = useLocation()
     const queryParams = new URLSearchParams(location.search)
-    const leadId :any = queryParams.get('id')
+    const leadId: any = queryParams.get('id')
     const [approvalLoading, setApprovalLoading] = useState(false)
     const { roleData } = useRoleContext()
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-    // const [users, setUsers] = useState<any>([])
-    const [globalFilter, setGlobalFilter] = useState('') 
-    const org_id:any= localStorage.getItem('orgId')
-    const user_id:any= localStorage.getItem('userId')
-    // console.log(data.users)
-    // console.log(data.loading)
-
-    
-
-    // useEffect(() => {
-
-    //     const usersWithUpdateContract = data.users.filter((user:any) => 
-
-    //         (!user.access || (user.access.contract && user.access.contract.includes("update")))
-            
-    //       );
-    //       console.log(usersWithUpdateContract)
-      
-    //       const filteredList = usersWithUpdateContract.filter((item:any) => 
-    //         data.leadData.some((firstItem:any) => firstItem.user_id === item.UserId)
-    //       );
-
-    //       setUsers(filteredList)
-
-        
-
-    // }, [data.users])
-
+    const [globalFilter, setGlobalFilter] = useState('')
+    const org_id: any = localStorage.getItem('orgId')
+    const user_id: any = localStorage.getItem('userId')
+    const [formloading, setFormLoading] = useState(false)
     const [Users, SetUsers] = useState<any>();
-    // console.log(Users)
+    const userrole = localStorage.getItem('role');
+    const fileUploadAccess = userrole === 'SUPERADMIN' ? true : roleData?.data?.file?.create?.includes(`${userrole}`)
+    const [dialogIsOpen2, setIsOpen2] = useState(false)
+
+
+    function getDateFromObjectId(objectId: string): Date {
+        // First 8 characters (4 bytes) are the timestamp in hex
+        const timestampHex = objectId.substring(0, 8);
+        const timestamp = parseInt(timestampHex, 16); // convert hex → decimal
+        return new Date(timestamp * 1000); // convert seconds → ms
+    }
 
     useEffect(() => {
-            const fetchData = async () => {
-                const res = await apiGetUsers();
+        const fetchData = async () => {
+            const res = await apiGetUsers();
 
 
-                const usersWithUpdateContract = res?.data.filter((user:any) => 
-    
-                    (!user.access || (user.access.contract && user.access.contract.includes("update")))
-                    
-                  );
-                //   console.log(usersWithUpdateContract)
-              
-                  const filteredList = usersWithUpdateContract.filter((item:any) => 
-                    data.leadData.some((firstItem:any) => firstItem.user_id === item.UserId)
-                  );
-        
-                  SetUsers(filteredList)  
+            const usersWithUpdateContract = res?.data.filter((user: any) =>
 
-                //   console.log(filteredList)
-            }
-            fetchData();
-        }, [data.leadData])
+                (!user.access || (user.access.contract && user.access.contract.includes("update")))
 
+            );
 
+            const filteredList = usersWithUpdateContract.filter((item: any) =>
+                data.leadData.some((firstItem: any) => firstItem.user_id === item.UserId)
+            );
 
-  
+            SetUsers(filteredList)
+        }
+        fetchData();
+    }, [data.leadData])
 
     const openDialog = () => {
         setIsOpen(true)
@@ -260,7 +238,7 @@ const ContractDetails = (data: FileItemProps) => {
 
 
 
-    const ApprovalDailog = (fileId:any,)=> {
+    const ApprovalDailog = (fileId: any,) => {
 
         const [dialogIsOpen2, setIsOpen2] = useState(false)
         const [loading2, setLoading2] = useState(false)
@@ -272,16 +250,16 @@ const ContractDetails = (data: FileItemProps) => {
 
 
         //         const usersWithUpdateContract = data?.data.filter((user:any) => 
-    
+
         //             (!user.access || (user.access.contract && user.access.contract.includes("update")))
-                    
+
         //           );
         //         //   console.log(usersWithUpdateContract)
-              
+
         //           const filteredList = usersWithUpdateContract.filter((item:any) => 
         //             fileId.LeadData.some((firstItem:any) => firstItem.user_id === item.UserId)
         //           );
-        
+
         //           setUsers(filteredList)  
         //     }
         //     fetchData();
@@ -292,20 +270,20 @@ const ContractDetails = (data: FileItemProps) => {
         // useEffect(() => {
 
         //     const usersWithUpdateContract = fileId.Users.filter((user:any) => 
-    
+
         //         (!user.access || (user.access.contract && user.access.contract.includes("update")))
-                
+
         //       );
         //     //   console.log(usersWithUpdateContract)
-          
+
         //       const filteredList = usersWithUpdateContract.filter((item:any) => 
         //         fileId.LeadData.some((firstItem:any) => firstItem.user_id === item.UserId)
         //       );
-    
+
         //       setUsers(filteredList)
-    
-            
-    
+
+
+
         // }, [fileId.Users])
 
         const openDialog2 = () => {
@@ -316,45 +294,43 @@ const ContractDetails = (data: FileItemProps) => {
             setIsOpen2(false)
         }
 
-        const contractApproval = async (values:any) => {
-            // console.log(values)
+        const contractApproval = async (values: any) => {
             try {
-                const formData = new FormData() 
+                const formData = new FormData()
                 formData.append('lead_id', leadId)
                 formData.append('folder_name', 'Contract')
                 formData.append('file_id', values.file_id)
-                formData.append('userId',values.userId)
-                formData.append('userEmail',values.email)
+                formData.append('userId', values.userId)
+                formData.append('userEmail', values.email)
                 formData.append('type', 'Internal')
                 formData.append('org_id', org_id)
                 formData.append('user_id', user_id)
-    
-                const response = await apiGetCrmFileManagerShareContractFile(formData) 
-                // console.log(response);
-    
+
+                const response = await apiGetCrmFileManagerShareContractFile(formData)
+
                 if (response.code === 200) {
                     toast.push(
-                    <Notification closable type="success" duration={2000}>
-                        Shared for approval successfully
-                    </Notification>, { placement: 'top-end' }
+                        <Notification closable type="success" duration={2000}>
+                            Shared for approval successfully
+                        </Notification>, { placement: 'top-end' }
                     )
                     window.location.reload();
-                    
+
                 }
                 else {
                     toast.push(
-                    <Notification closable type="danger" duration={2000}>
-                        {response.errorMessage}
-                    </Notification>, { placement: 'top-end' }
+                        <Notification closable type="danger" duration={2000}>
+                            {response.errorMessage}
+                        </Notification>, { placement: 'top-end' }
                     )
                 }
-            } catch (error:any) {
+            } catch (error: any) {
                 throw new Error(error);
-                
+
             }
         }
 
-        
+
         return (<>
             <Button variant='solid' size='sm' onClick={() => openDialog2()}>Share for approval</Button>
             <Dialog
@@ -387,30 +363,30 @@ const ContractDetails = (data: FileItemProps) => {
                     onSubmit={(values, { setSubmitting }) => {
 
 
-                        
+
                         // handleSubmit(values);
                         contractApproval(values)
                         setSubmitting(false);
                     }}
                 >
-                    {({setFieldValue, errors, touched }) => {
+                    {({ setFieldValue, errors, touched }) => {
                         return (
                             <div className='max-h-96 overflow-y-auto '>
                                 <Form className='mr-3'>
                                     <FormItem label='User' asterisk
                                         invalid={errors.userId && touched.userId}
                                         errorMessage={errors.userId}
-                                        >
+                                    >
 
-                                            <Select
-                                                options={Users.map((user:any) => ({ value: user.UserId, label: user.username, email: user.email }))}
-                                                onChange={(option:any) => {
-                                                    setFieldValue('userId', option?.value || '')
-                                                    setFieldValue('email', option?.email || '')
-                                                }}
-                                            />
+                                        <Select
+                                            options={Users.map((user: any) => ({ value: user.UserId, label: user.username, email: user.email }))}
+                                            onChange={(option: any) => {
+                                                setFieldValue('userId', option?.value || '')
+                                                setFieldValue('email', option?.email || '')
+                                            }}
+                                        />
                                     </FormItem>
-                                   
+
                                     <Button className='mt-16' type='submit' block variant='solid' loading={loading2}> {loading2 ? 'Sending' : 'Send'} </Button>
                                 </Form>
                             </div>)
@@ -418,10 +394,10 @@ const ContractDetails = (data: FileItemProps) => {
                 </Formik>
 
             </Dialog>
-            </>
+        </>
         )
     }
-    
+
     const columns =
         useMemo<ColumnDef<FileItem>[]>
             (() => {
@@ -453,7 +429,7 @@ const ContractDetails = (data: FileItemProps) => {
                                     onMouseLeave={handleMouseLeave}
                                 >
                                     <a href={`${row.original.files[0]}`} className=' cursor-pointer' target='_blank'>
-                                        {fileName.length > 31 ? `${fileName.substring(0,31)}...` : fileName}</a>
+                                        {fileName.length > 31 ? `${fileName.substring(0, 31)}...` : fileName}</a>
                                     {isHovered && (
                                         <div className='absolute bottom-0 left-full ml-2 bg-white border border-gray-300 p-2 shadow-lg z-9999 whitespace-nowrap transition-opacity duration-200'>
                                             <p>File Name: {fileName}</p>
@@ -495,7 +471,7 @@ const ContractDetails = (data: FileItemProps) => {
                                         (role === 'SUPERADMIN' || data.fileIdsForApproval.includes(fileId)) ? (
 
                                             <div>
-                                                    <div className='flex gap-1'>
+                                                <div className='flex gap-1'>
                                                     <Button variant='solid' size='sm' onClick={() => Approval(fileId, 'approved')}>{approvalLoading ? "Approving..." : 'Approve'}</Button>
                                                     <Button variant='solid' color='red-600' size='sm' onClick={() => openDialog1(fileId)}>Reject</Button>
                                                     <Dialog
@@ -505,7 +481,7 @@ const ContractDetails = (data: FileItemProps) => {
                                                     >
                                                         <h3 className='mb-4'> Reject Remarks</h3>
                                                         <Formik
-                                                            initialValues={{ lead_id: leadId, file_id: fileId, status: 'rejected', remark: '', org_id }}
+                                                            initialValues={{ lead_id: leadId, file_id: fileId, status: 'rejected', remark: '', org_id, user_id }}
                                                             validationSchema={Yup.object({ remark: Yup.string().required('Required') })}
                                                             onSubmit={async (values, { setSubmitting }) => {
                                                                 setSubmitting(true);
@@ -557,37 +533,37 @@ const ContractDetails = (data: FileItemProps) => {
                                                 </div>
 
                                             </div>
-                                            ) : (<div className=''>
+                                        ) : (<div className=''>
 
-                                                <div className=''>
-                                                    Pending for approval
-                                                </div>
-                                                
-                                                </div>)
+                                            <div className=''>
+                                                Pending for approval
+                                            </div>
+
+                                        </div>)
+                                    ) : (
+                                        data.fileIdsForApproval.includes(fileId) ? (
+                                            <div>you have not access to approve</div>
+
                                         ) : (
-                                            data.fileIdsForApproval.includes(fileId) ?  (
-                                                <div>you have not access to approve</div>
-
-                                            ) : (
-                                                <div className=''>
+                                            <div className=''>
 
                                                 <div className='mb-2'>
-                                                    Pending for approval 
-                                                </div>                                                
-                                                </div> 
+                                                    Pending for approval
+                                                </div>
+                                            </div>
 
-                                            )
                                         )
-                                    ) 
+                                    )
+                                )
                                     : (
 
                                         <span className=' flex flex-col items-start gap-2'>
 
-                                        <ApprovalDailog fileId={fileId} Users={Users} LeadData={data.leadData}/>
+                                            <ApprovalDailog fileId={fileId} Users={Users} LeadData={data.leadData} />
 
-                                        { role === 'SUPERADMIN' &&
-                                            
-                                            <div className='flex gap-1'>
+                                            {role === 'SUPERADMIN' &&
+
+                                                <div className='flex gap-1'>
                                                     <Button variant='solid' size='sm' onClick={() => Approval(fileId, 'approved')}>{approvalLoading ? "Approving..." : 'Approve'}</Button>
                                                     <Button variant='solid' color='red-600' size='sm' onClick={() => openDialog1(fileId)}>Reject</Button>
                                                     <Dialog
@@ -597,7 +573,7 @@ const ContractDetails = (data: FileItemProps) => {
                                                     >
                                                         <h3 className='mb-4'> Reject Remarks</h3>
                                                         <Formik
-                                                            initialValues={{ lead_id: leadId, file_id: fileId, status: 'rejected', remark: '', org_id }}
+                                                            initialValues={{ lead_id: leadId, file_id: fileId, status: 'rejected', remark: '', org_id, user_id }}
                                                             validationSchema={Yup.object({ remark: Yup.string().required('Required') })}
                                                             onSubmit={async (values, { setSubmitting }) => {
                                                                 setSubmitting(true);
@@ -648,11 +624,11 @@ const ContractDetails = (data: FileItemProps) => {
                                                     </Dialog>
                                                 </div>}
 
-                                                </span>
+                                        </span>
                                     )
 
                             )
-        
+
                         }
                     }
                     ,
@@ -674,7 +650,7 @@ const ContractDetails = (data: FileItemProps) => {
 
                             return (<>
                                 {admin_status === 'rejected' &&
-                                    <div><Button size='sm' variant='solid' onClick={() => openDialog()}>Remark</Button></div>}
+                                    <div><Button size='sm' variant='solid' onClick={() => openDialog()}>View Remarks</Button></div>}
                                 <Dialog
                                     isOpen={dialogIsOpen}
                                     onClose={onDialogClose}
@@ -687,7 +663,15 @@ const ContractDetails = (data: FileItemProps) => {
 
                             )
                         }
-                    }] : [])
+                    }] : []),
+                    {
+                        header: 'Created',
+                        accessorKey: '_id',
+                        cell: ({ row }) => {
+                            const date = getDateFromObjectId(row.original._id);
+                            return <div>{date ? formateDate(date.toString()) : 'N/A'}</div>;
+                        }
+                    }
                 ]
             },
                 [Users, data])
@@ -726,6 +710,14 @@ const ContractDetails = (data: FileItemProps) => {
 
     const onSelectChange = (value = 0) => {
         table.setPageSize(Number(value))
+    }
+
+    const onDialogClose2 = () => {
+        setIsOpen2(false)
+    }
+
+    const openDialog2 = () => {
+        setIsOpen2(true)
     }
 
     interface FormValues {
@@ -833,19 +825,16 @@ const ContractDetails = (data: FileItemProps) => {
 
     };
 
-    const navigate = useNavigate() 
+    const navigate = useNavigate()
     const approvedFiles = data.data.filter(file => file.admin_status === 'approved').map(file => ({ value: file.itemId, label: file.file_name }));
 
-    const [userOption, setUserOption] = useState<any>(); 
-    
+    const [userOption, setUserOption] = useState<any>();
+
     useEffect(() => {
-        const userData = data.users.map((user:any) => ({ value: user.UserId, label: user.username }));
+        const userData = data.users.map((user: any) => ({ value: user.UserId, label: user.username }));
         setUserOption(userData)
 
     }, [data.users])
-    // console.log(data.users)
-
-  
 
     return (
         <div>
@@ -858,82 +847,86 @@ const ContractDetails = (data: FileItemProps) => {
                 />
                 <div className=' flex mb-4 gap-3'>
                     <Button variant='solid' size='sm' onClick={() => openDialog()} >Share to Client</Button>
+                    {fileUploadAccess &&
+                    <Button className='' size='sm' variant='solid' onClick={() => openDialog2()}>
+                        Upload Contract
+                    </Button>}
                 </div>
             </div>
-             
-                <div>
-                    <TableContainer className='max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100' style={{ boxShadow: 'none'}}>
-                        <Table stickyHeader>
-                            <TableHead>
-                                {table.getHeaderGroups().map((headerGroup) => (
-                                    <TableRow key={headerGroup.id} className='uppercase'>
-                                        {headerGroup.headers.map((header) => (
-                                            <TableCell key={header.id} colSpan={header.colSpan} sx={{fontWeight:"600"}}>
-                                                {flexRender(header.column.columnDef.header, header.getContext())}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))}
-                            </TableHead>
-                            {
 
-                                data.loading ? (
-                                                
-                                    <TableRowSkeleton
-                                        avatarInColumns={[0]}
-                                        columns={columns.length}
-                                        avatarProps={{ width: 14, height: 14 }}
-                                    />
-                                        
-                                ) : data?.data.length === 0 ? (
-                                    <TableBody>
-                                        <TableRow>
-                                            <TableCell colSpan={columns.length}>
-                                                <NoData />
-                                            </TableCell>
+            <div>
+                <TableContainer className='max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100' style={{ boxShadow: 'none' }}>
+                    <Table stickyHeader>
+                        <TableHead>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id} className='uppercase'>
+                                    {headerGroup.headers.map((header) => (
+                                        <TableCell key={header.id} colSpan={header.colSpan} sx={{ fontWeight: "600" }}>
+                                            {flexRender(header.column.columnDef.header, header.getContext())}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableHead>
+                        {
+
+                            data.loading ? (
+
+                                <TableRowSkeleton
+                                    avatarInColumns={[0]}
+                                    columns={columns.length}
+                                    avatarProps={{ width: 14, height: 14 }}
+                                />
+
+                            ) : data?.data.length === 0 ? (
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell colSpan={columns.length}>
+                                            <NoData />
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            ) :
+
+
+                                (<TableBody>
+                                    {table.getRowModel().rows.map((row) => (
+                                        <TableRow key={row.id} sx={{ '&:hover': { backgroundColor: '#dfedfe' } }} >
+                                            {row.getVisibleCells().map((cell) => (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </TableCell>
+                                            ))}
                                         </TableRow>
-                                    </TableBody>
-                                ) :
+                                    ))}
+                                </TableBody>)
+                        }
 
-
-                            (<TableBody>
-                                {table.getRowModel().rows.map((row) => (
-                                    <TableRow key={row.id} sx={{'&:hover': { backgroundColor: '#dfedfe' }}} >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))}
-                            </TableBody>)
-                            }
-
-                        </Table>
-                    </TableContainer>
-                    <div className="flex items-center justify-between mt-4">
-                        <Pagination
-                            pageSize={table.getState().pagination.pageSize}
-                            currentPage={table.getState().pagination.pageIndex + 1}
-                            total={table.getFilteredRowModel().rows.length}
-                            onChange={onPaginationChange}
+                    </Table>
+                </TableContainer>
+                <div className="flex items-center justify-between mt-4">
+                    <Pagination
+                        pageSize={table.getState().pagination.pageSize}
+                        currentPage={table.getState().pagination.pageIndex + 1}
+                        total={table.getFilteredRowModel().rows.length}
+                        onChange={onPaginationChange}
+                    />
+                    <div style={{ minWidth: 130 }}>
+                        <Select<Option>
+                            size="sm"
+                            isSearchable={false}
+                            value={pageSizeOption.filter(
+                                (option) =>
+                                    option.value ===
+                                    table.getState().pagination.pageSize
+                            )}
+                            options={pageSizeOption}
+                            onChange={(option) => onSelectChange(option?.value)}
                         />
-                        <div style={{ minWidth: 130 }}>
-                            <Select<Option>
-                                size="sm"
-                                isSearchable={false}
-                                value={pageSizeOption.filter(
-                                    (option) =>
-                                        option.value ===
-                                        table.getState().pagination.pageSize
-                                )}
-                                options={pageSizeOption}
-                                onChange={(option) => onSelectChange(option?.value)}
-                            />
-                        </div>
                     </div>
                 </div>
-            
+            </div>
+
 
             <Dialog
                 isOpen={dialogIsOpen}
@@ -1044,12 +1037,78 @@ const ContractDetails = (data: FileItemProps) => {
 
             </Dialog>
 
+            <Dialog isOpen={dialogIsOpen2}
+                className=' '
+                onClose={onDialogClose2}
+                onRequestClose={onDialogClose2}>
+                <h3>Upload Contract</h3>
+                <Formik
+                initialValues={{
+                    lead_id: leadId,
+                    folder_name: "Contract",
+                    files: []
+                }}
+                onSubmit={async (values) => {
+                    setFormLoading(true)
+                    if (values.files.length === 0) {
+                    toast.push(
+                        <Notification closable type="warning" duration={2000}>
+                        No files selected for upload
+                        </Notification>, { placement: 'top-center' }
+                    )
+                    }
+                    else {
+                    // console.log(values);
+                    let formData = new FormData();
+                    formData.append('lead_id', values.lead_id || '');
+                    formData.append('folder_name', values.folder_name || '');
+                    for (let i = 0; i < values.files.length; i++) {
+                        formData.append('files', values.files[i]);
+                    }
 
-            
+                    formData.append('org_id', org_id)
+                    const response = await apiGetCrmFileManagerCreateLeadFolder(formData)
+                    // const responseData=await response.json()
+                    setFormLoading(false)
+                    setLoading(false)
+                    // console.log(response);
 
-
-
-
+                    if (response.code === 200) {
+                        toast.push(
+                        <Notification closable type="success" duration={2000}>
+                            Files uploaded successfully
+                        </Notification>, { placement: 'top-end' }
+                        )
+                        window.location.reload()
+                    }
+                    else {
+                        toast.push(
+                        <Notification closable type="danger" duration={2000}>
+                            {response.errorMessage}
+                        </Notification>, { placement: 'top-end' }
+                        )
+                    }
+                    }
+                }}
+                >
+                <Form className=' overflow-y-auto max-h-[400px] mt-4' style={{ scrollbarWidth: 'none' }}>
+                    <FormItem label='Files'>
+                    <Field name='files'>
+                        {({ field, form }: any) => (
+                        <Upload
+                            onChange={(files: File[], fileList: File[]) => {
+                            form.setFieldValue('files', files);
+                            }}
+                            draggable
+                            multiple
+                        />
+                        )}
+                    </Field>
+                    </FormItem>
+                    <Button variant='solid' type='submit' block loading={formloading}>{formloading ? 'Submitting' : 'Submit'}</Button>
+                </Form>
+                </Formik>
+            </Dialog>
 
         </div>
     )

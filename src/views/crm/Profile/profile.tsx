@@ -1,9 +1,6 @@
 import Input from '@/components/ui/Input'
 import Avatar from '@/components/ui/Avatar'
-import Upload from '@/components/ui/Upload'
 import Button from '@/components/ui/Button'
-import Select from '@/components/ui/Select'
-import Switcher from '@/components/ui/Switcher'
 import Notification from '@/components/ui/Notification'
 import toast from '@/components/ui/toast'
 import { FormContainer, FormItem } from '@/components/ui/Form'
@@ -12,9 +9,8 @@ import { HiOutlineUser } from 'react-icons/hi'
 import * as Yup from 'yup'
 import type { FormikProps, FieldInputProps, FieldProps } from 'formik'
 import FormRow from '@/views/account/Settings/components/FormRow'
-import { useContext, useEffect, useState } from 'react'
-import { addProfilePhoto } from '@/services/CrmService'
-import { UserDetailsContext } from '@/views/Context/userdetailsContext'
+import { useState } from 'react'
+import { addProfilePhoto, apiGetUserData } from '@/services/CrmService'
 
 export type ProfileFormModel = {
     username: string
@@ -31,6 +27,7 @@ export type ProfileUpdate = {
 export type ProfileProps = {
     data?: ProfileFormModel | null
 }
+
 const validationSchema = Yup.object().shape({
     avatar: Yup.string(),
 })
@@ -38,8 +35,8 @@ const validationSchema = Yup.object().shape({
 const Profile = ({ data }: ProfileProps) => {
     const [usernameData, setUserNameData] = useState<any>(data?.username)
     const org_id: any = localStorage.getItem('orgId')
-
     const [avatarUrl, setAvatarUrl] = useState<string | undefined>(data?.avatar)
+
     const onSetFormFile = (
         form: FormikProps<ProfileFormModel>,
         field: FieldInputProps<ProfileFormModel>,
@@ -61,13 +58,24 @@ const Profile = ({ data }: ProfileProps) => {
         formData.append('user_name', usernameData)
         formData.append('org_id', org_id)
 
-        const response = await addProfilePhoto(formData)
-
-        setAvatarUrl(data?.avatar)
-        toast.push(<Notification title={'Profile updated'} type="success" />, {
-            placement: 'top-center',
-        })
-        window.location.reload()
+        try {
+            const response = await addProfilePhoto(formData)
+            // The avatar URL is already updated in the state from file selection
+            // Just show success message and update localStorage
+            toast.push(<Notification title={'Profile updated successfully'} type="success" duration={3000} closable />, {
+                placement: 'top-center',
+            })
+            
+            // Update localStorage with the new username
+            if (usernameData) {
+                localStorage.setItem('userName', usernameData)
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error)
+            toast.push(<Notification title={'Failed to update profile'} type="danger" duration={3000} closable />, {
+                placement: 'top-center',
+            })
+        }
         setSubmitting(false)
     }
 

@@ -185,7 +185,7 @@ const Index = () => {
         postData.append('question', inputValue ? inputValue : "");
         try {
             setLoading(true);
-            const response = await fetch(`https://ada-bot.test.initz.run/summary`, {
+            const response = await fetch(`${chatApiUrl}summary`, {
                 method: "POST",
                 body: postData,
             });
@@ -382,7 +382,7 @@ const Index = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://ada-bot.test.initz.run/summary`, {
+            const response = await fetch(`${chatApiUrl}summary`, {
                 method: "POST",
                 body: postData,
             });
@@ -584,12 +584,12 @@ const Index = () => {
 
                                                 let match;
                                                 if (queryType === "summary") {
-                                                    if(line.includes("responseEnd"))
-                                                    match = line.match(/{"summary":"Chunk 1:(.*?)"}/s);
-                                                else match = line.replace("responseEnd", "").replace("data:", "").match(/"content":"(.*?)"/);
-                                                  } else {
+                                                    if (line.includes("responseEnd"))
+                                                        match = line.match(/{"summary":"Chunk 1:(.*?)"}/s);
+                                                    else match = line.replace("responseEnd", "").replace("data:", "").match(/"content":"(.*?)"/);
+                                                } else {
                                                     match = line.replace("responseEnd", "").replace("data:", "").match(/"content":"(.*?)"/);
-                                                  }
+                                                }
 
                                                 let lineShow = ''
                                                 let testShow = ''
@@ -816,7 +816,7 @@ const Index = () => {
                 )}
 
                 <InputGroup className="bottom-0 border rounded-md border-[#9f9e9e]">
-                {/* {queryType === "summary" && (
+                    {/* {queryType === "summary" && (
                             <div className="flex flex-col items-center justify-center ">
                                 <FormItem label="File">
                                     <Upload

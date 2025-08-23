@@ -9,6 +9,9 @@ const PublicSecond = ({ setImgList, data, mainLoading, setCurrentImage, currentI
     const queryParams = new URLSearchParams(location.search);
     const leadId = queryParams.get("lead_id") || "";
     const projectId = queryParams.get("project_id") || "";
+
+    console.log("public second org: ",orgId)
+    console.log("puclice secon user : ",userId)
     
     const imgId = queryParams.get("imgId") || "";
 

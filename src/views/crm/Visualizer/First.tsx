@@ -193,7 +193,14 @@ const Hotspot = ({ data, setCurrentView }) => {
         castShadow
       >
         <sphereGeometry args={[5, 32, 32]} />
-        <Box position={[1.2, 0, 0]} data={data} name={data?.name} hovered={hovered} hover={hover} handleClick={handleClick} />
+        <Box 
+          position={[1.2, 0, 0]} 
+          data={data} 
+          name={data?.name} 
+          hovered={hovered} 
+          hover={hover} 
+          handleClick={handleClick} 
+          />
         <meshStandardMaterial color={hovered ? 'white' : 'purple'} />
       </mesh>
 

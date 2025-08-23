@@ -7,14 +7,6 @@ import { useSearchParams, useLocation } from "react-router-dom";
 import Loading from "react-loading";
 
 // Define a local interface to avoid import conflicts, aligning with expected structure
-interface CrmDataItem {
-    img_id: string;
-    name?: string;
-    url?: string;
-    crd?: [number, number, number];
-    hp?: CrmDataItem[]; // Nested hotspots
-    [key: string]: any;
-}
 
 // Loader component
 const Loader = () => {
@@ -37,18 +29,18 @@ const Loader = () => {
 };
 
 // Box component with typed props
-interface BoxProps {
-    position: [number, number, number];
-    data: CrmDataItem;
-    name?: string;
-    hovered: boolean;
-    click: (value: boolean) => void;
-    clicked: boolean;
-    hover: (value: boolean) => void;
-    handleClick: () => void;
-}
+// interface BoxProps {
+//     position: [number, number, number];
+//     data: CrmDataItem;
+//     name?: string;
+//     hovered: boolean;
+//     click: (value: boolean) => void;
+//     clicked: boolean;
+//     hover: (value: boolean) => void;
+//     handleClick: () => void;
+// }
 
-function Box({ position, data, name, hovered, click, clicked, hover, handleClick }: BoxProps) {
+function Box({ position, data, name, hovered, click, clicked, hover, handleClick }: any) {
     const ref = useRef<THREE.Mesh>(null);
     const textRef = useRef<THREE.Object3D>(null); // Type for Text component
     const { gl, camera } = useThree();
@@ -97,12 +89,12 @@ function Box({ position, data, name, hovered, click, clicked, hover, handleClick
 }
 
 // Hotspot component with typed props
-interface HotspotProps {
-    data: CrmDataItem;
-    setCurrentView: React.Dispatch<React.SetStateAction<CrmDataItem | null>>;
-}
+// interface HotspotProps {
+//     data: CrmDataItem;
+//     setCurrentView: React.Dispatch<React.SetStateAction<CrmDataItem | null>>;
+// }
 
-const Hotspot = ({ data, setCurrentView }: HotspotProps) => {
+const Hotspot = ({ data, setCurrentView }:any) => {
     const [hovered, setHovered] = useState(false);
     const { gl } = useThree();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -140,7 +132,7 @@ const Hotspot = ({ data, setCurrentView }: HotspotProps) => {
                     hovered={hovered}
                     hover={setHovered}
                     handleClick={handleClick}
-                    click={(value) => setHovered(value)}
+                    click={(value: boolean) => setHovered(value)}
                     clicked={hovered}
                 />
                 <meshStandardMaterial color={hovered ? "white" : "purple"} />
@@ -149,25 +141,13 @@ const Hotspot = ({ data, setCurrentView }: HotspotProps) => {
     );
 }
 
-// Scene component with typed props
-interface SceneProps {
-    texture: THREE.Texture | null;
-    testData: CrmDataItem | null;
-    setCurrentView: React.Dispatch<React.SetStateAction<CrmDataItem | null>>;
-    currentView: CrmDataItem | null;
-    orgId: any;
-    userId: any;
-}
-
-const Scene = ({ texture, testData, setCurrentView, currentView, orgId, userId }: SceneProps) => {
+const Scene = ({ texture, testData, setCurrentView, currentView, orgId, userId }: any) => {
     const { camera, scene, gl } = useThree();
-    const [hotspots, setHotspots] = useState<CrmDataItem[]>(currentView?.hp || []);
+    const [hotspots, setHotspots] = useState<any>(currentView?.hp);
     const [hpLoading, setHpLoading] = useState<boolean>(false);
     const queryParams = new URLSearchParams(location.search);
     const leadId = queryParams.get("lead_id") || null;
     const projectId = queryParams.get("project_id") || null;
-    // const orgId = queryParams.get("org_id") || null;
-    // const userId = queryParams.get("user_id") || null;
 
     useEffect(() => {
         setHotspots(currentView?.hp || []);
@@ -179,7 +159,8 @@ const Scene = ({ texture, testData, setCurrentView, currentView, orgId, userId }
                 setHpLoading(false);
                 if (currentView?.img_id) {
                     const res = await apiGetCrmMainThreeImagePublic("hp", currentView.img_id, leadId, projectId, orgId, userId);
-                    setHotspots(res?.data[0]?.hp || []);
+                    console.log("res from public view : ",res)
+                    setHotspots((res?.data[0])?.hp || []);
                 }
                 setHpLoading(true);
             } catch (error: any) {
@@ -197,25 +178,14 @@ const Scene = ({ texture, testData, setCurrentView, currentView, orgId, userId }
                 <sphereGeometry args={[500, 60, 40]} />
                 <meshBasicMaterial map={texture} side={THREE.BackSide} />
             </mesh>
-            {hotspots?.map((data, index) => (
+            {hotspots?.map((data: any, index: number) => (
                 <Hotspot key={index} data={data} setCurrentView={setCurrentView} />
             ))}
         </group>
     );
 }
 
-// Second component with typed props (corrected to manage texture as state)
-interface SecondProps {
-    imageUrl: string | undefined;
-    setTexture: React.Dispatch<React.SetStateAction<THREE.Texture | null>>;
-    testData: CrmDataItem | null;
-    currentView: CrmDataItem | null;
-    setCurrentView: React.Dispatch<React.SetStateAction<CrmDataItem | null>>;
-    orgId: any,
-    userId: any
-}
-
-const Second = ({ imageUrl, setTexture, testData, currentView, setCurrentView, orgId, userId }: SecondProps) => {
+const Second = ({ imageUrl, setTexture, testData, currentView, setCurrentView, orgId, userId }: any) => {
     const [texture, setLocalTexture] = useState<THREE.Texture | null>(null); // Local state for texture
     const { progress } = useProgress();
     const textureLoader = new THREE.TextureLoader();
@@ -268,29 +238,21 @@ const Second = ({ imageUrl, setTexture, testData, currentView, setCurrentView, o
     );
 };
 
-// PublicFirst component with typed props
-interface PublicFirstProps {
-    imgIdList: string[];
-    currentImage: CrmDataItem | null;
-    setCurrentImage: React.Dispatch<React.SetStateAction<CrmDataItem | null>>;
-    setImgList: React.Dispatch<React.SetStateAction<string[]>>;
-    orgId: string | null;
-    userId: string | null;
-}
-
-const PublicFirst = ({ imgIdList, currentImage, setCurrentImage, setImgList, orgId, userId }: PublicFirstProps) => {
+const PublicFirst = ({ imgIdList, currentImage, setCurrentImage, setImgList, orgId, userId }: any) => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const leadId = queryParams.get("lead_id") || null;
     const projectId = queryParams.get("project_id") || null;
     const imgId = queryParams.get("imgId") || "";
 
-    const [testData, setTestData] = useState<CrmDataItem | null>(currentImage);
+    const [testData, setTestData] = useState<any>(currentImage)
     const [texture, setTexture] = useState<THREE.Texture | null>(null); // Properly initialized
     const [searchParams, setSearchParams] = useSearchParams();
 
     useEffect(() => {
         const fetchData = async () => {
+            console.log("org id : ",orgId)
+            console.log("user id : ",userId)
             const res = await apiGetCrmImageByIdPublic(imgId, leadId, projectId, orgId, userId);
 
             const paramEntries = Array.from(searchParams.entries());
@@ -310,7 +272,7 @@ const PublicFirst = ({ imgIdList, currentImage, setCurrentImage, setImgList, org
         fetchData();
     }, [imgId, leadId, projectId, setCurrentImage, setImgList, searchParams]);
 
-    const [currentView, setCurrentView] = useState<CrmDataItem | null>(null);
+    const [currentView, setCurrentView] = useState<any>({});
 
     useEffect(() => {
         setCurrentView(currentImage);

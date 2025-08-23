@@ -1352,6 +1352,8 @@ export async function apiGetCrmImageByIdPublic(
     user_id:any
 ) {
     // org done
+    console.log("org id service : ",org_id)
+    console.log("user id service : ",user_id)
     return ApiService.fetchData<ArchiveResponse>({
         url: `admin/get/threeimage?user_id=${user_id}&org_id=${org_id}&img_id=${img_id}&project_id=${project_id}&lead_id=${lead_id}`,
         method: 'get',

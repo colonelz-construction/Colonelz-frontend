@@ -1311,6 +1311,22 @@ export async function apiGetCrmUsersInContractFileApproval<T>(leadId :any) {  //
         return response.data
     })
 }
+export async function apiGetCrmMainThreeImagePublic(
+    type: any,
+    img_id: any,
+    lead_id: any,
+    project_id: any,
+    org_id: any,
+    user_id: any
+) {
+    // org done
+    return ApiService.fetchData<ArchiveResponse>({
+        url: `admin/get/all/mainthreeimage?user_id=${user_id}&org_id=${org_id}&type=${type}&img_id=${img_id}&project_id=${project_id}&lead_id=${lead_id}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
 
 export async function apiGetCrmMainThreeImage<T>(type:any, img_id:any, lead_id:any, project_id:any) { // org done
     return ApiService.fetchData<ArchiveResponse>({
@@ -1323,6 +1339,35 @@ export async function apiGetCrmMainThreeImage<T>(type:any, img_id:any, lead_id:a
 export async function apiGetCrmImageById<T>(img_id:any, lead_id:any, project_id:any) { // org done
     return ApiService.fetchData<ArchiveResponse>({
         url: `admin/get/threeimage?user_id=${localStorage.getItem('userId')}&org_id=${localStorage.getItem('orgId')}&img_id=${img_id}&project_id=${project_id}&lead_id=${lead_id}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiGetCrmImageByIdPublic(
+    img_id: any,
+    lead_id: any,
+    project_id: any,
+    org_id:any,
+    user_id:any
+) {
+    // org done
+    return ApiService.fetchData<ArchiveResponse>({
+        url: `admin/get/threeimage?user_id=${user_id}&org_id=${org_id}&img_id=${img_id}&project_id=${project_id}&lead_id=${lead_id}`,
+        method: 'get',
+    }).then((response) => {
+        return response.data
+    })
+}
+export async function apiGetCrmPanoImagesFileManagerPublic(
+    lead_id: any,
+    project_id: any,
+    org_id:any,
+    user_id:any
+) {
+    // org done
+    return ApiService.fetchData<any>({
+        url: `admin/get/all/panoimages?user_id=${user_id}&org_id=${org_id}&lead_id=${lead_id}&project_id=${project_id}`,
         method: 'get',
     }).then((response) => {
         return response.data

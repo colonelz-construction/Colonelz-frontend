@@ -1,5 +1,4 @@
-import { Button } from '@/components/ui'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import ContractDetails, { FileItem } from './Contract/contractDetail'
 import { apiGetCrmContractDetails, apiGetCrmUsersInContractFileApproval, apiGetUsers } from '@/services/CrmService'
@@ -33,9 +32,6 @@ const Contract = ({leadData}:any) => {
         const res = await apiGetCrmUsersInContractFileApproval(lead_id);
         setFileIdsForApproval(res.data)
 
-
-        
-        
         const usersWithUpdateContract = usersData.filter((user:any) => 
 
           (!user.access || (user.access.contract && user.access.contract.includes("update")))
@@ -46,7 +42,6 @@ const Contract = ({leadData}:any) => {
           leadData.some((firstItem:any) => firstItem.user_id === item.UserId)
         );
     
-        // console.log(filteredList) 
         setUsers(data.data)
         
         setDetails(response);

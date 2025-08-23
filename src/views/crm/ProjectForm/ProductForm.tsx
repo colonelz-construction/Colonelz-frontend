@@ -1,31 +1,44 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, FormContainer, FormItem, Input, Notification, Select, Upload, toast } from '@/components/ui';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DatePicker from '@/components/ui/DatePicker/DatePicker';
 import { StickyFooter } from '@/components/shared';
-import { apiGetCrmCreateLeadToProject } from '@/services/CrmService';
+import { apiGetCrmContractDetails, apiGetCrmCreateLeadToProject } from '@/services/CrmService';
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { HiOutlineCloudUpload } from 'react-icons/hi';
+import { FileItem } from '../../crm/CustomerDetail/components/Contract/contractDetail';
 
+interface ContractData {
+  _id: string;
+  admin_status: string;
+  createdAt: string;
+  file_name: string;
+  files: File[];
+  itemId: string;
+  remark: string;
+  project_name?: string;
+  project_type?: string;
+}
+
+// Define the interface for the form data
 interface FormData {
   lead_id: string | null;
-  status: string;
-  content: string;
-  createdBy: string;
+  org_id: string | null;
   client_name: string;
   client_email: string;
   client_contact: string;
+  project_name: string;
   location: string;
   designer: string;
-  description: string;
-  project_type: string;
-  project_name: string;
-  project_status: string;
-  timeline_date: Date | null;
   project_budget: string;
-  project_start_date: Date | null;
-  contract: File | null;
+  project_status: string;
+  project_type: string;
+  project_start_date: string;
+  timeline_date: string;
+  contract: File[]; // Form expects File[] for Upload component
+  description: string;
+  user_id: string;
 }
 
 interface CustomerProfileProps {
@@ -52,10 +65,12 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
     phone: string;
     location: string;
   }
-  const [loading,setLoading]=useState(false);
+
+  const [loading, setLoading] = useState(false);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const org_id = localStorage.getItem('orgId')
+  const org_id = localStorage.getItem('orgId');
+  const [prefillData, setPrefillData] = useState<FileItem | null>(null);
 
   // Create an object to store and map the query parameters
   const allQueryParams: QueryParams = {
@@ -65,7 +80,6 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
     phone: queryParams.get('phone') || '',
     location: queryParams.get('location') || '',
   };
-
 
   const navigate = useNavigate();
 
@@ -78,389 +92,372 @@ const YourFormComponent: React.FC<CustomerProfileProps> = ({ data }) => {
     { value: 'designing', label: 'Designing' },
     { value: 'executing', label: 'Executing' },
     { value: 'design & execution', label: 'Design & Execution' },
-
   ];
 
+  function getLatestContract(contracts:FileItem[]) {
+    if (!Array.isArray(contracts) || contracts.length === 0) return null;
+
+    // filter out rejected
+    const validContracts = contracts.filter(c => c.admin_status !== "rejected");
+    if (validContracts.length === 0) return null;
+
+    let latest = validContracts[0];
+    let latestTime = getObjectIdTimestamp(latest._id);
+
+    for (let i = 1; i < validContracts.length; i++) {
+      const currentTime = getObjectIdTimestamp(validContracts[i]._id);
+      if (currentTime > latestTime) {
+        latest = validContracts[i];
+        latestTime = currentTime;
+      }
+    }
+
+    return latest;
+  }
+
+  function getObjectIdTimestamp(id:string) {
+    const timestamp = parseInt(id.substring(0, 8), 16);
+    return new Date(timestamp * 1000);
+  }
+
+
+  const getPrefilled = async () => {
+    try {
+      const response = await apiGetCrmContractDetails(allQueryParams.id);
+      const latestContract = getLatestContract(response?.data)
+      setPrefillData(latestContract);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setPrefillData(null);
+    }
+  };
+
+  useEffect(() => {
+    getPrefilled();
+  }, []);
 
   return (
     <div>
-      <div className='flex justify-between items-center max-sm:flex-col mb-6'></div>
-     <Formik
-     initialValues={{
-      lead_id: allQueryParams.id,
-      org_id: org_id,
-      client_name:allQueryParams.name,
-      client_email:allQueryParams.email || '',
-      client_contact:allQueryParams.phone,
-      project_name:'',
-      location:allQueryParams.location || '',
-      designer:'',
-      project_budget:'',
-      project_type:'',
-      project_status:'',
-      project_start_date:'',
-      timeline_date:'',
-      contract:[],
-      description:'',
-      user_id:localStorage.getItem('userId') || '',
-     }}
-     validationSchema={Yup.object().shape({
-      client_name: Yup.string().required('Client Name is required'),
-      org_id: Yup.string().required('org_id is required'),
-      client_email: Yup.string().email('Invalid email').required('Email is required'),
-      client_contact: Yup.string().required('Contact is required'),
-      project_name: Yup.string().required('Project Name is required'),
-      location: Yup.string().required('Location is required'),
-      designer: Yup.string().required('Designer is required'),
-      project_budget: Yup.string().required('Budget is required'),
-      project_type: Yup.string().required('Type is required'),
-      project_status: Yup.string().required('Status is required'),
-      project_start_date: Yup.string().required('Start Date is required'),
-      timeline_date: Yup.string().required('Timeline is required').test(
-        'date',
-        'Timeline Date should be greater than Start Date',
-        function (value) {
-          const startDate = this.parent.project_start_date;
-          const timelineDate = new Date(value);
-          const startDateValue = new Date(startDate);
-          return timelineDate > startDateValue;
-        }
-      
-      ),
-      contract: Yup.array().required('Contract is required').test(
-        'file',
-        'File is required',
-        (value) => {
-          return value.length > 0;
-        }
-      ),
-      description: Yup.string(),
-     })}
-     onSubmit={async(values) => {
-       setLoading(true);
-       const formData=new FormData();
-       Object.keys(values).forEach((key: string) => {
-        if (key !== 'contract') {
-          formData.append(key, values[key as keyof typeof values] as string);
-        }
-      });
-      values.contract.forEach((file, index) => {
-        formData.append('contract', file);
-      });
-       
-       
-        const response =await apiGetCrmCreateLeadToProject(formData);
-        setLoading(false);
-        if(response.code===200){
-          toast.push(
-            <Notification
-              key={Math.random()}
-              type='success'
-              title='Project created successfully'
-              duration={2000}
-            />
-          )
-          navigate("/app/crm/projectslist");
-          window.location.reload();
-        }
-        else{
-          const errorMessage = response.errorMessage || 'Internal Server Error';
-          toast.push(
-            <Notification
-              key={Math.random()}
-              type='danger'
-              title={errorMessage}
-              duration={2000}
-            />
-          )
-        } 
-    }
-  }
-     >
-      {({ values,errors, touched }) => (
-        <Form >
-        <FormContainer className='grid grid-cols-1 sm:grid-cols-2 gap-5 xl:grid-cols-4'>
-        <FormItem label='Client Name'
-        asterisk
-        invalid={errors.client_name && touched.client_name}
-        errorMessage={errors.client_name}
-        >
-          <Field
-            
-            name='client_name'
-            type='text'
-            placeholder='Client Name'>
-            {({ field,form }:any) => {
-              return (
-                <Input
-                type='text'
-                placeholder='Client Name'
-                onChange={(e) => form.setFieldValue(field.name, e.target.value)}
-                value={field.value}
-                onKeyDown={(e) => {
-                  const regex = /^[a-zA-Z\s]*$/;
-                  if (!regex.test(e.key)) {
-                      e.preventDefault();
-                  }}}
-                />
-              );
-            }}
-            </Field>
-        </FormItem>
-        <FormItem label='Client Email'
-        asterisk
-        invalid={errors.client_email && touched.client_email}
-        errorMessage={errors.client_email}
-        >
-          <Field
-            component={Input}
-            name='client_email'
-            type='email'
-            placeholder='Client Email'/>  
-        </FormItem>
-        <FormItem label='Client Contact'
-        asterisk
-        invalid={errors.client_contact && touched.client_contact}
-        errorMessage={errors.client_contact}
-        
-        >
-          <Field
-            
-            name='client_contact'
-            type='text'
-            placeholder='Client Contact'>
-            {({ field,form }:any) => {
-              return (
-                <Input
-                type='text'
-                placeholder='Client Contact'
-                maxLength={10}
-                value={field.value}
-                onChange={(e) => form.setFieldValue(field.name, e.target.value)}
-              onKeyDown={(e) => {
-                  const charCode = e.which ? e.which : e.keyCode;
-                  if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                    e.preventDefault();
-                  }
-                }}
-                />
-              );}}
-            </Field>
-        </FormItem>
-        <FormItem label='Project Name'
-        asterisk
-        invalid={errors.project_name && touched.project_name}
-        errorMessage={errors.project_name}
-        >
-          <Field
-            name='project_name'
-            type='text'
-            placeholder='Project Name'>
-            {({ field,form }:any) => {
-              return (
-                <Input
-                type='text'
-                placeholder='Project Name'
-                onChange={(e) => form.setFieldValue(field.name, e.target.value)}
-                />
-              );
-            }}
-            </Field>
-        </FormItem>
-        <FormItem label='Project Start Date'
-        asterisk
-        invalid={errors.project_start_date && touched.project_start_date}
-        >
-          <Field
-            name='project_start_date'>
-            {({ field,form }:any) => {
-              return (
-                <DatePicker
-                
-                  onChange={(date) => form.setFieldValue(field.name, `${date}`)}
-                />
-              );
-            }}
-            </Field>
-            <div className=' text-red-500'>{errors.project_start_date}</div>
-        </FormItem>
-        <FormItem label='Timeline Date'
-        asterisk
-        invalid={errors.timeline_date && touched.timeline_date}
-        >
-          <Field
-            name='timeline_date'>
-            {({ field,form }:any) => {
-              return (
-                <DatePicker
-                  onChange={(date) => form.setFieldValue(field.name, `${date}`)}
-                />
-              );
-            }}
-            </Field>
-            <div className=' text-red-500'>{errors.timeline_date}</div>
-        </FormItem>
-        <FormItem label='Location'
-        asterisk
-        invalid={errors.location && touched.location}
-        >
-          
-          <Field
-            component={Input}
-            name='location'
-            type='text'
-            placeholder='Location'/>
-             <div className=' text-red-500'>{errors.location}</div>
-        </FormItem>
-        <FormItem label='Designer'
-        asterisk
-        invalid={errors.designer && touched.designer}
-        >
-          <Field
-            name='designer'
-            type='text'
-            placeholder='Designer'>
-            {({ field,form }:any) => {
-              return (
-              <Input
-              type='text'
-              placeholder='Designer'
-              onChange={(e) => form.setFieldValue(field.name, e.target.value)}
-              onKeyDown={(e) => {
-                const regex = /^[a-zA-Z\s]*$/;
-                if (!regex.test(e.key)) {
-                    e.preventDefault();
-                }
-            }}
+      <div className="flex justify-between items-center max-sm:flex-col mb-6"></div>
+      <Formik
+        enableReinitialize
+        initialValues={{
+          lead_id: allQueryParams.id,
+          org_id: org_id,
+          client_name: allQueryParams.name,
+          client_email: allQueryParams.email || '',
+          client_contact: allQueryParams.phone,
+          project_name: prefillData?.project_name || '',
+          location: allQueryParams.location || '',
+          designer: '',
+          project_budget: '',
+          project_status: '',
+          project_type: prefillData?.project_type, // Prefill project_type
+          project_start_date: '',
+          timeline_date: '',
+          contract: [], // Initialize as empty File array
+          description: '',
+          user_id: localStorage.getItem('userId') || '',
+        }}
+        validationSchema={Yup.object().shape({
+          client_name: Yup.string().required('Client Name is required'),
+          org_id: Yup.string().required('org_id is required'),
+          client_email: Yup.string().email('Invalid email').required('Email is required'),
+          client_contact: Yup.string().required('Contact is required'),
+          project_name: Yup.string().required('Project Name is required'),
+          location: Yup.string().required('Location is required'),
+          designer: Yup.string().required('Designer is required'),
+          project_budget: Yup.string().required('Budget is required'),
+          project_type: Yup.string().required('Type is required'),
+          project_status: Yup.string().required('Status is required'),
+          project_start_date: Yup.string().required('Start Date is required'),
+          timeline_date: Yup.string()
+            .required('Timeline is required')
+            .test('date', 'Timeline Date should be greater than Start Date', function (value) {
+              const startDate = this.parent.project_start_date;
+              const timelineDate = new Date(value);
+              const startDateValue = new Date(startDate);
+              return timelineDate > startDateValue;
+            }),
+          contract: Yup.array()
+            .required('Contract is required')
+            .test('file', 'File is required', (value) => value && value.length > 0),
+          description: Yup.string(),
+        })}
+        onSubmit={async (values) => {
+          setLoading(true);
+          const formData = new FormData();
+          Object.keys(values).forEach((key: string) => {
+            if (key !== 'contract') {
+              formData.append(key, values[key as keyof typeof values] as string);
+            }
+          });
+          values.contract.forEach((file) => {
+            formData.append('contract', file);
+          });
+
+          const response = await apiGetCrmCreateLeadToProject(formData);
+          setLoading(false);
+          if (response.code === 200) {
+            toast.push(
+              <Notification
+                key={Math.random()}
+                type="success"
+                title="Project created successfully"
+                duration={2000}
               />
-              );
-            }}
-            </Field>
-            <div className=' text-red-500'>{errors.designer}</div>
-        </FormItem>
-        <FormItem label='Project Budget'
-        asterisk
-        invalid={errors.project_budget && touched.project_budget}
-        >
-          <Field
-            name='project_budget'
-            type='text'
-            placeholder='Project Budget'>
-              {({ field,form }:any) => {
-                return (
-                  <Input
-                  type='text'
-                  placeholder='Project Budget'
-                  onChange={(e) => form.setFieldValue(field.name, e.target.value)}
-                  onKeyDown={(e) => {
-                    const charCode = e.which ? e.which : e.keyCode;
-                    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                      e.preventDefault();
-                    }
-                  }}
-                  />
-                );
-              }
-            }
-            </Field>
-            <div className=' text-red-500'>{errors.project_budget}</div>
-        </FormItem>
-        <FormItem label='Project Type'
-        asterisk
-        invalid={errors.project_type && touched.project_type}
-        >
-          <Field
-            name='project_type'>
-              {({ field,form }:any) => {
-                return (
-                  <Select
-                    options={projectTypeOptions}
-                    onChange={(option) => form.setFieldValue(field.name, option?.value)}
-                  />
-                );
-              }}
-            </Field>
-            <div className=' text-red-500'>{errors.project_type}</div>
-        </FormItem>
-        <FormItem label='Project Status'
-        asterisk
-        invalid={errors.project_status && touched.project_status}
-        >
-          <Field
-            name='project_status'>
-              {({ field,form }:any) => {
-                return (
-                  <Select
-                    options={projectStatusOptions}
-                    onChange={(option) => form.setFieldValue(field.name, option?.value)}
-                  />
-                );
-              }
-            }
-            </Field>
-            <div className=' text-red-500'>{errors.project_status}</div>
-        </FormItem>
-       
-       
-        <FormItem label='Contract'
-        asterisk
-        invalid={Boolean(
-          errors.contract && touched.contract
-      )}
-      
-        >
-        <Field name='contract'>
-  {({ field, form }: any) => {
-    return (
-      <Upload
-      className=''
-            onChange={(files) =>
-            form.setFieldValue(field.name, files)
+            );
+            navigate('/app/crm/projectslist');
+            window.location.reload();
+          } else {
+            const errorMessage = response.errorMessage || 'Internal Server Error';
+            toast.push(
+              <Notification
+                key={Math.random()}
+                type="danger"
+                title={errorMessage}
+                duration={2000}
+              />
+            );
           }
-        onFileRemove={(files) =>form.setFieldValue(field.name, files)}>
-          <Button variant="solid" icon={<HiOutlineCloudUpload />} type='button' block>
+        }}
+      >
+        {({ values, errors, touched }) => (
+          <Form>
+            <FormContainer className="grid grid-cols-1 sm:grid-cols-2 gap-5 xl:grid-cols-4">
+              <FormItem
+                label="Client Name"
+                asterisk
+                invalid={errors.client_name && touched.client_name}
+                errorMessage={errors.client_name}
+              >
+                <Field name="client_name" type="text" placeholder="Client Name">
+                  {({ field, form }: any) => (
+                    <Input
+                      type="text"
+                      placeholder="Client Name"
+                      onChange={(e) => form.setFieldValue(field.name, e.target.value)}
+                      value={field.value}
+                      onKeyDown={(e) => {
+                        const regex = /^[a-zA-Z\s]*$/;
+                        if (!regex.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+                  )}
+                </Field>
+              </FormItem>
+              <FormItem
+                label="Client Email"
+                asterisk
+                invalid={errors.client_email && touched.client_email}
+                errorMessage={errors.client_email}
+              >
+                <Field component={Input} name="client_email" type="email" placeholder="Client Email" />
+              </FormItem>
+              <FormItem
+                label="Client Contact"
+                asterisk
+                invalid={errors.client_contact && touched.client_contact}
+                errorMessage={errors.client_contact}
+              >
+                <Field name="client_contact" type="text" placeholder="Client Contact">
+                  {({ field, form }: any) => (
+                    <Input
+                      type="text"
+                      placeholder="Client Contact"
+                      maxLength={10}
+                      value={field.value}
+                      onChange={(e) => form.setFieldValue(field.name, e.target.value)}
+                      onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                        const charCode = e.which ? e.which : e.keyCode;
+                        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+                  )}
+                </Field>
+              </FormItem>
+              <FormItem
+                label="Project Name"
+                asterisk
+                invalid={errors.project_name && touched.project_name}
+                errorMessage={errors.project_name}
+              >
+                <Field name="project_name" type="text" placeholder="Project Name">
+                  {({ field, form }: any) => (
+                    <Input
+                      type="text"
+                      placeholder="Project Name"
+                      value={field.value}
+                      onChange={(e) => form.setFieldValue(field.name, e.target.value)}
+                    />
+                  )}
+                </Field>
+              </FormItem>
+              <FormItem
+                label="Project Start Date"
+                asterisk
+                invalid={errors.project_start_date && touched.project_start_date}
+              >
+                <Field name="project_start_date">
+                  {({ field, form }: any) => (
+                    <DatePicker
+                      onChange={(date) => form.setFieldValue(field.name, `${date}`)}
+                    />
+                  )}
+                </Field>
+                <div className="text-red-500">{errors.project_start_date}</div>
+              </FormItem>
+              <FormItem
+                label="Timeline Date"
+                asterisk
+                invalid={errors.timeline_date && touched.timeline_date}
+              >
+                <Field name="timeline_date">
+                  {({ field, form }: any) => (
+                    <DatePicker
+                      onChange={(date) => form.setFieldValue(field.name, `${date}`)}
+                    />
+                  )}
+                </Field>
+                <div className="text-red-500">{errors.timeline_date}</div>
+              </FormItem>
+              <FormItem
+                label="Location"
+                asterisk
+                invalid={errors.location && touched.location}
+              >
+                <Field component={Input} name="location" type="text" placeholder="Location" />
+                <div className="text-red-500">{errors.location}</div>
+              </FormItem>
+              <FormItem
+                label="Designer"
+                asterisk
+                invalid={errors.designer && touched.designer}
+              >
+                <Field name="designer" type="text" placeholder="Designer">
+                  {({ field, form }: any) => (
+                    <Input
+                      type="text"
+                      placeholder="Designer"
+                      onChange={(e) => form.setFieldValue(field.name, e.target.value)}
+                      onKeyDown={(e) => {
+                        const regex = /^[a-zA-Z\s]*$/;
+                        if (!regex.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+                  )}
+                </Field>
+                <div className="text-red-500">{errors.designer}</div>
+              </FormItem>
+              <FormItem
+                label="Project Budget"
+                asterisk
+                invalid={errors.project_budget && touched.project_budget}
+              >
+                <Field name="project_budget" type="text" placeholder="Project Budget">
+                  {({ field, form }: any) => (
+                    <Input
+                      type="text"
+                      placeholder="Project Budget"
+                      onChange={(e) => form.setFieldValue(field.name, e.target.value)}
+                      onKeyDown={(e) => {
+                        const charCode = e.which ? e.which : e.keyCode;
+                        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+                  )}
+                </Field>
+                <div className="text-red-500">{errors.project_budget}</div>
+              </FormItem>
+              <FormItem
+                label="Project Type"
+                asterisk
+                invalid={errors.project_type && touched.project_type}
+              >
+                <Field name="project_type">
+                  {({ field, form }: any) => (
+                    <Select
+                      options={projectTypeOptions}
+                      value={projectTypeOptions.find((option) => option.value === field.value)}
+                      onChange={(option) => form.setFieldValue(field.name, option?.value)}
+                    />
+                  )}
+                </Field>
+                <div className="text-red-500">{errors.project_type}</div>
+              </FormItem>
+              <FormItem
+                label="Project Status"
+                asterisk
+                invalid={errors.project_status && touched.project_status}
+              >
+                <Field name="project_status">
+                  {({ field, form }: any) => (
+                    <Select
+                      options={projectStatusOptions}
+                      // value={projectStatusOptions.find((option) => option.value === field.value)}
+                      onChange={(option) => form.setFieldValue(field.name, option?.value)}
+                    />
+                  )}
+                </Field>
+                <div className="text-red-500">{errors.project_status}</div>
+              </FormItem>
+              <FormItem
+                label="Contract"
+                asterisk
+                invalid={Boolean(errors.contract && touched.contract)}
+              >
+                <Field name="contract">
+                  {({ field, form }: any) => (
+                    <Upload
+                      className=""
+                      onChange={(files) => form.setFieldValue(field.name, files)}
+                      onFileRemove={(files) => form.setFieldValue(field.name, files)}
+                    >
+                      <Button variant="solid" icon={<HiOutlineCloudUpload />} type="button" block>
                         Upload your file
-                    </Button>
-        </Upload>
-    );
-  }}
-
-</Field>
-
-        <div className=' text-red-500'>{errors.contract}</div>
-        </FormItem>
-       
-        </FormContainer>
-        <div className='grid lg:grid-cols-2 '>
-        <FormItem label='Description'>
-          <Field
-            name='description'
+                      </Button>
+                    </Upload>
+                  )}
+                </Field>
+                <div className="text-red-500">{errors.contract}</div>
+              </FormItem>
+            </FormContainer>
+            <div className="grid lg:grid-cols-2">
+              <FormItem label="Description">
+                <Field name="description">
+                  {({ field, form }: any) => (
+                    <Input
+                      textArea
+                      type="text"
+                      placeholder="Description"
+                      onChange={(e) => form.setFieldValue(field.name, e.target.value)}
+                    />
+                  )}
+                </Field>
+              </FormItem>
+            </div>
+            <StickyFooter
+              className="-mx-8 px-8 flex items-center gap-3 py-4"
+              stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
             >
-            {({ field,form }:any) => {
-              return (
-                <Input
-                textArea  
-                  type='text'
-                  placeholder='Description'
-                  onChange={(e) => form.setFieldValue(field.name, e.target.value)}
-                />
-              );
-            }}
-            </Field>
-        </FormItem>
-        </div>
-        <StickyFooter 
-         className="-mx-8 px-8 flex items-center gap-3 py-4"
-                stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-        >
-
-          <Button type='button' size='sm' onClick={() => navigate(-1)}>Cancel</Button>
-
-          <Button type='submit' size='sm' variant='solid' loading={loading}>{loading?'Submitting':'Submit'}</Button>
-        </StickyFooter>
-        </Form>)}
-      
-        </Formik>
+              <Button type="button" size="sm" onClick={() => navigate(-1)}>
+                Cancel
+              </Button>
+              <Button type="submit" size="sm" variant="solid" loading={loading}>
+                {loading ? 'Submitting' : 'Submit'}
+              </Button>
+            </StickyFooter>
+          </Form>
+        )}
+      </Formik>
     </div>
   );
 };

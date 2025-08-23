@@ -8,6 +8,7 @@ export type AppConfig = {
     unAuthenticatedEntryPath: string;
     tourPath: string;
     locale: string;
+    publicPath: string;
     enableMock: boolean;
 };
 
@@ -18,6 +19,7 @@ const appConfig: AppConfig = {
     authenticatedEntryPath:'/app/crm/dashboard',
     unAuthenticatedEntryPath: '/sign-in',
     tourPath: '/app/account/kyc-form',
+    publicPath: '/publicView',
     locale: 'en',
     enableMock: false
 };

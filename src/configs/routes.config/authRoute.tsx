@@ -34,6 +34,12 @@ const authRoute: Routes = [
         component: lazy(() => import('@/views/auth/Oraganisation')),
         authority: [],
     },
+    {
+        key: 'publicView',
+        path: `/publicView`,
+        component: lazy(() => import('@/views/auth/publicView')),
+        authority: [],
+    }
   
    
 ]

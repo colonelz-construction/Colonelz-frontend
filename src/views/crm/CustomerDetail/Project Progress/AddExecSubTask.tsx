@@ -1,19 +1,23 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Button from '@/components/ui/Button'
 import Dialog from '@/components/ui/Dialog'
-import { Field, Form, Formik, FormikContext } from 'formik'
-import { DatePicker, FormItem, Input, Notification, Select, Tooltip, toast } from '@/components/ui'
-import { apiCreateCrmExecSubTask, apiCreateCrmExecTask, apiGetCrmLeadsAddMiniTask, apiGetCrmLeadsAddSubTask, apiGetCrmProjectsAddMiniTask, apiGetCrmProjectsAddSubTask, apiGetCrmProjectsAddTask, apiGetUsersList } from '@/services/CrmService'
-import { MdOutlineAdd } from 'react-icons/md'
+import { Field, Form, Formik } from 'formik'
+import { DatePicker, FormItem, Input, Notification, toast } from '@/components/ui'
+import { apiCreateCrmExecSubTask } from '@/services/CrmService'
 import * as Yup from 'yup'
 import { useLocation } from 'react-router-dom'
-import { setUser } from '@/store'
 import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
 
+interface AddExecSubTaskProps {
+    task: any;
+    openDialog: () => void;
+    onDialogClose: () => void;
+    dialogIsOpen: boolean;
+    setIsOpen: (open: boolean) => void;
+    onAddSuccess?: () => void;
+}
 
-const AddExecSubTask = ({task, openDialog, onDialogClose, dialogIsOpen, setIsOpen}:any) => {
-
-    // const [dialogIsOpen, setIsOpen] = useState(false)
+const AddExecSubTask = ({task, openDialog, onDialogClose, dialogIsOpen, setIsOpen, onAddSuccess}: AddExecSubTaskProps) => {
     const [loading, setLoading] = useState(false)
     const location=useLocation()
     const queryParams=new URLSearchParams(location.search)
@@ -21,20 +25,9 @@ const AddExecSubTask = ({task, openDialog, onDialogClose, dialogIsOpen, setIsOpe
     const org_id = localStorage.getItem('orgId')
     const [bgColor, setBgColor] = useState<any>("");
 
-    // const task_id=queryParams.get('task')
-    
-    
-    
-// const openDialog = () => {
-//     setIsOpen(true)
-// }
-
-// const onDialogClose = () => {
-//     setIsOpen(false)
-// }
-const handleChange = (value: string) => {
-    setBgColor(value);
-  };
+    const handleChange = (value: string) => {
+        setBgColor(value);
+    };
   
 
     return (
@@ -61,9 +54,6 @@ const handleChange = (value: string) => {
                         subtask_end_date: Yup.string().required('End Date is required'),
                       })}
                      onSubmit={async(values, actions) => {
-
-                        // console.log(values)
-
                         const val = {...values, color: bgColor }
                         setLoading(true)
                             const response = await apiCreateCrmExecSubTask(val)
@@ -72,7 +62,10 @@ const handleChange = (value: string) => {
                                 toast.push(
                                     <Notification closable type='success' duration={2000}>Task Added Successfully</Notification>
                                 )
-                                window.location.reload()
+                                onDialogClose()
+                                if (onAddSuccess) {
+                                    onAddSuccess()
+                                }
                             }
                             else{
                                 setLoading(false)
@@ -86,51 +79,78 @@ const handleChange = (value: string) => {
                         <Form className=' p-4 max-h-96 overflow-y-auto'>
                             <div className=' grid grid-cols-2 gap-x-5'>
 
-
-                            
-
-
-
+                              {/* subtask start date */}
                             <FormItem label='Start Date'
-                            asterisk
-                            invalid={errors.subtask_start_date && touched.subtask_start_date}
-                            errorMessage={errors.subtask_start_date}
-                           
+                                asterisk
+                                invalid={errors.subtask_start_date && touched.subtask_start_date}
+                                errorMessage={errors.subtask_start_date}
                             >
-                                <Field name='subtask_start_date'  placeholder='Start Date'>
-                                    {({field}:any)=>(
-                                        <DatePicker name='subtask_start_date'
-                                        value={field.value}
-                                        onChange={(value) => { field.onChange({ target: {name:'subtask_start_date', value: `${value}` } }) }}
+                                <Field name='subtask_start_date'>
+                                    {({ field, form }: any) => (
+                                        <DatePicker
+                                            name='subtask_start_date'
+                                            value={field.value ? new Date(field.value) : null}
+                                            onChange={(value: Date | null) => {
+                                                form.setFieldValue('subtask_start_date', value);
+                                                // If end date is before this new start date, reset end date
+                                                if (
+                                                    form.values.subtask_end_date &&
+                                                    value &&
+                                                    new Date(form.values.subtask_end_date) < value
+                                                ) {
+                                                    form.setFieldValue('subtask_end_date', '');
+                                                }
+                                            }}
+                                            minDate={task?.start_date ? new Date(task.start_date) : undefined} // task start
+                                            maxDate={form.values.subtask_end_date 
+                                                        ? new Date(form.values.subtask_end_date) 
+                                                        : task?.end_date ? new Date(task.end_date) : undefined} // cannot select start after end
                                         />
                                     )}
                                 </Field>
                             </FormItem>
 
+                            {/* subtask end date */}
                             <FormItem label='End Date'
-                            asterisk
-                            invalid={errors.subtask_end_date && touched.subtask_end_date}
-                            errorMessage={errors.subtask_end_date}
-                           
+                                asterisk
+                                invalid={errors.subtask_end_date && touched.subtask_end_date}
+                                errorMessage={errors.subtask_end_date}
                             >
-                                <Field name='subtask_end_date'  placeholder='End Date'>
-                                    {({field}:any)=>(
-                                        <DatePicker name='subtask_end_date'
-                                        value={field.value}
-                                        onChange={(value) => { field.onChange({ target: {name:'subtask_end_date', value: `${value}` } }) }}
+                                <Field name='subtask_end_date'>
+                                    {({ field, form }: any) => (
+                                        <DatePicker
+                                            name='subtask_end_date'
+                                            value={field.value ? new Date(field.value) : null}
+                                            onChange={(value: Date | null) => {
+                                                form.setFieldValue('subtask_end_date', value);
+                                                // If start date is after this new end date, reset start date
+                                                if (
+                                                    form.values.subtask_start_date &&
+                                                    value &&
+                                                    new Date(form.values.subtask_start_date) > value
+                                                ) {
+                                                    form.setFieldValue('subtask_start_date', '');
+                                                }
+                                            }}
+                                            minDate={form.values.subtask_start_date 
+                                                        ? new Date(form.values.subtask_start_date) 
+                                                        : task?.start_date ? new Date(task.start_date) : undefined} // cannot select end before start
+                                            maxDate={task?.end_date ? new Date(task.end_date) : undefined} // task end
                                         />
                                     )}
                                 </Field>
                             </FormItem>
 
+                             {/* subtask name */}
                             <FormItem label='Sub Task Name'
                             asterisk
-                        invalid={errors.subtask_name && touched.subtask_name}
-                        errorMessage={errors.subtask_name}
+                            invalid={errors.subtask_name && touched.subtask_name}
+                            errorMessage={errors.subtask_name}
                             >
                                 <Field name='subtask_name'  component={Input} placeholder='Name'/>
                             </FormItem>
 
+                            {/* subtask color */}
                             <FormItem label="Color" >
                                     <Field name='subtask_type'>
                                         {({ field }: any) => (
@@ -140,8 +160,7 @@ const handleChange = (value: string) => {
                                         )}
                                     </Field>
 
-                                </FormItem>
-
+                            </FormItem>
 
                             </div>
                             <div className='flex justify-end'>

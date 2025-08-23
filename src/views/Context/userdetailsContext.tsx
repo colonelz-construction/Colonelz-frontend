@@ -1,8 +1,9 @@
 import { apiGetUserData } from '@/services/CrmService';
-import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
+import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 
 export type ProfileFormModel = {
-  data: Data
+  data: Data | null;
+  // setData: React.Dispatch<React.SetStateAction<Data | null>>;
 };
 
 type Data = {
@@ -26,7 +27,6 @@ export const UserDetailsProvider = ({ children }: { children: ReactNode }) => {
         console.error('Error fetching user data', error);
       }
     };
-
     fetchUserData();
   }, []);
 

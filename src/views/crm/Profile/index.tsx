@@ -3,7 +3,7 @@ import TabContent from '@/components/ui/Tabs/TabContent'
 import TabList from '@/components/ui/Tabs/TabList'
 import TabNav from '@/components/ui/Tabs/TabNav'
 import React, { useContext } from 'react'
-import Profile from './profile'
+import Profile, { ProfileFormModel } from './profile'
 import Password from './passsword'
 import Users from '../users'
 import { UserDetailsContext} from '@/views/Context/userdetailsContext'
@@ -60,7 +60,9 @@ import { useNavigate } from 'react-router-dom'
     </TabList>
     <div className="p-4">
         <TabContent value="profile">
-        <Profile data={data}/>
+          <Profile
+            data={data}
+          />
         </TabContent>
         <TabContent value="pass">
             <Password/>

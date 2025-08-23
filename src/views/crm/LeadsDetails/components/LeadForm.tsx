@@ -63,7 +63,8 @@ const LeadForm = () => {
           Lead Status Updated Successfully
         </Notification>
       )
-      window.location.reload()
+      // Remove page reload for better UX
+      // window.location.reload()
     }
     else{
       toast.push(

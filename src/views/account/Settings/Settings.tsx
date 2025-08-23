@@ -107,7 +107,7 @@ const Settings = () => {
                 <div className="px-4 py-6">
                     <Suspense fallback={<></>}>
                         {currentTab === 'profile' && (
-                            <Profile data={data.profile} />
+                            <Profile data={data.profile}/>
                         )}
                         {currentTab === 'password' && (
                             <Password data={data.loginHistory} />

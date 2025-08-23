@@ -11,6 +11,7 @@ type CustomSelectProps = {
   placeholder?: string;
   onChange: (value: string) => void;
   modalId?: string; // ID of the parent modal to exclude from outside click detection
+  value?: string; // Add value prop for controlled component
 };
 
 const SelectWithBg: React.FC<CustomSelectProps> = ({
@@ -18,6 +19,7 @@ const SelectWithBg: React.FC<CustomSelectProps> = ({
   placeholder = "Default",
   onChange,
   modalId,
+  value,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<Option | any>(null);
@@ -105,6 +107,16 @@ const SelectWithBg: React.FC<CustomSelectProps> = ({
     { label: "pink-400", value: "pink-400", bgColor: "pink-400" },
     { label: "pink-800", value: "pink-800", bgColor: "pink-800" },
   ];
+
+  // Effect to set initial value based on value prop
+  useEffect(() => {
+    if (value && !selected) {
+      const initialOption = options.find(option => option.value === value);
+      if (initialOption) {
+        setSelected(initialOption);
+      }
+    }
+  }, [value, options, selected]);
 
   return (
     <div className="relative w-52" ref={selectRef}>

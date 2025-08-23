@@ -11,8 +11,11 @@ import { setUser } from '@/store'
 import { ColorLevel } from '../../../../@types/theme';
 import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
 
+interface AddExecTaskProps {
+    onAddSuccess?: () => void;
+}
 
-const AddExecTask = () => {
+const AddExecTask = ({ onAddSuccess }: AddExecTaskProps) => {
 
     const [dialogIsOpen, setIsOpen] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -77,7 +80,10 @@ const AddExecTask = () => {
                             toast.push(
                                 <Notification closable type='success' duration={2000}>Task Added Successfully</Notification>
                             )
-                            window.location.reload()
+                            onDialogClose()
+                            if (onAddSuccess) {
+                                onAddSuccess()
+                            }
                         }
                         else {
                             setLoading(false)

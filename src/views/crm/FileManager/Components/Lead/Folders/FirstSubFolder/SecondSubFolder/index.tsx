@@ -397,9 +397,6 @@ const Index = () => {
     }
     ShareFiles()
 
-
-
-
     function warn(text: string) {
       toast.push(
         <Notification closable type="warning" duration={2000}>
@@ -408,11 +405,6 @@ const Index = () => {
         { placement: 'top-center' },
       )
     }
-
-
-
-
-
   };
 
   const getFileIcon = (fileName: string) => {
@@ -458,9 +450,6 @@ const Index = () => {
     }
   };
 
-
-
-
   function formatFileSize(fileSizeInKB: string | undefined): string {
     if (!fileSizeInKB) {
       return '-';
@@ -503,16 +492,12 @@ const Index = () => {
           return <div>{getFileType(row.original.fileName)}</div>
         }
       },
-
-
       {
         header: 'Size', accessorKey: 'fileSize',
         cell: ({ row }) => {
           return <div>{formatFileSize(row.original.fileSize)}</div>
         }
       },
-
-
       {
         header: 'Created', accessorKey: 'date', cell: ({ row }) => {
           return <div>{formateDate(row.original.date)}</div>
@@ -605,10 +590,6 @@ const Index = () => {
     ],
     []
 )
-   
-  // const role = localStorage.getItem('role')
-
-  // console.log(folderName, drawingFolders)
 
   const table = useReactTable({
     data:leadData,

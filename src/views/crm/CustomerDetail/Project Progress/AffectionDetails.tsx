@@ -11,16 +11,16 @@ import { setUser } from '@/store'
 import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
 
 
-const AffectionDetails = ({task,subtask, openDialog, onDialogClose, dialogIsOpen, setIsOpen}:any) => {
+const AffectionDetails = ({ task, subtask, openDialog, onDialogClose, dialogIsOpen, setIsOpen }: any) => {
 
     const [loading, setLoading] = useState(false)
-    const location=useLocation()
-    const queryParams=new URLSearchParams(location.search)
-    const project_id=queryParams.get('project_id')
+    const location = useLocation()
+    const queryParams = new URLSearchParams(location.search)
+    const project_id = queryParams.get('project_id')
     const org_id = localStorage.getItem('orgId')
 
     const [affData, setAffData] = useState<any>([]);
-    console.log(affData)
+    console.log(affData, "affData")
 
 
     useEffect(() => {
@@ -34,11 +34,11 @@ const AffectionDetails = ({task,subtask, openDialog, onDialogClose, dialogIsOpen
 
                 // console.log(res.data)
                 setAffData(res.data)
-                
-            } catch (error:any) {
+
+            } catch (error: any) {
 
                 throw new Error("Somthing went wrong", error)
-                
+
             } finally {
                 setLoading(false)
             }
@@ -49,15 +49,14 @@ const AffectionDetails = ({task,subtask, openDialog, onDialogClose, dialogIsOpen
 
     }, [task, subtask])
 
-   
-  
+
+
 
     return (
         <div>
             <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
 
-                asfdds
-                
+                <h4>Affection Details Here (if any)</h4>
             </Dialog>
         </div>
     )

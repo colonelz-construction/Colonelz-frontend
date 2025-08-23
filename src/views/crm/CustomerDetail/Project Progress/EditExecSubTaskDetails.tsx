@@ -10,15 +10,25 @@ import { useLocation } from 'react-router-dom'
 import { setUser } from '@/store'
 import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
 
+interface EditExecSubTaskDetailsProps {
+    task: any;
+    subtask: any;
+    detail: any;
+    openDialog: (task: any, subtask: any, detail: any) => void;
+    onDialogClose: () => void;
+    dialogIsOpen: boolean;
+    setIsOpen: (isOpen: boolean) => void;
+    onUpdateSuccess?: (taskId: string, subtaskId: string, detailId: string, updatedDetail: any) => void;
+}
 
-const EditExecSubTaskDetails = ({ task, subtask, detail, openDialog, onDialogClose, dialogIsOpen, setIsOpen }: any) => {
+const EditExecSubTaskDetails = ({ task, subtask, detail, openDialog, onDialogClose, dialogIsOpen, setIsOpen, onUpdateSuccess }: EditExecSubTaskDetailsProps) => {
 
     const [loading, setLoading] = useState(false)
     const location = useLocation()
     const queryParams = new URLSearchParams(location.search)
     const project_id = queryParams.get('project_id')
     const org_id = localStorage.getItem('orgId')
-    const [bgColor, setBgColor] = useState<any>("");
+    const [bgColor, setBgColor] = useState<any>(detail?.color || "");
 
     // const task_id=queryParams.get('task')
 
@@ -52,7 +62,7 @@ const EditExecSubTaskDetails = ({ task, subtask, detail, openDialog, onDialogClo
                         project_id: project_id || '',
                         task_id: task?.task_id,
                         subtask_id: subtask?.sub_task_id,
-
+                        subtask_name: subtask?.subtask_name,
                         subtask_details_start_date: new Date(detail?.subtask_details_start_date),
                         subtask_details_end_date: new Date(detail?.subtask_details_end_date),
                         subtask_comment: detail?.subtask_comment,
@@ -70,14 +80,18 @@ const EditExecSubTaskDetails = ({ task, subtask, detail, openDialog, onDialogClo
 
                         // console.log(values)
                         setLoading(true)
-                        const val = {...values, detail_color: bgColor }
+                        const colorValue = bgColor || values.color;
+                        const val = {...values, color: colorValue, detail_color: colorValue }
                         const response = await apiUpdateCrmExecSubTaskDetail(val)
                         if (response.code === 200) {
                             setLoading(false)
                             toast.push(
-                                <Notification closable type='success' duration={2000}>Task Added Successfully</Notification>
+                                <Notification closable type='success' duration={2000}>Task Updated Successfully</Notification>
                             )
-                            window.location.reload()
+                            onDialogClose()
+                            if (onUpdateSuccess) {
+                                onUpdateSuccess(task?.task_id, subtask?.sub_task_id, detail?.subtask_details_id, val);
+                            }
                         }
                         else {
                             setLoading(false)
@@ -89,6 +103,8 @@ const EditExecSubTaskDetails = ({ task, subtask, detail, openDialog, onDialogClo
                 >
                     {({ values, errors, touched, setFieldValue }: any) => (
                         <Form className=' p-4 max-h-96 overflow-y-auto'>
+                            {/* Hidden field to include subtask_name in the payload */}
+                            <Field name='subtask_name' type='hidden' />
                             <div className=' grid grid-cols-2 gap-x-5'>
 
                                 <FormItem label='Start Date'
@@ -172,7 +188,14 @@ const EditExecSubTaskDetails = ({ task, subtask, detail, openDialog, onDialogClo
   <FormItem label="Color">
     <Field name='color'>
       {({ field }: any) => (
-        <SelectWithBg onChange={handleChange} />
+        <SelectWithBg 
+          onChange={(value) => {
+            handleChange(value);
+            setFieldValue('color', value);
+          }} 
+          value={bgColor || field.value}
+          placeholder={bgColor || field.value || "Select..."}
+        />
       )}
     </Field>
   </FormItem>

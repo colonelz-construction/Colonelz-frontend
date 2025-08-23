@@ -193,8 +193,13 @@ const Second = ({ imageUrl, setTexture, testData, currentView, setCurrentView, o
     useEffect(() => {
         if (imageUrl) {
             textureLoader.load(imageUrl, (loadedTexture) => {
-                loadedTexture.flipY = false;
+                loadedTexture.flipY = false; // Already set to prevent WebGL Y-flip
                 loadedTexture.colorSpace = THREE.SRGBColorSpace;
+
+                // Flip texture vertically
+                loadedTexture.center.set(0.5, 0.5); // Set the center for transformation
+                loadedTexture.repeat.set(1, -1); // Flip vertically by setting y-repeat to -1
+
                 setLocalTexture(loadedTexture); // Update local state
                 setTexture(loadedTexture); // Sync with parent state
             }, undefined, (error) => {
@@ -207,6 +212,8 @@ const Second = ({ imageUrl, setTexture, testData, currentView, setCurrentView, o
             setTexture(null); // Reset when no imageUrl
         }
     }, [imageUrl, setTexture]);
+
+
 
     return (
         <Canvas

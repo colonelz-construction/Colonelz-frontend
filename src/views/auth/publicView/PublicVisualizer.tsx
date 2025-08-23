@@ -9,8 +9,8 @@ import { useLocation } from 'react-router-dom';
 
 type DataItem = {
     img_id: string;
+    hp?: any[];
     [key: string]: any;
-    // hp:any;
 };
 
 const PublicVisualizer = () => {

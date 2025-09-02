@@ -48,6 +48,12 @@ const appsRoute: Routes = [
         authority: [],
     },
     {
+        key: 'appsCrm.dailyLineUp',
+        path: `${APP_PREFIX_PATH}/crm/daily-lineup`,
+        component: lazy(() => import('@/views/crm/DailyLineUp')),
+        authority: [],
+    },
+    {
         key: 'appsCrm.register',
         path: `${APP_PREFIX_PATH}/crm/profile`,
         component: lazy(() => import('@/views/crm/Profile/index')),

@@ -25,7 +25,7 @@ const permissionsMap: { [key: string]: Permission[] } = {
     archive: ['read', 'restore','delete'],
     addMember: ['create', 'delete'],
     lead: ['create', 'read', 'update', 'delete'],
-    project: ['create', 'read', 'update'],
+    project: ['create', 'read', 'update', 'delete'],
     mom: ['create', 'read', 'update', 'delete'],
     contract: ['create', 'read','update'],
     quotation: [ 'read','update'],

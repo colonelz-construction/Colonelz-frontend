@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Formik, Field, Form, useFormikContext } from 'formik';
 import axios from 'axios';
 import { Button, FormItem, Input, Notification, Select, toast } from '@/components/ui';
-import { apiAddMember } from '@/services/AuthService';
+import { apiAddMember, apiAddBulkMembers } from '@/services/AuthService';
 import { apiGetAllUsersList } from '@/services/CrmService';
 import { apiGetCrmProjects } from '@/services/CrmService';
 import { set } from 'lodash';
@@ -115,30 +115,67 @@ const AddUserToProject = ({project_id}: any) => {
 
   }, [selectedRole, users]);
 
-  const handleSubmit = async (values: FormValues) => {
+  const handleSubmit = async (values: any) => {
     setLoading(true)
-    const response = await apiAddMember(values);
 
+    // Check if multiple users are selected
+    const isMultipleUsers = Array.isArray(values.user_name) && values.user_name.length > 1;
 
-    setLoading(false)
-    if (response?.code === 200) {
+    if (isMultipleUsers) {
+      // Handle bulk assignment
+      const users = values.user_name.map((username: string) => ({
+        user_name: username,
+        role: values.role
+      }));
 
-      toast.push(
-        <Notification closable type="success" duration={2000}>
-          Member Added Successfully
-        </Notification>
+      const bulkData = {
+        id: values.id,
+        project_id: values.project_id,
+        users: users,
+        org_id: values.org_id
+      };
 
-      )
+      const response = await apiAddBulkMembers(bulkData);
+      setLoading(false)
 
-      window.location.reload()
+      if (response?.code === 200) {
+        toast.push(
+          <Notification closable type="success" duration={2000}>
+            {response.message}
+          </Notification>
+        )
+        window.location.reload()
+      } else {
+        toast.push(
+          <Notification closable type="danger" duration={2000}>
+            {response.errorMessage}
+          </Notification>
+        )
+      }
+    } else {
+      // Handle single user assignment (existing logic)
+      const singleUserData = {
+        ...values,
+        user_name: Array.isArray(values.user_name) ? values.user_name[0] : values.user_name
+      };
 
-    }
-    else {
-      toast.push(
-        <Notification closable type="danger" duration={2000}>
-          {response.errorMessage}
-        </Notification>
-      )
+      const response = await apiAddMember(singleUserData);
+      setLoading(false)
+
+      if (response?.code === 200) {
+        toast.push(
+          <Notification closable type="success" duration={2000}>
+            Member Added Successfully
+          </Notification>
+        )
+        window.location.reload()
+      } else {
+        toast.push(
+          <Notification closable type="danger" duration={2000}>
+            {response.errorMessage}
+          </Notification>
+        )
+      }
     }
   };
 
@@ -148,14 +185,14 @@ const AddUserToProject = ({project_id}: any) => {
         id: id || '',
         org_id,
         role: '',
-        user_name: '',
+        user_name: [],
         project_id: project_id,
       }}
       onSubmit={handleSubmit}
     >
       {({ setFieldValue }) => (
         <Form className=''>
-          <h3 className='mb-4'>Add User To Project</h3>
+          <h3 className='mb-4'>Add User(s) To Project</h3>
           <FormItem label="Role">
             <Select
               options={Options}
@@ -165,10 +202,15 @@ const AddUserToProject = ({project_id}: any) => {
               }}
             />
           </FormItem>
-          <FormItem label="User Name">
+          <FormItem label="User Name(s)">
             <Select
+              isMulti
               options={filteredUsers.map((user) => ({ value: user.username, label: user.username }))}
-              onChange={(option) => setFieldValue('user_name', option?.value || '')}
+              onChange={(options) => {
+                const selectedUsers = options ? options.map((option: any) => option.value) : [];
+                setFieldValue('user_name', selectedUsers);
+              }}
+              placeholder="Select one or more users..."
             />
           </FormItem>
 

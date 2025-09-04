@@ -42,7 +42,7 @@ const DailyLineUp: React.FC = () => {
     const [sheetToDelete, setSheetToDelete] = useState<string>('')
     const [newSheetDate, setNewSheetDate] = useState('')
     const [gridRows, setGridRows] = useState<GridRow[]>([])
-    const [editingCell, setEditingCell] = useState<{row: number, column: string} | null>(null)
+    const [editingCell, setEditingCell] = useState<{ row: number, column: string } | null>(null)
     const [editValue, setEditValue] = useState('')
     const [downloadDropdownOpen, setDownloadDropdownOpen] = useState(false)
     const [createLoading, setCreateLoading] = useState(false)
@@ -74,7 +74,7 @@ const DailyLineUp: React.FC = () => {
             const response = await apiGetDateSheets()
             if (response.status) {
                 setDateSheets(response.data)
-                
+
                 // Set current sheet to today's date if it exists, otherwise first sheet
                 const todaySheet = getTodaySheetDate()
                 const todayExists = response.data.some(sheet => sheet.title === todaySheet)
@@ -311,7 +311,7 @@ const DailyLineUp: React.FC = () => {
                     { placement: 'top-end' }
                 )
                 loadDateSheets()
-                
+
                 // If deleted sheet was current, switch to first available
                 if (currentSheet === sheetToDelete) {
                     const remainingSheets = dateSheets.filter(sheet => sheet.title !== sheetToDelete)
@@ -419,9 +419,9 @@ const DailyLineUp: React.FC = () => {
                 <table>
                     <thead><tr>${data.headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
                     <tbody>
-                        ${data.rows.map(row => 
-                            `<tr><td>${row.time}</td>${data.headers.slice(1).map(h => `<td>${row[h] || ''}</td>`).join('')}</tr>`
-                        ).join('')}
+                        ${data.rows.map(row =>
+            `<tr><td>${row.time}</td>${data.headers.slice(1).map(h => `<td>${row[h] || ''}</td>`).join('')}</tr>`
+        ).join('')}
                     </tbody>
                 </table>
             </body>
@@ -441,7 +441,7 @@ const DailyLineUp: React.FC = () => {
         if (format === 'csv') downloadCSV()
         else if (format === 'excel') downloadExcel()
         else if (format === 'pdf') downloadPDF()
-        
+
         setDownloadDropdownOpen(false)
         toast.push(
             <Notification title={'Success'} type="success" duration={1500}>
@@ -510,21 +510,28 @@ const DailyLineUp: React.FC = () => {
                 <Card>
                     <Tabs value={currentSheet} onChange={setCurrentSheet}>
                         <div className="flex justify-between items-center px-3 py-2 border-b border-gray-200 dark:border-gray-700">
-                            <div className="flex-1 overflow-hidden">
-                                <TabList className="flex overflow-x-auto scrollbar-hide whitespace-nowrap">
-                                {dateSheets.map((sheet) => (
-                                    <TabNav key={sheet.title} value={sheet.title}>
-                                        <div className="flex items-center gap-2 text-base text-gray-900 dark:text-gray-100">
-                                            {sheet.title}
-                                            {isToday(sheet.title) && (
-                                                <Badge content="Today" className="bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded" />
-                                            )}
-                                        </div>
-                                    </TabNav>
-                                ))}
+                            <div className="relative flex-1 overflow-hidden">
+                                {/* Left Arrow */}
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-full flex items-center justify-start pointer-events-none">
+                                    <span className="text-gray-500 dark:text-gray-400 text-sm">◀</span>
+                                </div>
+                                <TabList className="flex overflow-x-auto whitespace-nowrap no-scrollbar scroll-smooth px-6">
+                                    {dateSheets.map((sheet) => (
+                                        <TabNav key={sheet.title} value={sheet.title}>
+                                            <div className="flex items-center gap-2 text-base text-gray-900 dark:text-gray-100">
+                                                {sheet.title}
+                                                {isToday(sheet.title) && (
+                                                    <Badge content="Today" className="bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded" />
+                                                )}
+                                            </div>
+                                        </TabNav>
+                                    ))}
                                 </TabList>
+                                <div className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-full flex items-center justify-end pointer-events-none">
+                                    <span className="text-gray-500 dark:text-gray-400 text-sm">▶</span>
+                                </div>
                             </div>
-                            
+
                             <div className="flex items-center gap-2">
                                 {currentSheet && (
                                     <Dropdown
@@ -573,60 +580,24 @@ const DailyLineUp: React.FC = () => {
                                             <Spinner size="40px" />
                                         </div>
                                     ) : (
-                                    <Table className="w-full text-base">
-                                        <THead className="sticky top-0 bg-gray-50 dark:bg-gray-800">
-                                            <Tr>
-                                                <Th className="sticky left-0 bg-gray-100 dark:bg-gray-700 font-semibold min-w-[160px] py-3 px-4 text-gray-900 dark:text-gray-100">
-                                                    Time
-                                                </Th>
-                                                {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow')).map((header) => (
-                                                    <Th key={header} className="min-w-[200px] font-semibold py-3 px-4 text-gray-900 dark:text-gray-100">
-                                                        {header}
+                                        <Table className="w-full text-base">
+                                            <THead className="sticky top-0 bg-gray-50 dark:bg-gray-800">
+                                                <Tr>
+                                                    <Th className="sticky left-0 bg-gray-100 dark:bg-gray-700 font-semibold min-w-[160px] py-3 px-4 text-gray-900 dark:text-gray-100">
+                                                        Time
                                                     </Th>
-                                                ))}
-                                            </Tr>
-                                        </THead>
-                                        <TBody>
-                                            {gridRows.map((row) => (
-                                                <Tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                                    <Td className="sticky left-0 bg-gray-50 dark:bg-gray-800 font-medium border-r border-gray-200 dark:border-gray-700 py-3 px-4">
-                                                        {editingCell?.row === row.id && editingCell?.column === (sheetData?.headers?.[0] || 'Time') ? (
-                                                            <div className="relative">
-                                                                <Input
-                                                                    value={editValue}
-                                                                    onChange={(e) => setEditValue(e.target.value)}
-                                                                    onKeyDown={(e) => {
-                                                                        if (e.key === 'Enter') handleCellSave()
-                                                                        if (e.key === 'Escape') handleCellCancel()
-                                                                    }}
-                                                                    className="text-base h-10 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
-                                                                    autoFocus
-                                                                    disabled={cellUpdateLoading}
-                                                                />
-                                                                {cellUpdateLoading && (
-                                                                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                                                                        <Spinner size="16px" />
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        ) : (
-                                                            <div
-                                                                className={`min-h-[40px] py-2 px-2 whitespace-pre-wrap break-words text-gray-900 dark:text-gray-100 ${userRole === 'SUPERADMIN' && row.id <= getTimeSlots().length ? 'cursor-text' : ''}`}
-                                                                onClick={() => {
-                                                                    if (userRole === 'SUPERADMIN' && row.id <= getTimeSlots().length) {
-                                                                        const timeHeader = sheetData?.headers?.[0] || 'Time'
-                                                                        handleCellClick(row.id, timeHeader, row.time)
-                                                                    }
-                                                                }}
-                                                                title={row.time as string}
-                                                            >
-                                                                {row.time}
-                                                            </div>
-                                                        )}
-                                                    </Td>
                                                     {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow')).map((header) => (
-                                                        <Td key={header} className="border-r border-gray-200 dark:border-gray-700 py-2 px-2 align-top">
-                                                            {editingCell?.row === row.id && editingCell?.column === header ? (
+                                                        <Th key={header} className="min-w-[200px] font-semibold py-3 px-4 text-gray-900 dark:text-gray-100">
+                                                            {header}
+                                                        </Th>
+                                                    ))}
+                                                </Tr>
+                                            </THead>
+                                            <TBody>
+                                                {gridRows.map((row) => (
+                                                    <Tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                                        <Td className="sticky left-0 bg-gray-50 dark:bg-gray-800 font-medium border-r border-gray-200 dark:border-gray-700 py-3 px-4">
+                                                            {editingCell?.row === row.id && editingCell?.column === (sheetData?.headers?.[0] || 'Time') ? (
                                                                 <div className="relative">
                                                                     <Input
                                                                         value={editValue}
@@ -647,19 +618,55 @@ const DailyLineUp: React.FC = () => {
                                                                 </div>
                                                             ) : (
                                                                 <div
-                                                                    className="min-h-[40px] py-2 px-2 cursor-text whitespace-pre-wrap break-words text-gray-900 dark:text-gray-100"
-                                                                    onClick={() => handleCellClick(row.id, header, row[header] || '')}
-                                                                    title={(row[header] || '') as string}
+                                                                    className={`min-h-[40px] py-2 px-2 whitespace-pre-wrap break-words text-gray-900 dark:text-gray-100 ${userRole === 'SUPERADMIN' && row.id <= getTimeSlots().length ? 'cursor-text' : ''}`}
+                                                                    onClick={() => {
+                                                                        if (userRole === 'SUPERADMIN' && row.id <= getTimeSlots().length) {
+                                                                            const timeHeader = sheetData?.headers?.[0] || 'Time'
+                                                                            handleCellClick(row.id, timeHeader, row.time)
+                                                                        }
+                                                                    }}
+                                                                    title={row.time as string}
                                                                 >
-                                                                    {row[header] || ''}
+                                                                    {row.time}
                                                                 </div>
                                                             )}
                                                         </Td>
-                                                    ))}
-                                                </Tr>
-                                            ))}
-                                        </TBody>
-                                    </Table>
+                                                        {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow')).map((header) => (
+                                                            <Td key={header} className="border-r border-gray-200 dark:border-gray-700 py-2 px-2 align-top">
+                                                                {editingCell?.row === row.id && editingCell?.column === header ? (
+                                                                    <div className="relative">
+                                                                        <Input
+                                                                            value={editValue}
+                                                                            onChange={(e) => setEditValue(e.target.value)}
+                                                                            onKeyDown={(e) => {
+                                                                                if (e.key === 'Enter') handleCellSave()
+                                                                                if (e.key === 'Escape') handleCellCancel()
+                                                                            }}
+                                                                            className="text-base h-10 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
+                                                                            autoFocus
+                                                                            disabled={cellUpdateLoading}
+                                                                        />
+                                                                        {cellUpdateLoading && (
+                                                                            <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                                                                                <Spinner size="16px" />
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                ) : (
+                                                                    <div
+                                                                        className="min-h-[40px] py-2 px-2 cursor-text whitespace-pre-wrap break-words text-gray-900 dark:text-gray-100"
+                                                                        onClick={() => handleCellClick(row.id, header, row[header] || '')}
+                                                                        title={(row[header] || '') as string}
+                                                                    >
+                                                                        {row[header] || ''}
+                                                                    </div>
+                                                                )}
+                                                            </Td>
+                                                        ))}
+                                                    </Tr>
+                                                ))}
+                                            </TBody>
+                                        </Table>
                                     )}
                                 </div>
                             </TabContent>

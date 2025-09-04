@@ -38,6 +38,8 @@ const DailyLineUp: React.FC = () => {
     const [sheetData, setSheetData] = useState<SheetData | null>(null)
     const [loading, setLoading] = useState(false)
     const [createDialogOpen, setCreateDialogOpen] = useState(false)
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const [sheetToDelete, setSheetToDelete] = useState<string>('')
     const [newSheetDate, setNewSheetDate] = useState('')
     const [gridRows, setGridRows] = useState<GridRow[]>([])
     const [editingCell, setEditingCell] = useState<{row: number, column: string} | null>(null)
@@ -82,7 +84,6 @@ const DailyLineUp: React.FC = () => {
                 )
             }
         } catch (error) {
-            console.error('Error loading date sheets:', error)
             toast.push(
                 <Notification title={'Error'} type="danger" duration={2000}>
                     Failed to load date sheets
@@ -110,7 +111,6 @@ const DailyLineUp: React.FC = () => {
                 )
             }
         } catch (error) {
-            console.error('Error loading sheet data:', error)
             toast.push(
                 <Notification title={'Error'} type="danger" duration={2000}>
                     Failed to load sheet data
@@ -171,7 +171,6 @@ const DailyLineUp: React.FC = () => {
     }
 
     const handleCellClick = (rowId: number, columnName: string, currentValue: string) => {
-        console.log('userRole', userRole, 'userName', userName, 'columnName', columnName)
         // Check if user has permission to edit this column
         if (!canEditColumn(userRole, userName, columnName)) {
             toast.push(
@@ -226,7 +225,6 @@ const DailyLineUp: React.FC = () => {
                 )
             }
         } catch (error) {
-            console.error('Error updating cell:', error)
             toast.push(
                 <Notification title={'Error'} type="danger" duration={2000}>
                     Failed to update cell
@@ -276,7 +274,6 @@ const DailyLineUp: React.FC = () => {
                 )
             }
         } catch (error) {
-            console.error('Error creating sheet:', error)
             toast.push(
                 <Notification title={'Error'} type="danger" duration={2000}>
                     Failed to create sheet
@@ -286,13 +283,16 @@ const DailyLineUp: React.FC = () => {
         }
     }
 
-    const handleDeleteSheet = async (date: string) => {
-        if (!window.confirm(`Are you sure you want to delete the sheet for ${date}?`)) {
-            return
-        }
+    const handleDeleteSheet = (date: string) => {
+        setSheetToDelete(date)
+        setDeleteDialogOpen(true)
+    }
+
+    const handleDeleteConfirm = async () => {
+        if (!sheetToDelete) return
 
         try {
-            const response = await apiDeleteDateSheet(date)
+            const response = await apiDeleteDateSheet(sheetToDelete)
             if (response.status) {
                 toast.push(
                     <Notification title={'Success'} type="success" duration={1500}>
@@ -303,8 +303,8 @@ const DailyLineUp: React.FC = () => {
                 loadDateSheets()
                 
                 // If deleted sheet was current, switch to first available
-                if (currentSheet === date) {
-                    const remainingSheets = dateSheets.filter(sheet => sheet.title !== date)
+                if (currentSheet === sheetToDelete) {
+                    const remainingSheets = dateSheets.filter(sheet => sheet.title !== sheetToDelete)
                     setCurrentSheet(remainingSheets[0]?.title || '')
                 }
             } else {
@@ -316,13 +316,15 @@ const DailyLineUp: React.FC = () => {
                 )
             }
         } catch (error) {
-            console.error('Error deleting sheet:', error)
             toast.push(
                 <Notification title={'Error'} type="danger" duration={2000}>
                     Failed to delete sheet
                 </Notification>,
                 { placement: 'top-end' }
             )
+        } finally {
+            setDeleteDialogOpen(false)
+            setSheetToDelete('')
         }
     }
 
@@ -330,10 +332,10 @@ const DailyLineUp: React.FC = () => {
         <div className="p-6">
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                         Daily LineUp
                     </h1>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-gray-400">
                         Manage team tasks and schedules in an Excel-like grid format
                     </p>
                 </div>
@@ -350,10 +352,10 @@ const DailyLineUp: React.FC = () => {
 
             {dateSheets.length === 0 ? (
                 <Card className="p-8 text-center">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                         No date sheets available
                     </h3>
-                    <p className="text-gray-600 mb-4">
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">
                         Create your first date sheet to get started
                     </p>
                     <AuthorityCheck userAuthority={userAuthority} authority={['SUPERADMIN']}>
@@ -368,11 +370,11 @@ const DailyLineUp: React.FC = () => {
             ) : (
                 <Card>
                     <Tabs value={currentSheet} onChange={setCurrentSheet}>
-                        <div className="flex justify-between items-center px-3 py-2 border-b">
+                        <div className="flex justify-between items-center px-3 py-2 border-b border-gray-200 dark:border-gray-700">
                             <TabList className="flex-1">
                                 {dateSheets.map((sheet) => (
                                     <TabNav key={sheet.title} value={sheet.title}>
-                                        <div className="flex items-center gap-2 text-base">
+                                        <div className="flex items-center gap-2 text-base text-gray-900 dark:text-gray-100">
                                             {sheet.title}
                                             {sheet.title === getTodaySheetDate() && (
                                                 <Badge content="Today" className="bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded" />
@@ -387,7 +389,7 @@ const DailyLineUp: React.FC = () => {
                                     <Button
                                         variant="plain"
                                         size="xs"
-                                        className="text-red-600 hover:bg-red-50 h-7 px-2"
+                                        className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 h-7 px-2"
                                         onClick={() => handleDeleteSheet(currentSheet)}
                                     >
                                         Delete Sheet
@@ -400,13 +402,13 @@ const DailyLineUp: React.FC = () => {
                             <TabContent key={sheet.title} value={sheet.title}>
                                 <div className="overflow-x-auto" style={{ maxHeight: '600px' }}>
                                     <Table className="w-full text-base">
-                                        <THead className="sticky top-0 bg-gray-50">
+                                        <THead className="sticky top-0 bg-gray-50 dark:bg-gray-800">
                                             <Tr>
-                                                <Th className="sticky left-0 bg-gray-100 font-semibold min-w-[160px] py-3 px-4">
+                                                <Th className="sticky left-0 bg-gray-100 dark:bg-gray-700 font-semibold min-w-[160px] py-3 px-4 text-gray-900 dark:text-gray-100">
                                                     Time
                                                 </Th>
                                                 {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow')).map((header) => (
-                                                    <Th key={header} className="min-w-[200px] font-semibold py-3 px-4">
+                                                    <Th key={header} className="min-w-[200px] font-semibold py-3 px-4 text-gray-900 dark:text-gray-100">
                                                         {header}
                                                     </Th>
                                                 ))}
@@ -414,8 +416,8 @@ const DailyLineUp: React.FC = () => {
                                         </THead>
                                         <TBody>
                                             {gridRows.map((row) => (
-                                                <Tr key={row.id} className="hover:bg-gray-50">
-                                                    <Td className="sticky left-0 bg-gray-50 font-medium border-r py-3 px-4">
+                                                <Tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                                    <Td className="sticky left-0 bg-gray-50 dark:bg-gray-800 font-medium border-r border-gray-200 dark:border-gray-700 py-3 px-4">
                                                         {editingCell?.row === row.id && editingCell?.column === (sheetData?.headers?.[0] || 'Time') ? (
                                                             <Input
                                                                 value={editValue}
@@ -424,12 +426,12 @@ const DailyLineUp: React.FC = () => {
                                                                     if (e.key === 'Enter') handleCellSave()
                                                                     if (e.key === 'Escape') handleCellCancel()
                                                                 }}
-                                                                className="text-base h-10 px-3"
+                                                                className="text-base h-10 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
                                                                 autoFocus
                                                             />
                                                         ) : (
                                                             <div
-                                                                className={`min-h-[40px] py-2 px-2 whitespace-pre-wrap break-words ${userRole === 'SUPERADMIN' && row.id <= getTimeSlots().length ? 'cursor-text' : ''}`}
+                                                                className={`min-h-[40px] py-2 px-2 whitespace-pre-wrap break-words text-gray-900 dark:text-gray-100 ${userRole === 'SUPERADMIN' && row.id <= getTimeSlots().length ? 'cursor-text' : ''}`}
                                                                 onClick={() => {
                                                                     if (userRole === 'SUPERADMIN' && row.id <= getTimeSlots().length) {
                                                                         const timeHeader = sheetData?.headers?.[0] || 'Time'
@@ -443,7 +445,7 @@ const DailyLineUp: React.FC = () => {
                                                         )}
                                                     </Td>
                                                     {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow')).map((header) => (
-                                                        <Td key={header} className="border-r py-2 px-2 align-top">
+                                                        <Td key={header} className="border-r border-gray-200 dark:border-gray-700 py-2 px-2 align-top">
                                                             {editingCell?.row === row.id && editingCell?.column === header ? (
                                                                 <Input
                                                                     value={editValue}
@@ -452,12 +454,12 @@ const DailyLineUp: React.FC = () => {
                                                                         if (e.key === 'Enter') handleCellSave()
                                                                         if (e.key === 'Escape') handleCellCancel()
                                                                     }}
-                                                                    className="text-base h-10 px-3"
+                                                                    className="text-base h-10 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
                                                                     autoFocus
                                                                 />
                                                             ) : (
                                                                 <div
-                                                                    className="min-h-[40px] py-2 px-2 cursor-text whitespace-pre-wrap break-words"
+                                                                    className="min-h-[40px] py-2 px-2 cursor-text whitespace-pre-wrap break-words text-gray-900 dark:text-gray-100"
                                                                     onClick={() => handleCellClick(row.id, header, row[header] || '')}
                                                                     title={(row[header] || '') as string}
                                                                 >
@@ -513,6 +515,52 @@ const DailyLineUp: React.FC = () => {
                             onClick={handleCreateSheet}
                         >
                             Create
+                        </Button>
+                    </div>
+                </div>
+            </Dialog>
+
+            {/* Delete Sheet Dialog */}
+            <Dialog
+                isOpen={deleteDialogOpen}
+                onClose={() => setDeleteDialogOpen(false)}
+                onRequestClose={() => setDeleteDialogOpen(false)}
+            >
+                <div className="p-6 bg-white dark:bg-gray-800">
+                    <div className="flex items-center mb-4">
+                        <div className="flex-shrink-0 w-10 h-10 mx-auto flex items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
+                            <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100 text-center">
+                        Delete Date Sheet
+                    </h3>
+                    <div className="space-y-4">
+                        <p className="text-gray-700 dark:text-gray-300 text-center">
+                            Are you sure you want to delete the sheet for <strong className="text-gray-900 dark:text-gray-100">{sheetToDelete}</strong>?
+                        </p>
+                        <Alert className="mt-4 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20">
+                            <div className="text-red-800 dark:text-red-200">
+                                <strong>Warning:</strong> This action cannot be undone. All data in this sheet will be permanently deleted.
+                            </div>
+                        </Alert>
+                    </div>
+                    <div className="flex justify-end gap-3 mt-6">
+                        <Button
+                            variant="plain"
+                            onClick={() => setDeleteDialogOpen(false)}
+                            className="text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="solid"
+                            className="bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 text-white"
+                            onClick={handleDeleteConfirm}
+                        >
+                            Delete Sheet
                         </Button>
                     </div>
                 </div>

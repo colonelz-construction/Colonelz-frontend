@@ -42,7 +42,7 @@ export interface ApiResponse<T> {
  */
 export async function apiGetDateSheets(): Promise<ApiResponse<DateSheet[]>> {
     return ApiService.fetchData<ApiResponse<DateSheet[]>>({
-        url: `${apiPrefix}/admin/daily-lineup/sheets`,
+        url: `${apiPrefix}admin/daily-lineup/sheets`,
         method: 'get',
     }).then((response) => response.data)
 }
@@ -52,7 +52,7 @@ export async function apiGetDateSheets(): Promise<ApiResponse<DateSheet[]>> {
  */
 export async function apiGetSheetData(date: string): Promise<ApiResponse<SheetData>> {
     return ApiService.fetchData<ApiResponse<SheetData>>({
-        url: `${apiPrefix}/admin/daily-lineup/sheet/${date}`,
+        url: `${apiPrefix}admin/daily-lineup/sheet/${date}`,
         method: 'get',
     }).then((response) => response.data)
 }
@@ -65,7 +65,7 @@ export async function apiUpdateCell(
     cellUpdate: CellUpdate
 ): Promise<ApiResponse<{ success: boolean; message: string }>> {
     return ApiService.fetchData<ApiResponse<{ success: boolean; message: string }>>({
-        url: `${apiPrefix}/admin/daily-lineup/sheet/${date}/cell`,
+        url: `${apiPrefix}admin/daily-lineup/sheet/${date}/cell`,
         method: 'put',
         data: cellUpdate,
     }).then((response) => response.data)
@@ -79,7 +79,7 @@ export async function apiBatchUpdateCells(
     batchUpdate: BatchUpdateRequest
 ): Promise<ApiResponse<{ success: boolean; message: string }>> {
     return ApiService.fetchData<ApiResponse<{ success: boolean; message: string }>>({
-        url: `${apiPrefix}/admin/daily-lineup/sheet/${date}/batch`,
+        url: `${apiPrefix}admin/daily-lineup/sheet/${date}/batch`,
         method: 'put',
         data: batchUpdate,
     }).then((response) => response.data)
@@ -92,7 +92,7 @@ export async function apiCreateDateSheet(
     createRequest: CreateSheetRequest
 ): Promise<ApiResponse<{ success: boolean; message: string }>> {
     return ApiService.fetchData<ApiResponse<{ success: boolean; message: string }>>({
-        url: `${apiPrefix}/admin/daily-lineup/sheet`,
+        url: `${apiPrefix}admin/daily-lineup/sheet`,
         method: 'post',
         data: createRequest,
     }).then((response) => response.data)
@@ -105,7 +105,7 @@ export async function apiDeleteDateSheet(
     date: string
 ): Promise<ApiResponse<{ success: boolean; message: string }>> {
     return ApiService.fetchData<ApiResponse<{ success: boolean; message: string }>>({
-        url: `${apiPrefix}/admin/daily-lineup/sheet/${date}`,
+        url: `${apiPrefix}admin/daily-lineup/sheet/${date}`,
         method: 'delete',
     }).then((response) => response.data)
 }

@@ -211,11 +211,14 @@ const Roles = () => {
                 header: 'Access Level',
                 accessorKey: 'access',
                 cell: ({ row }) => {
-                    const access = row.original.access
-                    const accessLevels = Object.entries(access).map(([key, value]: any) => {
-                        return `${key}: ${value.join(', ')}`
-                    }).join(' | ')
-                    return <span>{accessLevels}</span>
+                    const access = row.original.access ?? {}
+                    const accessLevels = Object.entries(access)
+                        .map(([key, value]: any) => {
+                            const permissions = Array.isArray(value) ? value.join(', ') : ''
+                            return `${key}: ${permissions}`
+                        })
+                        .join(' | ')
+                    return <span>{accessLevels || '-'}</span>
                 }
             },
             {

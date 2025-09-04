@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Button, Dialog, Input, Alert, Badge } from '@/components/ui'
+import React, { useState, useEffect, useContext } from 'react'
+import { Button, Dialog, Input, Alert, Badge, Notification } from '@/components/ui'
 import Tabs from '@/components/ui/Tabs'
 import Card from '@/components/ui/Card'
 import Table from '@/components/ui/Table'
@@ -21,6 +21,7 @@ import {
     isValidDateFormat,
     getTimeSlots
 } from '@/services/DailyLineUpService'
+import { UserDetailsContext } from '@/views/Context/userdetailsContext'
 
 interface GridRow {
     id: number
@@ -42,9 +43,12 @@ const DailyLineUp: React.FC = () => {
     const [editingCell, setEditingCell] = useState<{row: number, column: string} | null>(null)
     const [editValue, setEditValue] = useState('')
 
-    const userAuthority = useAppSelector((state) => state.auth.user.authority)
-    const userRole = useAppSelector((state) => state.auth.user.role)
-    const userName = useAppSelector((state) => state.auth.user.userName)
+    const userAuthority = useAppSelector((state) => state.auth.user.authority) || []
+    const userRole = useAppSelector((state) => state.auth.session.role || localStorage.getItem('role') || '')
+    const data = useContext(UserDetailsContext);
+    const userName = data?.username || '';
+
+
 
     // Load date sheets on component mount
     useEffect(() => {
@@ -70,19 +74,21 @@ const DailyLineUp: React.FC = () => {
                 const todayExists = response.data.some(sheet => sheet.title === todaySheet)
                 setCurrentSheet(todayExists ? todaySheet : response.data[0]?.title || '')
             } else {
-                toast.push({
-                    type: 'danger',
-                    title: 'Error',
-                    message: response.message || 'Failed to load date sheets'
-                })
+                toast.push(
+                    <Notification title={'Error'} type="danger" duration={2000}>
+                        {response.message || 'Failed to load date sheets'}
+                    </Notification>,
+                    { placement: 'top-end' }
+                )
             }
         } catch (error) {
             console.error('Error loading date sheets:', error)
-            toast.push({
-                type: 'danger',
-                title: 'Error',
-                message: 'Failed to load date sheets'
-            })
+            toast.push(
+                <Notification title={'Error'} type="danger" duration={2000}>
+                    Failed to load date sheets
+                </Notification>,
+                { placement: 'top-end' }
+            )
         } finally {
             setLoading(false)
         }
@@ -96,19 +102,21 @@ const DailyLineUp: React.FC = () => {
                 setSheetData(response.data)
                 setupGridData(response.data)
             } else {
-                toast.push({
-                    type: 'danger',
-                    title: 'Error',
-                    message: response.message || 'Failed to load sheet data'
-                })
+                toast.push(
+                    <Notification title={'Error'} type="danger" duration={2000}>
+                        {response.message || 'Failed to load sheet data'}
+                    </Notification>,
+                    { placement: 'top-end' }
+                )
             }
         } catch (error) {
             console.error('Error loading sheet data:', error)
-            toast.push({
-                type: 'danger',
-                title: 'Error',
-                message: 'Failed to load sheet data'
-            })
+            toast.push(
+                <Notification title={'Error'} type="danger" duration={2000}>
+                    Failed to load sheet data
+                </Notification>,
+                { placement: 'top-end' }
+            )
         } finally {
             setLoading(false)
         }
@@ -125,14 +133,18 @@ const DailyLineUp: React.FC = () => {
         timeSlots.forEach((timeSlot, rowIndex) => {
             const row: GridRow = {
                 id: rowIndex + 1,
-                time: timeSlot
+                time: (data.data[rowIndex]?.[0] ?? timeSlot) as string
             }
 
             // Add data for each team member column
-            data.headers.slice(1).forEach((header, colIndex) => {
-                const cellValue = data.data[rowIndex] ? data.data[rowIndex][colIndex + 1] : ''
-                row[header] = cellValue || ''
-            })
+            data.headers
+                .slice(1)
+                .filter(header => (header || '').trim() !== 'Tasks For Tomorrow')
+                .forEach((header) => {
+                    const originalIndex = data.headers.indexOf(header)
+                    const cellValue = data.data[rowIndex] ? data.data[rowIndex][originalIndex] : ''
+                    row[header] = cellValue || ''
+                })
 
             gridRows.push(row)
         })
@@ -144,10 +156,14 @@ const DailyLineUp: React.FC = () => {
             time: 'Tasks For Tomorrow'
         }
 
-        data.headers.slice(1).forEach((header, colIndex) => {
-            const cellValue = data.data[tomorrowRowIndex] ? data.data[tomorrowRowIndex][colIndex + 1] : ''
-            tomorrowRow[header] = cellValue || ''
-        })
+        data.headers
+            .slice(1)
+            .filter(header => (header || '').trim() !== 'Tasks For Tomorrow')
+            .forEach((header) => {
+                const originalIndex = data.headers.indexOf(header)
+                const cellValue = data.data[tomorrowRowIndex] ? data.data[tomorrowRowIndex][originalIndex] : ''
+                tomorrowRow[header] = cellValue || ''
+            })
 
         gridRows.push(tomorrowRow)
 
@@ -155,13 +171,15 @@ const DailyLineUp: React.FC = () => {
     }
 
     const handleCellClick = (rowId: number, columnName: string, currentValue: string) => {
+        console.log('userRole', userRole, 'userName', userName, 'columnName', columnName)
         // Check if user has permission to edit this column
         if (!canEditColumn(userRole, userName, columnName)) {
-            toast.push({
-                type: 'danger',
-                title: 'Permission Denied',
-                message: 'You can only edit your own column'
-            })
+            toast.push(
+                <Notification title={'Permission Denied'} type="danger" duration={2000}>
+                    You can only edit your own column
+                </Notification>,
+                { placement: 'top-end' }
+            )
             return
         }
 
@@ -184,29 +202,37 @@ const DailyLineUp: React.FC = () => {
 
             if (response.status) {
                 // Update local state
-                setGridRows(prev => prev.map(row =>
-                    row.id === editingCell.row ? { ...row, [editingCell.column]: editValue } : row
-                ))
+                const isTimeColumn = editingCell.column === (sheetData.headers?.[0] || 'Time')
+                setGridRows(prev => prev.map(row => {
+                    if (row.id !== editingCell.row) return row
+                    if (isTimeColumn) {
+                        return { ...row, time: editValue }
+                    }
+                    return { ...row, [editingCell.column]: editValue }
+                }))
 
-                toast.push({
-                    type: 'success',
-                    title: 'Success',
-                    message: 'Cell updated successfully'
-                })
+                toast.push(
+                    <Notification title={'Success'} type="success" duration={1500}>
+                        Cell updated successfully
+                    </Notification>,
+                    { placement: 'top-end' }
+                )
             } else {
-                toast.push({
-                    type: 'danger',
-                    title: 'Error',
-                    message: response.message || 'Failed to update cell'
-                })
+                toast.push(
+                    <Notification title={'Error'} type="danger" duration={2000}>
+                        {response.message || 'Failed to update cell'}
+                    </Notification>,
+                    { placement: 'top-end' }
+                )
             }
         } catch (error) {
             console.error('Error updating cell:', error)
-            toast.push({
-                type: 'danger',
-                title: 'Error',
-                message: 'Failed to update cell'
-            })
+            toast.push(
+                <Notification title={'Error'} type="danger" duration={2000}>
+                    Failed to update cell
+                </Notification>,
+                { placement: 'top-end' }
+            )
         } finally {
             setEditingCell(null)
             setEditValue('')
@@ -220,39 +246,43 @@ const DailyLineUp: React.FC = () => {
 
     const handleCreateSheet = async () => {
         if (!isValidDateFormat(newSheetDate)) {
-            toast.push({
-                type: 'danger',
-                title: 'Invalid Date',
-                message: 'Please enter date in YYYY-MM-DD format'
-            })
+            toast.push(
+                <Notification title={'Invalid Date'} type="danger" duration={2000}>
+                    Please enter date in YYYY-MM-DD format
+                </Notification>,
+                { placement: 'top-end' }
+            )
             return
         }
 
         try {
             const response = await apiCreateDateSheet({ date: newSheetDate })
             if (response.status) {
-                toast.push({
-                    type: 'success',
-                    title: 'Success',
-                    message: 'Date sheet created successfully'
-                })
+                toast.push(
+                    <Notification title={'Success'} type="success" duration={1500}>
+                        Date sheet created successfully
+                    </Notification>,
+                    { placement: 'top-end' }
+                )
                 setCreateDialogOpen(false)
                 setNewSheetDate('')
                 loadDateSheets()
             } else {
-                toast.push({
-                    type: 'danger',
-                    title: 'Error',
-                    message: response.message || 'Failed to create sheet'
-                })
+                toast.push(
+                    <Notification title={'Error'} type="danger" duration={2000}>
+                        {response.message || 'Failed to create sheet'}
+                    </Notification>,
+                    { placement: 'top-end' }
+                )
             }
         } catch (error) {
             console.error('Error creating sheet:', error)
-            toast.push({
-                type: 'danger',
-                title: 'Error',
-                message: 'Failed to create sheet'
-            })
+            toast.push(
+                <Notification title={'Error'} type="danger" duration={2000}>
+                    Failed to create sheet
+                </Notification>,
+                { placement: 'top-end' }
+            )
         }
     }
 
@@ -264,11 +294,12 @@ const DailyLineUp: React.FC = () => {
         try {
             const response = await apiDeleteDateSheet(date)
             if (response.status) {
-                toast.push({
-                    type: 'success',
-                    title: 'Success',
-                    message: 'Date sheet deleted successfully'
-                })
+                toast.push(
+                    <Notification title={'Success'} type="success" duration={1500}>
+                        Date sheet deleted successfully
+                    </Notification>,
+                    { placement: 'top-end' }
+                )
                 loadDateSheets()
                 
                 // If deleted sheet was current, switch to first available
@@ -277,19 +308,21 @@ const DailyLineUp: React.FC = () => {
                     setCurrentSheet(remainingSheets[0]?.title || '')
                 }
             } else {
-                toast.push({
-                    type: 'danger',
-                    title: 'Error',
-                    message: response.message || 'Failed to delete sheet'
-                })
+                toast.push(
+                    <Notification title={'Error'} type="danger" duration={2000}>
+                        {response.message || 'Failed to delete sheet'}
+                    </Notification>,
+                    { placement: 'top-end' }
+                )
             }
         } catch (error) {
             console.error('Error deleting sheet:', error)
-            toast.push({
-                type: 'danger',
-                title: 'Error',
-                message: 'Failed to delete sheet'
-            })
+            toast.push(
+                <Notification title={'Error'} type="danger" duration={2000}>
+                    Failed to delete sheet
+                </Notification>,
+                { placement: 'top-end' }
+            )
         }
     }
 
@@ -335,14 +368,14 @@ const DailyLineUp: React.FC = () => {
             ) : (
                 <Card>
                     <Tabs value={currentSheet} onChange={setCurrentSheet}>
-                        <div className="flex justify-between items-center p-4 border-b">
+                        <div className="flex justify-between items-center px-3 py-2 border-b">
                             <TabList className="flex-1">
                                 {dateSheets.map((sheet) => (
                                     <TabNav key={sheet.title} value={sheet.title}>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 text-base">
                                             {sheet.title}
                                             {sheet.title === getTodaySheetDate() && (
-                                                <Badge content="Today" className="bg-blue-500 text-white text-xs px-2 py-1 rounded" />
+                                                <Badge content="Today" className="bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded" />
                                             )}
                                         </div>
                                     </TabNav>
@@ -353,8 +386,8 @@ const DailyLineUp: React.FC = () => {
                                 {currentSheet && (
                                     <Button
                                         variant="plain"
-                                        size="sm"
-                                        className="text-red-600 hover:bg-red-50"
+                                        size="xs"
+                                        className="text-red-600 hover:bg-red-50 h-7 px-2"
                                         onClick={() => handleDeleteSheet(currentSheet)}
                                     >
                                         Delete Sheet
@@ -366,14 +399,14 @@ const DailyLineUp: React.FC = () => {
                         {dateSheets.map((sheet) => (
                             <TabContent key={sheet.title} value={sheet.title}>
                                 <div className="overflow-x-auto" style={{ maxHeight: '600px' }}>
-                                    <Table className="w-full">
+                                    <Table className="w-full text-base">
                                         <THead className="sticky top-0 bg-gray-50">
                                             <Tr>
-                                                <Th className="sticky left-0 bg-gray-100 font-bold min-w-[120px]">
+                                                <Th className="sticky left-0 bg-gray-100 font-semibold min-w-[160px] py-3 px-4">
                                                     Time
                                                 </Th>
-                                                {sheetData?.headers.slice(1).map((header) => (
-                                                    <Th key={header} className="min-w-[200px] font-bold">
+                                                {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow')).map((header) => (
+                                                    <Th key={header} className="min-w-[200px] font-semibold py-3 px-4">
                                                         {header}
                                                     </Th>
                                                 ))}
@@ -382,34 +415,51 @@ const DailyLineUp: React.FC = () => {
                                         <TBody>
                                             {gridRows.map((row) => (
                                                 <Tr key={row.id} className="hover:bg-gray-50">
-                                                    <Td className="sticky left-0 bg-gray-50 font-bold border-r">
-                                                        {row.time}
+                                                    <Td className="sticky left-0 bg-gray-50 font-medium border-r py-3 px-4">
+                                                        {editingCell?.row === row.id && editingCell?.column === (sheetData?.headers?.[0] || 'Time') ? (
+                                                            <Input
+                                                                value={editValue}
+                                                                onChange={(e) => setEditValue(e.target.value)}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') handleCellSave()
+                                                                    if (e.key === 'Escape') handleCellCancel()
+                                                                }}
+                                                                className="text-base h-10 px-3"
+                                                                autoFocus
+                                                            />
+                                                        ) : (
+                                                            <div
+                                                                className={`min-h-[40px] py-2 px-2 whitespace-pre-wrap break-words ${userRole === 'SUPERADMIN' && row.id <= getTimeSlots().length ? 'cursor-text' : ''}`}
+                                                                onClick={() => {
+                                                                    if (userRole === 'SUPERADMIN' && row.id <= getTimeSlots().length) {
+                                                                        const timeHeader = sheetData?.headers?.[0] || 'Time'
+                                                                        handleCellClick(row.id, timeHeader, row.time)
+                                                                    }
+                                                                }}
+                                                                title={row.time as string}
+                                                            >
+                                                                {row.time}
+                                                            </div>
+                                                        )}
                                                     </Td>
-                                                    {sheetData?.headers.slice(1).map((header) => (
-                                                        <Td key={header} className="border-r">
+                                                    {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow')).map((header) => (
+                                                        <Td key={header} className="border-r py-2 px-2 align-top">
                                                             {editingCell?.row === row.id && editingCell?.column === header ? (
-                                                                <div className="flex gap-2">
-                                                                    <Input
-                                                                        value={editValue}
-                                                                        onChange={(e) => setEditValue(e.target.value)}
-                                                                        onKeyDown={(e) => {
-                                                                            if (e.key === 'Enter') handleCellSave()
-                                                                            if (e.key === 'Escape') handleCellCancel()
-                                                                        }}
-                                                                        className="text-sm"
-                                                                        autoFocus
-                                                                    />
-                                                                    <Button size="sm" onClick={handleCellSave}>
-                                                                        ✓
-                                                                    </Button>
-                                                                    <Button size="sm" variant="plain" onClick={handleCellCancel}>
-                                                                        ✕
-                                                                    </Button>
-                                                                </div>
+                                                                <Input
+                                                                    value={editValue}
+                                                                    onChange={(e) => setEditValue(e.target.value)}
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === 'Enter') handleCellSave()
+                                                                        if (e.key === 'Escape') handleCellCancel()
+                                                                    }}
+                                                                    className="text-base h-10 px-3"
+                                                                    autoFocus
+                                                                />
                                                             ) : (
                                                                 <div
-                                                                    className="min-h-[40px] p-2 cursor-pointer hover:bg-gray-100 rounded"
+                                                                    className="min-h-[40px] py-2 px-2 cursor-text whitespace-pre-wrap break-words"
                                                                     onClick={() => handleCellClick(row.id, header, row[header] || '')}
+                                                                    title={(row[header] || '') as string}
                                                                 >
                                                                     {row[header] || ''}
                                                                 </div>

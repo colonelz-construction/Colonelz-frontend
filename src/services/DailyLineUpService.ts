@@ -64,7 +64,7 @@ export async function apiUpdateCell(
     date: string,
     cellUpdate: CellUpdate
 ): Promise<ApiResponse<{ success: boolean; message: string }>> {
-    return ApiService.fetchData<ApiResponse<{ success: boolean; message: string }>>({
+    return ApiService.fetchData<ApiResponse<{ success: boolean; message: string }>, CellUpdate>({
         url: `${apiPrefix}admin/daily-lineup/sheet/${date}/cell`,
         method: 'put',
         data: cellUpdate,
@@ -78,7 +78,7 @@ export async function apiBatchUpdateCells(
     date: string,
     batchUpdate: BatchUpdateRequest
 ): Promise<ApiResponse<{ success: boolean; message: string }>> {
-    return ApiService.fetchData<ApiResponse<{ success: boolean; message: string }>>({
+    return ApiService.fetchData<ApiResponse<{ success: boolean; message: string }>, BatchUpdateRequest>({
         url: `${apiPrefix}admin/daily-lineup/sheet/${date}/batch`,
         method: 'put',
         data: batchUpdate,
@@ -91,7 +91,7 @@ export async function apiBatchUpdateCells(
 export async function apiCreateDateSheet(
     createRequest: CreateSheetRequest
 ): Promise<ApiResponse<{ success: boolean; message: string }>> {
-    return ApiService.fetchData<ApiResponse<{ success: boolean; message: string }>>({
+    return ApiService.fetchData<ApiResponse<{ success: boolean; message: string }>, CreateSheetRequest>({
         url: `${apiPrefix}admin/daily-lineup/sheet`,
         method: 'post',
         data: createRequest,
@@ -153,14 +153,15 @@ export function canEditColumn(userRole: string, userName: string, columnHeader: 
     }
     
     // Other users can only edit their own column
-    return columnHeader === userName
+    return columnHeader.toLowerCase().trim() === userName.toLowerCase().trim()
 }
 
 /**
  * Get column index for a specific user
  */
 export function getUserColumnIndex(headers: string[], userName: string): number {
-    return headers.findIndex(header => header === userName)
+    const target = (userName || '').trim()
+    return headers.findIndex(header => (header || '').trim() === target)
 }
 
 /**

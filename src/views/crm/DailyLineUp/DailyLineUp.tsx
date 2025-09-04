@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { Button, Dialog, Input, Alert, Badge, Notification } from '@/components/ui'
+import { Button, Dialog, Input, Alert, Badge, Notification, Dropdown, Spinner } from '@/components/ui'
 import Tabs from '@/components/ui/Tabs'
 import Card from '@/components/ui/Card'
 import Table from '@/components/ui/Table'
@@ -44,6 +44,10 @@ const DailyLineUp: React.FC = () => {
     const [gridRows, setGridRows] = useState<GridRow[]>([])
     const [editingCell, setEditingCell] = useState<{row: number, column: string} | null>(null)
     const [editValue, setEditValue] = useState('')
+    const [downloadDropdownOpen, setDownloadDropdownOpen] = useState(false)
+    const [createLoading, setCreateLoading] = useState(false)
+    const [deleteLoading, setDeleteLoading] = useState(false)
+    const [cellUpdateLoading, setCellUpdateLoading] = useState(false)
 
     const userAuthority = useAppSelector((state) => state.auth.user.authority) || []
     const userRole = useAppSelector((state) => state.auth.session.role || localStorage.getItem('role') || '')
@@ -189,6 +193,7 @@ const DailyLineUp: React.FC = () => {
     const handleCellSave = async () => {
         if (!editingCell || !sheetData) return
 
+        setCellUpdateLoading(true)
         try {
             const rowIndex = editingCell.row - 1
             const columnIndex = sheetData.headers.findIndex(header => header === editingCell.column) || 0
@@ -232,6 +237,7 @@ const DailyLineUp: React.FC = () => {
                 { placement: 'top-end' }
             )
         } finally {
+            setCellUpdateLoading(false)
             setEditingCell(null)
             setEditValue('')
         }
@@ -253,6 +259,7 @@ const DailyLineUp: React.FC = () => {
             return
         }
 
+        setCreateLoading(true)
         try {
             const response = await apiCreateDateSheet({ date: newSheetDate })
             if (response.status) {
@@ -280,6 +287,8 @@ const DailyLineUp: React.FC = () => {
                 </Notification>,
                 { placement: 'top-end' }
             )
+        } finally {
+            setCreateLoading(false)
         }
     }
 
@@ -291,6 +300,7 @@ const DailyLineUp: React.FC = () => {
     const handleDeleteConfirm = async () => {
         if (!sheetToDelete) return
 
+        setDeleteLoading(true)
         try {
             const response = await apiDeleteDateSheet(sheetToDelete)
             if (response.status) {
@@ -323,9 +333,128 @@ const DailyLineUp: React.FC = () => {
                 { placement: 'top-end' }
             )
         } finally {
+            setDeleteLoading(false)
             setDeleteDialogOpen(false)
             setSheetToDelete('')
         }
+    }
+
+    const getVisibleData = () => {
+        if (!sheetData || !gridRows.length) return null
+        const visibleHeaders = ['Time', ...((sheetData.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow'))]
+        return { headers: visibleHeaders, rows: gridRows }
+    }
+
+    const downloadCSV = () => {
+        const data = getVisibleData()
+        if (!data) return
+
+        const csvContent = [
+            data.headers.join(','),
+            ...data.rows.map(row => [
+                `"${row.time.toString().replace(/"/g, '""')}"`,
+                ...data.headers.slice(1).map(header => `"${(row[header] || '').toString().replace(/"/g, '""')}"`)
+            ].join(','))
+        ].join('\n')
+
+        const blob = new Blob([csvContent], { type: 'text/csv' })
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `daily-lineup-${currentSheet}.csv`
+        a.click()
+        window.URL.revokeObjectURL(url)
+    }
+
+    const downloadExcel = () => {
+        const data = getVisibleData()
+        if (!data) return
+
+        const worksheet = [
+            data.headers,
+            ...data.rows.map(row => [
+                row.time,
+                ...data.headers.slice(1).map(header => row[header] || '')
+            ])
+        ]
+
+        let xlsContent = '<table>'
+        worksheet.forEach((row, i) => {
+            xlsContent += '<tr>'
+            row.forEach(cell => {
+                xlsContent += i === 0 ? `<th>${cell}</th>` : `<td>${cell}</td>`
+            })
+            xlsContent += '</tr>'
+        })
+        xlsContent += '</table>'
+
+        const blob = new Blob([xlsContent], { type: 'application/vnd.ms-excel' })
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `daily-lineup-${currentSheet}.xls`
+        a.click()
+        window.URL.revokeObjectURL(url)
+    }
+
+    const downloadPDF = () => {
+        const data = getVisibleData()
+        if (!data) return
+
+        let htmlContent = `
+            <html>
+            <head>
+                <title>Daily LineUp - ${currentSheet}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    h1 { color: #333; text-align: center; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f5f5f5; font-weight: bold; }
+                    tr:nth-child(even) { background-color: #f9f9f9; }
+                </style>
+            </head>
+            <body>
+                <h1>Daily LineUp - ${currentSheet}</h1>
+                <table>
+                    <thead><tr>${data.headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+                    <tbody>
+                        ${data.rows.map(row => 
+                            `<tr><td>${row.time}</td>${data.headers.slice(1).map(h => `<td>${row[h] || ''}</td>`).join('')}</tr>`
+                        ).join('')}
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `
+
+        const blob = new Blob([htmlContent], { type: 'text/html' })
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `daily-lineup-${currentSheet}.html`
+        a.click()
+        window.URL.revokeObjectURL(url)
+    }
+
+    const handleDownload = (format: string) => {
+        if (format === 'csv') downloadCSV()
+        else if (format === 'excel') downloadExcel()
+        else if (format === 'pdf') downloadPDF()
+        
+        setDownloadDropdownOpen(false)
+        toast.push(
+            <Notification title={'Success'} type="success" duration={1500}>
+                Sheet downloaded successfully
+            </Notification>,
+            { placement: 'top-end' }
+        )
+    }
+
+    const isToday = (dateString: string) => {
+        const today = new Date()
+        const sheetDate = new Date(dateString)
+        return today.toDateString() === sheetDate.toDateString()
     }
 
     return (
@@ -343,14 +472,21 @@ const DailyLineUp: React.FC = () => {
                 <AuthorityCheck userAuthority={userAuthority} authority={['SUPERADMIN']}>
                     <Button
                         variant="solid"
-                        onClick={() => setCreateDialogOpen(true)}
+                        onClick={() => {
+                            setNewSheetDate(new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }))
+                            setCreateDialogOpen(true)
+                        }}
                     >
                         Create New Date Sheet
                     </Button>
                 </AuthorityCheck>
             </div>
 
-            {dateSheets.length === 0 ? (
+            {loading ? (
+                <div className="flex justify-center items-center py-20">
+                    <Spinner size="40px" />
+                </div>
+            ) : dateSheets.length === 0 ? (
                 <Card className="p-8 text-center">
                     <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                         No date sheets available
@@ -361,7 +497,10 @@ const DailyLineUp: React.FC = () => {
                     <AuthorityCheck userAuthority={userAuthority} authority={['SUPERADMIN']}>
                         <Button
                             variant="solid"
-                            onClick={() => setCreateDialogOpen(true)}
+                            onClick={() => {
+                                setNewSheetDate(new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }))
+                                setCreateDialogOpen(true)
+                            }}
                         >
                             Create Date Sheet
                         </Button>
@@ -371,36 +510,69 @@ const DailyLineUp: React.FC = () => {
                 <Card>
                     <Tabs value={currentSheet} onChange={setCurrentSheet}>
                         <div className="flex justify-between items-center px-3 py-2 border-b border-gray-200 dark:border-gray-700">
-                            <TabList className="flex-1">
+                            <div className="flex-1 overflow-hidden">
+                                <TabList className="flex overflow-x-auto scrollbar-hide whitespace-nowrap">
                                 {dateSheets.map((sheet) => (
                                     <TabNav key={sheet.title} value={sheet.title}>
                                         <div className="flex items-center gap-2 text-base text-gray-900 dark:text-gray-100">
                                             {sheet.title}
-                                            {sheet.title === getTodaySheetDate() && (
+                                            {isToday(sheet.title) && (
                                                 <Badge content="Today" className="bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded" />
                                             )}
                                         </div>
                                     </TabNav>
                                 ))}
-                            </TabList>
+                                </TabList>
+                            </div>
                             
-                            <AuthorityCheck userAuthority={userAuthority} authority={['SUPERADMIN']}>
+                            <div className="flex items-center gap-2">
                                 {currentSheet && (
-                                    <Button
-                                        variant="plain"
-                                        size="xs"
-                                        className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 h-7 px-2"
-                                        onClick={() => handleDeleteSheet(currentSheet)}
+                                    <Dropdown
+                                        placement="bottom-end"
+                                        renderTitle={
+                                            <Button
+                                                variant="solid"
+                                                size="xs"
+                                                className="bg-green-600 hover:bg-green-700 text-white h-7 px-3 rounded-md shadow-sm"
+                                            >
+                                                ⬇️ Download
+                                            </Button>
+                                        }
                                     >
-                                        Delete Sheet
-                                    </Button>
+                                        <Dropdown.Item eventKey="csv" onSelect={() => handleDownload('csv')}>
+                                            📄 CSV
+                                        </Dropdown.Item>
+                                        <Dropdown.Item eventKey="excel" onSelect={() => handleDownload('excel')}>
+                                            📊 Excel
+                                        </Dropdown.Item>
+                                        <Dropdown.Item eventKey="pdf" onSelect={() => handleDownload('pdf')}>
+                                            📋 PDF
+                                        </Dropdown.Item>
+                                    </Dropdown>
                                 )}
-                            </AuthorityCheck>
+                                <AuthorityCheck userAuthority={userAuthority} authority={['SUPERADMIN']}>
+                                    {currentSheet && (
+                                        <Button
+                                            variant="plain"
+                                            size="xs"
+                                            className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-md h-7 px-2 transition-all duration-200 hover:border-red-300 dark:hover:border-red-600"
+                                            onClick={() => handleDeleteSheet(currentSheet)}
+                                        >
+                                            🗑️ Delete
+                                        </Button>
+                                    )}
+                                </AuthorityCheck>
+                            </div>
                         </div>
 
                         {dateSheets.map((sheet) => (
                             <TabContent key={sheet.title} value={sheet.title}>
-                                <div className="overflow-x-auto" style={{ maxHeight: '600px' }}>
+                                <div className="overflow-y-auto" style={{ maxHeight: '600px', overflowX: 'hidden' }}>
+                                    {loading ? (
+                                        <div className="flex justify-center items-center py-20">
+                                            <Spinner size="40px" />
+                                        </div>
+                                    ) : (
                                     <Table className="w-full text-base">
                                         <THead className="sticky top-0 bg-gray-50 dark:bg-gray-800">
                                             <Tr>
@@ -419,16 +591,24 @@ const DailyLineUp: React.FC = () => {
                                                 <Tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                                                     <Td className="sticky left-0 bg-gray-50 dark:bg-gray-800 font-medium border-r border-gray-200 dark:border-gray-700 py-3 px-4">
                                                         {editingCell?.row === row.id && editingCell?.column === (sheetData?.headers?.[0] || 'Time') ? (
-                                                            <Input
-                                                                value={editValue}
-                                                                onChange={(e) => setEditValue(e.target.value)}
-                                                                onKeyDown={(e) => {
-                                                                    if (e.key === 'Enter') handleCellSave()
-                                                                    if (e.key === 'Escape') handleCellCancel()
-                                                                }}
-                                                                className="text-base h-10 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
-                                                                autoFocus
-                                                            />
+                                                            <div className="relative">
+                                                                <Input
+                                                                    value={editValue}
+                                                                    onChange={(e) => setEditValue(e.target.value)}
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === 'Enter') handleCellSave()
+                                                                        if (e.key === 'Escape') handleCellCancel()
+                                                                    }}
+                                                                    className="text-base h-10 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
+                                                                    autoFocus
+                                                                    disabled={cellUpdateLoading}
+                                                                />
+                                                                {cellUpdateLoading && (
+                                                                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                                                                        <Spinner size="16px" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         ) : (
                                                             <div
                                                                 className={`min-h-[40px] py-2 px-2 whitespace-pre-wrap break-words text-gray-900 dark:text-gray-100 ${userRole === 'SUPERADMIN' && row.id <= getTimeSlots().length ? 'cursor-text' : ''}`}
@@ -447,16 +627,24 @@ const DailyLineUp: React.FC = () => {
                                                     {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow')).map((header) => (
                                                         <Td key={header} className="border-r border-gray-200 dark:border-gray-700 py-2 px-2 align-top">
                                                             {editingCell?.row === row.id && editingCell?.column === header ? (
-                                                                <Input
-                                                                    value={editValue}
-                                                                    onChange={(e) => setEditValue(e.target.value)}
-                                                                    onKeyDown={(e) => {
-                                                                        if (e.key === 'Enter') handleCellSave()
-                                                                        if (e.key === 'Escape') handleCellCancel()
-                                                                    }}
-                                                                    className="text-base h-10 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
-                                                                    autoFocus
-                                                                />
+                                                                <div className="relative">
+                                                                    <Input
+                                                                        value={editValue}
+                                                                        onChange={(e) => setEditValue(e.target.value)}
+                                                                        onKeyDown={(e) => {
+                                                                            if (e.key === 'Enter') handleCellSave()
+                                                                            if (e.key === 'Escape') handleCellCancel()
+                                                                        }}
+                                                                        className="text-base h-10 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
+                                                                        autoFocus
+                                                                        disabled={cellUpdateLoading}
+                                                                    />
+                                                                    {cellUpdateLoading && (
+                                                                        <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                                                                            <Spinner size="16px" />
+                                                                        </div>
+                                                                    )}
+                                                                </div>
                                                             ) : (
                                                                 <div
                                                                     className="min-h-[40px] py-2 px-2 cursor-text whitespace-pre-wrap break-words text-gray-900 dark:text-gray-100"
@@ -472,6 +660,7 @@ const DailyLineUp: React.FC = () => {
                                             ))}
                                         </TBody>
                                     </Table>
+                                    )}
                                 </div>
                             </TabContent>
                         ))}
@@ -482,8 +671,14 @@ const DailyLineUp: React.FC = () => {
             {/* Create Sheet Dialog */}
             <Dialog
                 isOpen={createDialogOpen}
-                onClose={() => setCreateDialogOpen(false)}
-                onRequestClose={() => setCreateDialogOpen(false)}
+                onClose={() => {
+                    setCreateDialogOpen(false)
+                    setNewSheetDate('')
+                }}
+                onRequestClose={() => {
+                    setCreateDialogOpen(false)
+                    setNewSheetDate('')
+                }}
             >
                 <div className="p-6">
                     <h3 className="text-lg font-semibold mb-4">Create New Date Sheet</h3>
@@ -506,13 +701,17 @@ const DailyLineUp: React.FC = () => {
                     <div className="flex justify-end gap-2 mt-6">
                         <Button
                             variant="plain"
-                            onClick={() => setCreateDialogOpen(false)}
+                            onClick={() => {
+                                setCreateDialogOpen(false)
+                                setNewSheetDate('')
+                            }}
                         >
                             Cancel
                         </Button>
                         <Button
                             variant="solid"
                             onClick={handleCreateSheet}
+                            loading={createLoading}
                         >
                             Create
                         </Button>
@@ -559,6 +758,7 @@ const DailyLineUp: React.FC = () => {
                             variant="solid"
                             className="bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 text-white"
                             onClick={handleDeleteConfirm}
+                            loading={deleteLoading}
                         >
                             Delete Sheet
                         </Button>

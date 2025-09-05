@@ -109,6 +109,26 @@ export async function apiAddMemberToLead(data:any) {  // org done
     });
 }
 
+export async function apiAddBulkMembers(data:any) {
+    return ApiService.fetchData<any>({
+        url: 'admin/add/bulk/members',
+        method: 'post',
+        data,
+    }).then((response) => {
+        return response.data;
+    });
+}
+
+export async function apiAddBulkMembersToLead(data:any) {
+    return ApiService.fetchData<any>({
+        url: 'admin/add/bulk/members/lead',
+        method: 'post',
+        data,
+    }).then((response) => {
+        return response.data;
+    });
+}
+
 
 export async function apiSignUp(data:SignUpCredential) {
     data.email=data.email.toLowerCase();

@@ -26,6 +26,7 @@ type RoleAccessPermissions = {
     | "task"
     | "file"
     | "mom"
+    | "dailyLineUp"
     | "archive"
     | "contract"
     | "quotation"

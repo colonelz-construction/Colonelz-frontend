@@ -1,47 +1,66 @@
 @import "./assets/styles/app.css";
 
 .remark-content ol {
-    list-style-type: decimal;
-    margin-left: 20px;
+  list-style-type: decimal;
+  margin-left: 20px;
 }
 
 .remark-content ul {
-    list-style-type: disc;
-    margin-left: 20px;
+  list-style-type: disc;
+  margin-left: 20px;
 }
 
 .wx-weekend {
-    background-color: rgba(255, 152, 0, 0.3) !important; /* Light orange */
-  }
-  
-
-  .wx-delay {
-    background-color: rgba(255, 0, 0, 0.3) !important; /* Semi-transparent red */
-  }
-
-  
-  .wx-willow-theme .myMiddleClass {
-    background-color: rgba(142, 255, 44, 0.77);
-  }
-
-  .delay-bar {
-    position: absolute;
-    top: 0;
-    height: 100%;
-    background-color: rgba(255, 165, 0, 0.6); /* Orange overlay */
-    border-left: 2px solid red; /* Border to highlight start */
-    border-right: 2px solid red; /* Border to highlight end */
-    z-index: 10;
-    border-radius: 3px;
-  }
+  background-color: rgba(255, 152, 0, 0.3) !important;
+  /* Light orange */
+}
 
 
-  rect[fill="#ff5733"] {
-    opacity: 0.6; /* Makes delay bar semi-transparent */
-  }
-  
+.wx-delay {
+  background-color: rgba(255, 0, 0, 0.3) !important;
+  /* Semi-transparent red */
+}
 
-  /* Add to your global CSS */
-#task-column, #calendar-content {
-    scroll-behavior: smooth;
-  }
+
+.wx-willow-theme .myMiddleClass {
+  background-color: rgba(142, 255, 44, 0.77);
+}
+
+.delay-bar {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background-color: rgba(255, 165, 0, 0.6);
+  /* Orange overlay */
+  border-left: 2px solid red;
+  /* Border to highlight start */
+  border-right: 2px solid red;
+  /* Border to highlight end */
+  z-index: 10;
+  border-radius: 3px;
+}
+
+
+rect[fill="#ff5733"] {
+  opacity: 0.6;
+  /* Makes delay bar semi-transparent */
+}
+
+
+/* Add to your global CSS */
+#task-column,
+#calendar-content {
+  scroll-behavior: smooth;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari */
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE/Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}

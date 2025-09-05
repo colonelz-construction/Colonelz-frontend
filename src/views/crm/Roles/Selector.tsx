@@ -25,14 +25,15 @@ const permissionsMap: { [key: string]: Permission[] } = {
     archive: ['read', 'restore','delete'],
     addMember: ['create', 'delete'],
     lead: ['create', 'read', 'update', 'delete'],
-    project: ['create', 'read', 'update'],
+    project: ['create', 'read', 'update', 'delete'],
     mom: ['create', 'read', 'update', 'delete'],
     contract: ['create', 'read','update'],
     quotation: [ 'read','update'],
     user: [ 'create','read', 'update', 'delete'],
     userArchive:['read','restore','delete'],
     leadArchive:['read','restore','delete'],
-    companyData:['read']
+    companyData:['read'],
+    dailyLineUp: ['create', 'delete']
 
 };
 

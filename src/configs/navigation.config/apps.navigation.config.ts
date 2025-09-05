@@ -120,6 +120,19 @@ const appsNavigationConfig: NavigationTree[] = [
         : data?.data?.task?.read ?? [],
         subMenu: [],
     },
+    {
+        key: 'appsCrm.dailyLineUp',
+        path: `${APP_PREFIX_PATH}/crm/daily-lineup`,
+        title: 'Daily LineUp',
+        translateKey: 'Daily LineUp',
+        icon: 'calendar',
+        type: NAV_ITEM_TYPE_ITEM,
+        authority:
+            role === 'SUPERADMIN'
+                ? ['SUPERADMIN']
+                : data?.data?.dailyLineUp?.read ?? [],
+        subMenu: [],
+    },
     // {
     //     key: 'appsCrm.visualizer',
     //     path: `${APP_PREFIX_PATH}/crm/visualizer`,

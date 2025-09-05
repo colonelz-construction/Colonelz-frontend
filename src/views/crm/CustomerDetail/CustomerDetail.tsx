@@ -3,17 +3,17 @@ import Container from '@/components/shared/Container'
 import CustomerProfile from './components/CustomerProfile'
 import useQuery from '@/utils/hooks/useQuery'
 import MOM from './components/MOM/Mom'
-import { Button, Dropdown, Skeleton, Tabs } from '@/components/ui'
+import { Button, Dropdown, Notification, Skeleton, Tabs, toast } from '@/components/ui'
 import TabList from '@/components/ui/Tabs/TabList'
 import TabNav from '@/components/ui/Tabs/TabNav'
 import TabContent from '@/components/ui/Tabs/TabContent'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { apiCreateCrmExecTask, apiGetCrmExecutionTask, apiGetCrmProjectsMom, apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList, apiGetUsersListProject } from '@/services/CrmService'
+import { apiCreateCrmExecTask, apiGetCrmExecutionTask, apiGetCrmProjectsMom, apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList, apiGetUsersListProject, apiDeactivateProject, apiDeleteInactiveProject, apiReactivateProject } from '@/services/CrmService'
 import Index from './Quotation'
 import Task from './Task/index'
 import Activity from './Project Progress/Activity'
 import Timeline from './Timeline/Timeline'
-import { AuthorityCheck } from '@/components/shared'
+import { AuthorityCheck, ConfirmDialog } from '@/components/shared'
 import { useRoleContext } from '../Roles/RolesContext'
 import { Customer, Data, Tasks } from './store'
 import { FileItemType } from './Quotation/Quotations'
@@ -88,13 +88,129 @@ const CustomerDetail = () => {
   const [data, setData] = useState<any>([])
   const [report, setReport] = useState<ReportResponse>()
   const [activity, setActivity] = useState<any>()
-  const [users, setUsers] = useState<any>([])
+  const [users, setUsers] = useState<any>([]) 
   const quotationAccess = role === 'SUPERADMIN' ? true : roleData?.data?.quotation?.read?.includes(`${localStorage.getItem('role')}`)
   const momAccess = role === 'SUPERADMIN' ? true : roleData?.data?.mom?.read?.includes(`${localStorage.getItem('role')}`)
   const taskAccess = role === 'SUPERADMIN' ? true : roleData?.data?.task?.read?.includes(`${localStorage.getItem('role')}`)
   const projectAccess = role === 'SUPERADMIN' ? true : roleData?.data?.project?.read?.includes(`${localStorage.getItem('role')}`)
 
   const org_id = localStorage.getItem('orgId')
+
+  // Project deletion state and functions
+  const [dialogIsOpen2, setIsOpen2] = useState(false)
+  const [dialogIsOpen4, setIsOpen4] = useState(false)
+  const [dialogIsOpen5, setIsOpen5] = useState(false)
+  const projectUpdateAccess = role === 'SUPERADMIN' ? true : roleData?.data?.project?.update?.includes(`${localStorage.getItem('role')}`)
+  const projectDeleteAccess = role === 'SUPERADMIN' ? true : roleData?.data?.project?.delete?.includes(`${localStorage.getItem('role')}`)
+
+  const openDialog2 = () => {
+    setIsOpen2(true)
+  }
+
+  const onDialogClose2 = () => {
+    setIsOpen2(false)
+  }
+
+  const openDialog4 = () => {
+    setIsOpen4(true)
+  }
+
+  const onDialogClose4 = () => {
+    setIsOpen4(false)
+  }
+
+  const openDialog5 = () => {
+    setIsOpen5(true)
+  }
+
+  const onDialogClose5 = () => {
+    setIsOpen5(false)
+  }
+
+  const deactivateProject = async () => {
+    const values = {
+      project_id: allQueryParams.project_id,
+      org_id,
+      content: '',
+    }
+
+    try {
+      const response = await apiDeactivateProject(values)
+      if (response.code === 200) {
+        toast.push(
+          <Notification type='success' duration={2000} closable>
+            Project deactivated successfully
+          </Notification>
+        )
+        window.location.reload()
+      } else {
+        toast.push(
+          <Notification type='danger' duration={2000} closable>
+            Error deactivating project
+          </Notification>
+        )
+      }
+    } catch (error: any) {
+      console.log(error)
+      toast.push(
+        <Notification type='danger' duration={2000} closable>
+          Error deactivating project
+        </Notification>
+      )
+    }
+  }
+
+  const handleDeleteInactiveProject = async () => {
+    try {
+      if (projectData[0]?.status === 'Inactive') {
+        const res = await apiDeleteInactiveProject(allQueryParams.project_id);
+        toast.push(
+          <Notification closable type="success" duration={2000}>
+            Project deleted successfully
+          </Notification>, { placement: 'top-end' }
+        )
+        navigate('/app/crm/projects');
+        window.location.reload()
+      }
+    } catch (error) {
+      toast.push(
+        <Notification closable type="danger" duration={2000}>
+          Error deleting project
+        </Notification>, { placement: 'top-end' }
+      )
+    }
+  }
+
+  const reactivateProject = async () => {
+    const values = {
+      project_id: allQueryParams.project_id,
+      org_id,
+      content: '',
+    }
+    try {
+      const response = await apiReactivateProject(values);
+      if (response?.errorMessage) {
+        toast.push(
+          <Notification closable type="danger" duration={2000}>
+            {response?.errorMessage}
+          </Notification>, { placement: 'top-end' }
+        )
+      } else {
+        toast.push(
+          <Notification closable type="success" duration={2000}>
+            Project reactivated successfully
+          </Notification>, { placement: 'top-end' }
+        )
+        window.location.reload()
+      }
+    } catch (error) {
+      toast.push(
+        <Notification closable type="danger" duration={2000}>
+          Error reactivating project
+        </Notification>, { placement: 'top-end' }
+      )
+    }
+  }
 
   const handleTabChange = (selectedTab: any) => {
     const currentUrlParams = new URLSearchParams(location.search);
@@ -198,24 +314,52 @@ const CustomerDetail = () => {
       <span className='flex justify-between'>
         <h3 className='pb-5 capitalize flex items-center'><span>Project-</span>{loading ? <Skeleton width={100} /> : projectData[0]?.project_name}</h3>
 
-        {/* <Dropdown renderTitle={Toggle} placement='middle-end-top' >
-              
-              {<AuthorityCheck
-                  userAuthority={[`${localStorage.getItem('role')}`]}
-                  authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
-              >
-                  <Link to={`/app/crm/projects/blueprint?project_id=${allQueryParams.project_id}`}><Dropdown.Item eventKey="d">2D View</Dropdown.Item></Link>
+        <div className=''>
+          <Dropdown renderTitle={
+            <Button variant='solid' size='sm' className='flex justify-center items-center gap-4'>
+              <span>Actions</span>
+              <span><GoChevronDown /></span>
+            </Button>
+          } placement='middle-end-top' >
 
-              </AuthorityCheck>}
-              {<AuthorityCheck
-                  userAuthority={[`${localStorage.getItem('role')}`]}
-                  authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
-              >
-                  <Link to={`/app/crm/visualizer?project_id=${allQueryParams.project_id}`}><Dropdown.Item eventKey="g">3D View</Dropdown.Item></Link>
+            {<AuthorityCheck
+                userAuthority={[`${localStorage.getItem('role')}`]}
+                authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
+            >
+                <Link to={`/app/crm/projects/blueprint?project_id=${allQueryParams.project_id}`}><Dropdown.Item eventKey="d">2D View</Dropdown.Item></Link>
+            </AuthorityCheck>}
 
-              </AuthorityCheck>}
+            {<AuthorityCheck
+                userAuthority={[`${localStorage.getItem('role')}`]}
+                authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.read ?? []}
+            >
+                <Link to={`/app/crm/visualizer?project_id=${allQueryParams.project_id}`}><Dropdown.Item eventKey="g">3D View</Dropdown.Item></Link>
+            </AuthorityCheck>}
 
-              {/* {<AuthorityCheck
+            {projectData && projectData[0]?.status === "Inactive" && projectDeleteAccess && <AuthorityCheck
+                userAuthority={[`${localStorage.getItem('role')}`]}
+                authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.delete ?? []}
+            >
+                <Dropdown.Item eventKey="delete" onClick={() => openDialog2()}><div>Delete Project</div></Dropdown.Item>
+            </AuthorityCheck>}
+
+            {projectData && projectData[0]?.status === "Inactive" && projectUpdateAccess && <AuthorityCheck
+                userAuthority={[`${localStorage.getItem('role')}`]}
+                authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.update ?? []}
+            >
+                <Dropdown.Item eventKey="reactivate" onClick={() => openDialog5()}><div>Reactivate Project</div></Dropdown.Item>
+            </AuthorityCheck>}
+
+            {projectData && projectData[0]?.status !== "Inactive" && projectUpdateAccess && <AuthorityCheck
+                userAuthority={[`${localStorage.getItem('role')}`]}
+                authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.update ?? []}
+            >
+                <Dropdown.Item eventKey="deactivate" onClick={() => openDialog4()}><div>Deactivate Project</div></Dropdown.Item>
+            </AuthorityCheck>}
+          </Dropdown>
+        </div>
+
+        {/* {<AuthorityCheck
                   userAuthority={[`${localStorage.getItem('role')}`]}
                   authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.lead?.read ?? []}
               >
@@ -353,6 +497,43 @@ const CustomerDetail = () => {
             </div>
           </Tabs>}
       </div>
+
+      {/* Confirmation Dialogs */}
+      <ConfirmDialog
+        isOpen={dialogIsOpen2}
+        type="danger"
+        onClose={onDialogClose2}
+        confirmButtonColor="red-600"
+        onCancel={onDialogClose2}
+        onConfirm={handleDeleteInactiveProject}
+        title="Delete Project"
+        onRequestClose={onDialogClose2}>
+        <p>Are you sure you want to delete this project? This action cannot be undone.</p>
+      </ConfirmDialog>
+
+      <ConfirmDialog
+        isOpen={dialogIsOpen4}
+        type="warning"
+        onClose={onDialogClose4}
+        confirmButtonColor="amber-600"
+        onCancel={onDialogClose4}
+        onConfirm={deactivateProject}
+        title="Deactivate Project"
+        onRequestClose={onDialogClose4}>
+        <p>Are you sure you want to deactivate this project? You can reactivate it later if needed.</p>
+      </ConfirmDialog>
+
+      <ConfirmDialog
+        isOpen={dialogIsOpen5}
+        type="success"
+        onClose={onDialogClose5}
+        confirmButtonColor="green-600"
+        onCancel={onDialogClose5}
+        onConfirm={reactivateProject}
+        title="Reactivate Project"
+        onRequestClose={onDialogClose5}>
+        <p>Are you sure you want to reactivate this project? This will make it active again and available for normal operations.</p>
+      </ConfirmDialog>
     </>);
 
 };

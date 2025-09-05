@@ -115,8 +115,12 @@ const CustomerDetail = () => {
     }
 
     const onDialogClose1 = () => {
-
         setIsOpen1(false)
+    }
+
+    const handleFollowUpSuccess = () => {
+        setIsOpen1(false)
+        window.location.reload()
     }
 
     const openDialog = () => {
@@ -620,7 +624,7 @@ const CustomerDetail = () => {
                 isOpen={dialogIsOpen1}
                 onClose={onDialogClose1}
                 onRequestClose={onDialogClose1}
-            ><LeadForm /></Dialog>
+            ><LeadForm onSuccess={handleFollowUpSuccess} /></Dialog>
             <Dialog
                 isOpen={dialogIsOpen}
                 onClose={onDialogClose}

@@ -173,6 +173,36 @@ export async function apiDeleteInactiveLead(id: any) { //org done
     })
 }
 
+export async function apiDeactivateProject(data: any) {
+    return ApiService.fetchData<any>({
+        url: 'admin/deactivate/project',
+        method: 'put',
+        data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiReactivateProject(data: any) {
+    return ApiService.fetchData<any>({
+        url: 'admin/reactivate/project',
+        method: 'put',
+        data,
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiDeleteInactiveProject(project_id: any) {
+    return ApiService.fetchData<any>({
+        url: `admin/delete/inactive/project?project_id=${project_id}&org_id=${localStorage.getItem('orgId')}`,
+        method: 'delete',
+        data: project_id,
+    }).then((response) => {
+        return response.data
+    })
+}
+
 export async function addProfilePhoto(data: any) { //org done
     return ApiService.fetchData<ProfileProps>({
         url: 'users/profileurl',

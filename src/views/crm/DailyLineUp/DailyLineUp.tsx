@@ -6,6 +6,7 @@ import Table from '@/components/ui/Table'
 import { toast } from '@/components/ui'
 import { AuthorityCheck } from '@/components/shared'
 import { useAppSelector } from '@/store/hook'
+import { useRoleContext } from '../Roles/RolesContext'
 import {
     apiGetDateSheets,
     apiGetSheetData,
@@ -22,6 +23,7 @@ import {
     getTimeSlots
 } from '@/services/DailyLineUpService'
 import { UserDetailsContext } from '@/views/Context/userdetailsContext'
+import NoData from '@/views/pages/NoData'
 
 interface GridRow {
     id: number
@@ -53,6 +55,11 @@ const DailyLineUp: React.FC = () => {
     const userRole = useAppSelector((state) => state.auth.session.role || localStorage.getItem('role') || '')
     const data = useContext(UserDetailsContext);
     const userName = data?.username || '';
+    const { roleData } = useRoleContext();
+
+    // Permission checks
+    const createAccess = userRole === 'SUPERADMIN' ? true : roleData?.data?.dailyLineUp?.create?.includes(userRole)
+    const deleteAccess = userRole === 'SUPERADMIN' ? true : roleData?.data?.dailyLineUp?.delete?.includes(userRole)
 
 
 
@@ -469,7 +476,7 @@ const DailyLineUp: React.FC = () => {
                     </p>
                 </div>
 
-                <AuthorityCheck userAuthority={userAuthority} authority={['SUPERADMIN']}>
+                {createAccess && (
                     <Button
                         variant="solid"
                         onClick={() => {
@@ -479,7 +486,7 @@ const DailyLineUp: React.FC = () => {
                     >
                         Create New Date Sheet
                     </Button>
-                </AuthorityCheck>
+                )}
             </div>
 
             {loading ? (
@@ -488,13 +495,16 @@ const DailyLineUp: React.FC = () => {
                 </div>
             ) : dateSheets.length === 0 ? (
                 <Card className="p-8 text-center">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                    {/* <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                         No date sheets available
                     </h3>
                     <p className="text-gray-600 dark:text-gray-400 mb-4">
                         Create your first date sheet to get started
                     </p>
-                    <AuthorityCheck userAuthority={userAuthority} authority={['SUPERADMIN']}>
+                    <AuthorityCheck
+                        userAuthority={[`${localStorage.getItem('role')}`]}
+                        authority={userRole === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.dailyLineUp?.create ?? []}
+                    >
                         <Button
                             variant="solid"
                             onClick={() => {
@@ -504,7 +514,8 @@ const DailyLineUp: React.FC = () => {
                         >
                             Create Date Sheet
                         </Button>
-                    </AuthorityCheck>
+                    </AuthorityCheck> */}
+                    <NoData text='No Sheets Available'/>
                 </Card>
             ) : (
                 <Card>
@@ -557,18 +568,16 @@ const DailyLineUp: React.FC = () => {
                                         </Dropdown.Item>
                                     </Dropdown>
                                 )}
-                                <AuthorityCheck userAuthority={userAuthority} authority={['SUPERADMIN']}>
-                                    {currentSheet && (
-                                        <Button
-                                            variant="plain"
-                                            size="xs"
-                                            className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-md h-7 px-2 transition-all duration-200 hover:border-red-300 dark:hover:border-red-600"
-                                            onClick={() => handleDeleteSheet(currentSheet)}
-                                        >
-                                            🗑️ Delete
-                                        </Button>
-                                    )}
-                                </AuthorityCheck>
+                                {deleteAccess && currentSheet && (
+                                    <Button
+                                        variant="plain"
+                                        size="xs"
+                                        className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-md h-7 px-2 transition-all duration-200 hover:border-red-300 dark:hover:border-red-600"
+                                        onClick={() => handleDeleteSheet(currentSheet)}
+                                    >
+                                        🗑️ Delete
+                                    </Button>
+                                )}
                             </div>
                         </div>
 

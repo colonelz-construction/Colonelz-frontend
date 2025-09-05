@@ -32,7 +32,8 @@ const permissionsMap: { [key: string]: Permission[] } = {
     user: [ 'create','read', 'update', 'delete'],
     userArchive:['read','restore','delete'],
     leadArchive:['read','restore','delete'],
-    companyData:['read']
+    companyData:['read'],
+    dailyLineUp: ['create', 'delete']
 
 };
 

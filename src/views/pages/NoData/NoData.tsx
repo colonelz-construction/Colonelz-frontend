@@ -1,7 +1,11 @@
 import Container from '@/components/shared/Container'
 import DoubleSidedImage from '@/components/shared/DoubleSidedImage'
 
-const NoData = () => {
+interface NoDataProps {
+    text?: string
+}
+
+const NoData = ({ text = "Data Not Found!" }: NoDataProps) => {
     return (
         <Container className="h-full">
             <div className="h-full flex flex-col items-center justify-center">
@@ -11,7 +15,7 @@ const NoData = () => {
                     alt="Access Denied!"
                 />
                 <div className="mt-6 text-center">
-                    <h3 className="mb-2">Data Not Found!</h3>
+                    <h3 className="mb-2">{text}</h3>
                     
                 </div>
             </div>

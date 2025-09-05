@@ -16,7 +16,11 @@ interface FormData {
   createdBy: string;
 }
 
-const LeadForm = () => {
+interface LeadFormProps {
+  onSuccess?: () => void;
+}
+
+const LeadForm = ({ onSuccess }: LeadFormProps) => {
   const location=useLocation()
   const queryParams = new URLSearchParams(location.search)
   const org_id = localStorage.getItem('orgId')
@@ -63,8 +67,7 @@ const LeadForm = () => {
           Lead Status Updated Successfully
         </Notification>
       )
-      // Remove page reload for better UX
-      // window.location.reload()
+      onSuccess?.()
     }
     else{
       toast.push(

@@ -8,7 +8,7 @@ import { MdOutlineAdd } from 'react-icons/md'
 import * as Yup from 'yup'
 import { useLocation } from 'react-router-dom'
 import { setUser } from '@/store'
-import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
+import ColorPicker from '@/components/ui/ColorPicker'
 
 interface EditExecSubTaskDetailsProps {
     task: any;
@@ -188,13 +188,13 @@ const EditExecSubTaskDetails = ({ task, subtask, detail, openDialog, onDialogClo
   <FormItem label="Color">
     <Field name='color'>
       {({ field }: any) => (
-        <SelectWithBg 
+        <ColorPicker 
           onChange={(value) => {
             handleChange(value);
             setFieldValue('color', value);
           }} 
           value={bgColor || field.value}
-          placeholder={bgColor || field.value || "Select..."}
+          placeholder="Select detail color"
         />
       )}
     </Field>

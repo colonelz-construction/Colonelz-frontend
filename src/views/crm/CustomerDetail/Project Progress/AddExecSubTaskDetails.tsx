@@ -6,7 +6,7 @@ import { DatePicker, FormItem, Input, Notification, Select, toast } from '@/comp
 import { apiGetCrmExecutionTask, apiUpdateCrmExecSubTask } from '@/services/CrmService'
 import * as Yup from 'yup'
 import { useLocation } from 'react-router-dom'
-import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
+import ColorPicker from '@/components/ui/ColorPicker'
 
 interface AddExecSubTaskDetailsProps {
     task: any;
@@ -201,7 +201,7 @@ const AddExecSubTaskDetails = ({ task, subtask, openDialog, onDialogClose, dialo
                             {values.subtask_type !== 'Delay' && (
                                 <FormItem label="Color">
                                     <Field name='color'>
-                                        {() => <SelectWithBg onChange={handleChange} />}
+                                        {() => <ColorPicker onChange={handleChange} placeholder="Select detail color" />}
                                     </Field>
                                 </FormItem>
                             )}

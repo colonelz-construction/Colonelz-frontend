@@ -8,7 +8,7 @@ import { MdOutlineAdd } from 'react-icons/md'
 import * as Yup from 'yup'
 import { useLocation } from 'react-router-dom'
 import { setUser } from '@/store'
-import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
+import ColorPicker from '@/components/ui/ColorPicker'
 
 
 const EditExecTask = ({ task, dialogIsOpen, setIsOpen, openDialog, onDialogClose, onUpdateSuccess }: any) => {
@@ -147,9 +147,11 @@ const EditExecTask = ({ task, dialogIsOpen, setIsOpen, openDialog, onDialogClose
                                 <FormItem label="Color" >
                                     <Field name='color'>
                                         {({ field }: any) => (
-
-                                            <SelectWithBg onChange={handleChange} placeholder={field.value} />
-
+                                            <ColorPicker 
+                                                onChange={handleChange} 
+                                                value={bgColor || field.value}
+                                                placeholder="Select task color"
+                                            />
                                         )}
                                     </Field>
 

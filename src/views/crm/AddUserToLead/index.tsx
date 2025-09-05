@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Formik, Field, Form } from 'formik';
 import axios from 'axios';
 import { Button, FormItem, Input, Notification, Select, toast } from '@/components/ui';
-import { apiAddMember, apiAddMemberToLead } from '@/services/AuthService';
+import { apiAddMember, apiAddMemberToLead, apiAddBulkMembersToLead } from '@/services/AuthService';
 import { apiGetAllUsersList } from '@/services/CrmService';
 import { apiGetCrmLeads } from '@/services/CrmService';
 import { useRoleContext } from '../Roles/RolesContext';
@@ -106,25 +106,67 @@ const Index = () => {
 
   
 
-  const handleSubmit = async (values: FormValues) => {
+  const handleSubmit = async (values: any) => {
     setLoading(true)
-    const response = await apiAddMemberToLead(values);
-    setLoading(false)
-    if (response.code === 200) {
-      toast.push(
-        <Notification closable type="success" duration={2000}>
-          Member Added Successfully
-        </Notification>
-      )
-      // Redirect to lead page after success
-      navigate(`/app/crm/lead/?id=${values.lead_id}&tab=AddedUser`);
-    }
-    else {
-      toast.push(
-        <Notification closable type="danger" duration={2000}>
-          {response.errorMessage}
-        </Notification>
-      )
+
+    // Check if multiple users are selected
+    const isMultipleUsers = Array.isArray(values.user_name) && values.user_name.length > 1;
+
+    if (isMultipleUsers) {
+      // Handle bulk assignment
+      const users = values.user_name.map((username: string) => ({
+        user_name: username,
+        role: values.role
+      }));
+
+      const bulkData = {
+        id: values.id,
+        lead_id: values.lead_id,
+        users: users,
+        org_id: values.org_id
+      };
+
+      const response = await apiAddBulkMembersToLead(bulkData);
+      setLoading(false)
+
+      if (response?.code === 200) {
+        toast.push(
+          <Notification closable type="success" duration={2000}>
+            {response.message}
+          </Notification>
+        )
+        navigate(`/app/crm/lead/?id=${values.lead_id}&tab=AddedUser`);
+      } else {
+        toast.push(
+          <Notification closable type="danger" duration={2000}>
+            {response.errorMessage}
+          </Notification>
+        )
+      }
+    } else {
+      // Handle single user assignment (existing logic)
+      const singleUserData = {
+        ...values,
+        user_name: Array.isArray(values.user_name) ? values.user_name[0] : values.user_name
+      };
+
+      const response = await apiAddMemberToLead(singleUserData);
+      setLoading(false)
+
+      if (response.code === 200) {
+        toast.push(
+          <Notification closable type="success" duration={2000}>
+            Member Added Successfully
+          </Notification>
+        )
+        navigate(`/app/crm/lead/?id=${values.lead_id}&tab=AddedUser`);
+      } else {
+        toast.push(
+          <Notification closable type="danger" duration={2000}>
+            {response.errorMessage}
+          </Notification>
+        )
+      }
     }
   };
 
@@ -134,14 +176,14 @@ const Index = () => {
         id:id || '',
         org_id,
         role: '',
-        user_name: '',
+        user_name: [],
         lead_id: '',
       }}
       onSubmit={handleSubmit}
     >
       {({ setFieldValue }) => (
         <Form className='w-2/5'>
-          <h3 className='mb-4'>Add User To Lead</h3>
+          <h3 className='mb-4'>Add User(s) To Lead</h3>
           <FormItem label="Role">
             <Select
               options={Options}
@@ -151,10 +193,15 @@ const Index = () => {
               }}
             />
           </FormItem>
-          <FormItem label="User Name">
+          <FormItem label="User Name(s)">
             <Select
+              isMulti
               options={filteredUsers.map((user) => ({ value: user.username, label: user.username }))}
-              onChange={(option) => setFieldValue('user_name', option?.value || '')}
+              onChange={(options) => {
+                const selectedUsers = options ? options.map((option: any) => option.value) : [];
+                setFieldValue('user_name', selectedUsers);
+              }}
+              placeholder="Select one or more users..."
             />
           </FormItem>
           <FormItem label="Lead Name">

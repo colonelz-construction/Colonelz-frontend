@@ -32,6 +32,7 @@ import { MdOutlineDashboard,MdManageAccounts } from "react-icons/md";
 import { LuWarehouse,LuFileStack } from "react-icons/lu";
 import { GoProject } from "react-icons/go";
 import { CiStopwatch } from "react-icons/ci";
+import { HiOutlineCalendar } from "react-icons/hi";
 
 export type NavigationIcons = Record<string, JSX.Element>
 
@@ -73,6 +74,7 @@ const navigationIcon: NavigationIcons = {
     utilsDoc: <HiOutlineVariable />,
     changeLog: <HiOutlineCode />,
     timeline: <TbTimelineEventText />,
+    calendar: <HiOutlineCalendar />,
 }
 
 export default navigationIcon

@@ -10,7 +10,7 @@ type RoleAccessPermissions = {
     move?: string[];
   };
   
-  type ModuleNames = 
+  type ModuleNames =
     | "user"
     | "lead"
     | "project"
@@ -26,7 +26,8 @@ type RoleAccessPermissions = {
     | "role"
     | "userArchive"
     | "leadArchive"
-    | "companyData";
+    | "companyData"
+    | "dailyLineUp";
   
   type RoleAccessData = {
     message: string;

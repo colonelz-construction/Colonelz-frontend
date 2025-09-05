@@ -59,10 +59,14 @@ const   SignUpForm = (props: SignUpFormProps) => {
             values.user_name = ''
             values.email = ''
             values.role = ''
-          toast.push(
-            <Notification closable type="success" duration={2000}>
-                User Registered Successfully
-            </Notification>,{placement:'top-center'})
+            toast.push(
+                <Notification closable type="success" duration={2000}>
+                    User Registered Successfully
+                </Notification>,{placement:'top-center'}
+            )
+            setTimeout(() => {
+                navigate('/app/crm/profile?type=users')
+            }, 1000)
         }
         else{
             toast.push(

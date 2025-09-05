@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { StickyFooter } from '@/components/shared';
 
 type Permission = 'create' | 'read' | 'update' | 'delete' | 'restore' | 'move';
-type AccessType = 'lead' | 'user' | 'project' | 'task' | 'leadtask' | 'opentask' | 'contract' | 'quotation' | 'file' | 'archive' | 'mom' | 'addMember' | 'role' | 'companyData' | 'userArchive' | 'leadArchive';
+type AccessType = 'lead' | 'user' | 'project' | 'task' | 'leadtask' | 'opentask' | 'contract' | 'quotation' | 'file' | 'archive' | 'mom' | 'addMember' | 'role' | 'companyData' | 'userArchive' | 'leadArchive' | 'dailyLineUp';
 
 type AccessPermissions = Permission[];
 
@@ -18,7 +18,7 @@ type FormValues = {
 };
 
 const accessTypes: AccessType[] = [
-    'lead', 'user', 'project', 'task', 'leadtask', 'opentask', 'contract', 'quotation', 'file', 'archive', 'mom', 'addMember', 'role', 'companyData', 'userArchive', 'leadArchive'
+    'lead', 'user', 'project', 'task', 'leadtask', 'opentask', 'contract', 'quotation', 'file', 'archive', 'mom', 'addMember', 'role', 'companyData', 'userArchive', 'leadArchive', 'dailyLineUp'
 ];
 
 export const permissionsMap: { [key: string]: Permission[] } = {
@@ -31,14 +31,15 @@ export const permissionsMap: { [key: string]: Permission[] } = {
     archive: ['read', 'restore', 'delete'],
     addMember: ['create', 'delete'],
     lead: ['create', 'read', 'update', 'delete'],
-    project: ['create', 'read', 'update'],
+    project: ['create', 'read', 'update', 'delete'],
     mom: ['create', 'read', 'delete', 'update'],
     contract: ['create', 'read', 'update'],
     quotation: ['read', 'update'],
     user: ['create', 'read', 'update', 'delete'],
     userArchive: ['read', 'restore', 'delete'],
     leadArchive: ['read', 'restore', 'delete'],
-    companyData: ['read']
+    companyData: ['read'],
+    dailyLineUp: ['create', 'delete']
 };
 
 const validationSchema = Yup.object().shape(
@@ -65,7 +66,8 @@ export const obj: Record<AccessType, boolean> = {
     user: false,
     userArchive: false,
     leadArchive: false,
-    companyData: false
+    companyData: false,
+    dailyLineUp: false
 
 }
 

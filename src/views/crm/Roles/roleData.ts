@@ -18,6 +18,7 @@ type RoleAccessPermissions = {
     | "opentask"
     | "file"
     | "mom"
+    | "dailyLineUp"
     | "archive"
     | "contract"
     | "quotation"

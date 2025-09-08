@@ -290,7 +290,7 @@ const DailyLineUp: React.FC = () => {
 
         data.headers
             .slice(1)
-            .filter(header => (header || '').trim() !== 'Tasks For Tomorrow')
+            .filter(header => (header || '').trim() !== 'Tasks For Tomorrow' && (header || '').trim() !== 'Remarks')
             .forEach((header) => {
                 const originalIndex = data.headers.indexOf(header)
                 const cellValue = data.data[tomorrowRowIndex] ? data.data[tomorrowRowIndex][originalIndex] : ''
@@ -298,6 +298,24 @@ const DailyLineUp: React.FC = () => {
             })
 
         gridRows.push(tomorrowRow)
+
+        // Add "Remarks" row
+        const remarksRowIndex = timeSlots.length + 1
+        const remarksRow: GridRow = {
+            id: remarksRowIndex + 1,
+            time: 'Remarks'
+        }
+
+        data.headers
+            .slice(1)
+            .filter(header => (header || '').trim() !== 'Tasks For Tomorrow' && (header || '').trim() !== 'Remarks')
+            .forEach((header) => {
+                const originalIndex = data.headers.indexOf(header)
+                const cellValue = data.data[remarksRowIndex] ? data.data[remarksRowIndex][originalIndex] : ''
+                remarksRow[header] = cellValue || ''
+            })
+
+        gridRows.push(remarksRow)
 
         setGridRows(gridRows)
     }
@@ -469,7 +487,7 @@ const DailyLineUp: React.FC = () => {
 
     const getVisibleData = () => {
         if (!sheetData || !gridRows.length) return null
-        const visibleHeaders = ['Time', ...((sheetData.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow'))]
+        const visibleHeaders = ['Time', ...((sheetData.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow' && (header || '').trim() !== 'Remarks'))]
         return { headers: visibleHeaders, rows: gridRows }
     }
 
@@ -855,7 +873,7 @@ const DailyLineUp: React.FC = () => {
                                                     <Th className="sticky left-0 bg-gray-100 dark:bg-gray-700 font-semibold min-w-[160px] py-3 px-4 text-gray-900 dark:text-gray-100">
                                                         Time
                                                     </Th>
-                                                    {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow')).map((header) => (
+                                                    {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow' && (header || '').trim() !== 'Remarks')).map((header) => (
                                                         <Th key={header} className="min-w-[200px] font-semibold py-3 px-4 text-gray-900 dark:text-gray-100">
                                                             {header}
                                                         </Th>
@@ -878,7 +896,7 @@ const DailyLineUp: React.FC = () => {
                                                                             if (e.key === 'Enter' && e.ctrlKey) handleCellSave()
                                                                             if (e.key === 'Escape') handleCellCancel()
                                                                         }}
-                                                                        className="text-base min-h-[80px] px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 resize-none overflow-hidden transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                                        className="text-base min-h-[100px] px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 resize-none overflow-hidden transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                                         autoFocus
                                                                         disabled={cellUpdateLoading}
                                                                     />
@@ -903,7 +921,7 @@ const DailyLineUp: React.FC = () => {
                                                                 </div>
                                                             )}
                                                         </Td>
-                                                        {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow')).map((header) => (
+                                                        {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow' && (header || '').trim() !== 'Remarks')).map((header) => (
                                                             <Td key={header} className="border-r border-gray-200 dark:border-gray-700 py-2 px-2 align-top">
                                                                 {editingCell?.row === row.id && editingCell?.column === header ? (
                                                                     <div className="relative">
@@ -917,7 +935,7 @@ const DailyLineUp: React.FC = () => {
                                                                                 if (e.key === 'Enter' && e.ctrlKey) handleCellSave()
                                                                                 if (e.key === 'Escape') handleCellCancel()
                                                                             }}
-                                                                            className="text-base min-h-[80px] px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 resize-none overflow-hidden transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                                            className="text-base min-h-[100px] px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 resize-none overflow-hidden transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                                             autoFocus
                                                                             disabled={cellUpdateLoading}
                                                                         />

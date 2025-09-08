@@ -112,7 +112,7 @@ const AddExecSubTaskDetails = ({ task, subtask, openDialog, onDialogClose, dialo
 
 
     return (
-        <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
+        <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose} width={900}>
             <div className="pl-4 ">
                 <h3>Add New Detail</h3>
             </div>

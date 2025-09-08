@@ -51,7 +51,7 @@ const EditExecSubTaskDetails = ({ task, subtask, detail, openDialog, onDialogClo
     return (
         <div>
             {/* <Button onClick={openDialog}  variant='solid' size='sm' className=' rounded-lg'> Add Details</Button> */}
-            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
+            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose} width={800}>
                 <div className="pl-4 ">
                     <h3>Edit Details</h3>
                 </div>

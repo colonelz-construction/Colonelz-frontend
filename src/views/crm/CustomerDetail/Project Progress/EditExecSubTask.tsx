@@ -32,7 +32,7 @@ const EditExecSubTask = ({ task, subtask, openDialog, onDialogClose, dialogIsOpe
 
     return (
         <div>
-            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
+            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose} width={800}>
                 <div className="pl-4 ">
                     <h3>Edit SubTask</h3>
                 </div>

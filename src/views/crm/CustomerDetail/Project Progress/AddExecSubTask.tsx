@@ -33,7 +33,7 @@ const AddExecSubTask = ({task, openDialog, onDialogClose, dialogIsOpen, setIsOpe
     return (
         <div>
             {/* <Button onClick={openDialog}  variant='solid' size='sm' className=' rounded-lg'> Add Sub Task</Button> */}
-            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
+            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose} width={800}>
                 <div className="pl-4 ">
                     <h3>Add New SubTask</h3>
                 </div>

@@ -44,7 +44,7 @@ const EditExecTask = ({ task, dialogIsOpen, setIsOpen, openDialog, onDialogClose
     return (
         <div>
             {/* <Button onClick={openDialog}  variant='solid' size='sm' className=' rounded-lg'> Add Task</Button> */}
-            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
+            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose} width={800}>
                 <div className="pl-4">
                     <h3>Edit Task</h3>
                 </div>

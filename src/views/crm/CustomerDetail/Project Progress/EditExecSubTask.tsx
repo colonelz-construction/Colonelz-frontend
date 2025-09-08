@@ -6,7 +6,7 @@ import { DatePicker, FormItem, Input, Notification, toast } from '@/components/u
 import { apiUpdateCrmExecSubTask } from '@/services/CrmService'
 import * as Yup from 'yup'
 import { useLocation } from 'react-router-dom'
-import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
+import ColorPicker from '@/components/ui/ColorPicker'
 
 const EditExecSubTask = ({ task, subtask, openDialog, onDialogClose, dialogIsOpen, setIsOpen, onUpdateSuccess }: any) => {
     const [loading, setLoading] = useState(false)
@@ -32,7 +32,7 @@ const EditExecSubTask = ({ task, subtask, openDialog, onDialogClose, dialogIsOpe
 
     return (
         <div>
-            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
+            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose} width={800}>
                 <div className="pl-4 ">
                     <h3>Edit SubTask</h3>
                 </div>
@@ -140,13 +140,13 @@ const EditExecSubTask = ({ task, subtask, openDialog, onDialogClose, dialogIsOpe
                                     <FormItem label="Color">
                                         <Field name='color'>
                                             {({ field }: any) => (
-                                                <SelectWithBg
+                                                <ColorPicker
                                                     onChange={(value) => {
                                                         handleChange(value);
                                                         setFieldValue('color', value);
                                                     }}
                                                     value={bgColor || field.value}
-                                                    placeholder={bgColor || field.value || "Select..."}
+                                                    placeholder="Select subtask color"
                                                 />
                                             )}
                                         </Field>

@@ -1101,18 +1101,18 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
             const daysTimeline = timeline as TimelineDayView;
             return (
                 <>
-                    <div className="relative flex border-b border-gray-200">
+                    <div className="relative flex border-b border-gray-200 dark:border-gray-600">
                         {daysTimeline.monthHeaders.map(({ month, span }, i) => localExecData.length > 0 && (
                             <div
                                 key={`month-${i}`}
-                                className="text-center text-xs font-medium py-1 border-r border-gray-200"
+                                className="text-center text-xs font-medium py-1 border-r border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100"
                                 style={{ minWidth: `${span * dayWidth}px` }}
                             >
                                 {month}
                             </div>
                         ))}
                     </div>
-                    <div className="relative flex border-b border-gray-300">
+                    <div className="relative flex border-b border-gray-300 dark:border-gray-600">
                         {daysTimeline.dayHeaders.map(({ day, date }, index) => {
                             const isHighlighted = hoveredDelay &&
                                 date >= hoveredDelay.start &&
@@ -1126,7 +1126,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                             return (
                                 <div
                                     key={date.toString()}
-                                    className={`text-center text-xs border-r border-gray-300 relative ${isHighlighted || isLastDayOfDelay ? 'bg-blue-300 font-bold' : ''
+                                    className={`text-center text-xs border-r border-gray-300 dark:border-gray-600 relative text-gray-900 dark:text-gray-100 ${isHighlighted || isLastDayOfDelay ? 'bg-blue-300 dark:bg-blue-600 font-bold' : ''
                                         }`}
                                     style={{ minWidth: `${dayWidth}px` }}
                                 >
@@ -1136,7 +1136,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                         <div>{day}</div>
                                         <div className="text-[0.6rem] opacity-70">{dayName}</div>
                                         <div
-                                            className={`absolute top-0 bottom-0 w-px ${isHighlighted || isLastDayOfDelay ? 'bg-blue-700' : 'bg-gray-400 opacity-30'
+                                            className={`absolute top-0 bottom-0 w-px ${isHighlighted || isLastDayOfDelay ? 'bg-blue-700 dark:bg-blue-400' : 'bg-gray-400 dark:bg-gray-500 opacity-30'
                                                 }`}
                                             style={{ left: "50%", transform: "translateX(-50%)" }}
                                         />
@@ -1147,7 +1147,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                         })}
                     </div>
                     {/* Enhanced highlight line */}
-                    <div className="relative flex h-2 border-b border-gray-300">
+                    <div className="relative flex h-2 border-b border-gray-300 dark:border-gray-600">
                         {daysTimeline.dayHeaders.map(({ date }, index) => {
                             const isHighlighted = hoveredDelay &&
                                 date >= hoveredDelay.start &&
@@ -1160,7 +1160,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                             return (
                                 <div
                                     key={`highlight-${date.toString()}`}
-                                    className={`border-r border-gray-300 ${isHighlighted || isLastDayOfDelay ? 'bg-blue-500' : 'bg-gray-100'
+                                    className={`border-r border-gray-300 dark:border-gray-600 ${isHighlighted || isLastDayOfDelay ? 'bg-blue-500 dark:bg-blue-600' : 'bg-gray-100 dark:bg-gray-700'
                                         }`}
                                     style={{ minWidth: `${dayWidth}px` }}
                                 />
@@ -1172,16 +1172,16 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
         } else {
             const otherTimeline = timeline as TimelineOtherView;
             return (
-                <div className="relative flex border-b border-gray-300">
+                <div className="relative flex border-b border-gray-300 dark:border-gray-600">
                     {otherTimeline.map(({ label, date }) => (
                         <div
                             key={date.toString()}
-                            className="text-center text-xs border-r border-gray-300 relative"
+                            className="text-center text-xs border-r border-gray-300 dark:border-gray-600 relative text-gray-900 dark:text-gray-100"
                             style={{ minWidth: `${dayWidth}px` }}
                         >
                             {label}
                             <div
-                                className="absolute top-0 bottom-0 w-px bg-gray-400 opacity-30"
+                                className="absolute top-0 bottom-0 w-px bg-gray-400 dark:bg-gray-500 opacity-30"
                                 style={{ left: "50%", transform: "translateX(-50%)" }}
                             />
                         </div>
@@ -1395,7 +1395,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     }));
 
     return (
-        <div className="w-full p-4 bg-gray-100 rounded-lg">
+        <div className="w-full p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
 
             <div className="flex items-center justify-end mb-3">
 
@@ -1428,16 +1428,16 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
 
             </div>
 
-            <div className="relative overflow-hidden border border-gray-900 rounded-lg"
+            <div className="relative overflow-hidden border border-gray-900 dark:border-gray-600 rounded-lg"
                 ref={cardRef}
             >
                 <div
-                    className="sticky top-0 z-20 bg-gray-100 border-b border-gray-300 overflow-hidden"
+                    className="sticky top-0 z-20 bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 overflow-hidden"
                     ref={headerRef}
                 >
                     <div className="flex">
-                        <div className="w-[22rem] shrink-0 border-r border-gray-300"></div>
-                        <div className="w-[12rem] shrink-0 border-r border-gray-300"></div>
+                        <div className="w-[22rem] shrink-0 border-r border-gray-300 dark:border-gray-600"></div>
+                        <div className="w-[12rem] shrink-0 border-r border-gray-300 dark:border-gray-600"></div>
                         <div className="flex-1 min-w-max">
                             {renderTimelineHeader()}
                         </div>
@@ -1446,15 +1446,19 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
 
                 <div className="flex overflow-x-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
                     {/* LEFT COLUMN: Task color bar */}
-                    <div className="w-2 shrink-0 pr-[0.10rem] h-full sticky left-0 bg-slate-100 z-10">
+                    <div className="w-2 shrink-0 pr-[0.10rem] h-full sticky left-0 bg-slate-100 dark:bg-slate-700 z-10">
                         {sortedTasks.map((task: any) => {
                             const subtaskCount = task.subtasks?.length || 1;
                             const totalHeight = subtaskCount * 65 + (subtaskCount - 1) * 1;
                             return (
                                 <div
                                     key={task.task_id}
-                                    className={`capitalize pl-2 font-bold text-lg border-b border-gray-200 bg-${task?.color ? task?.color : "rose-600"} bg-opacity-50 flex items-center justify-between mb-2`}
-                                    style={{ height: `${totalHeight}px` }}
+                                    className="capitalize pl-2 font-bold text-lg border-b border-gray-200 dark:border-gray-600 flex items-center justify-between mb-2"
+                                    style={{ 
+                                        height: `${totalHeight}px`,
+                                        backgroundColor: task?.color || "#DC2626",
+                                        opacity: 0.5
+                                    }}
                                 >
 
                                 </div>
@@ -1463,20 +1467,25 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                     </div>
 
                     {/* LEFT COLUMN: Task names */}
-                    <div className="w-[11.5rem] shrink-0 pr-[0.10rem] h-full sticky left-0 bg-slate-100 z-10">
+                    <div className="w-[11.5rem] shrink-0 pr-[0.10rem] h-full sticky left-0 bg-slate-100 dark:bg-slate-700 z-10">
                         {sortedTasks.map((task: any) => {
                             const subtaskCount = task.subtasks?.length || 1;
                             const totalHeight = subtaskCount * 65 + (subtaskCount - 1) * 1;
                             return (
                                 <div
                                     key={task.task_id}
-                                    className="capitalize pl-2 font-bold text-lg border-b border-gray-200 bg-white flex items-center justify-between mb-2"
+                                    className="capitalize pl-2 font-bold text-lg border-b border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 flex items-center justify-between mb-2"
                                     style={{ height: `${totalHeight}px` }}
                                 >
 
                                     <span>
 
-                                        <span className={`break-all text-${task?.color ? task?.color : "rose-600"}`}>{task.task_name}</span>
+                                        <span 
+                                            className="break-all"
+                                            style={{ color: task?.color || "#DC2626" }}
+                                        >
+                                            {task.task_name}
+                                        </span>
                                         <span className={`flex text-[0.5rem] `}>
 
                                             <span>{format(task?.start_date, "MMM d yyyy")}</span>
@@ -1504,13 +1513,13 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                     </div>
 
                     {/* LEFT COLUMN: Subtask names */}
-                    <div className="w-[22rem] shrink-0 min-h-screen border-r-2 border-slate-500 sticky left-48 bg-slate-100 z-10">
+                    <div className="w-[22rem] shrink-0 min-h-screen border-r-2 border-slate-500 dark:border-slate-400 sticky left-48 bg-slate-100 dark:bg-slate-700 z-10">
                         {sortedTasks.map((task: any) => {
                             const subtaskCount = Math.max(1, task.subtasks?.length || 0);
                             return (
                                 <div
                                     key={`subtask-names-${task.task_id}`}
-                                    className="bg-slate-100 mb-2"
+                                    className="bg-slate-100 dark:bg-slate-700 mb-2"
                                     style={{ height: `${subtaskCount * 65 + (subtaskCount - 1) * 1}px` }}
                                 >
                                     {task.subtasks && task.subtasks.length > 0 ? (
@@ -1524,7 +1533,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                             return (
                                                 <div
                                                     key={`${subtask.sub_task_id}-${subIndex}-name`}
-                                                    className="text-wrap text-md flex items-center justify-between bg-slate-200 capitalize"
+                                                    className="text-wrap text-md flex items-center justify-between bg-slate-200 dark:bg-slate-600 text-gray-900 dark:text-gray-100 capitalize"
                                                     style={{
                                                         height: '65px',
                                                         marginTop: subIndex > 0 ? '1px' : '0'
@@ -1534,7 +1543,13 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                                     <span className="flex h-full w-full justify-between items-center gap-2">
 
 
-                                                        <div className={`w-[4%] h-full bg-${subtask?.color ? subtask?.color : "blue-800"} bg-opacity-60`}>
+                                                        <div 
+                                                            className="w-[4%] h-full"
+                                                            style={{ 
+                                                                backgroundColor: subtask?.color || "#1E40AF",
+                                                                opacity: 0.6
+                                                            }}
+                                                        >
 
                                                         </div>
 
@@ -1542,7 +1557,12 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                                             {/* <span className={`font-semibold text-${subtask?.color ? subtask?.color : "blue-800"}`}>{subtask_text}</span> */}
                                                             <span>
 
-                                                                <span className={`font-semibold text-${subtask?.color ? subtask?.color : "blue-800"}`}>{subtask_text}</span>
+                                                                <span 
+                                                                    className="font-semibold"
+                                                                    style={{ color: subtask?.color || "#1E40AF" }}
+                                                                >
+                                                                    {subtask_text}
+                                                                </span>
                                                                 <span className={`flex text-[0.5rem] `}>
 
                                                                     <span>{format(subtask?.sub_task_start_date, "MMM d yyyy")}</span>
@@ -1580,7 +1600,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                     ) : (
                                         // Render an empty row if no subtasks
                                         <div
-                                            className="bg-slate-100"
+                                            className="bg-slate-100 dark:bg-slate-700"
                                             style={{ height: '65px' }}
                                         />
                                     )}
@@ -1590,7 +1610,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                     </div>
 
                     <div
-                        className="flex-1 overflow-x-auto h-full overflow-y-hidden bg-slate-200 relative"
+                        className="flex-1 overflow-x-auto h-full overflow-y-hidden bg-slate-200 dark:bg-slate-600 relative"
                         ref={chartAreaRef}
                     >
                         {/* Vertical lines */}
@@ -1608,7 +1628,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                 <React.Fragment key={date.toString()}>
                                     {/* Original vertical line */}
                                     <div
-                                        className={`absolute top-0 bottom-0 w-px ${isHighlighted || isLastDayOfDelay ? 'bg-blue-700' : 'bg-gray-400 opacity-30'
+                                        className={`absolute top-0 bottom-0 w-px ${isHighlighted || isLastDayOfDelay ? 'bg-blue-700 dark:bg-blue-400' : 'bg-gray-400 dark:bg-gray-500 opacity-30'
                                             }`}
                                         style={{
                                             left: `${getLeftPosition(date)}px`,
@@ -1618,7 +1638,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                     {/* Additional highlighted line - appears for delay dates and one beyond */}
                                     {(isHighlighted || isLastDayOfDelay) && (
                                         <div
-                                            className="absolute top-0 bottom-0 w-[0.100rem] bg-blue-500 z-10"
+                                            className="absolute top-0 bottom-0 w-[0.100rem] bg-blue-500 dark:bg-blue-400 z-10"
                                             style={{
                                                 left: `${getLeftPosition(date) + (dayWidth / 2) + 14}px`,
                                                 transform: 'translateX(-50%)',
@@ -1641,11 +1661,13 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                         style={{ height: `${totalHeight}px` }}
                                     >
                                         <div
-                                            className={`absolute h-full bg-${task?.color ? task?.color : "rose-800"} bg-opacity-50 `}
+                                            className="absolute h-full"
                                             style={{
                                                 left: `${getLeftPosition(task.start_date)}px`,
                                                 width: `${getWidth(task.start_date, task.end_date)}px`,
-                                                height: `${totalHeight}px`
+                                                height: `${totalHeight}px`,
+                                                backgroundColor: task?.color || "#B91C1C",
+                                                opacity: 0.5
                                             }}
                                         />
                                         {task.subtasks?.map((subtask: any, subIndex: any) => {
@@ -1665,11 +1687,13 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                                     <div className="relative h-full w-[100%] flex items-center">
                                                         {/* Subtask bar with drag handles */}
                                                         <div
-                                                            className={`absolute h-[95%] bg-${subtask?.color ? subtask?.color : "blue-800"} bg-opacity-60`}
+                                                            className="absolute h-[95%]"
                                                             style={{
                                                                 left: `${getLeftPosition(startDate)}px`,
                                                                 width: `${getWidth(startDate, endDate)}px`,
-                                                                zIndex: isDraggingThis ? 50 : 'auto'
+                                                                zIndex: isDraggingThis ? 50 : 'auto',
+                                                                backgroundColor: subtask?.color || "#1E40AF",
+                                                                opacity: 0.6
                                                             }}
                                                         >
                                                             {/* Left drag handle */}
@@ -1728,12 +1752,14 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                                             return (
                                                                 <div
                                                                     key={index}
-                                                                    className={`absolute h-[75%] ${delay.subtask_type == "Delay" ? "bg-zinc-700" : delay?.color ? "bg-" + delay?.color : "bg-green-400"} bg-opacity-75 flex items-center justify-center`}
+                                                                    className="absolute h-[75%] flex items-center justify-center"
                                                                     style={{
                                                                         left: `${getLeftPosition(startDate)}px`,
                                                                         width: `${getWidth(startDate, endDate)}px`,
                                                                         zIndex: isBeingDragged ? 50 : 'auto',
-                                                                        cursor: 'move' // Add move cursor for the entire bar
+                                                                        cursor: 'move',
+                                                                        backgroundColor: delay.subtask_type === "Delay" ? "#3F3F46" : (delay?.color || "#4ADE80"),
+                                                                        opacity: 0.75
                                                                     }}
                                                                     onMouseDown={(e) => {
                                                                         // Only start move drag if not clicking on resize handles

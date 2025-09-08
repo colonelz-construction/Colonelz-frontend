@@ -54,7 +54,7 @@ const AffectionDetails = ({ task, subtask, openDialog, onDialogClose, dialogIsOp
 
     return (
         <div>
-            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
+            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose} width={800}>
 
                 <h4>Affection Details Here (if any)</h4>
             </Dialog>

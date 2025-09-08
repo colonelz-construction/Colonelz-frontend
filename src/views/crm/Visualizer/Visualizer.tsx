@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import Second from './Second'
 import First from './First'
 import { apiGetCrmMainThreeImage } from '@/services/CrmService'
 import { FaPanorama } from "react-icons/fa6";
 import { Button } from '@/components/ui';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { IoArrowBackOutline } from "react-icons/io5";
 
 type DataItem = {
@@ -14,55 +14,53 @@ type DataItem = {
 
 const Visualizer = () => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams();
   const [data, setData] = useState<DataItem[]>([]);
   const [mainLoading, setMainLoading] = useState<boolean>(false);
-
   const [imgIdList, setImgList] = useState<any>([]);
-  // console.log(imgIdList)
-
-  const queryParams = new URLSearchParams(location.search);
-  const leadId = queryParams.get('lead_id') || '';
-  const projectId = queryParams.get('project_id') || '';
-
   const [currentImage, setCurrentImage] = useState<any>({});
-  // console.log(currentImage)
+
+  // Memoize query params to prevent unnecessary re-renders
+  const { leadId, projectId } = useMemo(() => ({
+    leadId: searchParams.get('lead_id') || '',
+    projectId: searchParams.get('project_id') || ''
+  }), [searchParams]);
+
+  // Memoized fetch function to prevent recreation on every render
+  const fetchData = useCallback(async () => {
+    if (!leadId && !projectId) return;
+    
+    setMainLoading(true);
+    try {
+      // Use Promise.all for concurrent requests instead of sequential
+      const [mainRes, hotspotRes] = await Promise.all([
+        apiGetCrmMainThreeImage('main', '', leadId, projectId),
+        apiGetCrmMainThreeImage('hp', '', leadId, projectId)
+      ]);
+
+      const mainImages = (mainRes?.data || []) as unknown as DataItem[];
+      const hotspotImages = (hotspotRes?.data || []) as unknown as DataItem[];
+      
+      // More efficient deduplication
+      const allImagesMap = new Map<string, DataItem>();
+      [...mainImages, ...hotspotImages].forEach((img: DataItem) => {
+        if (img.img_id) {
+          allImagesMap.set(img.img_id, img);
+        }
+      });
+      
+      const allImages = Array.from(allImagesMap.values());
+      setData(allImages);
+    } catch (error: any) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setMainLoading(false);
+    }
+  }, [leadId, projectId]);
 
   useEffect(() => {
-
-    const fetchData = async () => {
-      setMainLoading(true);
-
-      try {
-
-        // Fetch main images
-        const mainRes = await apiGetCrmMainThreeImage('main', '', leadId, projectId);
-        // Fetch hotspot images
-        const hotspotRes = await apiGetCrmMainThreeImage('hp', '', leadId, projectId);
-
-        // Merge and remove duplicates (if any)
-        const mainImages = (mainRes?.data || []) as unknown as DataItem[];
-        const hotspotImages = (hotspotRes?.data || []) as unknown as DataItem[];
-        // Optional: Remove duplicates by img_id
-        const allImagesMap = new Map();
-        ([...mainImages, ...hotspotImages] as DataItem[]).forEach((img: DataItem) => {
-          allImagesMap.set(img.img_id, img);
-        });
-        const allImages = Array.from(allImagesMap.values());
-
-        setData(allImages);
-        setMainLoading(false);
-
-      } catch (error: any) {
-        setMainLoading(false);
-        throw new Error(error);
-
-      }
-
-    }
-
     fetchData();
-
-  }, [leadId, projectId])
+  }, [fetchData])
 
   const openPublicView = () => {
     const orgId = localStorage.getItem('orgId') || '';
@@ -109,4 +107,4 @@ const Visualizer = () => {
   )
 }
 
-export default Visualizer
+export default React.memo(Visualizer);

@@ -697,15 +697,76 @@ const DailyLineUp: React.FC = () => {
                                         {visibleData.rows.map((row, index) => (
                                             <Tr key={row.id} className={`${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'} border-b border-gray-200 dark:border-gray-700`}>
                                                 <Td className="font-semibold text-lg py-4 px-6 text-gray-900 dark:text-gray-100 border-r border-gray-300 dark:border-gray-600">
-                                                    <div className="whitespace-pre-wrap break-words">
-                                                        {row.time}
-                                                    </div>
+                                                    {editingCell?.row === row.id && editingCell?.column === (sheetData?.headers?.[0] || 'Time') ? (
+                                                        <div className="relative">
+                                                            <Input
+                                                                textArea
+                                                                rows={3}
+                                                                value={editValue}
+                                                                onChange={(e) => setEditValue(e.target.value)}
+                                                                onBlur={handleCellSave}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter' && e.ctrlKey) handleCellSave()
+                                                                    if (e.key === 'Escape') handleCellCancel()
+                                                                }}
+                                                                className="text-lg min-h-[100px] px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 resize-none overflow-hidden transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                                autoFocus
+                                                                disabled={cellUpdateLoading}
+                                                            />
+                                                            {cellUpdateLoading && (
+                                                                <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                                                                    <Spinner size="16px" />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <div
+                                                            className={`whitespace-pre-wrap break-words min-h-[2.5rem] flex items-start cursor-text ${userRole === 'SUPERADMIN' && row.id <= getTimeSlots().length ? 'cursor-text' : ''}`}
+                                                            onClick={() => {
+                                                                if (userRole === 'SUPERADMIN' && row.id <= getTimeSlots().length) {
+                                                                    const timeHeader = sheetData?.headers?.[0] || 'Time'
+                                                                    handleCellClick(row.id, timeHeader, row.time)
+                                                                }
+                                                            }}
+                                                            title={row.time as string}
+                                                        >
+                                                            {row.time}
+                                                        </div>
+                                                    )}
                                                 </Td>
                                                 {visibleData.headers.slice(1).map((header) => (
                                                     <Td key={header} className="text-lg py-4 px-6 text-gray-800 dark:text-gray-200 border-r border-gray-200 dark:border-gray-700 align-top">
-                                                        <div className="whitespace-pre-wrap break-words min-h-[2.5rem] flex items-start">
-                                                            {row[header] || ''}
-                                                        </div>
+                                                        {editingCell?.row === row.id && editingCell?.column === header ? (
+                                                            <div className="relative">
+                                                                <Input
+                                                                    textArea
+                                                                    rows={3}
+                                                                    value={editValue}
+                                                                    onChange={(e) => setEditValue(e.target.value)}
+                                                                    onBlur={handleCellSave}
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === 'Enter' && e.ctrlKey) handleCellSave()
+                                                                        if (e.key === 'Escape') handleCellCancel()
+                                                                    }}
+                                                                    className="text-lg min-h-[100px] px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 resize-none overflow-hidden transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                                    autoFocus
+                                                                    disabled={cellUpdateLoading}
+                                                                />
+                                                                {cellUpdateLoading && (
+                                                                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                                                                        <Spinner size="16px" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            <div
+                                                                className="whitespace-pre-wrap break-words min-h-[2.5rem] flex items-start cursor-text"
+                                                                onClick={() => handleCellClick(row.id, header, row[header] || '')}
+                                                                title={(row[header] || '') as string}
+                                                            >
+                                                                {row[header] || ''}
+                                                            </div>
+                                                        )}
                                                     </Td>
                                                 ))}
                                             </Tr>

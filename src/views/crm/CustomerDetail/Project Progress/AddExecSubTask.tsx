@@ -6,7 +6,7 @@ import { DatePicker, FormItem, Input, Notification, toast } from '@/components/u
 import { apiCreateCrmExecSubTask } from '@/services/CrmService'
 import * as Yup from 'yup'
 import { useLocation } from 'react-router-dom'
-import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
+import ColorPicker from '@/components/ui/ColorPicker'
 
 interface AddExecSubTaskProps {
     task: any;
@@ -33,7 +33,7 @@ const AddExecSubTask = ({task, openDialog, onDialogClose, dialogIsOpen, setIsOpe
     return (
         <div>
             {/* <Button onClick={openDialog}  variant='solid' size='sm' className=' rounded-lg'> Add Sub Task</Button> */}
-            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
+            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose} width={800}>
                 <div className="pl-4 ">
                     <h3>Add New SubTask</h3>
                 </div>
@@ -152,11 +152,13 @@ const AddExecSubTask = ({task, openDialog, onDialogClose, dialogIsOpen, setIsOpe
 
                             {/* subtask color */}
                             <FormItem label="Color" >
-                                    <Field name='subtask_type'>
+                                    <Field name='color'>
                                         {({ field }: any) => (
-
-                                            <SelectWithBg onChange={handleChange} />
-
+                                            <ColorPicker 
+                                                onChange={handleChange}
+                                                value={bgColor}
+                                                placeholder="Select subtask color"
+                                            />
                                         )}
                                     </Field>
 

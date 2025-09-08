@@ -50,6 +50,8 @@ const DailyLineUp: React.FC = () => {
     const [createLoading, setCreateLoading] = useState(false)
     const [deleteLoading, setDeleteLoading] = useState(false)
     const [cellUpdateLoading, setCellUpdateLoading] = useState(false)
+    const [isFullScreen, setIsFullScreen] = useState(false)
+    const [showFullScreenControls, setShowFullScreenControls] = useState(true)
 
     const userAuthority = useAppSelector((state) => state.auth.user.authority) || []
     const userRole = useAppSelector((state) => state.auth.session.role || localStorage.getItem('role') || '')
@@ -60,6 +62,70 @@ const DailyLineUp: React.FC = () => {
     // Permission checks
     const createAccess = userRole === 'SUPERADMIN' ? true : roleData?.data?.dailyLineUp?.create?.includes(userRole)
     const deleteAccess = userRole === 'SUPERADMIN' ? true : roleData?.data?.dailyLineUp?.delete?.includes(userRole)
+
+    // Full screen functionality
+    const enterFullScreen = async () => {
+        try {
+            const element = document.documentElement
+            if (element.requestFullscreen) {
+                await element.requestFullscreen()
+            } else if ((element as any).webkitRequestFullscreen) {
+                await (element as any).webkitRequestFullscreen()
+            } else if ((element as any).msRequestFullscreen) {
+                await (element as any).msRequestFullscreen()
+            }
+            setIsFullScreen(true)
+            setShowFullScreenControls(true)
+            // Hide controls after 3 seconds
+            setTimeout(() => setShowFullScreenControls(false), 3000)
+        } catch (error) {
+            console.error('Failed to enter full screen:', error)
+        }
+    }
+
+    const exitFullScreen = async () => {
+        try {
+            if (document.exitFullscreen) {
+                await document.exitFullscreen()
+            } else if ((document as any).webkitExitFullscreen) {
+                await (document as any).webkitExitFullscreen()
+            } else if ((document as any).msExitFullscreen) {
+                await (document as any).msExitFullscreen()
+            }
+            setIsFullScreen(false)
+            setShowFullScreenControls(true)
+        } catch (error) {
+            console.error('Failed to exit full screen:', error)
+        }
+    }
+
+    const toggleFullScreen = () => {
+        if (isFullScreen) {
+            exitFullScreen()
+        } else {
+            enterFullScreen()
+        }
+    }
+
+    const navigateToSheet = (direction: 'prev' | 'next') => {
+        const currentIndex = dateSheets.findIndex(sheet => sheet.title === currentSheet)
+        let newIndex: number
+        
+        if (direction === 'prev') {
+            newIndex = currentIndex > 0 ? currentIndex - 1 : dateSheets.length - 1
+        } else {
+            newIndex = currentIndex < dateSheets.length - 1 ? currentIndex + 1 : 0
+        }
+        
+        setCurrentSheet(dateSheets[newIndex]?.title || '')
+    }
+
+    const handleMouseMove = () => {
+        if (isFullScreen) {
+            setShowFullScreenControls(true)
+            setTimeout(() => setShowFullScreenControls(false), 3000)
+        }
+    }
 
 
 
@@ -74,6 +140,61 @@ const DailyLineUp: React.FC = () => {
             loadSheetData(currentSheet)
         }
     }, [currentSheet])
+
+    // Keyboard event handler for full screen functionality
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            // Prevent default behavior if we're handling the key
+            if (event.key === 'F5' || (isFullScreen && ['Escape', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown'].includes(event.key))) {
+                event.preventDefault()
+            }
+            
+            switch (event.key) {
+                case 'F5':
+                    toggleFullScreen()
+                    break
+                case 'Escape':
+                    if (isFullScreen) {
+                        exitFullScreen()
+                    }
+                    break
+                case 'ArrowLeft':
+                case 'PageUp':
+                    if (isFullScreen && dateSheets.length > 1) {
+                        navigateToSheet('prev')
+                    }
+                    break
+                case 'ArrowRight':
+                case 'PageDown':
+                    if (isFullScreen && dateSheets.length > 1) {
+                        navigateToSheet('next')
+                    }
+                    break
+            }
+        }
+        
+        const handleFullScreenChange = () => {
+            const isCurrentlyFullScreen = !!(document.fullscreenElement || 
+                (document as any).webkitFullscreenElement || 
+                (document as any).msFullscreenElement)
+            setIsFullScreen(isCurrentlyFullScreen)
+            if (!isCurrentlyFullScreen) {
+                setShowFullScreenControls(true)
+            }
+        }
+        
+        document.addEventListener('keydown', handleKeyDown)
+        document.addEventListener('fullscreenchange', handleFullScreenChange)
+        document.addEventListener('webkitfullscreenchange', handleFullScreenChange)
+        document.addEventListener('msfullscreenchange', handleFullScreenChange)
+        
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown)
+            document.removeEventListener('fullscreenchange', handleFullScreenChange)
+            document.removeEventListener('webkitfullscreenchange', handleFullScreenChange)
+            document.removeEventListener('msfullscreenchange', handleFullScreenChange)
+        }
+    }, [isFullScreen, dateSheets, currentSheet])
 
     const loadDateSheets = async () => {
         try {
@@ -169,7 +290,7 @@ const DailyLineUp: React.FC = () => {
 
         data.headers
             .slice(1)
-            .filter(header => (header || '').trim() !== 'Tasks For Tomorrow')
+            .filter(header => (header || '').trim() !== 'Tasks For Tomorrow' && (header || '').trim() !== 'Remarks')
             .forEach((header) => {
                 const originalIndex = data.headers.indexOf(header)
                 const cellValue = data.data[tomorrowRowIndex] ? data.data[tomorrowRowIndex][originalIndex] : ''
@@ -177,6 +298,24 @@ const DailyLineUp: React.FC = () => {
             })
 
         gridRows.push(tomorrowRow)
+
+        // Add "Remarks" row
+        const remarksRowIndex = timeSlots.length + 1
+        const remarksRow: GridRow = {
+            id: remarksRowIndex + 1,
+            time: 'Remarks'
+        }
+
+        data.headers
+            .slice(1)
+            .filter(header => (header || '').trim() !== 'Tasks For Tomorrow' && (header || '').trim() !== 'Remarks')
+            .forEach((header) => {
+                const originalIndex = data.headers.indexOf(header)
+                const cellValue = data.data[remarksRowIndex] ? data.data[remarksRowIndex][originalIndex] : ''
+                remarksRow[header] = cellValue || ''
+            })
+
+        gridRows.push(remarksRow)
 
         setGridRows(gridRows)
     }
@@ -348,7 +487,7 @@ const DailyLineUp: React.FC = () => {
 
     const getVisibleData = () => {
         if (!sheetData || !gridRows.length) return null
-        const visibleHeaders = ['Time', ...((sheetData.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow'))]
+        const visibleHeaders = ['Time', ...((sheetData.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow' && (header || '').trim() !== 'Remarks'))]
         return { headers: visibleHeaders, rows: gridRows }
     }
 
@@ -464,6 +603,195 @@ const DailyLineUp: React.FC = () => {
         return today.toDateString() === sheetDate.toDateString()
     }
 
+    // Full screen presentation view
+    if (isFullScreen) {
+        const visibleData = getVisibleData()
+        if (!visibleData || !currentSheet) {
+            return (
+                <div className="fixed inset-0 bg-black text-white flex items-center justify-center z-50">
+                    <div className="text-center">
+                        <h2 className="text-4xl font-bold mb-4">No Data Available</h2>
+                        <p className="text-xl mb-8">Please select a sheet with data to present</p>
+                        <Button onClick={exitFullScreen} className="bg-red-600 hover:bg-red-700 text-white px-6 py-3">
+                            Exit Full Screen
+                        </Button>
+                    </div>
+                </div>
+            )
+        }
+
+        return (
+            <div 
+                className="fixed inset-0 bg-white dark:bg-gray-900 z-50 overflow-hidden"
+                onMouseMove={handleMouseMove}
+            >
+                {/* Full screen controls overlay */}
+                <div className={`absolute top-0 left-0 right-0 z-10 transition-all duration-300 ${
+                    showFullScreenControls ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+                }`}>
+                    <div className="bg-black/80 backdrop-blur-sm text-white px-6 py-4 flex justify-between items-center">
+                        <div className="flex items-center gap-4">
+                            <h1 className="text-2xl font-bold">Daily LineUp</h1>
+                            <div className="flex items-center gap-2">
+                                <Badge content={`${dateSheets.findIndex(s => s.title === currentSheet) + 1} / ${dateSheets.length}`} 
+                                       className="bg-blue-500 text-white px-3 py-1 rounded-full" />
+                                <span className="text-lg font-medium">{currentSheet}</span>
+                                {isToday(currentSheet) && (
+                                    <Badge content="Today" className="bg-green-500 text-white px-2 py-1 rounded-full" />
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <Button 
+                                variant="plain" 
+                                size="sm" 
+                                className="text-white hover:bg-white/20 px-3 py-2"
+                                onClick={() => navigateToSheet('prev')}
+                                disabled={dateSheets.length <= 1}
+                                title="Previous Sheet (Left Arrow)"
+                            >
+                                ← Prev
+                            </Button>
+                            <Button 
+                                variant="plain" 
+                                size="sm" 
+                                className="text-white hover:bg-white/20 px-3 py-2"
+                                onClick={() => navigateToSheet('next')}
+                                disabled={dateSheets.length <= 1}
+                                title="Next Sheet (Right Arrow)"
+                            >
+                                Next →
+                            </Button>
+                            <Button 
+                                variant="plain" 
+                                size="sm" 
+                                className="text-white hover:bg-white/20 px-3 py-2"
+                                onClick={exitFullScreen}
+                                title="Exit Full Screen (ESC)"
+                            >
+                                ✕ Exit
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Full screen content */}
+                <div className="h-full w-full overflow-auto p-8 pt-20">
+                    <div className="max-w-full mx-auto">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl overflow-hidden">
+                            <div className="overflow-x-auto">
+                                <Table className="w-full text-lg">
+                                    <THead className="bg-gray-100 dark:bg-gray-700">
+                                        <Tr>
+                                            <Th className="font-bold text-xl py-4 px-6 text-gray-900 dark:text-gray-100 min-w-[200px]">
+                                                Time
+                                            </Th>
+                                            {visibleData.headers.slice(1).map((header) => (
+                                                <Th key={header} className="font-bold text-xl py-4 px-6 text-gray-900 dark:text-gray-100 min-w-[250px]">
+                                                    {header}
+                                                </Th>
+                                            ))}
+                                        </Tr>
+                                    </THead>
+                                    <TBody>
+                                        {visibleData.rows.map((row, index) => (
+                                            <Tr key={row.id} className={`${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'} border-b border-gray-200 dark:border-gray-700`}>
+                                                <Td className="font-semibold text-lg py-4 px-6 text-gray-900 dark:text-gray-100 border-r border-gray-300 dark:border-gray-600">
+                                                    {editingCell?.row === row.id && editingCell?.column === (sheetData?.headers?.[0] || 'Time') ? (
+                                                        <div className="relative">
+                                                            <Input
+                                                                textArea
+                                                                rows={3}
+                                                                value={editValue}
+                                                                onChange={(e) => setEditValue(e.target.value)}
+                                                                onBlur={handleCellSave}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter' && e.ctrlKey) handleCellSave()
+                                                                    if (e.key === 'Escape') handleCellCancel()
+                                                                }}
+                                                                className="text-lg min-h-[100px] px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 resize-none overflow-hidden transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                                autoFocus
+                                                                disabled={cellUpdateLoading}
+                                                            />
+                                                            {cellUpdateLoading && (
+                                                                <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                                                                    <Spinner size="16px" />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <div
+                                                            className={`whitespace-pre-wrap break-words min-h-[2.5rem] flex items-start cursor-text ${userRole === 'SUPERADMIN' && row.id <= getTimeSlots().length ? 'cursor-text' : ''}`}
+                                                            onClick={() => {
+                                                                if (userRole === 'SUPERADMIN' && row.id <= getTimeSlots().length) {
+                                                                    const timeHeader = sheetData?.headers?.[0] || 'Time'
+                                                                    handleCellClick(row.id, timeHeader, row.time)
+                                                                }
+                                                            }}
+                                                            title={row.time as string}
+                                                        >
+                                                            {row.time}
+                                                        </div>
+                                                    )}
+                                                </Td>
+                                                {visibleData.headers.slice(1).map((header) => (
+                                                    <Td key={header} className="text-lg py-4 px-6 text-gray-800 dark:text-gray-200 border-r border-gray-200 dark:border-gray-700 align-top">
+                                                        {editingCell?.row === row.id && editingCell?.column === header ? (
+                                                            <div className="relative">
+                                                                <Input
+                                                                    textArea
+                                                                    rows={3}
+                                                                    value={editValue}
+                                                                    onChange={(e) => setEditValue(e.target.value)}
+                                                                    onBlur={handleCellSave}
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === 'Enter' && e.ctrlKey) handleCellSave()
+                                                                        if (e.key === 'Escape') handleCellCancel()
+                                                                    }}
+                                                                    className="text-lg min-h-[100px] px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 resize-none overflow-hidden transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                                    autoFocus
+                                                                    disabled={cellUpdateLoading}
+                                                                />
+                                                                {cellUpdateLoading && (
+                                                                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                                                                        <Spinner size="16px" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            <div
+                                                                className="whitespace-pre-wrap break-words min-h-[2.5rem] flex items-start cursor-text"
+                                                                onClick={() => handleCellClick(row.id, header, row[header] || '')}
+                                                                title={(row[header] || '') as string}
+                                                            >
+                                                                {row[header] || ''}
+                                                            </div>
+                                                        )}
+                                                    </Td>
+                                                ))}
+                                            </Tr>
+                                        ))}
+                                    </TBody>
+                                </Table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Keyboard shortcuts hint */}
+                <div className={`absolute bottom-4 right-4 transition-all duration-300 ${
+                    showFullScreenControls ? 'opacity-100' : 'opacity-0'
+                }`}>
+                    <div className="bg-black/60 backdrop-blur-sm text-white text-sm px-4 py-2 rounded-lg">
+                        <div className="text-center">
+                            <div>F5: Toggle • ESC: Exit • ←/→: Navigate • Mouse: Show Controls</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="p-6">
             <div className="flex justify-between items-center mb-6">
@@ -545,6 +873,17 @@ const DailyLineUp: React.FC = () => {
 
                             <div className="flex items-center gap-2">
                                 {currentSheet && (
+                                    <Button
+                                        variant="solid"
+                                        size="xs"
+                                        className="bg-blue-600 hover:bg-blue-700 text-white h-7 px-3 rounded-md shadow-sm"
+                                        onClick={toggleFullScreen}
+                                        title="Enter Full Screen Mode (F5)"
+                                    >
+                                        🖥️ Present
+                                    </Button>
+                                )}
+                                {currentSheet && (
                                     <Dropdown
                                         placement="bottom-end"
                                         renderTitle={
@@ -595,7 +934,7 @@ const DailyLineUp: React.FC = () => {
                                                     <Th className="sticky left-0 bg-gray-100 dark:bg-gray-700 font-semibold min-w-[160px] py-3 px-4 text-gray-900 dark:text-gray-100">
                                                         Time
                                                     </Th>
-                                                    {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow')).map((header) => (
+                                                    {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow' && (header || '').trim() !== 'Remarks')).map((header) => (
                                                         <Th key={header} className="min-w-[200px] font-semibold py-3 px-4 text-gray-900 dark:text-gray-100">
                                                             {header}
                                                         </Th>
@@ -618,7 +957,7 @@ const DailyLineUp: React.FC = () => {
                                                                             if (e.key === 'Enter' && e.ctrlKey) handleCellSave()
                                                                             if (e.key === 'Escape') handleCellCancel()
                                                                         }}
-                                                                        className="text-base min-h-[80px] px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 resize-none overflow-hidden transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                                        className="text-base min-h-[100px] px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 resize-none overflow-hidden transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                                         autoFocus
                                                                         disabled={cellUpdateLoading}
                                                                     />
@@ -643,7 +982,7 @@ const DailyLineUp: React.FC = () => {
                                                                 </div>
                                                             )}
                                                         </Td>
-                                                        {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow')).map((header) => (
+                                                        {((sheetData?.headers?.slice(1) ?? []).filter(header => (header || '').trim() !== 'Tasks For Tomorrow' && (header || '').trim() !== 'Remarks')).map((header) => (
                                                             <Td key={header} className="border-r border-gray-200 dark:border-gray-700 py-2 px-2 align-top">
                                                                 {editingCell?.row === row.id && editingCell?.column === header ? (
                                                                     <div className="relative">
@@ -657,7 +996,7 @@ const DailyLineUp: React.FC = () => {
                                                                                 if (e.key === 'Enter' && e.ctrlKey) handleCellSave()
                                                                                 if (e.key === 'Escape') handleCellCancel()
                                                                             }}
-                                                                            className="text-base min-h-[80px] px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 resize-none overflow-hidden transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                                            className="text-base min-h-[100px] px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 resize-none overflow-hidden transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                                             autoFocus
                                                                             disabled={cellUpdateLoading}
                                                                         />

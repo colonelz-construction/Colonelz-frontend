@@ -9,7 +9,7 @@ import * as Yup from 'yup'
 import { useLocation } from 'react-router-dom'
 import { setUser } from '@/store'
 import { ColorLevel } from '../../../../@types/theme';
-import SelectWithBg from '@/components/ui/CustomSelect/SelectWithBg'
+import ColorPicker from '@/components/ui/ColorPicker'
 
 interface AddExecTaskProps {
     onAddSuccess?: () => void;
@@ -51,7 +51,7 @@ const AddExecTask = ({ onAddSuccess }: AddExecTaskProps) => {
     return (
         <div>
             <Button onClick={openDialog} variant='solid' size='sm' className=' rounded-lg'> Add Task</Button>
-            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose}>
+            <Dialog isOpen={dialogIsOpen} onClose={onDialogClose} onRequestClose={onDialogClose} width={800}>
                 <div className="pl-4 ">
                     <h3>Add New Task</h3>
                 </div>
@@ -138,9 +138,14 @@ const AddExecTask = ({ onAddSuccess }: AddExecTaskProps) => {
                                 </FormItem>
 
                                 <FormItem label="Color" >
-                                    <Field name='subtask_type'>
+                                    <Field name='color'>
                                         {({ field }: any) => (
-                                            <SelectWithBg onChange={handleChange} modalId="add-task-dialog" />
+                                            <ColorPicker 
+                                                onChange={handleChange} 
+                                                modalId="add-task-dialog"
+                                                value={bgColor}
+                                                placeholder="Select task color"
+                                            />
                                         )}
                                     </Field>
                                 </FormItem>

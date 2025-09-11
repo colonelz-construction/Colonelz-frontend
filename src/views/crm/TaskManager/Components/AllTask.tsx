@@ -329,6 +329,9 @@ const AllTask = ({ users }: any) => {
                     </Notification>,
                 )
             }
+            finally {
+                onDialogClose()
+            }
         }
         console.log('moveAccess:', moveAccess, 'row.type:', row?.type);
 

@@ -23,13 +23,12 @@ import { HiOutlineEye, HiOutlinePencil, HiPlusCircle } from 'react-icons/hi'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import { MdDeleteOutline } from 'react-icons/md'
 import SubTaskDetails from './SubTaskDetailsDrawer'
-import EditSubTask from './EditSubTask'
+import EditSubTask from '../Subtasks/EditSubTask'
 import { ConfirmDialog } from '@/components/shared'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import Sorter from '@/components/ui/Table/Sorter'
-import SubTaskTimer from './SubTaskTimer'
-
+import SubTaskTimer from '@/views/crm/CustomerDetail/Task/Subtasks/SubtaskTimer'
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
     value: string | number
@@ -120,6 +119,7 @@ const ActionColumn = ({ row,users }: { row: SubTask,users:any}) => {
             )
         
         }
+        onDialogClose();
         
        
     }

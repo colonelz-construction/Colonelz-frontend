@@ -118,9 +118,8 @@ const ActionColumn = ({ row,users }: { row: SubTask,users:any}) => {
             toast.push(
                 <Notification type='danger' duration={2000} closable>{response.errorMessage}</Notification>
             )
-        
         }
-        
+        onDialogClose();
        
     }
     return (

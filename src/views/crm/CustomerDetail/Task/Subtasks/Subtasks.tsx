@@ -123,6 +123,7 @@ const ActionColumn = ({ row,users }: { row: SubTask,users:any}) => {
             )
         
         }
+        onDialogClose();
         
        
     }

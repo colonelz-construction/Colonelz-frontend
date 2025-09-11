@@ -206,6 +206,9 @@ const LeadTask = ({ task, users }: any) => {
                     <Notification type='danger' duration={2000} closable>Internal Server Error</Notification>
                 )
             }
+            finally {
+                onDialogClose();
+            }
         }
 
         return (

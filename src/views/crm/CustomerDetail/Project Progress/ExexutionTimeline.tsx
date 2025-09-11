@@ -22,7 +22,7 @@ import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 import { IoIosOptions } from "react-icons/io";
 import EditExecSubTaskDetails from "./EditExecSubTaskDetails";
 import { ConfirmDialog } from "@/components/shared";
-import { apiDeleteCrmExecSubTask, apiDeleteCrmExecSubTaskDetail, apiDeleteCrmExecTask, apiDownloadExecChart, apiUpdateCrmExecSubTask, apiUpdateCrmExecSubTaskDetail } from "@/services/CrmService";
+import { apiDeleteCrmExecSubTask, apiDeleteCrmExecSubTaskDetail, apiDeleteCrmExecTask, apiDownloadExecChart, apiUpdateCrmExecSubTask, apiUpdateCrmExecSubTaskDetail, apiUpdateCrmExecTask } from "@/services/CrmService";
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import { MdAddCircle } from "react-icons/md";
@@ -910,6 +910,327 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
 
     //move delay drag end ----------------------------------------------------------
 
+    // TASK drag start (resize + move) --------------------------------------------
+    const [taskDragging, setTaskDragging] = useState<{
+        type: 'left' | 'right' | null;
+        taskId: string | null;
+        startX: number | null;
+        originalStartDate: Date | null;
+        originalEndDate: Date | null;
+        task_name: string | null;
+        color: string | null;
+    }>({
+        type: null,
+        taskId: null,
+        startX: null,
+        originalStartDate: null,
+        originalEndDate: null,
+        task_name: null,
+        color: null,
+    });
+
+    const [taskTempDates, setTaskTempDates] = useState<{
+        start: Date | null;
+        end: Date | null;
+    }>({ start: null, end: null });
+
+    const handleTaskDragStart = (
+        e: React.MouseEvent,
+        type: 'left' | 'right',
+        taskId: string,
+        originalStartDate: Date,
+        originalEndDate: Date,
+        task_name: string,
+        color: string
+    ) => {
+        e.stopPropagation();
+        setTaskDragging({
+            type,
+            taskId,
+            startX: e.clientX,
+            originalStartDate,
+            originalEndDate,
+            task_name,
+            color,
+        });
+        setTaskTempDates({ start: originalStartDate, end: originalEndDate });
+    };
+
+    const handleTaskDragMove = (e: MouseEvent) => {
+        if (!taskDragging.type || !taskDragging.startX || !taskDragging.taskId) return;
+        const deltaX = e.clientX - taskDragging.startX;
+        const deltaDays = Math.round(deltaX / dayWidth);
+        if (deltaDays === 0) return;
+
+        if (taskDragging.type === 'left') {
+            const newStartDate = addDays(taskDragging.originalStartDate as Date, deltaDays);
+            if (newStartDate < (taskTempDates.end || taskDragging.originalEndDate as Date)) {
+                setTaskTempDates({
+                    start: newStartDate,
+                    end: taskTempDates.end || taskDragging.originalEndDate
+                });
+            }
+        } else {
+            const newEndDate = addDays(taskDragging.originalEndDate as Date, deltaDays);
+            if (newEndDate > (taskTempDates.start || taskDragging.originalStartDate as Date)) {
+                setTaskTempDates({
+                    start: taskTempDates.start || taskDragging.originalStartDate,
+                    end: newEndDate
+                });
+            }
+        }
+    };
+
+    const handleTaskDragEnd = async () => {
+        if (!taskDragging.type || !taskDragging.taskId) {
+            setTaskDragging({
+                type: null,
+                taskId: null,
+                startX: null,
+                originalStartDate: null,
+                originalEndDate: null,
+                task_name: null,
+                color: null,
+            });
+            setTaskTempDates({ start: null, end: null });
+            return;
+        }
+
+        try {
+            const newStartDate = taskTempDates.start || taskDragging.originalStartDate;
+            const newEndDate = taskTempDates.end || taskDragging.originalEndDate;
+            if (!newStartDate || !newEndDate) return;
+
+            const data = {
+                user_id: localStorage.getItem('userId') || '',
+                org_id,
+                project_id: project_id || '',
+                task_id: taskDragging.taskId,
+                task_name: taskDragging.task_name,
+                start_date: newStartDate,
+                end_date: newEndDate,
+                color: taskDragging.color,
+            };
+
+            const response = await apiUpdateCrmExecTask(data);
+            if (response.code === 200) {
+                updateTaskInLocalState(taskDragging.taskId, {
+                    start_date: newStartDate,
+                    end_date: newEndDate,
+                });
+                refreshExecData();
+                toast.push(
+                    <Notification closable type="success" duration={2000}>
+                        Task dates updated successfully
+                    </Notification>,
+                    { placement: 'top-end' }
+                );
+            } else {
+                toast.push(
+                    <Notification closable type="info" duration={2500}>
+                        {response.errorMessage || 'Unable to update task dates'}
+                    </Notification>,
+                    { placement: 'top-end' }
+                );
+            }
+        } catch (error) {
+            console.error('Error updating task dates:', error);
+            toast.push(
+                <Notification closable type="danger" duration={2000}>
+                    Error updating task dates
+                </Notification>,
+                { placement: 'top-end' }
+            );
+        } finally {
+            setTaskDragging({
+                type: null,
+                taskId: null,
+                startX: null,
+                originalStartDate: null,
+                originalEndDate: null,
+                task_name: null,
+                color: null,
+            });
+            setTaskTempDates({ start: null, end: null });
+        }
+    };
+
+    // Move whole task horizontally (press-hold to avoid misclicks)
+    const [taskMoveDragging, setTaskMoveDragging] = useState<{
+        isMoving: boolean;
+        taskId: string | null;
+        startX: number | null;
+        originalStartDate: Date | null;
+        originalEndDate: Date | null;
+        durationDays: number | null;
+        task_name: string | null;
+        color: string | null;
+    }>({
+        isMoving: false,
+        taskId: null,
+        startX: null,
+        originalStartDate: null,
+        originalEndDate: null,
+        durationDays: null,
+        task_name: null,
+        color: null,
+    });
+
+    const [taskDragStartTimer, setTaskDragStartTimer] = useState<NodeJS.Timeout | null>(null);
+    const [taskMoveTempDates, setTaskMoveTempDates] = useState<{ start: Date | null; end: Date | null; }>({ start: null, end: null });
+
+    const handleTaskMoveStart = (
+        e: React.MouseEvent,
+        taskId: string,
+        originalStartDate: Date,
+        originalEndDate: Date,
+        task_name: string,
+        color: string
+    ) => {
+        const isInteractive = (e.target as HTMLElement).closest('.interactive-element');
+        if (isInteractive) return;
+        if (taskDragStartTimer) {
+            clearTimeout(taskDragStartTimer);
+            setTaskDragStartTimer(null);
+            return;
+        }
+        setTaskDragStartTimer(setTimeout(() => {
+            e.stopPropagation();
+            const durationDays = differenceInDays(originalEndDate, originalStartDate);
+            setTaskMoveDragging({
+                isMoving: true,
+                taskId,
+                startX: e.clientX,
+                originalStartDate,
+                originalEndDate,
+                durationDays,
+                task_name,
+                color,
+            });
+            setTaskMoveTempDates({ start: originalStartDate, end: originalEndDate });
+        }, 200));
+    };
+
+    const handleTaskMoveMove = (e: MouseEvent) => {
+        if (!taskMoveDragging.isMoving || !taskMoveDragging.startX || !taskMoveDragging.durationDays) return;
+        const deltaX = e.clientX - taskMoveDragging.startX;
+        const deltaDays = Math.round(deltaX / dayWidth);
+        if (deltaDays === 0) return;
+        const newStartDate = addDays(taskMoveDragging.originalStartDate as Date, deltaDays);
+        const newEndDate = addDays(newStartDate, taskMoveDragging.durationDays);
+        setTaskMoveTempDates({ start: newStartDate, end: newEndDate });
+    };
+
+    const handleTaskMoveEnd = async () => {
+        if (!taskMoveDragging.isMoving || !taskMoveDragging.taskId) {
+            setTaskMoveDragging({
+                isMoving: false,
+                taskId: null,
+                startX: null,
+                originalStartDate: null,
+                originalEndDate: null,
+                durationDays: null,
+                task_name: null,
+                color: null,
+            });
+            setTaskMoveTempDates({ start: null, end: null });
+            return;
+        }
+
+        try {
+            const newStartDate = taskMoveTempDates.start || taskMoveDragging.originalStartDate;
+            const newEndDate = taskMoveTempDates.end || taskMoveDragging.originalEndDate;
+            if (!newStartDate || !newEndDate) return;
+            const data = {
+                user_id: localStorage.getItem('userId') || '',
+                org_id,
+                project_id: project_id || '',
+                task_id: taskMoveDragging.taskId,
+                task_name: taskMoveDragging.task_name,
+                start_date: newStartDate,
+                end_date: newEndDate,
+                color: taskMoveDragging.color,
+            };
+            const response = await apiUpdateCrmExecTask(data);
+            if (response.code === 200) {
+                updateTaskInLocalState(taskMoveDragging.taskId, {
+                    start_date: newStartDate,
+                    end_date: newEndDate,
+                });
+                refreshExecData();
+                toast.push(
+                    <Notification closable type="success" duration={2000}>
+                        Task position updated successfully
+                    </Notification>,
+                    { placement: 'top-end' }
+                );
+            } else {
+                toast.push(
+                    <Notification closable type="danger" duration={2000}>
+                        {response.errorMessage || 'Error updating task position'}
+                    </Notification>,
+                    { placement: 'top-end' }
+                );
+            }
+        } catch (error) {
+            console.error('Error updating task position:', error);
+            toast.push(
+                <Notification closable type="danger" duration={2000}>
+                    Error updating task position
+                </Notification>,
+                { placement: 'top-end' }
+            );
+        } finally {
+            setTaskMoveDragging({
+                isMoving: false,
+                taskId: null,
+                startX: null,
+                originalStartDate: null,
+                originalEndDate: null,
+                durationDays: null,
+                task_name: null,
+                color: null,
+            });
+            setTaskMoveTempDates({ start: null, end: null });
+        }
+    };
+
+    const handleTaskClick = (e: React.MouseEvent) => {
+        if (taskDragStartTimer) {
+            clearTimeout(taskDragStartTimer);
+            setTaskDragStartTimer(null);
+        }
+    };
+
+    useEffect(() => {
+        if (taskDragging.type) {
+            document.addEventListener('mousemove', handleTaskDragMove);
+            document.addEventListener('mouseup', handleTaskDragEnd);
+            return () => {
+                document.removeEventListener('mousemove', handleTaskDragMove);
+                document.removeEventListener('mouseup', handleTaskDragEnd);
+            };
+        }
+    }, [taskDragging, taskTempDates]);
+
+    useEffect(() => {
+        if (taskMoveDragging.isMoving) {
+            document.addEventListener('mousemove', handleTaskMoveMove);
+            document.addEventListener('mouseup', handleTaskMoveEnd);
+            return () => {
+                document.removeEventListener('mousemove', handleTaskMoveMove);
+                document.removeEventListener('mouseup', handleTaskMoveEnd);
+            };
+        }
+    }, [taskMoveDragging, taskMoveTempDates]);
+
+    useEffect(() => {
+        return () => {
+            if (taskDragStartTimer) clearTimeout(taskDragStartTimer);
+        };
+    }, [taskDragStartTimer]);
+
+    // TASK drag end --------------------------------------------------------------
     const safeParseDate = (date: Date | string): Date => {
         if (date instanceof Date) return date;
         try {
@@ -1663,13 +1984,54 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                         <div
                                             className="absolute h-full"
                                             style={{
-                                                left: `${getLeftPosition(task.start_date)}px`,
-                                                width: `${getWidth(task.start_date, task.end_date)}px`,
+                                                left: `${getLeftPosition((taskDragging.taskId === task.task_id && taskTempDates.start) ? taskTempDates.start : taskMoveDragging.taskId === task.task_id && taskMoveTempDates.start ? taskMoveTempDates.start : task.start_date)}px`,
+                                                width: `${getWidth(
+                                                    (taskDragging.taskId === task.task_id && taskTempDates.start) ? taskTempDates.start as Date : taskMoveDragging.taskId === task.task_id && taskMoveTempDates.start ? taskMoveTempDates.start as Date : task.start_date,
+                                                    (taskDragging.taskId === task.task_id && taskTempDates.end) ? taskTempDates.end as Date : taskMoveDragging.taskId === task.task_id && taskMoveTempDates.end ? taskMoveTempDates.end as Date : task.end_date
+                                                )}px`,
                                                 height: `${totalHeight}px`,
                                                 backgroundColor: task?.color || "#B91C1C",
-                                                opacity: 0.5
+                                                opacity: 0.5,
+                                                zIndex: (taskDragging.taskId === task.task_id || taskMoveDragging.taskId === task.task_id) ? 40 : 'auto',
+                                                cursor: 'move'
                                             }}
-                                        />
+                                            onMouseDown={(e) => handleTaskMoveStart(
+                                                e,
+                                                task.task_id,
+                                                safeParseDate(task.start_date),
+                                                safeParseDate(task.end_date),
+                                                task?.task_name,
+                                                task?.color
+                                            )}
+                                            onClick={handleTaskClick}
+                                        >
+                                            {/* Left resize handle */}
+                                            <div
+                                                className="absolute left-0 top-0 bottom-0 w-2 cursor-col-resize z-20 hover:bg-white hover:bg-opacity-30"
+                                                onMouseDown={(e) => handleTaskDragStart(
+                                                    e,
+                                                    'left',
+                                                    task.task_id,
+                                                    safeParseDate(task.start_date),
+                                                    safeParseDate(task.end_date),
+                                                    task?.task_name,
+                                                    task?.color
+                                                )}
+                                            />
+                                            {/* Right resize handle */}
+                                            <div
+                                                className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize z-20 hover:bg-white hover:bg-opacity-30"
+                                                onMouseDown={(e) => handleTaskDragStart(
+                                                    e,
+                                                    'right',
+                                                    task.task_id,
+                                                    safeParseDate(task.start_date),
+                                                    safeParseDate(task.end_date),
+                                                    task?.task_name,
+                                                    task?.color
+                                                )}
+                                            />
+                                        </div>
                                         {task.subtasks?.map((subtask: any, subIndex: any) => {
                                             const isDraggingThis = subtaskDragging.subtaskId === subtask.sub_task_id;
                                             const startDate = isDraggingThis && subtaskTempDates.start ? subtaskTempDates.start : safeParseDate(subtask.sub_task_start_date);

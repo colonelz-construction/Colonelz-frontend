@@ -110,13 +110,13 @@ const DailyLineUp: React.FC = () => {
     const navigateToSheet = (direction: 'prev' | 'next') => {
         const currentIndex = dateSheets.findIndex(sheet => sheet.title === currentSheet)
         let newIndex: number
-        
+
         if (direction === 'prev') {
             newIndex = currentIndex > 0 ? currentIndex - 1 : dateSheets.length - 1
         } else {
             newIndex = currentIndex < dateSheets.length - 1 ? currentIndex + 1 : 0
         }
-        
+
         setCurrentSheet(dateSheets[newIndex]?.title || '')
     }
 
@@ -148,7 +148,7 @@ const DailyLineUp: React.FC = () => {
             if (event.key === 'F5' || (isFullScreen && ['Escape', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown'].includes(event.key))) {
                 event.preventDefault()
             }
-            
+
             switch (event.key) {
                 case 'F5':
                     toggleFullScreen()
@@ -172,22 +172,22 @@ const DailyLineUp: React.FC = () => {
                     break
             }
         }
-        
+
         const handleFullScreenChange = () => {
-            const isCurrentlyFullScreen = !!(document.fullscreenElement || 
-                (document as any).webkitFullscreenElement || 
+            const isCurrentlyFullScreen = !!(document.fullscreenElement ||
+                (document as any).webkitFullscreenElement ||
                 (document as any).msFullscreenElement)
             setIsFullScreen(isCurrentlyFullScreen)
             if (!isCurrentlyFullScreen) {
                 setShowFullScreenControls(true)
             }
         }
-        
+
         document.addEventListener('keydown', handleKeyDown)
         document.addEventListener('fullscreenchange', handleFullScreenChange)
         document.addEventListener('webkitfullscreenchange', handleFullScreenChange)
         document.addEventListener('msfullscreenchange', handleFullScreenChange)
-        
+
         return () => {
             document.removeEventListener('keydown', handleKeyDown)
             document.removeEventListener('fullscreenchange', handleFullScreenChange)
@@ -565,9 +565,21 @@ const DailyLineUp: React.FC = () => {
                 <table>
                     <thead><tr>${data.headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
                     <tbody>
-                        ${data.rows.map(row =>
-            `<tr><td>${row.time}</td>${data.headers.slice(1).map(h => `<td>${row[h] || ''}</td>`).join('')}</tr>`
+${data.rows.map(row =>
+            `<tr>
+     <td>${row.time}</td>
+     ${data.headers.slice(1).map(h => {
+                let cell = row[h] || ''
+                // Preserve newlines as <br>
+                if (typeof cell === 'string') {
+                    cell = cell.replace(/\n/g, '<br>')
+                }
+                return `<td>${cell}</td>`
+            }).join('')}
+   </tr>`
         ).join('')}
+
+
                     </tbody>
                 </table>
             </body>
@@ -621,20 +633,19 @@ const DailyLineUp: React.FC = () => {
         }
 
         return (
-            <div 
+            <div
                 className="fixed inset-0 bg-white dark:bg-gray-900 z-50 overflow-hidden"
                 onMouseMove={handleMouseMove}
             >
                 {/* Full screen controls overlay */}
-                <div className={`absolute top-0 left-0 right-0 z-10 transition-all duration-300 ${
-                    showFullScreenControls ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
-                }`}>
+                <div className={`absolute top-0 left-0 right-0 z-10 transition-all duration-300 ${showFullScreenControls ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+                    }`}>
                     <div className="bg-black/80 backdrop-blur-sm text-white px-6 py-4 flex justify-between items-center">
                         <div className="flex items-center gap-4">
                             <h1 className="text-2xl font-bold">Daily LineUp</h1>
                             <div className="flex items-center gap-2">
-                                <Badge content={`${dateSheets.findIndex(s => s.title === currentSheet) + 1} / ${dateSheets.length}`} 
-                                       className="bg-blue-500 text-white px-3 py-1 rounded-full" />
+                                <Badge content={`${dateSheets.findIndex(s => s.title === currentSheet) + 1} / ${dateSheets.length}`}
+                                    className="bg-blue-500 text-white px-3 py-1 rounded-full" />
                                 <span className="text-lg font-medium">{currentSheet}</span>
                                 {isToday(currentSheet) && (
                                     <Badge content="Today" className="bg-green-500 text-white px-2 py-1 rounded-full" />
@@ -642,9 +653,9 @@ const DailyLineUp: React.FC = () => {
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <Button 
-                                variant="plain" 
-                                size="sm" 
+                            <Button
+                                variant="plain"
+                                size="sm"
                                 className="text-white hover:bg-white/20 px-3 py-2"
                                 onClick={() => navigateToSheet('prev')}
                                 disabled={dateSheets.length <= 1}
@@ -652,9 +663,9 @@ const DailyLineUp: React.FC = () => {
                             >
                                 ← Prev
                             </Button>
-                            <Button 
-                                variant="plain" 
-                                size="sm" 
+                            <Button
+                                variant="plain"
+                                size="sm"
                                 className="text-white hover:bg-white/20 px-3 py-2"
                                 onClick={() => navigateToSheet('next')}
                                 disabled={dateSheets.length <= 1}
@@ -662,9 +673,9 @@ const DailyLineUp: React.FC = () => {
                             >
                                 Next →
                             </Button>
-                            <Button 
-                                variant="plain" 
-                                size="sm" 
+                            <Button
+                                variant="plain"
+                                size="sm"
                                 className="text-white hover:bg-white/20 px-3 py-2"
                                 onClick={exitFullScreen}
                                 title="Exit Full Screen (ESC)"
@@ -779,9 +790,8 @@ const DailyLineUp: React.FC = () => {
                 </div>
 
                 {/* Keyboard shortcuts hint */}
-                <div className={`absolute bottom-4 right-4 transition-all duration-300 ${
-                    showFullScreenControls ? 'opacity-100' : 'opacity-0'
-                }`}>
+                <div className={`absolute bottom-4 right-4 transition-all duration-300 ${showFullScreenControls ? 'opacity-100' : 'opacity-0'
+                    }`}>
                     <div className="bg-black/60 backdrop-blur-sm text-white text-sm px-4 py-2 rounded-lg">
                         <div className="text-center">
                             <div>F5: Toggle • ESC: Exit • ←/→: Navigate • Mouse: Show Controls</div>
@@ -843,7 +853,7 @@ const DailyLineUp: React.FC = () => {
                             Create Date Sheet
                         </Button>
                     </AuthorityCheck> */}
-                    <NoData text='No Sheets Available'/>
+                    <NoData text='No Sheets Available' />
                 </Card>
             ) : (
                 <Card>

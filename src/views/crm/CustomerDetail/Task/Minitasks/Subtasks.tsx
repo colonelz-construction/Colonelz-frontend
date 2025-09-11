@@ -23,12 +23,13 @@ import { HiOutlineEye, HiOutlinePencil, HiPlusCircle } from 'react-icons/hi'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import { MdDeleteOutline } from 'react-icons/md'
 import SubTaskDetails from './SubTaskDetailsDrawer'
-import EditSubTask from './EditSubTask'
+import EditSubTask from '../Subtasks/EditSubTask'
 import { ConfirmDialog } from '@/components/shared'
 import { useRoleContext } from '@/views/crm/Roles/RolesContext'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import Sorter from '@/components/ui/Table/Sorter'
-import SubTaskTimer from './SubTaskTimer'
+import SubTaskTimer from '../Subtasks/SubTaskTimer'
+import type { SubTask, Remarks } from '@/@types/common'
 
 
 interface DebouncedInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'size' | 'prefix'> {
@@ -43,28 +44,7 @@ export type SubTaskResponse = {
     code: number;
     data: SubTask[]
 }
-type SubTask = {
-    lead_id: string;
-    task_id: string;
-    sub_task_id: string;
-    sub_task_name: string;
-    sub_task_description: string;
-    actual_sub_task_start_date: string;
-    actual_sub_task_end_date: string;
-    estimated_sub_task_start_date: string;
-    estimated_sub_task_end_date: string;
-    sub_task_status: string;
-    sub_task_priority: string;
-    sub_task_createdOn: string;
-    sub_task_reporter: string;
-    sub_task_createdBy: string;
-    sub_task_assignee: string;
-    remark:Remarks[]
-};
-type Remarks={
-    remark:string;
-    remark_by:string;
-    remark_date:string;}
+
 type Data={
     Data:SubTask
   }
@@ -118,9 +98,9 @@ const ActionColumn = ({ row,users }: { row: SubTask,users:any}) => {
             toast.push(
                 <Notification type='danger' duration={2000} closable>{response.errorMessage}</Notification>
             )
-        
+            
         }
-        
+        onDialogClose();
        
     }
     return (

@@ -36,6 +36,7 @@ import 'tippy.js/animations/shift-away.css';
 import AffectionDetails from "./AffectionDetails";
 import { toPng } from 'html-to-image';
 import { Button } from "@/components/ui";
+import jsPDF from 'jspdf';
 
 interface Delay {
     name: string;
@@ -1846,6 +1847,136 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
         }
     };
 
+    const handleDownloadPdf = async () => {
+        try {
+            const node = cardRef.current as HTMLElement | null;
+            if (!node) return;
+
+            if (chartAreaRef.current) chartAreaRef.current.scrollLeft = 0;
+            if (headerRef.current) headerRef.current.scrollLeft = 0;
+            await new Promise(requestAnimationFrame);
+
+            const chart = chartAreaRef.current as HTMLElement | null;
+            const header = headerRef.current as HTMLElement | null;
+            const scrollRow = node.querySelector('div.flex.overflow-x-auto') as HTMLElement | null;
+
+            const original = {
+                width: node.style.width,
+                height: node.style.height,
+                overflow: node.style.overflow,
+                maxHeight: node.style.maxHeight,
+            };
+            const originalChart = chart ? {
+                width: chart.style.width,
+                height: chart.style.height,
+                overflow: chart.style.overflow,
+                maxHeight: chart.style.maxHeight,
+            } : null;
+            const originalHeader = header ? {
+                width: header.style.width,
+                overflow: header.style.overflow,
+            } : null;
+            const originalScrollRow = scrollRow ? {
+                width: scrollRow.style.width,
+                overflow: scrollRow.style.overflow,
+            } : null;
+
+            // Allow inner scrollables to not clip
+            if (chart) {
+                chart.style.overflow = 'visible';
+                chart.style.maxHeight = 'none';
+            }
+            if (scrollRow) {
+                scrollRow.style.overflow = 'visible';
+            }
+            if (header) {
+                header.style.overflow = 'visible';
+            }
+
+            await new Promise(requestAnimationFrame);
+
+            // Compute exact target width
+            const tl = generateTimeline();
+            const timelineWidth = view === 'days'
+                ? (tl as TimelineDayView).dayHeaders.length * dayWidth
+                : (tl as TimelineOtherView).length * dayWidth;
+            const leftStaticWidth = chart ? chart.offsetLeft : 0;
+            const targetWidth = Math.ceil(leftStaticWidth + timelineWidth);
+            const fullHeight = node.scrollHeight;
+
+            if (chart) chart.style.width = `${timelineWidth}px`;
+            const headerFlex = header ? (header.querySelector(':scope > div.flex') as HTMLElement | null) : null;
+            const headerTimeline = headerFlex && headerFlex.children && headerFlex.children.length >= 3 ? (headerFlex.children[2] as HTMLElement) : null;
+            const originalHeaderTimeline = headerTimeline ? { width: headerTimeline.style.width } : null;
+            if (headerTimeline) headerTimeline.style.width = `${timelineWidth}px`;
+
+            node.style.width = `${targetWidth}px`;
+            node.style.height = `${fullHeight}px`;
+            node.style.overflow = 'visible';
+            node.style.maxHeight = 'none';
+
+            const pixelRatio = Math.min(2, Math.max(1, Math.floor(window.devicePixelRatio || 1)));
+            const dataUrl = await toPng(node, {
+                cacheBust: true,
+                backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('color-scheme') === 'dark' ? '#1f2937' : '#f3f4f6',
+                pixelRatio,
+                width: targetWidth,
+                height: fullHeight,
+                style: { transform: 'none' },
+                filter: (domNode) => {
+                    if (!(domNode instanceof Element)) return true;
+                    if (domNode.classList.contains('tippy-box')) return false;
+                    if (domNode.getAttribute('role') === 'tooltip') return false;
+                    return true;
+                }
+            });
+
+            // Restore styles
+            node.style.width = original.width;
+            node.style.height = original.height;
+            node.style.overflow = original.overflow;
+            node.style.maxHeight = original.maxHeight;
+            if (chart && originalChart) {
+                chart.style.width = originalChart.width;
+                chart.style.height = originalChart.height;
+                chart.style.overflow = originalChart.overflow;
+                chart.style.maxHeight = originalChart.maxHeight;
+            }
+            if (header && originalHeader) {
+                header.style.width = originalHeader.width;
+                header.style.overflow = originalHeader.overflow;
+            }
+            if (scrollRow && originalScrollRow) {
+                scrollRow.style.width = originalScrollRow.width;
+                scrollRow.style.overflow = originalScrollRow.overflow;
+            }
+            if (headerTimeline && originalHeaderTimeline) {
+                headerTimeline.style.width = originalHeaderTimeline.width;
+            }
+
+            // Create PDF sized exactly to content to avoid scaling artifacts
+            const pdf = new jsPDF({ orientation: targetWidth >= fullHeight ? 'l' : 'p', unit: 'px', format: [targetWidth, fullHeight] });
+            pdf.addImage(dataUrl, 'PNG', 0, 0, targetWidth, fullHeight);
+            const dateStr = format(new Date(), 'yyyy-MM-dd_HH-mm');
+            pdf.save(`Execution_Timeline_${dateStr}.pdf`);
+
+            toast.push(
+                <Notification closable type="success" duration={2000}>
+                    PDF downloaded
+                </Notification>,
+                { placement: 'top-end' }
+            );
+        } catch (error) {
+            console.error('Error downloading PDF:', error);
+            toast.push(
+                <Notification closable type="danger" duration={2500}>
+                    Failed to download PDF
+                </Notification>,
+                { placement: 'top-end' }
+            );
+        }
+    };
+
     // Helper to safely sort by date or name
     const sortByDateOrName = (arr: any, dateKey: string, nameKey: string) => {
         return [...arr].sort((a, b) => {
@@ -1894,6 +2025,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                         className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
                     > */}
                     <Button variant='solid' size='sm' className='rounded-lg' onClick={handleDownload}>Download</Button>
+                    <Button variant='twoTone' size='sm' className='rounded-lg' onClick={handleDownloadPdf}>Download PDF</Button>
                     {/* </button> */}
 
                 </div>

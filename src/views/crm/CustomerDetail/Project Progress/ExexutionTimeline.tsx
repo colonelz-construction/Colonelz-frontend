@@ -11,7 +11,7 @@ import {
     addYears,
     startOfWeek,
 } from "date-fns";
-import { Dropdown, Notification, toast } from "@/components/ui";
+import { Dropdown, Notification, toast, Dialog, Input, Select, FormItem, Button } from "@/components/ui";
 import AddExecTask from "./AddExecTask";
 import AddExecSubTask from "./AddExecSubTask";
 import AddExecSubTaskDetails from "./AddExecSubTaskDetails";
@@ -22,7 +22,7 @@ import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 import { IoIosOptions } from "react-icons/io";
 import EditExecSubTaskDetails from "./EditExecSubTaskDetails";
 import { ConfirmDialog } from "@/components/shared";
-import { apiDeleteCrmExecSubTask, apiDeleteCrmExecSubTaskDetail, apiDeleteCrmExecTask, apiDownloadExecChart, apiUpdateCrmExecSubTask, apiUpdateCrmExecSubTaskDetail, apiUpdateCrmExecTask } from "@/services/CrmService";
+import { apiDeleteCrmExecSubTask, apiDeleteCrmExecSubTaskDetail, apiDeleteCrmExecTask, apiDownloadExecChart, apiUpdateCrmExecSubTask, apiUpdateCrmExecSubTaskDetail, apiUpdateCrmExecTask, apiGetCrmFileManagerCreateProjectFolder, apiGetCrmProjectShareQuotation } from "@/services/CrmService";
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import { MdAddCircle } from "react-icons/md";
@@ -35,7 +35,9 @@ import 'tippy.js/dist/backdrop.css'; // Optional for animations
 import 'tippy.js/animations/shift-away.css';
 import AffectionDetails from "./AffectionDetails";
 import { toPng } from 'html-to-image';
-import { Button } from "@/components/ui";
+import { HiOutlineDownload, HiShare } from 'react-icons/hi';
+import { Formik, Field, Form } from 'formik';
+import * as Yup from 'yup';
 import jsPDF from 'jspdf';
 
 interface Delay {
@@ -80,6 +82,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     const [dialogIsOpen6, setIsOpen6] = useState(false)
     const [dialogIsOpen7, setIsOpen7] = useState(false)
     const [dialogIsOpen8, setIsOpen8] = useState(false)
+    const [shareDialogOpen, setShareDialogOpen] = useState(false)
     const [selectedTask, setSelectedTask] = useState<any>({});
     const [selectedSubTask, setSelectedSubTask] = useState<any>({});
     const [selectedDetail, setSelectedDetail] = useState<any>({});
@@ -168,6 +171,9 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     const onDialogClose8 = () => {
         setIsOpen8(false)
     }
+
+    const openShareDialog = () => setShareDialogOpen(true)
+    const closeShareDialog = () => setShareDialogOpen(false)
 
     const openDialog3 = (task: any, subtask: any, execData: any) => {
         setSelectedTask(task);
@@ -662,21 +668,21 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                     { placement: 'top-end' }
                 );
             } else {
+                    toast.push(
+                        <Notification closable type="info" duration={2000}>
+                            Subtask must remain within the start and end dates of its parent task!
+                        </Notification>,
+                        { placement: 'top-end' }
+                    );
+            }
+        } catch (error) {
+                console.error('Error updating subtask dates:', error);
                 toast.push(
-                    <Notification closable type="info" duration={2000}>
-                        Subtask must remain within the start and end dates of its parent task!
+                    <Notification closable type="danger" duration={2000}>
+                        Error updating subtask dates
                     </Notification>,
                     { placement: 'top-end' }
                 );
-            }
-        } catch (error) {
-            console.error('Error updating subtask dates:', error);
-            toast.push(
-                <Notification closable type="danger" duration={2000}>
-                    Error updating subtask dates
-                </Notification>,
-                { placement: 'top-end' }
-            );
         } finally {
             setSubtaskDragging({
                 type: null,
@@ -747,19 +753,19 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     ) => {
         const isInteractiveElement = (e.target as HTMLElement).closest('.interactive-element');
         if (isInteractiveElement) return;
-
+    
         // Clear any existing timer
         if (dragStartTimer) {
             clearTimeout(dragStartTimer);
             setDragStartTimer(null);
             return;
         }
-
+    
         // Set a new timer
         setDragStartTimer(setTimeout(() => {
             e.stopPropagation();
             const durationDays = differenceInDays(originalEndDate, originalStartDate);
-
+    
             setMoveDragging({
                 isMoving: true,
                 taskId,
@@ -1567,7 +1573,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                 if (subtask.sub_task_id === selectedSubTask?.sub_task_id) {
                                     return {
                                         ...subtask,
-                                        sub_task_details: subtask.sub_task_details?.filter((detail: any) =>
+                                        sub_task_details: subtask.sub_task_details?.filter((detail: any) => 
                                             detail.subtask_details_id !== selectedDetail?.subtask_details_id
                                         )
                                     };
@@ -1621,7 +1627,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                     if (task.task_id === selectedTask?.task_id) {
                         return {
                             ...task,
-                            subtasks: task.subtasks?.filter((subtask: any) =>
+                            subtasks: task.subtasks?.filter((subtask: any) => 
                                 subtask.sub_task_id !== selectedSubTask?.sub_task_id
                             )
                         };
@@ -1666,7 +1672,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
 
             if (res.code === 200) {
                 // Remove task from local state
-                const newData = localExecData.filter((task: any) =>
+                const newData = localExecData.filter((task: any) => 
                     task.task_id !== selectedTask?.task_id
                 );
                 setLocalExecData(newData);
@@ -2020,13 +2026,20 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                 <div className="flex items-center justify-end gap-3">
 
                     <AddExecTask onAddSuccess={refreshExecData} />
-                    {/* <button
-                        onClick={handleDownload}
-                        className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-                    > */}
-                    <Button variant='solid' size='sm' className='rounded-lg' onClick={handleDownload}>Download</Button>
-                    <Button variant='twoTone' size='sm' className='rounded-lg' onClick={handleDownloadPdf}>Download PDF</Button>
-                    {/* </button> */}
+
+                    <div className="flex items-center gap-2">
+                        <Button variant='solid' size='sm' className='rounded-lg' onClick={openShareDialog}>
+                            Share to Client
+                        </Button>
+                        <Dropdown renderTitle={<HiOutlineDownload className="cursor-pointer text-xl" />} placement='bottom-end'>
+                            <Dropdown.Item eventKey="png" onClick={handleDownload}>
+                                <div className="text-sm">Download PNG</div>
+                            </Dropdown.Item>
+                            <Dropdown.Item eventKey="pdf" onClick={handleDownloadPdf}>
+                                <div className="text-sm">Download PDF</div>
+                            </Dropdown.Item>
+                        </Dropdown>
+                    </div>
 
                 </div>
 
@@ -2036,6 +2049,218 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
             <div className="relative overflow-hidden border border-gray-900 dark:border-gray-600 rounded-lg"
                 ref={cardRef}
             >
+                <Dialog
+                    isOpen={shareDialogOpen}
+                    onClose={closeShareDialog}
+                    onRequestClose={closeShareDialog}
+                    className={`pb-3`}
+                >
+                    <h3 className='mb-4'>Share To Client</h3>
+                    <Formik
+                        initialValues={{
+                            client_name: '',
+                            client_email: '',
+                            type: 'Client',
+                            project_id,
+                            folder_name: 'Execution Timeline',
+                            user_id: localStorage.getItem('userId'),
+                            org_id,
+                            file_id: 'execution_timeline',
+                        }}
+                        validationSchema={Yup.object({
+                            client_name: Yup.string().required('Required'),
+                            client_email: Yup.string().email('Invalid email address').required('Required'),
+                        })}
+                        onSubmit={async (values, { setSubmitting, resetForm }) => {
+                            try {
+                                // 1) Capture full PNG data URL
+                                const node = cardRef.current as HTMLElement | null;
+                                if (!node) return;
+
+                                // Reuse PNG capture by calling the same logic but returning data URL instead of downloading
+                                const getPng = async (): Promise<string> => {
+                                    const chart = chartAreaRef.current as HTMLElement | null;
+                                    const header = headerRef.current as HTMLElement | null;
+                                    const scrollRow = node.querySelector('div.flex.overflow-x-auto') as HTMLElement | null;
+
+                                    if (chartAreaRef.current) chartAreaRef.current.scrollLeft = 0;
+                                    if (headerRef.current) headerRef.current.scrollLeft = 0;
+                                    await new Promise(requestAnimationFrame);
+
+                                    const original = {
+                                        width: node.style.width,
+                                        height: node.style.height,
+                                        overflow: node.style.overflow,
+                                        maxHeight: node.style.maxHeight,
+                                    };
+                                    const originalChart = chart ? {
+                                        width: chart.style.width,
+                                        height: chart.style.height,
+                                        overflow: chart.style.overflow,
+                                        maxHeight: chart.style.maxHeight,
+                                    } : null;
+                                    const originalHeader = header ? {
+                                        width: header.style.width,
+                                        overflow: header.style.overflow,
+                                    } : null;
+                                    const originalScrollRow = scrollRow ? {
+                                        width: scrollRow.style.width,
+                                        overflow: scrollRow.style.overflow,
+                                    } : null;
+
+                                    if (chart) {
+                                        chart.style.overflow = 'visible';
+                                        chart.style.maxHeight = 'none';
+                                    }
+                                    if (scrollRow) {
+                                        scrollRow.style.overflow = 'visible';
+                                    }
+                                    if (header) {
+                                        header.style.overflow = 'visible';
+                                    }
+                                    await new Promise(requestAnimationFrame);
+
+                                    const tl = generateTimeline();
+                                    const timelineWidth = view === 'days'
+                                        ? (tl as TimelineDayView).dayHeaders.length * dayWidth
+                                        : (tl as TimelineOtherView).length * dayWidth;
+                                    const leftStaticWidth = chart ? chart.offsetLeft : 0;
+                                    const targetWidth = Math.ceil(leftStaticWidth + timelineWidth);
+                                    const fullHeight = node.scrollHeight;
+
+                                    if (chart) chart.style.width = `${timelineWidth}px`;
+                                    const headerFlex = header ? (header.querySelector(':scope > div.flex') as HTMLElement | null) : null;
+                                    const headerTimeline = headerFlex && headerFlex.children && headerFlex.children.length >= 3 ? (headerFlex.children[2] as HTMLElement) : null;
+                                    const originalHeaderTimeline = headerTimeline ? { width: headerTimeline.style.width } : null;
+                                    if (headerTimeline) headerTimeline.style.width = `${timelineWidth}px`;
+
+                                    node.style.width = `${targetWidth}px`;
+                                    node.style.height = `${fullHeight}px`;
+                                    node.style.overflow = 'visible';
+                                    node.style.maxHeight = 'none';
+
+                                    const pixelRatio = Math.min(2, Math.max(1, Math.floor(window.devicePixelRatio || 1)));
+                                    const dataUrl = await toPng(node, {
+                                        cacheBust: true,
+                                        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('color-scheme') === 'dark' ? '#1f2937' : '#f3f4f6',
+                                        pixelRatio,
+                                        width: targetWidth,
+                                        height: fullHeight,
+                                        style: { transform: 'none' },
+                                        filter: (domNode) => {
+                                            if (!(domNode instanceof Element)) return true;
+                                            if (domNode.classList.contains('tippy-box')) return false;
+                                            if (domNode.getAttribute('role') === 'tooltip') return false;
+                                            return true;
+                                        }
+                                    });
+
+                                    // restore
+                                    node.style.width = original.width;
+                                    node.style.height = original.height;
+                                    node.style.overflow = original.overflow;
+                                    node.style.maxHeight = original.maxHeight;
+                                    if (chart && originalChart) {
+                                        chart.style.width = originalChart.width;
+                                        chart.style.height = originalChart.height;
+                                        chart.style.overflow = originalChart.overflow;
+                                        chart.style.maxHeight = originalChart.maxHeight;
+                                    }
+                                    if (header && originalHeader) {
+                                        header.style.width = originalHeader.width;
+                                        header.style.overflow = originalHeader.overflow;
+                                    }
+                                    if (scrollRow && originalScrollRow) {
+                                        scrollRow.style.width = originalScrollRow.width;
+                                        scrollRow.style.overflow = originalScrollRow.overflow;
+                                    }
+                                    if (headerTimeline && originalHeaderTimeline) {
+                                        headerTimeline.style.width = originalHeaderTimeline.width;
+                                    }
+                                    return dataUrl;
+                                };
+
+                                const pngDataUrl = await getPng();
+                                
+                                // 2) Convert data URL to Blob and create File
+                                const res = await fetch(pngDataUrl);
+                                const blob = await res.blob();
+                                const fileName = `Execution_Timeline_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.png`;
+                                const file = new File([blob], fileName, { type: 'image/png' });
+                                console.log('file Name', file);
+
+                                // 3) Upload to project file manager
+                                const project_id_for_share = project_id || '';
+                                const uploadData = new FormData();
+                                uploadData.append('project_id', project_id_for_share);
+                                uploadData.append('folder_name', 'Execution Timeline');
+                                uploadData.append('files', file);
+                                uploadData.append('org_id', org_id || '');
+
+                                const uploadResp = await apiGetCrmFileManagerCreateProjectFolder(uploadData);
+                                if (uploadResp.code !== 200) {
+                                    throw new Error(uploadResp.errorMessage || 'Upload failed');
+                                }
+
+                                // 4) Get the uploaded file ID from response
+                                const uploadedFileId = uploadResp?.fileId || uploadResp?.data?.[0]?.fileId || uploadResp?.data?.fileId;
+                                if (!uploadedFileId) {
+                                    throw new Error('No file ID returned from upload');
+                                }
+
+                                // 5) Share using the quotation share API (same as contract/quotation)
+                                const sharePayload = {
+                                    client_name: values.client_name,
+                                    client_email: values.client_email,
+                                    file_id: uploadedFileId,
+                                    type: 'Client',
+                                    project_id: project_id_for_share,
+                                    folder_name: 'Execution Timeline',
+                                    user_id: localStorage.getItem('userId'),
+                                    org_id,
+                                };
+
+                                const shareResp = await apiGetCrmProjectShareQuotation(sharePayload);
+                                if (shareResp.code === 200) {
+                                    toast.push(
+                                        <Notification closable type="success" duration={2000}>
+                                            Execution Timeline shared with client successfully
+                                        </Notification>,
+                                        { placement: 'top-end' }
+                                    );
+                                    resetForm();
+                                    closeShareDialog();
+                                } else {
+                                    throw new Error(shareResp.errorMessage || 'Share failed');
+                                }
+                            } catch (err) {
+                                console.error('Share error:', err);
+                                toast.push(
+                                    <Notification closable type="danger" duration={2000}>
+                                        Failed to share timeline: {err instanceof Error ? err.message : 'Unknown error'}
+                                    </Notification>,
+                                    { placement: 'top-end' }
+                                );
+                            } finally {
+                                setSubmitting(false);
+                            }
+                        }}
+                    >
+                        {({ errors, touched }) => (
+                            <Form>
+                                <FormItem label='Client Name' asterisk invalid={!!(errors.client_name && touched.client_name)} errorMessage={errors.client_name}>
+                                    <Field name="client_name" component={Input} />
+                                </FormItem>
+                                <FormItem label='Client Email' asterisk invalid={!!(errors.client_email && touched.client_email)} errorMessage={errors.client_email}>
+                                    <Field name="client_email" component={Input} />
+                                </FormItem>
+                                <div className='flex justify-end'>
+                                    <Button type='submit' variant='solid' size='sm'>Send</Button>
+                                </div>
+                            </Form>
+                        )}
+                    </Formik>
+                </Dialog>
                 <div
                     className="sticky top-0 z-20 bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 overflow-hidden"
                     ref={headerRef}
@@ -2059,7 +2284,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                 <div
                                     key={task.task_id}
                                     className="capitalize pl-2 font-bold text-lg border-b border-gray-200 dark:border-gray-600 flex items-center justify-between mb-2"
-                                    style={{
+                                    style={{ 
                                         height: `${totalHeight}px`,
                                         backgroundColor: task?.color || "#DC2626",
                                         opacity: 0.5
@@ -2085,7 +2310,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
 
                                     <span>
 
-                                        <span
+                                        <span 
                                             className="break-all"
                                             style={{ color: task?.color || "#DC2626" }}
                                         >
@@ -2148,9 +2373,9 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                                     <span className="flex h-full w-full justify-between items-center gap-2">
 
 
-                                                        <div
+                                                        <div 
                                                             className="w-[4%] h-full"
-                                                            style={{
+                                                            style={{ 
                                                                 backgroundColor: subtask?.color || "#1E40AF",
                                                                 opacity: 0.6
                                                             }}
@@ -2162,7 +2387,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                                             {/* <span className={`font-semibold text-${subtask?.color ? subtask?.color : "blue-800"}`}>{subtask_text}</span> */}
                                                             <span>
 
-                                                                <span
+                                                                <span 
                                                                     className="font-semibold"
                                                                     style={{ color: subtask?.color || "#1E40AF" }}
                                                                 >
@@ -2188,7 +2413,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
 
                                                                 <div>
                                                                     <span className="cursor-pointer  hover:text-blue-500" onClick={() => openDialog8(task, subtask)}><IoIosInformationCircleOutline /></span>
-
+                                                                    
                                                                 </div>
 
                                                             </span>
@@ -2535,31 +2760,31 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
             </div>
 
             <AddExecSubTask task={selectedTask} openDialog={openAddSubTaskDialog} onDialogClose={onDialogClose} dialogIsOpen={dialogIsOpen} setIsOpen={setIsOpen} onAddSuccess={refreshExecData} />
-            <EditExecTask
-                task={selectedTask}
-                openDialog={openDialog1}
-                onDialogClose={onDialogClose1}
-                dialogIsOpen={dialogIsOpen1}
+            <EditExecTask 
+                task={selectedTask} 
+                openDialog={openDialog1} 
+                onDialogClose={onDialogClose1} 
+                dialogIsOpen={dialogIsOpen1} 
                 setIsOpen={setIsOpen1}
                 onUpdateSuccess={updateTaskInLocalState}
             />
-            <EditExecSubTask
-                task={selectedTask}
-                subtask={selectedSubTask}
-                openDialog={openDialog2}
-                onDialogClose={onDialogClose2}
-                dialogIsOpen={dialogIsOpen2}
+            <EditExecSubTask 
+                task={selectedTask} 
+                subtask={selectedSubTask} 
+                openDialog={openDialog2} 
+                onDialogClose={onDialogClose2} 
+                dialogIsOpen={dialogIsOpen2} 
                 setIsOpen={setIsOpen2}
                 onUpdateSuccess={updateSubtaskInLocalState}
             />
             <AddExecSubTaskDetails task={selectedTask} subtask={selectedSubTask} openDialog={openAddSubTaskDetailsDialog} onDialogClose={onDialogClose3} dialogIsOpen={dialogIsOpen3} setIsOpen={setIsOpen3} onAddSuccess={refreshExecData} />
-            <EditExecSubTaskDetails
-                task={selectedTask}
-                subtask={selectedSubTask}
-                detail={selectedDetail}
-                openDialog={openDialog4}
-                onDialogClose={onDialogClose4}
-                dialogIsOpen={dialogIsOpen4}
+            <EditExecSubTaskDetails 
+                task={selectedTask} 
+                subtask={selectedSubTask} 
+                detail={selectedDetail} 
+                openDialog={openDialog4} 
+                onDialogClose={onDialogClose4} 
+                dialogIsOpen={dialogIsOpen4} 
                 setIsOpen={setIsOpen4}
                 onUpdateSuccess={updateDetailInLocalState}
             />

@@ -110,7 +110,7 @@ const appsNavigationConfig: NavigationTree[] = [
     {
         key: 'appsCrm.timeline',
         path: `${APP_PREFIX_PATH}/crm/timeline`,
-        title: 'Timeline',
+        title: 'Activity Timeline',
         translateKey: 'Timeline',
         icon:'timeline',
         type: NAV_ITEM_TYPE_ITEM,

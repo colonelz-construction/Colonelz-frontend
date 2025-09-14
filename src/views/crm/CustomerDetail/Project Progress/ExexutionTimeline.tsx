@@ -22,7 +22,7 @@ import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 import { IoIosOptions } from "react-icons/io";
 import EditExecSubTaskDetails from "./EditExecSubTaskDetails";
 import { ConfirmDialog } from "@/components/shared";
-import { apiDeleteCrmExecSubTask, apiDeleteCrmExecSubTaskDetail, apiDeleteCrmExecTask, apiDownloadExecChart, apiUpdateCrmExecSubTask, apiUpdateCrmExecSubTaskDetail, apiUpdateCrmExecTask, apiGetCrmFileManagerCreateProjectFolder, apiGetCrmProjectShareQuotation } from "@/services/CrmService";
+import { apiDeleteCrmExecSubTask, apiDeleteCrmExecSubTaskDetail, apiDeleteCrmExecTask, apiDownloadExecChart, apiUpdateCrmExecSubTask, apiUpdateCrmExecSubTaskDetail, apiUpdateCrmExecTask, apiGetCrmFileManagerCreateProjectFolder, apiGetCrmFileManagerShareFiles } from "@/services/CrmService";
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import { MdAddCircle } from "react-icons/md";
@@ -668,21 +668,21 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                     { placement: 'top-end' }
                 );
             } else {
-                    toast.push(
-                        <Notification closable type="info" duration={2000}>
-                            Subtask must remain within the start and end dates of its parent task!
-                        </Notification>,
-                        { placement: 'top-end' }
-                    );
-            }
-        } catch (error) {
-                console.error('Error updating subtask dates:', error);
                 toast.push(
-                    <Notification closable type="danger" duration={2000}>
-                        Error updating subtask dates
+                    <Notification closable type="info" duration={2000}>
+                        Subtask must remain within the start and end dates of its parent task!
                     </Notification>,
                     { placement: 'top-end' }
                 );
+            }
+        } catch (error) {
+            console.error('Error updating subtask dates:', error);
+            toast.push(
+                <Notification closable type="danger" duration={2000}>
+                    Error updating subtask dates
+                </Notification>,
+                { placement: 'top-end' }
+            );
         } finally {
             setSubtaskDragging({
                 type: null,
@@ -753,19 +753,19 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
     ) => {
         const isInteractiveElement = (e.target as HTMLElement).closest('.interactive-element');
         if (isInteractiveElement) return;
-    
+
         // Clear any existing timer
         if (dragStartTimer) {
             clearTimeout(dragStartTimer);
             setDragStartTimer(null);
             return;
         }
-    
+
         // Set a new timer
         setDragStartTimer(setTimeout(() => {
             e.stopPropagation();
             const durationDays = differenceInDays(originalEndDate, originalStartDate);
-    
+
             setMoveDragging({
                 isMoving: true,
                 taskId,
@@ -1436,7 +1436,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                             <div
                                 key={`month-${i}`}
                                 className="text-center text-xs font-medium py-1 border-r border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100"
-                                style={{ minWidth: `${span * dayWidth}px` }}
+                                style={{ width: `${span * dayWidth}px`, minWidth: `${span * dayWidth}px` }}
                             >
                                 {month}
                             </div>
@@ -1458,7 +1458,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                     key={date.toString()}
                                     className={`text-center text-xs border-r border-gray-300 dark:border-gray-600 relative text-gray-900 dark:text-gray-100 ${isHighlighted || isLastDayOfDelay ? 'bg-blue-300 dark:bg-blue-600 font-bold' : ''
                                         }`}
-                                    style={{ minWidth: `${dayWidth}px` }}
+                                    style={{ width: `${dayWidth}px`, minWidth: `${dayWidth}px` }}
                                 >
 
                                     {localExecData.length > 0 && <div>
@@ -1492,7 +1492,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                     key={`highlight-${date.toString()}`}
                                     className={`border-r border-gray-300 dark:border-gray-600 ${isHighlighted || isLastDayOfDelay ? 'bg-blue-500 dark:bg-blue-600' : 'bg-gray-100 dark:bg-gray-700'
                                         }`}
-                                    style={{ minWidth: `${dayWidth}px` }}
+                                    style={{ width: `${dayWidth}px`, minWidth: `${dayWidth}px` }}
                                 />
                             );
                         })}
@@ -1507,7 +1507,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                         <div
                             key={date.toString()}
                             className="text-center text-xs border-r border-gray-300 dark:border-gray-600 relative text-gray-900 dark:text-gray-100"
-                            style={{ minWidth: `${dayWidth}px` }}
+                            style={{ width: `${dayWidth}px`, minWidth: `${dayWidth}px` }}
                         >
                             {label}
                             <div
@@ -1573,7 +1573,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                 if (subtask.sub_task_id === selectedSubTask?.sub_task_id) {
                                     return {
                                         ...subtask,
-                                        sub_task_details: subtask.sub_task_details?.filter((detail: any) => 
+                                        sub_task_details: subtask.sub_task_details?.filter((detail: any) =>
                                             detail.subtask_details_id !== selectedDetail?.subtask_details_id
                                         )
                                     };
@@ -1627,7 +1627,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                     if (task.task_id === selectedTask?.task_id) {
                         return {
                             ...task,
-                            subtasks: task.subtasks?.filter((subtask: any) => 
+                            subtasks: task.subtasks?.filter((subtask: any) =>
                                 subtask.sub_task_id !== selectedSubTask?.sub_task_id
                             )
                         };
@@ -1672,7 +1672,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
 
             if (res.code === 200) {
                 // Remove task from local state
-                const newData = localExecData.filter((task: any) => 
+                const newData = localExecData.filter((task: any) =>
                     task.task_id !== selectedTask?.task_id
                 );
                 setLocalExecData(newData);
@@ -2181,7 +2181,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                 };
 
                                 const pngDataUrl = await getPng();
-                                
+
                                 // 2) Convert data URL to Blob and create File
                                 const res = await fetch(pngDataUrl);
                                 const blob = await res.blob();
@@ -2197,18 +2197,26 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                 uploadData.append('files', file);
                                 uploadData.append('org_id', org_id || '');
 
+                                console.log('Upload data:', uploadData);
                                 const uploadResp = await apiGetCrmFileManagerCreateProjectFolder(uploadData);
+                                console.log('Upload response:', uploadResp);
+                                
                                 if (uploadResp.code !== 200) {
-                                    throw new Error(uploadResp.errorMessage || 'Upload failed');
+                                    throw new Error(uploadResp.errorMessage || `Upload failed with code: ${uploadResp.code}`);
                                 }
 
                                 // 4) Get the uploaded file ID from response
-                                const uploadedFileId = uploadResp?.fileId || uploadResp?.data?.[0]?.fileId || uploadResp?.data?.fileId;
+                                const uploadedFileId =
+                                    uploadResp?.data?.[0]?.fileId || // <-- this matches backend
+                                    uploadResp?.data?.fileId ||
+                                    uploadResp?.fileId;
+
+                                console.log('Uploaded file ID:', uploadedFileId);
                                 if (!uploadedFileId) {
-                                    throw new Error('No file ID returned from upload');
+                                    throw new Error('No file ID returned from upload: ' + JSON.stringify(uploadResp));
                                 }
 
-                                // 5) Share using the quotation share API (same as contract/quotation)
+                                // 5) Share using the file manager share API
                                 const sharePayload = {
                                     client_name: values.client_name,
                                     client_email: values.client_email,
@@ -2220,7 +2228,10 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                     org_id,
                                 };
 
-                                const shareResp = await apiGetCrmProjectShareQuotation(sharePayload);
+                                console.log('Sharing payload:', sharePayload);
+                                const shareResp = await apiGetCrmFileManagerShareFiles(sharePayload);
+                                console.log('Share response:', shareResp);
+                                
                                 if (shareResp.code === 200) {
                                     toast.push(
                                         <Notification closable type="success" duration={2000}>
@@ -2231,7 +2242,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                     resetForm();
                                     closeShareDialog();
                                 } else {
-                                    throw new Error(shareResp.errorMessage || 'Share failed');
+                                    throw new Error(shareResp.errorMessage || `Share failed with code: ${shareResp.code}`);
                                 }
                             } catch (err) {
                                 console.error('Share error:', err);
@@ -2284,7 +2295,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                 <div
                                     key={task.task_id}
                                     className="capitalize pl-2 font-bold text-lg border-b border-gray-200 dark:border-gray-600 flex items-center justify-between mb-2"
-                                    style={{ 
+                                    style={{
                                         height: `${totalHeight}px`,
                                         backgroundColor: task?.color || "#DC2626",
                                         opacity: 0.5
@@ -2310,7 +2321,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
 
                                     <span>
 
-                                        <span 
+                                        <span
                                             className="break-all"
                                             style={{ color: task?.color || "#DC2626" }}
                                         >
@@ -2373,9 +2384,9 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                                     <span className="flex h-full w-full justify-between items-center gap-2">
 
 
-                                                        <div 
+                                                        <div
                                                             className="w-[4%] h-full"
-                                                            style={{ 
+                                                            style={{
                                                                 backgroundColor: subtask?.color || "#1E40AF",
                                                                 opacity: 0.6
                                                             }}
@@ -2387,7 +2398,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                                             {/* <span className={`font-semibold text-${subtask?.color ? subtask?.color : "blue-800"}`}>{subtask_text}</span> */}
                                                             <span>
 
-                                                                <span 
+                                                                <span
                                                                     className="font-semibold"
                                                                     style={{ color: subtask?.color || "#1E40AF" }}
                                                                 >
@@ -2413,7 +2424,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
 
                                                                 <div>
                                                                     <span className="cursor-pointer  hover:text-blue-500" onClick={() => openDialog8(task, subtask)}><IoIosInformationCircleOutline /></span>
-                                                                    
+
                                                                 </div>
 
                                                             </span>
@@ -2760,31 +2771,31 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
             </div>
 
             <AddExecSubTask task={selectedTask} openDialog={openAddSubTaskDialog} onDialogClose={onDialogClose} dialogIsOpen={dialogIsOpen} setIsOpen={setIsOpen} onAddSuccess={refreshExecData} />
-            <EditExecTask 
-                task={selectedTask} 
-                openDialog={openDialog1} 
-                onDialogClose={onDialogClose1} 
-                dialogIsOpen={dialogIsOpen1} 
+            <EditExecTask
+                task={selectedTask}
+                openDialog={openDialog1}
+                onDialogClose={onDialogClose1}
+                dialogIsOpen={dialogIsOpen1}
                 setIsOpen={setIsOpen1}
                 onUpdateSuccess={updateTaskInLocalState}
             />
-            <EditExecSubTask 
-                task={selectedTask} 
-                subtask={selectedSubTask} 
-                openDialog={openDialog2} 
-                onDialogClose={onDialogClose2} 
-                dialogIsOpen={dialogIsOpen2} 
+            <EditExecSubTask
+                task={selectedTask}
+                subtask={selectedSubTask}
+                openDialog={openDialog2}
+                onDialogClose={onDialogClose2}
+                dialogIsOpen={dialogIsOpen2}
                 setIsOpen={setIsOpen2}
                 onUpdateSuccess={updateSubtaskInLocalState}
             />
             <AddExecSubTaskDetails task={selectedTask} subtask={selectedSubTask} openDialog={openAddSubTaskDetailsDialog} onDialogClose={onDialogClose3} dialogIsOpen={dialogIsOpen3} setIsOpen={setIsOpen3} onAddSuccess={refreshExecData} />
-            <EditExecSubTaskDetails 
-                task={selectedTask} 
-                subtask={selectedSubTask} 
-                detail={selectedDetail} 
-                openDialog={openDialog4} 
-                onDialogClose={onDialogClose4} 
-                dialogIsOpen={dialogIsOpen4} 
+            <EditExecSubTaskDetails
+                task={selectedTask}
+                subtask={selectedSubTask}
+                detail={selectedDetail}
+                openDialog={openDialog4}
+                onDialogClose={onDialogClose4}
+                dialogIsOpen={dialogIsOpen4}
                 setIsOpen={setIsOpen4}
                 onUpdateSuccess={updateDetailInLocalState}
             />

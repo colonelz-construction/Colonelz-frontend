@@ -86,7 +86,6 @@ const Selector = ({ field, form, setCheckType, checkType }: SelectorProps) => {
                                 ? "bg-gray-700 text-gray-100 hover:text-white"
                                 : "bg-gray-100 text-gray-700 hover:text-gray-900"}`
                     )}
-
                 >
                     {icons[perm]}
                     <span className="ml-2">{perm}</span>

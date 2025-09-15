@@ -20,6 +20,7 @@ import { FileItemType } from './Quotation/Quotations'
 import Assignee, { UsersResponse } from './Project Progress/Assignee'
 import { update } from 'lodash'
 import { GoChevronDown } from 'react-icons/go'
+import { useProjectContext } from '../Customers/store/ProjectContext'
 
 import PdfTextLinker from '../PdfTextLinkerProject'
 import Visualizer from '../Visualizer/Visualizer'
@@ -127,33 +128,42 @@ const CustomerDetail = () => {
     setIsOpen5(false)
   }
 
-  // Rename project dialog state and handlers
-  const [renameOpen, setRenameOpen] = useState(false)
-  const [newProjectName, setNewProjectName] = useState('')
-  const handleOpenRename = () => {
-    setNewProjectName(projectData?.[0]?.project_name || '')
-    setRenameOpen(true)
-  }
-  const handleCloseRename = () => setRenameOpen(false)
-  const handleConfirmRename = async () => {
-    if (!newProjectName || newProjectName.trim().length < 1) return
+  // Inline rename state and handlers
+  const { updateProjectInContext } = useProjectContext()
+  const [isEditingName, setIsEditingName] = useState(false)
+  const [tempProjectName, setTempProjectName] = useState('')
+  useEffect(() => {
+    if (projectData?.[0]?.project_name) {
+      setTempProjectName(projectData[0].project_name)
+    }
+  }, [projectData])
+  const commitProjectName = async () => {
+    const trimmed = tempProjectName?.trim()
+    if (!trimmed || trimmed === projectData?.[0]?.project_name) {
+      setIsEditingName(false)
+      setTempProjectName(projectData?.[0]?.project_name || '')
+      return
+    }
     try {
-      await apiUpdateProjectName({ project_id: allQueryParams.project_id, org_id: localStorage.getItem('orgId') as string, project_name: newProjectName.trim() })
+      await apiUpdateProjectName({ project_id: allQueryParams.project_id, org_id: localStorage.getItem('orgId') as string, project_name: trimmed })
       const response = await apiGetCrmSingleProjects(allQueryParams.project_id, org_id)
       setProjectData(response.data)
+      updateProjectInContext(allQueryParams.project_id, { project_name: trimmed })
       toast.push(
         <Notification type='success' duration={2000} closable>
           Project renamed successfully
         </Notification>
       )
-      setRenameOpen(false)
     } catch (e) {
       console.error('Rename failed', e)
+      setTempProjectName(projectData?.[0]?.project_name || '')
       toast.push(
         <Notification type='danger' duration={2000} closable>
           Failed to rename project
         </Notification>
       )
+    } finally {
+      setIsEditingName(false)
     }
   }
 
@@ -342,7 +352,37 @@ const CustomerDetail = () => {
     <>
 
       <span className='flex justify-between'>
-        <h3 className='pb-5 capitalize flex items-center'><span>Project-</span>{loading ? <Skeleton width={100} /> : projectData[0]?.project_name}</h3>
+        <h3 className='pb-5 capitalize flex items-center gap-2 whitespace-nowrap'>
+          <span>Project -</span>
+          {loading ? (
+            <Skeleton width={100} />
+          ) : (
+            isEditingName && projectUpdateAccess ? (
+              <Input
+                autoFocus
+                size='sm'
+                value={tempProjectName}
+                className='border-0 bg-transparent p-0 h-auto text-inherit font-inherit focus:ring-0 focus:outline-none border-b border-transparent focus:border-blue-500 inline-block w-auto whitespace-nowrap'
+                onChange={(e) => setTempProjectName(e.target.value)}
+                onBlur={commitProjectName}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') commitProjectName()
+                  if (e.key === 'Escape') {
+                    setIsEditingName(false)
+                    setTempProjectName(projectData?.[0]?.project_name || '')
+                  }
+                }}
+              />
+            ) : (
+              <span className='cursor-text whitespace-nowrap' onClick={() => projectUpdateAccess && setIsEditingName(true)}>{projectData[0]?.project_name}</span>
+            )
+          )}
+          {projectData && projectData[0]?.status === 'Inactive' && (
+            <span className='ml-2 text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-0.5 text-xs whitespace-nowrap'>
+              Deactivated
+            </span>
+          )}
+        </h3>
 
         <div className=''>
           <Dropdown renderTitle={
@@ -386,12 +426,7 @@ const CustomerDetail = () => {
             >
                 <Dropdown.Item eventKey="deactivate" onClick={() => openDialog4()}><div>Deactivate Project</div></Dropdown.Item>
             </AuthorityCheck>}
-            <AuthorityCheck
-                userAuthority={[`${localStorage.getItem('role')}`]}
-                authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.update ?? []}
-            >
-                <Dropdown.Item eventKey="rename" onClick={handleOpenRename}><div>Rename Project</div></Dropdown.Item>
-            </AuthorityCheck>
+            {/* Rename action removed; inline editing enabled on title */}
           </Dropdown>
         </div>
 
@@ -535,20 +570,6 @@ const CustomerDetail = () => {
       </div>
 
       {/* Confirmation Dialogs */}
-      <ConfirmDialog
-        isOpen={renameOpen}
-        type="info"
-        onClose={handleCloseRename}
-        confirmButtonColor="blue-600"
-        onCancel={handleCloseRename}
-        onConfirm={handleConfirmRename}
-        title="Rename Project"
-        onRequestClose={handleCloseRename}>
-        <div className='flex flex-col gap-3'>
-          <p>Enter a new name for this project.</p>
-          <Input value={newProjectName} onChange={(e) => setNewProjectName(e.target.value)} placeholder='New project name' />
-        </div>
-      </ConfirmDialog>
       <ConfirmDialog
         isOpen={dialogIsOpen2}
         type="danger"

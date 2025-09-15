@@ -6,7 +6,7 @@ import { Badge, Button, Tooltip, Spinner } from '../ui'; // Import Spinner compo
 import { apiGetNotification, apiPutNotificationUpdate } from '@/services/CrmService';
 import type FilterFn from '@tanstack/react-table';
 import Notification from '@/components/template/Notification';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export type NotificationResponse = {
   data: NotificatioData;
@@ -46,6 +46,7 @@ const Notification1 = () => {
   const [processingNotification, setProcessingNotification] = useState<string | null>(null); // Track which notification is being processed
   const observer = useRef<IntersectionObserver | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const fetchData = useCallback(async (page: number, unreadOnly: boolean = true, resetData: boolean = false) => {
     setLoading(true); // Set loading to true when fetching data
@@ -53,11 +54,22 @@ const Notification1 = () => {
     try {
       const userDetailData = await apiGetNotification(userId, page, unreadOnly);
       const newNotifications = userDetailData?.data?.NotificationData || [];
-      
+
+      // De-duplicate by notification_id when merging
+      const mergeUnique = (existing: Notification[], incoming: Notification[]) => {
+        const seen = new Set(existing.map(n => n.notification_id));
+        const filteredIncoming = incoming.filter(n => {
+          if (seen.has(n.notification_id)) return false;
+          seen.add(n.notification_id);
+          return true;
+        });
+        return [...existing, ...filteredIncoming];
+      };
+
       if (resetData) {
-        setNotificationData(newNotifications);
+        setNotificationData(mergeUnique([], newNotifications));
       } else {
-        setNotificationData((prevData) => [...prevData, ...newNotifications]);
+        setNotificationData((prevData) => mergeUnique(prevData as Notification[], newNotifications));
       }
       
       setHasMore(newNotifications.length > 0);
@@ -227,12 +239,18 @@ const Notification1 = () => {
     };
   }, []);
   
+  // Close dropdown on route changes (ensures modal closes when redirected)
+  useEffect(() => {
+    setIsDropdownOpen(false);
+  }, [location.pathname, location.search]);
+  
   // Always show all notifications in dropdown, but use unread count for badge
   const displayNotifications = notificationData;
 
   return (
     <div>
       <Dropdown
+        key={`${location.pathname}${location.search}${location.key ?? ''}`}
         renderTitle={
           unreadNotifications.length > 0 ? 
 

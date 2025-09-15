@@ -2,11 +2,12 @@ import { Tabs } from '@/components/ui'
 import TabContent from '@/components/ui/Tabs/TabContent'
 import TabList from '@/components/ui/Tabs/TabList'
 import TabNav from '@/components/ui/Tabs/TabNav'
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Profile, { ProfileFormModel } from './profile'
 import Password from './passsword'
 import Users from '../users'
 import { UserDetailsContext} from '@/views/Context/userdetailsContext'
+import { apiGetUserData } from '@/services/CrmService'
 import Roles from './Roles'
 import { useRoleContext } from '../Roles/RolesContext'
 import { AuthorityCheck } from '@/components/shared'
@@ -17,6 +18,7 @@ import { useNavigate } from 'react-router-dom'
     const userRole=localStorage.getItem('role') || ''
     const {roleData}=useRoleContext()
     const data = useContext(UserDetailsContext);
+    const [userData, setUserData] = useState<any>(data)
     
     const navigate = useNavigate();
 
@@ -35,6 +37,20 @@ import { useNavigate } from 'react-router-dom'
       currentUrlParams.set('type', selectedTab);
       navigate(`${location.pathname}?${currentUrlParams.toString()}`);
   };
+  
+  useEffect(() => {
+    const fetchFresh = async () => {
+      try {
+        const res = await apiGetUserData(localStorage.getItem('userId'))
+        setUserData(res.data)
+      } catch (e) {
+        // silent
+      }
+    }
+    if (allQueryParams.type === 'profile') {
+      fetchFresh()
+    }
+  }, [allQueryParams.type])
     
     const userAccess= userRole === 'SUPERADMIN' ? true : roleData?.data?.user?.read?roleData?.data?.user?.read.includes(userRole):false
     const roleAccess= userRole === 'SUPERADMIN' ? true : roleData?.data?.role?.read?roleData?.data?.role?.read.includes(userRole):false
@@ -61,7 +77,13 @@ import { useNavigate } from 'react-router-dom'
     <div className="p-4">
         <TabContent value="profile">
           <Profile
-            data={data}
+            data={userData}
+            onUpdated={async () => {
+              try {
+                const res = await apiGetUserData(localStorage.getItem('userId'))
+                setUserData(res.data)
+              } catch (e) {}
+            }}
           />
         </TabContent>
         <TabContent value="pass">

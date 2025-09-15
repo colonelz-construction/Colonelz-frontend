@@ -26,13 +26,14 @@ export type ProfileUpdate = {
 
 export type ProfileProps = {
     data?: ProfileFormModel | null
+    onUpdated?: () => void
 }
 
 const validationSchema = Yup.object().shape({
     avatar: Yup.string(),
 })
 
-const Profile = ({ data }: ProfileProps) => {
+const Profile = ({ data, onUpdated }: ProfileProps) => {
     const [usernameData, setUserNameData] = useState<any>(data?.username)
     const org_id: any = localStorage.getItem('orgId')
     const [avatarUrl, setAvatarUrl] = useState<string | undefined>(data?.avatar)
@@ -70,6 +71,7 @@ const Profile = ({ data }: ProfileProps) => {
             if (usernameData) {
                 localStorage.setItem('userName', usernameData)
             }
+            if (onUpdated) onUpdated()
         } catch (error) {
             console.error('Error updating profile:', error)
             toast.push(<Notification title={'Failed to update profile'} type="danger" duration={3000} closable />, {

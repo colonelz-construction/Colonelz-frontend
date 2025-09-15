@@ -8,8 +8,11 @@ import PublicVisualizer from './views/auth/publicView/PublicVisualizer'
 import appConfig from '@/configs/app.config'
 import './locales'
 import { createTheme, ThemeProvider, responsiveFontSizes } from '@mui/material/styles';
+import { useAppSelector } from '@/store'
+import { THEME_ENUM } from '@/constants/theme.constant'
 
-let theme = createTheme({
+const buildMuiTheme = (mode: 'light' | 'dark') =>
+  createTheme({
   typography: {
     fontFamily: [
       'Inter',
@@ -40,15 +43,13 @@ let theme = createTheme({
     },
   },
   palette: {
-    mode: 'light', // or 'dark', depending on Tailwind's `darkMode`
-    text: {
-      primary: '#6b7280', // gray.500 equivalent
-      secondary: '#9ca3af', // gray.400 equivalent
-    },
-    background: {
-      default: '#ffffff',
-      paper: '#f9fafb', // Tailwind's light background colors
-    },
+    mode,
+    text: mode === 'dark'
+      ? { primary: '#e5e7eb', secondary: '#9ca3af' }
+      : { primary: '#6b7280', secondary: '#9ca3af' },
+    background: mode === 'dark'
+      ? { default: '#111827', paper: '#1f2937' }
+      : { default: '#ffffff', paper: '#f9fafb' },
   },
   components: {
     MuiCssBaseline: {
@@ -60,8 +61,35 @@ let theme = createTheme({
             height: '8px',
           },
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: '#d1d5db', // Tailwind gray.300
+            backgroundColor: mode === 'dark' ? '#4b5563' : '#d1d5db',
             borderRadius: '4px',
+          },
+        },
+      },
+    },
+    // Ensure MUI Table headers obey dark mode similar to Tailwind table styles
+    MuiTableHead: {
+      styleOverrides: {
+        root: {
+          backgroundColor: mode === 'dark' ? '#374151' : '#f9fafb',
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        head: {
+          color: mode === 'dark' ? '#f3f4f6' : '#6b7280',
+          fontWeight: 600,
+          textTransform: 'uppercase',
+        },
+      },
+    },
+    // Make row hover subtle and readable across the app
+    MuiTableRow: {
+      styleOverrides: {
+        root: {
+          '&.MuiTableRow-hover:hover > *': {
+            backgroundColor: mode === 'dark' ? 'rgba(55, 65, 81, 0.10)' : 'rgba(243, 244, 246, 0.10)',
           },
         },
       },
@@ -69,25 +97,31 @@ let theme = createTheme({
   },
 });
 
-theme = responsiveFontSizes(theme);
 
 
+function InnerApp() {
+  const mode = useAppSelector((state) => state.theme.mode)
+  const muiMode: 'light' | 'dark' = mode === THEME_ENUM.MODE_DARK ? 'dark' : 'light'
+  let theme = buildMuiTheme(muiMode)
+  theme = responsiveFontSizes(theme)
+  return (
+    <Theme>
+      <ThemeProvider theme={theme}>
+        <Routes>
+          <Route path="/publicView" element={<PublicVisualizer />} />
+          <Route path="/*" element={<Layout />} />
+        </Routes>
+      </ThemeProvider>
+    </Theme>
+  )
+}
 
 function App() {
   return (
     <Provider store={store}>
-
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
-          <Theme>
-            <ThemeProvider theme={theme}>
-              <Routes>
-                <Route path="/publicView" element={<PublicVisualizer />} />
-                <Route path="/*" element={<Layout />} />
-              </Routes>
-            </ThemeProvider>
-
-          </Theme>
+          <InnerApp />
         </BrowserRouter>
       </PersistGate>
     </Provider>

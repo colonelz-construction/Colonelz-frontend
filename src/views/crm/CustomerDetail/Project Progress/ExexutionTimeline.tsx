@@ -34,7 +34,7 @@ import 'tippy.js/dist/tippy.css';
 import 'tippy.js/dist/backdrop.css'; // Optional for animations
 import 'tippy.js/animations/shift-away.css';
 import AffectionDetails from "./AffectionDetails";
-import { toPng } from 'html-to-image';
+import { toPng, toJpeg } from 'html-to-image';
 import { HiOutlineDownload, HiShare } from 'react-icons/hi';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
@@ -2077,42 +2077,173 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                         })}
                         onSubmit={async (values, { setSubmitting, resetForm }) => {
                             try {
-                                // First, get the file ID from the Execution Timeline folder
-                                console.log('Fetching files from Execution Timeline folder...');
-                                const folderData = await apiGetCrmFileManagerProjects(project_id);
-                                console.log('Folder data:', folderData);
-                                
-                                // Find the Execution Timeline folder and get the first file ID
-                                const executionTimelineFolder = folderData?.data?.find((folder: any) => 
-                                    folder.folder_name === 'Execution Timeline'
-                                );
-                                
-                                if (!executionTimelineFolder || !executionTimelineFolder.files || executionTimelineFolder.files.length === 0) {
-                                    throw new Error('No files found in Execution Timeline folder. Please upload a timeline first.');
+                                // 1) Capture current timeline as PNG (same target used by download)
+                                const node = cardRef.current as HTMLElement | null;
+                                if (!node) throw new Error('Timeline view not ready to capture.');
+
+                                if (chartAreaRef.current) chartAreaRef.current.scrollLeft = 0;
+                                if (headerRef.current) headerRef.current.scrollLeft = 0;
+                                await new Promise(requestAnimationFrame);
+
+                                const chart = chartAreaRef.current as HTMLElement | null;
+                                const header = headerRef.current as HTMLElement | null;
+                                const scrollRow = node.querySelector('div.flex.overflow-x-auto') as HTMLElement | null;
+
+                                const original = {
+                                    width: node.style.width,
+                                    height: node.style.height,
+                                    overflow: node.style.overflow,
+                                    maxHeight: node.style.maxHeight,
+                                };
+                                const originalChart = chart ? {
+                                    width: chart.style.width,
+                                    height: chart.style.height,
+                                    overflow: chart.style.overflow,
+                                    maxHeight: chart.style.maxHeight,
+                                } : null;
+                                const originalHeader = header ? {
+                                    width: header.style.width,
+                                    overflow: header.style.overflow,
+                                } : null;
+                                const originalScrollRow = scrollRow ? {
+                                    width: scrollRow.style.width,
+                                    overflow: scrollRow.style.overflow,
+                                } : null;
+
+                                if (chart) {
+                                    chart.style.overflow = 'visible';
+                                    chart.style.maxHeight = 'none';
                                 }
-                                
-                                // Get the file ID from the first file in the folder
-                                const fileId = executionTimelineFolder.files[0].fileId;
-                                console.log('Found file ID:', fileId);
-                                
-                                // Now share the file using the same approach as File Manager
+                                if (scrollRow) {
+                                    scrollRow.style.overflow = 'visible';
+                                }
+                                if (header) {
+                                    header.style.overflow = 'visible';
+                                }
+                                await new Promise(requestAnimationFrame);
+
+                                const tl = generateTimeline();
+                                const timelineWidth = view === 'days'
+                                    ? (tl as TimelineDayView).dayHeaders.length * dayWidth
+                                    : (tl as TimelineOtherView).length * dayWidth;
+                                const leftStaticWidth = chart ? chart.offsetLeft : 0;
+                                const targetWidth = Math.ceil(leftStaticWidth + timelineWidth);
+                                const fullHeight = node.scrollHeight;
+
+                                if (chart) chart.style.width = `${timelineWidth}px`;
+                                const headerFlex = header ? (header.querySelector(':scope > div.flex') as HTMLElement | null) : null;
+                                const headerTimeline = headerFlex && headerFlex.children && headerFlex.children.length >= 3 ? (headerFlex.children[2] as HTMLElement) : null;
+                                const originalHeaderTimeline = headerTimeline ? { width: headerTimeline.style.width } : null;
+                                if (headerTimeline) headerTimeline.style.width = `${timelineWidth}px`;
+
+                                node.style.width = `${targetWidth}px`;
+                                node.style.height = `${fullHeight}px`;
+                                node.style.overflow = 'visible';
+                                node.style.maxHeight = 'none';
+
+                                const pixelRatio = 1.5; // keep smaller to reduce payload
+                                // Constrain capture size to avoid huge payloads
+                                const maxWidth = 5000;
+                                const maxHeight = 3000;
+                                const exportWidth = Math.min(targetWidth, maxWidth);
+                                const exportHeight = Math.min(fullHeight, maxHeight);
+
+                                // Prefer JPEG with quality to keep under server limits
+                                const dataUrl = await toJpeg(node, {
+                                    cacheBust: true,
+                                    backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('color-scheme') === 'dark' ? '#1f2937' : '#f3f4f6',
+                                    pixelRatio,
+                                    quality: 0.7,
+                                    width: exportWidth,
+                                    height: exportHeight,
+                                    style: { transform: 'none' },
+                                    filter: (domNode) => {
+                                        if (!(domNode instanceof Element)) return true;
+                                        if (domNode.classList.contains('tippy-box')) return false;
+                                        if (domNode.getAttribute('role') === 'tooltip') return false;
+                                        return true;
+                                    }
+                                });
+
+                                // Restore styles
+                                node.style.width = original.width;
+                                node.style.height = original.height;
+                                node.style.overflow = original.overflow;
+                                node.style.maxHeight = original.maxHeight;
+                                if (chart && originalChart) {
+                                    chart.style.width = originalChart.width;
+                                    chart.style.height = originalChart.height;
+                                    chart.style.overflow = originalChart.overflow;
+                                    chart.style.maxHeight = originalChart.maxHeight;
+                                }
+                                if (header && originalHeader) {
+                                    header.style.width = originalHeader.width;
+                                    header.style.overflow = originalHeader.overflow;
+                                }
+                                if (scrollRow && originalScrollRow) {
+                                    scrollRow.style.width = originalScrollRow.width;
+                                    scrollRow.style.overflow = originalScrollRow.overflow;
+                                }
+                                if (headerTimeline && originalHeaderTimeline) {
+                                    headerTimeline.style.width = originalHeaderTimeline.width;
+                                }
+
+                                // 2) Upload PNG to project folder "Execution Timeline"
+                                const dateStr = format(new Date(), 'yyyy-MM-dd_HH-mm');
+                                const fileName = `Execution_Timeline_${dateStr}.jpg`;
+
+                                const dataURLToBlob = (url: string) => {
+                                    const arr = url.split(',');
+                                    const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+                                    const bstr = atob(arr[1]);
+                                    let n = bstr.length;
+                                    const u8arr = new Uint8Array(n);
+                                    for (let i = 0; i < n; i++) u8arr[i] = bstr.charCodeAt(i);
+                                    return new Blob([u8arr], { type: mime });
+                                };
+
+                                const blob = dataURLToBlob(dataUrl);
+                                const file = new File([blob], fileName, { type: 'image/jpeg' });
+                                const formData = new FormData();
+                                formData.append('project_id', project_id || '');
+                                formData.append('folder_name', 'Execution Timeline');
+                                formData.append('files', file);
+                                formData.append('org_id', org_id || '');
+
+                                const uploadResp = await apiGetCrmFileManagerCreateProjectFolder(formData);
+                                if (uploadResp.code !== 200) {
+                                    throw new Error(uploadResp.errorMessage || 'Upload failed');
+                                }
+
+                                // 3) Fetch folder and find the just uploaded file to get its fileId
+                                const folderData = await apiGetCrmFileManagerProjects(project_id);
+                                const executionTimelineFolder = folderData?.data?.find((folder: any) => folder.folder_name === 'Execution Timeline');
+                                if (!executionTimelineFolder || !executionTimelineFolder.files || executionTimelineFolder.files.length === 0) {
+                                    throw new Error('Uploaded timeline not found in folder');
+                                }
+
+                                // Prefer exact name match; fallback to most recent by date
+                                let uploadedFile = executionTimelineFolder.files.find((f: any) => f.fileName === fileName);
+                                if (!uploadedFile) {
+                                    uploadedFile = [...executionTimelineFolder.files].sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+                                }
+                                const fileId = uploadedFile.fileId;
+
+                                // 4) Share the uploaded file
                                 const sharePayload = {
-                                    file_id: [fileId], // Use the actual file ID from the folder
-                                    lead_id: '', // Empty for project files
+                                    file_id: [fileId],
+                                    lead_id: '',
                                     project_id: project_id || '',
-                                    email: [values.client_email], // API expects array of emails
-                                    cc: [], // Empty CC
-                                    bcc: [], // Empty BCC
+                                    email: [values.client_email],
+                                    cc: [],
+                                    bcc: [],
                                     subject: values.subject || `Execution Timeline - ${values.client_name}`,
                                     body: values.body || `Dear ${values.client_name},\n\nPlease find attached the Execution Timeline for your project.\n\nBest regards,\nYour Team`,
                                     user_id: localStorage.getItem('userId'),
                                     org_id,
-                                };
+                                } as any;
 
-                                console.log('Sharing payload:', sharePayload);
                                 const shareResp = await apiGetCrmFileManagerShareFiles(sharePayload);
-                                console.log('Share response:', shareResp);
-                                
                                 if (shareResp.code === 200) {
                                     toast.push(
                                         <Notification closable type="success" duration={2000}>

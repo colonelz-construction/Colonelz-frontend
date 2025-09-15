@@ -440,7 +440,7 @@ function Expanding() {
                                     {isExpanded && (
                                         <TableRow>
                                             <TableCell colSpan={row.getVisibleCells().length}>
-                                                <TableContainer className="max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100" sx={{ boxShadow: 'none', '&:hover': { backgroundColor: '#dfedfe' } }}>
+                                                <TableContainer className="max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100" sx={(theme) => ({boxShadow: 'none', '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? 'rgba(55, 65, 81, 0.10)' : 'rgba(243, 244, 246, 0.10)' }})}>
                                                     <Table stickyHeader>
                                                         <TableHead>
                                                             <TableRow>

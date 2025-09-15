@@ -836,7 +836,7 @@ const AllTask = ({ users }: any) => {
                                                     textAlign: 'center',
                                                     color: '#6B7280',
                                                     cursor: isClickable ? 'pointer' : 'default',
-                                                    '&:hover': isClickable ? { backgroundColor: '#dfedfe' } : {},
+                                                    '&:hover': isClickable ? (theme) => ({ backgroundColor: theme.palette.mode === 'dark' ? 'rgba(55, 65, 81, 0.10)' : 'rgba(243, 244, 246, 0.10)' }) : {},
                                                 }}
                                                 onClick={
                                                     isClickable

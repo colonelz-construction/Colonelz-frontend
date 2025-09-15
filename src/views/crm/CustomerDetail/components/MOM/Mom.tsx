@@ -403,7 +403,7 @@ function ReactTable({
                         <TableBody>
                             {filteredRows.map((row) => (
                                 <Fragment key={row.id}>
-                                    <TableRow sx={{'&:hover': { backgroundColor: '#dfedfe' }}}>
+                                    <TableRow sx={(theme) => ({'&:hover': { backgroundColor: theme.palette.mode === 'dark' ? 'rgba(55, 65, 81, 0.10)' : 'rgba(243, 244, 246, 0.10)' }})}>
                                         {row.getVisibleCells().map((cell) => (
                                             <TableCell key={cell.id}>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -411,7 +411,7 @@ function ReactTable({
                                         ))}
                                     </TableRow>
                                     {row.getIsExpanded() && (
-                                        <TableRow sx={{'&:hover': { backgroundColor: '#dfedfe' }}}>
+                                        <TableRow sx={(theme) => ({'&:hover': { backgroundColor: theme.palette.mode === 'dark' ? 'rgba(55, 65, 81, 0.10)' : 'rgba(243, 244, 246, 0.10)' }})}>
                                             <TableCell colSpan={row.getVisibleCells().length}>
                                                 {renderRowSubComponent({ row })}
                                             </TableCell>

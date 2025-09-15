@@ -3,12 +3,12 @@ import Container from '@/components/shared/Container'
 import CustomerProfile from './components/CustomerProfile'
 import useQuery from '@/utils/hooks/useQuery'
 import MOM from './components/MOM/Mom'
-import { Button, Dropdown, Notification, Skeleton, Tabs, toast } from '@/components/ui'
+import { Button, Dropdown, Notification, Skeleton, Tabs, toast, Input } from '@/components/ui'
 import TabList from '@/components/ui/Tabs/TabList'
 import TabNav from '@/components/ui/Tabs/TabNav'
 import TabContent from '@/components/ui/Tabs/TabContent'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { apiCreateCrmExecTask, apiGetCrmExecutionTask, apiGetCrmProjectsMom, apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList, apiGetUsersListProject, apiDeactivateProject, apiDeleteInactiveProject, apiReactivateProject } from '@/services/CrmService'
+import { apiCreateCrmExecTask, apiGetCrmExecutionTask, apiGetCrmProjectsMom, apiGetCrmProjectsTaskData, apiGetCrmSingleProjectQuotation, apiGetCrmSingleProjectReport, apiGetCrmSingleProjects, apiGetUsersList, apiGetUsersListProject, apiDeactivateProject, apiDeleteInactiveProject, apiReactivateProject, apiUpdateProjectName } from '@/services/CrmService'
 import Index from './Quotation'
 import Task from './Task/index'
 import Activity from './Project Progress/Activity'
@@ -125,6 +125,36 @@ const CustomerDetail = () => {
 
   const onDialogClose5 = () => {
     setIsOpen5(false)
+  }
+
+  // Rename project dialog state and handlers
+  const [renameOpen, setRenameOpen] = useState(false)
+  const [newProjectName, setNewProjectName] = useState('')
+  const handleOpenRename = () => {
+    setNewProjectName(projectData?.[0]?.project_name || '')
+    setRenameOpen(true)
+  }
+  const handleCloseRename = () => setRenameOpen(false)
+  const handleConfirmRename = async () => {
+    if (!newProjectName || newProjectName.trim().length < 1) return
+    try {
+      await apiUpdateProjectName({ project_id: allQueryParams.project_id, org_id: localStorage.getItem('orgId') as string, project_name: newProjectName.trim() })
+      const response = await apiGetCrmSingleProjects(allQueryParams.project_id, org_id)
+      setProjectData(response.data)
+      toast.push(
+        <Notification type='success' duration={2000} closable>
+          Project renamed successfully
+        </Notification>
+      )
+      setRenameOpen(false)
+    } catch (e) {
+      console.error('Rename failed', e)
+      toast.push(
+        <Notification type='danger' duration={2000} closable>
+          Failed to rename project
+        </Notification>
+      )
+    }
   }
 
   const deactivateProject = async () => {
@@ -356,6 +386,12 @@ const CustomerDetail = () => {
             >
                 <Dropdown.Item eventKey="deactivate" onClick={() => openDialog4()}><div>Deactivate Project</div></Dropdown.Item>
             </AuthorityCheck>}
+            <AuthorityCheck
+                userAuthority={[`${localStorage.getItem('role')}`]}
+                authority={role === 'SUPERADMIN' ? ["SUPERADMIN"] : roleData?.data?.project?.update ?? []}
+            >
+                <Dropdown.Item eventKey="rename" onClick={handleOpenRename}><div>Rename Project</div></Dropdown.Item>
+            </AuthorityCheck>
           </Dropdown>
         </div>
 
@@ -499,6 +535,20 @@ const CustomerDetail = () => {
       </div>
 
       {/* Confirmation Dialogs */}
+      <ConfirmDialog
+        isOpen={renameOpen}
+        type="info"
+        onClose={handleCloseRename}
+        confirmButtonColor="blue-600"
+        onCancel={handleCloseRename}
+        onConfirm={handleConfirmRename}
+        title="Rename Project"
+        onRequestClose={handleCloseRename}>
+        <div className='flex flex-col gap-3'>
+          <p>Enter a new name for this project.</p>
+          <Input value={newProjectName} onChange={(e) => setNewProjectName(e.target.value)} placeholder='New project name' />
+        </div>
+      </ConfirmDialog>
       <ConfirmDialog
         isOpen={dialogIsOpen2}
         type="danger"

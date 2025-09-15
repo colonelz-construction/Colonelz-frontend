@@ -22,7 +22,7 @@ import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 import { IoIosOptions } from "react-icons/io";
 import EditExecSubTaskDetails from "./EditExecSubTaskDetails";
 import { ConfirmDialog } from "@/components/shared";
-import { apiDeleteCrmExecSubTask, apiDeleteCrmExecSubTaskDetail, apiDeleteCrmExecTask, apiDownloadExecChart, apiUpdateCrmExecSubTask, apiUpdateCrmExecSubTaskDetail, apiUpdateCrmExecTask, apiGetCrmFileManagerCreateProjectFolder, apiGetCrmFileManagerShareFiles } from "@/services/CrmService";
+import { apiDeleteCrmExecSubTask, apiDeleteCrmExecSubTaskDetail, apiDeleteCrmExecTask, apiDownloadExecChart, apiUpdateCrmExecSubTask, apiUpdateCrmExecSubTaskDetail, apiUpdateCrmExecTask, apiGetCrmFileManagerCreateProjectFolder, apiGetCrmFileManagerCreateLeadFolder, apiGetCrmFileManagerCreateTemplateFolder, apiGetCrmFileManagerShareFiles, apiGetCrmFileManagerProjects } from "@/services/CrmService";
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import { MdAddCircle } from "react-icons/md";
@@ -2060,6 +2060,8 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                         initialValues={{
                             client_name: '',
                             client_email: '',
+                            subject: '',
+                            body: '',
                             type: 'Client',
                             project_id,
                             folder_name: 'Execution Timeline',
@@ -2070,160 +2072,39 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                         validationSchema={Yup.object({
                             client_name: Yup.string().required('Required'),
                             client_email: Yup.string().email('Invalid email address').required('Required'),
+                            subject: Yup.string().required('Required'),
+                            body: Yup.string().required('Required'),
                         })}
                         onSubmit={async (values, { setSubmitting, resetForm }) => {
                             try {
-                                // 1) Capture full PNG data URL
-                                const node = cardRef.current as HTMLElement | null;
-                                if (!node) return;
-
-                                // Reuse PNG capture by calling the same logic but returning data URL instead of downloading
-                                const getPng = async (): Promise<string> => {
-                                    const chart = chartAreaRef.current as HTMLElement | null;
-                                    const header = headerRef.current as HTMLElement | null;
-                                    const scrollRow = node.querySelector('div.flex.overflow-x-auto') as HTMLElement | null;
-
-                                    if (chartAreaRef.current) chartAreaRef.current.scrollLeft = 0;
-                                    if (headerRef.current) headerRef.current.scrollLeft = 0;
-                                    await new Promise(requestAnimationFrame);
-
-                                    const original = {
-                                        width: node.style.width,
-                                        height: node.style.height,
-                                        overflow: node.style.overflow,
-                                        maxHeight: node.style.maxHeight,
-                                    };
-                                    const originalChart = chart ? {
-                                        width: chart.style.width,
-                                        height: chart.style.height,
-                                        overflow: chart.style.overflow,
-                                        maxHeight: chart.style.maxHeight,
-                                    } : null;
-                                    const originalHeader = header ? {
-                                        width: header.style.width,
-                                        overflow: header.style.overflow,
-                                    } : null;
-                                    const originalScrollRow = scrollRow ? {
-                                        width: scrollRow.style.width,
-                                        overflow: scrollRow.style.overflow,
-                                    } : null;
-
-                                    if (chart) {
-                                        chart.style.overflow = 'visible';
-                                        chart.style.maxHeight = 'none';
-                                    }
-                                    if (scrollRow) {
-                                        scrollRow.style.overflow = 'visible';
-                                    }
-                                    if (header) {
-                                        header.style.overflow = 'visible';
-                                    }
-                                    await new Promise(requestAnimationFrame);
-
-                                    const tl = generateTimeline();
-                                    const timelineWidth = view === 'days'
-                                        ? (tl as TimelineDayView).dayHeaders.length * dayWidth
-                                        : (tl as TimelineOtherView).length * dayWidth;
-                                    const leftStaticWidth = chart ? chart.offsetLeft : 0;
-                                    const targetWidth = Math.ceil(leftStaticWidth + timelineWidth);
-                                    const fullHeight = node.scrollHeight;
-
-                                    if (chart) chart.style.width = `${timelineWidth}px`;
-                                    const headerFlex = header ? (header.querySelector(':scope > div.flex') as HTMLElement | null) : null;
-                                    const headerTimeline = headerFlex && headerFlex.children && headerFlex.children.length >= 3 ? (headerFlex.children[2] as HTMLElement) : null;
-                                    const originalHeaderTimeline = headerTimeline ? { width: headerTimeline.style.width } : null;
-                                    if (headerTimeline) headerTimeline.style.width = `${timelineWidth}px`;
-
-                                    node.style.width = `${targetWidth}px`;
-                                    node.style.height = `${fullHeight}px`;
-                                    node.style.overflow = 'visible';
-                                    node.style.maxHeight = 'none';
-
-                                    const pixelRatio = Math.min(2, Math.max(1, Math.floor(window.devicePixelRatio || 1)));
-                                    const dataUrl = await toPng(node, {
-                                        cacheBust: true,
-                                        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('color-scheme') === 'dark' ? '#1f2937' : '#f3f4f6',
-                                        pixelRatio,
-                                        width: targetWidth,
-                                        height: fullHeight,
-                                        style: { transform: 'none' },
-                                        filter: (domNode) => {
-                                            if (!(domNode instanceof Element)) return true;
-                                            if (domNode.classList.contains('tippy-box')) return false;
-                                            if (domNode.getAttribute('role') === 'tooltip') return false;
-                                            return true;
-                                        }
-                                    });
-
-                                    // restore
-                                    node.style.width = original.width;
-                                    node.style.height = original.height;
-                                    node.style.overflow = original.overflow;
-                                    node.style.maxHeight = original.maxHeight;
-                                    if (chart && originalChart) {
-                                        chart.style.width = originalChart.width;
-                                        chart.style.height = originalChart.height;
-                                        chart.style.overflow = originalChart.overflow;
-                                        chart.style.maxHeight = originalChart.maxHeight;
-                                    }
-                                    if (header && originalHeader) {
-                                        header.style.width = originalHeader.width;
-                                        header.style.overflow = originalHeader.overflow;
-                                    }
-                                    if (scrollRow && originalScrollRow) {
-                                        scrollRow.style.width = originalScrollRow.width;
-                                        scrollRow.style.overflow = originalScrollRow.overflow;
-                                    }
-                                    if (headerTimeline && originalHeaderTimeline) {
-                                        headerTimeline.style.width = originalHeaderTimeline.width;
-                                    }
-                                    return dataUrl;
-                                };
-
-                                const pngDataUrl = await getPng();
-
-                                // 2) Convert data URL to Blob and create File
-                                const res = await fetch(pngDataUrl);
-                                const blob = await res.blob();
-                                const fileName = `Execution_Timeline_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.png`;
-                                const file = new File([blob], fileName, { type: 'image/png' });
-                                console.log('file Name', file);
-
-                                // 3) Upload to project file manager
-                                const project_id_for_share = project_id || '';
-                                const uploadData = new FormData();
-                                uploadData.append('project_id', project_id_for_share);
-                                uploadData.append('folder_name', 'Execution Timeline');
-                                uploadData.append('files', file);
-                                uploadData.append('org_id', org_id || '');
-
-                                console.log('Upload data:', uploadData);
-                                const uploadResp = await apiGetCrmFileManagerCreateProjectFolder(uploadData);
-                                console.log('Upload response:', uploadResp);
+                                // First, get the file ID from the Execution Timeline folder
+                                console.log('Fetching files from Execution Timeline folder...');
+                                const folderData = await apiGetCrmFileManagerProjects(project_id);
+                                console.log('Folder data:', folderData);
                                 
-                                if (uploadResp.code !== 200) {
-                                    throw new Error(uploadResp.errorMessage || `Upload failed with code: ${uploadResp.code}`);
+                                // Find the Execution Timeline folder and get the first file ID
+                                const executionTimelineFolder = folderData?.data?.find((folder: any) => 
+                                    folder.folder_name === 'Execution Timeline'
+                                );
+                                
+                                if (!executionTimelineFolder || !executionTimelineFolder.files || executionTimelineFolder.files.length === 0) {
+                                    throw new Error('No files found in Execution Timeline folder. Please upload a timeline first.');
                                 }
-
-                                // 4) Get the uploaded file ID from response
-                                const uploadedFileId =
-                                    uploadResp?.data?.[0]?.fileId || // <-- this matches backend
-                                    uploadResp?.data?.fileId ||
-                                    uploadResp?.fileId;
-
-                                console.log('Uploaded file ID:', uploadedFileId);
-                                if (!uploadedFileId) {
-                                    throw new Error('No file ID returned from upload: ' + JSON.stringify(uploadResp));
-                                }
-
-                                // 5) Share using the file manager share API
+                                
+                                // Get the file ID from the first file in the folder
+                                const fileId = executionTimelineFolder.files[0].fileId;
+                                console.log('Found file ID:', fileId);
+                                
+                                // Now share the file using the same approach as File Manager
                                 const sharePayload = {
-                                    client_name: values.client_name,
-                                    client_email: values.client_email,
-                                    file_id: uploadedFileId,
-                                    type: 'Client',
-                                    project_id: project_id_for_share,
-                                    folder_name: 'Execution Timeline',
+                                    file_id: [fileId], // Use the actual file ID from the folder
+                                    lead_id: '', // Empty for project files
+                                    project_id: project_id || '',
+                                    email: [values.client_email], // API expects array of emails
+                                    cc: [], // Empty CC
+                                    bcc: [], // Empty BCC
+                                    subject: values.subject || `Execution Timeline - ${values.client_name}`,
+                                    body: values.body || `Dear ${values.client_name},\n\nPlease find attached the Execution Timeline for your project.\n\nBest regards,\nYour Team`,
                                     user_id: localStorage.getItem('userId'),
                                     org_id,
                                 };
@@ -2264,6 +2145,12 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                                 </FormItem>
                                 <FormItem label='Client Email' asterisk invalid={!!(errors.client_email && touched.client_email)} errorMessage={errors.client_email}>
                                     <Field name="client_email" component={Input} />
+                                </FormItem>
+                                <FormItem label='Subject' asterisk invalid={!!(errors.subject && touched.subject)} errorMessage={errors.subject}>
+                                    <Field name="subject" component={Input} placeholder="Execution Timeline - Project Update" />
+                                </FormItem>
+                                <FormItem label='Message' asterisk invalid={!!(errors.body && touched.body)} errorMessage={errors.body}>
+                                    <Field name="body" component={Input} as="textarea" className="min-h-[100px] resize-none" placeholder="Dear [Client Name],&#10;&#10;Please find attached the Execution Timeline for your project.&#10;&#10;Best regards,&#10;Your Team" />
                                 </FormItem>
                                 <div className='flex justify-end'>
                                     <Button type='submit' variant='solid' size='sm'>Send</Button>

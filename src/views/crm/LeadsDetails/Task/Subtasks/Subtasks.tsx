@@ -364,7 +364,7 @@ const Subtasks = ({task,users}:any) => {
                 <TableBody>
                     {table.getRowModel().rows.map((row) => {
                         return (
-                            <TableRow key={row.id} className='' sx={{'&:hover': { backgroundColor: '#dfedfe' }}}>
+                            <TableRow key={row.id} className='' sx={(theme) => ({'&:hover': { backgroundColor: theme.palette.mode === 'dark' ? 'rgba(55, 65, 81, 0.10)' : 'rgba(243, 244, 246, 0.10)' }})}>
                                 {row.getVisibleCells().map((cell) => {
                                     return (
                                         <TableCell key={cell.id}>

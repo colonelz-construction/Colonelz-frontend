@@ -336,7 +336,7 @@ const Filtering = () => {
                     ) : (
                         <TableBody>
                             {table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} className='cursor-pointer' onClick={() => navigate(`/app/crm/fileManager/leads?lead_id=${row.original.lead_id}&lead_name=${row.original.lead_name}`)} sx={{ '&:hover': { backgroundColor: '#dfedfe' } }}>
+                                <TableRow key={row.id} className='cursor-pointer' onClick={() => navigate(`/app/crm/fileManager/leads?lead_id=${row.original.lead_id}&lead_name=${row.original.lead_name}`)} sx={(theme) => ({'&:hover': { backgroundColor: theme.palette.mode === 'dark' ? 'rgba(55, 65, 81, 0.10)' : 'rgba(243, 244, 246, 0.10)' }})}>
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}

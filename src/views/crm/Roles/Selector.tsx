@@ -21,18 +21,18 @@ const permissionsMap: { [key: string]: Permission[] } = {
     leadtask: ['create', 'read', 'update', 'delete'],
     opentask: ['create', 'read', 'update', 'delete', 'move'],
     role: ['create', 'read', 'update', 'delete'],
-    file:['create','read','delete'],
-    archive: ['read', 'restore','delete'],
+    file: ['create', 'read', 'delete'],
+    archive: ['read', 'restore', 'delete'],
     addMember: ['create', 'delete'],
     lead: ['create', 'read', 'update', 'delete'],
     project: ['create', 'read', 'update', 'delete'],
     mom: ['create', 'read', 'update', 'delete'],
-    contract: ['create', 'read','update'],
-    quotation: [ 'read','update'],
-    user: [ 'create','read', 'update', 'delete'],
-    userArchive:['read','restore','delete'],
-    leadArchive:['read','restore','delete'],
-    companyData:['read'],
+    contract: ['create', 'read', 'update'],
+    quotation: ['read', 'update'],
+    user: ['create', 'read', 'update', 'delete'],
+    userArchive: ['read', 'restore', 'delete'],
+    leadArchive: ['read', 'restore', 'delete'],
+    companyData: ['read'],
     dailyLineUp: ['create', 'delete']
 
 };
@@ -48,7 +48,7 @@ const icons = {
 
 const Selector = ({ field, form, setCheckType, checkType }: SelectorProps) => {
     const permissions = permissionsMap[field.name] || permissionsMap.default;
-    const {  bgTheme } = useThemeClass()
+    const { bgTheme } = useThemeClass()
     const [isDark, setIsDark] = useDarkMode()
 
     const handleChange = (permission: Permission) => {
@@ -57,14 +57,14 @@ const Selector = ({ field, form, setCheckType, checkType }: SelectorProps) => {
             : [...field.value, permission];
 
 
-            if(newValue.length == permissionsMap[field.name].length) {
+        if (newValue.length == permissionsMap[field.name].length) {
 
-                setCheckType({...checkType, [field.name]: true})
+            setCheckType({ ...checkType, [field.name]: true })
 
-            } else {
-                setCheckType({...checkType, [field.name]: false})
+        } else {
+            setCheckType({ ...checkType, [field.name]: false })
 
-            }
+        }
 
         form.setFieldValue(field.name, newValue);
     };
@@ -80,12 +80,20 @@ const Selector = ({ field, form, setCheckType, checkType }: SelectorProps) => {
                     className={classNames(
                         'flex items-center !rounded-md cursor-pointer',
                         field.value.includes(perm)
-                            ? perm === 'create' ? `${bgTheme} ${!isDark && "text-white hover:text-gray-700"}` :
-                              perm === 'read' ? `${bgTheme} ${!isDark && "text-white hover:text-gray-700"}` :
-                              perm === 'update' ? `${bgTheme} ${!isDark && "text-white hover:text-gray-700"}` :
-                              perm === 'restore' ? `${bgTheme} ${!isDark && "text-white hover:text-gray-700"}` :
-                              `${bgTheme} ${!isDark && "text-white hover:text-gray-700"}`
-                            : `bg-gray-100 text-gray-700 ${isDark && "hover:text-white" } `
+                            // ? perm === 'create'
+                            //     ? `${bgTheme} ${isDark ? "text-gray-100 hover:text-gray-300" : "text-white hover:text-gray-700"}`
+                            //     : perm === 'read'
+                            //         ? `${bgTheme} ${isDark ? "text-gray-100 hover:text-gray-300" : "text-white hover:text-gray-700"}`
+                            //         : perm === 'update'
+                            //             ? `${bgTheme} ${isDark ? "text-gray-100 hover:text-gray-300" : "text-white hover:text-gray-700"}`
+                            //             : perm === 'restore'
+                            //                 ? `${bgTheme} ${isDark ? "text-gray-100 hover:text-gray-300" : "text-white hover:text-gray-700"}`
+                            //                 : `${bgTheme} ${isDark ? "text-gray-100 hover:text-gray-300" : "text-white hover:text-gray-700"}`
+                            // : `bg-gray-100 text-gray-700 ${isDark ? "bg-gray-700 text-gray-100 hover:text-white" : ""}`
+
+
+                            ? `${bgTheme} ${isDark ? "text-gray-100 hover:text-gray-200" : "text-white hover:text-gray-700"}`
+                            : `${isDark ? "bg-gray-700 text-gray-100 hover:text-white" : "bg-gray-100 text-gray-700 hover:text-gray-900"}`
                     )}
                 >
                     {icons[perm]}

@@ -1704,13 +1704,12 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
             const node = cardRef.current as HTMLElement | null;
             if (!node) return;
 
-            // Sync to far left so header/body align and full range is visible on capture
+            // Use original node to ensure actual current UI is captured
+            // Sync scrolls
             if (chartAreaRef.current) chartAreaRef.current.scrollLeft = 0;
             if (headerRef.current) headerRef.current.scrollLeft = 0;
-
             await new Promise(requestAnimationFrame);
 
-            // Collect key elements that impose scroll clipping
             const chart = chartAreaRef.current as HTMLElement | null;
             const header = headerRef.current as HTMLElement | null;
             const scrollRow = node.querySelector('div.flex.overflow-x-auto') as HTMLElement | null;
@@ -1739,38 +1738,24 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                 overflow: scrollRow.style.overflow,
             } : null;
 
-            // Expand to exact content width (avoid extra empty months)
-            // 1) Allow inner scrollables to not clip
-            if (chart) {
-                chart.style.overflow = 'visible';
-                chart.style.maxHeight = 'none';
-            }
-            if (scrollRow) {
-                scrollRow.style.overflow = 'visible';
-            }
-            if (header) {
-                header.style.overflow = 'visible';
-            }
-
-            await new Promise(requestAnimationFrame);
-
-            // 2) Compute timeline width precisely from headers count * dayWidth
+            // Compute exact export size
             const tl = generateTimeline();
             const timelineWidth = view === 'days'
                 ? (tl as TimelineDayView).dayHeaders.length * dayWidth
                 : (tl as TimelineOtherView).length * dayWidth;
-
-            // 3) Compute left static columns width using the chart area's offset
             const leftStaticWidth = chart ? chart.offsetLeft : 0;
-
-            // 4) Apply exact widths so export includes just content
             const targetWidth = Math.ceil(leftStaticWidth + timelineWidth);
             const fullHeight = node.scrollHeight;
 
-            // Widen the chart area content width to timeline only
-            if (chart) chart.style.width = `${timelineWidth}px`;
+            // Minimize visible changes: only adjust overflow and exact widths required
+            if (chart) {
+                chart.style.overflow = 'visible';
+                chart.style.maxHeight = 'none';
+                chart.style.width = `${timelineWidth}px`;
+            }
+            if (scrollRow) scrollRow.style.overflow = 'visible';
+            if (header) header.style.overflow = 'visible';
 
-            // Also expand header's timeline section to the same width
             const headerFlex = header ? (header.querySelector(':scope > div.flex') as HTMLElement | null) : null;
             const headerTimeline = headerFlex && headerFlex.children && headerFlex.children.length >= 3 ? (headerFlex.children[2] as HTMLElement) : null;
             const originalHeaderTimeline = headerTimeline ? { width: headerTimeline.style.width } : null;
@@ -1781,51 +1766,41 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
             node.style.overflow = 'visible';
             node.style.maxHeight = 'none';
 
-            // High-DPI render while avoiding canvas size limits
             const pixelRatio = Math.min(2, Math.max(1, Math.floor(window.devicePixelRatio || 1)));
-
             const dataUrl = await toPng(node, {
                 cacheBust: true,
                 backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('color-scheme') === 'dark' ? '#1f2937' : '#f3f4f6',
                 pixelRatio,
                 width: targetWidth,
                 height: fullHeight,
-                style: {
-                    transform: 'none',
-                },
-                // Filter out interactive dropdown portals if any are mounted inside
+                style: { transform: 'none' },
                 filter: (domNode) => {
                     if (!(domNode instanceof Element)) return true;
-                    // Exclude tippy/tooltips and dropdown menus that might float
                     if (domNode.classList.contains('tippy-box')) return false;
                     if (domNode.getAttribute('role') === 'tooltip') return false;
                     return true;
                 }
             });
 
-            // Restore styles
+            // Restore styles ASAP
             node.style.width = original.width;
             node.style.height = original.height;
             node.style.overflow = original.overflow;
             node.style.maxHeight = original.maxHeight;
-
             if (chart && originalChart) {
                 chart.style.width = originalChart.width;
                 chart.style.height = originalChart.height;
                 chart.style.overflow = originalChart.overflow;
                 chart.style.maxHeight = originalChart.maxHeight;
             }
-
             if (header && originalHeader) {
                 header.style.width = originalHeader.width;
                 header.style.overflow = originalHeader.overflow;
             }
-
             if (scrollRow && originalScrollRow) {
                 scrollRow.style.width = originalScrollRow.width;
                 scrollRow.style.overflow = originalScrollRow.overflow;
             }
-
             if (headerTimeline && originalHeaderTimeline) {
                 headerTimeline.style.width = originalHeaderTimeline.width;
             }
@@ -1858,6 +1833,7 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
             const node = cardRef.current as HTMLElement | null;
             if (!node) return;
 
+            // Use original node for PDF as well, to match the exact on-screen look
             if (chartAreaRef.current) chartAreaRef.current.scrollLeft = 0;
             if (headerRef.current) headerRef.current.scrollLeft = 0;
             await new Promise(requestAnimationFrame);
@@ -1887,21 +1863,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                 overflow: scrollRow.style.overflow,
             } : null;
 
-            // Allow inner scrollables to not clip
-            if (chart) {
-                chart.style.overflow = 'visible';
-                chart.style.maxHeight = 'none';
-            }
-            if (scrollRow) {
-                scrollRow.style.overflow = 'visible';
-            }
-            if (header) {
-                header.style.overflow = 'visible';
-            }
-
-            await new Promise(requestAnimationFrame);
-
-            // Compute exact target width
             const tl = generateTimeline();
             const timelineWidth = view === 'days'
                 ? (tl as TimelineDayView).dayHeaders.length * dayWidth
@@ -1910,7 +1871,13 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
             const targetWidth = Math.ceil(leftStaticWidth + timelineWidth);
             const fullHeight = node.scrollHeight;
 
-            if (chart) chart.style.width = `${timelineWidth}px`;
+            if (chart) {
+                chart.style.overflow = 'visible';
+                chart.style.maxHeight = 'none';
+                chart.style.width = `${timelineWidth}px`;
+            }
+            if (scrollRow) scrollRow.style.overflow = 'visible';
+            if (header) header.style.overflow = 'visible';
             const headerFlex = header ? (header.querySelector(':scope > div.flex') as HTMLElement | null) : null;
             const headerTimeline = headerFlex && headerFlex.children && headerFlex.children.length >= 3 ? (headerFlex.children[2] as HTMLElement) : null;
             const originalHeaderTimeline = headerTimeline ? { width: headerTimeline.style.width } : null;
@@ -1936,7 +1903,6 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                     return true;
                 }
             });
-
             // Restore styles
             node.style.width = original.width;
             node.style.height = original.height;

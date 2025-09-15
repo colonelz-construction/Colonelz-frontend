@@ -49,6 +49,7 @@ const icons = {
 const Selector = ({ field, form, setCheckType, checkType }: SelectorProps) => {
     const permissions = permissionsMap[field.name] || permissionsMap.default;
     const { bgTheme } = useThemeClass()
+    const importantBgTheme = bgTheme.replace(/^bg-/, "!bg-")
     const [isDark, setIsDark] = useDarkMode()
 
     const handleChange = (permission: Permission) => {
@@ -80,21 +81,12 @@ const Selector = ({ field, form, setCheckType, checkType }: SelectorProps) => {
                     className={classNames(
                         'flex items-center !rounded-md cursor-pointer',
                         field.value.includes(perm)
-                            // ? perm === 'create'
-                            //     ? `${bgTheme} ${isDark ? "text-gray-100 hover:text-gray-300" : "text-white hover:text-gray-700"}`
-                            //     : perm === 'read'
-                            //         ? `${bgTheme} ${isDark ? "text-gray-100 hover:text-gray-300" : "text-white hover:text-gray-700"}`
-                            //         : perm === 'update'
-                            //             ? `${bgTheme} ${isDark ? "text-gray-100 hover:text-gray-300" : "text-white hover:text-gray-700"}`
-                            //             : perm === 'restore'
-                            //                 ? `${bgTheme} ${isDark ? "text-gray-100 hover:text-gray-300" : "text-white hover:text-gray-700"}`
-                            //                 : `${bgTheme} ${isDark ? "text-gray-100 hover:text-gray-300" : "text-white hover:text-gray-700"}`
-                            // : `bg-gray-100 text-gray-700 ${isDark ? "bg-gray-700 text-gray-100 hover:text-white" : ""}`
-
-
-                            ? `${bgTheme} ${isDark ? "text-gray-100 hover:text-gray-200" : "text-white hover:text-gray-700"}`
-                            : `${isDark ? "bg-gray-700 text-gray-100 hover:text-white" : "bg-gray-100 text-gray-700 hover:text-gray-900"}`
+                            ? `${importantBgTheme} text-white`
+                            : `${isDark
+                                ? "bg-gray-700 text-gray-100 hover:text-white"
+                                : "bg-gray-100 text-gray-700 hover:text-gray-900"}`
                     )}
+
                 >
                     {icons[perm]}
                     <span className="ml-2">{perm}</span>

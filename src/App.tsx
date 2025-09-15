@@ -71,7 +71,7 @@ const buildMuiTheme = (mode: 'light' | 'dark') =>
     MuiTableHead: {
       styleOverrides: {
         root: {
-          backgroundColor: mode === 'dark' ? '#374151' : '#f9fafb',
+          backgroundColor: mode === 'dark' ? '#374151' : '#f3f4f6',
         },
       },
     },

@@ -307,7 +307,7 @@ const Project = ({ className }: LeadsProps) => {
 
             <TableContainer style={{ scrollbarWidth: 'none', boxShadow: 'none'}}>
                 <Table stickyHeader>
-                    <TableHead>
+                    <TableHead sx={(theme) => ({ backgroundColor: theme.palette.mode === 'dark' ? undefined : '#f3f4f6' })}>
                         <TableRow  className='uppercase'>
                             <TableCell sx={{fontWeight:"600"}}>Project Name</TableCell>
                             <TableCell sx={{fontWeight:"600"}}>Project Type</TableCell>

@@ -8,9 +8,10 @@ import { apiEditRoles, apiGetRoleDetails } from '@/services/CrmService';
 import { StickyFooter } from '@/components/shared';
 import { useNavigate } from 'react-router-dom';
 import { obj, permissionsMap } from './CreateRole';
+import { useConfig } from '@/components/ui/ConfigProvider';
 
-type Permission = 'create' | 'read' | 'update' | 'delete'| 'restore' | 'move';
-type AccessType = 'lead' | 'user' | 'project' | 'task' | 'leadtask' | 'opentask' | 'contract' | 'quotation' | 'file' | 'archive' | 'mom' | 'addMember' | 'role' | 'companyData'| 'userArchive' | 'leadArchive' | 'dailyLineUp';
+type Permission = 'create' | 'read' | 'update' | 'delete' | 'restore' | 'move';
+type AccessType = 'lead' | 'user' | 'project' | 'task' | 'leadtask' | 'opentask' | 'contract' | 'quotation' | 'file' | 'archive' | 'mom' | 'addMember' | 'role' | 'companyData' | 'userArchive' | 'leadArchive' | 'dailyLineUp';
 
 type AccessPermissions = Permission[];
 
@@ -19,7 +20,7 @@ export type FormValues = {
 };
 
 const accessTypes: AccessType[] = [
-    'lead', 'user', 'project', 'task', 'leadtask', 'opentask', 'contract', 'quotation', 'file', 'archive', 'mom', 'addMember', 'role','companyData','userArchive', 'leadArchive', 'dailyLineUp'
+    'lead', 'user', 'project', 'task', 'leadtask', 'opentask', 'contract', 'quotation', 'file', 'archive', 'mom', 'addMember', 'role', 'companyData', 'userArchive', 'leadArchive', 'dailyLineUp'
 ];
 
 
@@ -32,6 +33,9 @@ const EditRoles = () => {
     const [checkType, setCheckType] = useState<any>(obj);
     const [newName, setNewName] = useState(role);
     const org_id = localStorage.getItem('orgId')
+
+    const { themeColor, primaryColorLevel } = useConfig()
+    console.log(themeColor, primaryColorLevel);
 
 
 
@@ -46,13 +50,13 @@ const EditRoles = () => {
         const fetchData = async () => {
             if (id) {
                 const response = await apiGetRoleDetails();
-                
+
                 if (response && response.data) {
                     const roleData = response.data.find((r: any) => r._id === id);
 
                     if (roleData && roleData.access) {
                         const newInitialValues = accessTypes.reduce((acc, type) => {
-                           
+
                             acc[type] = roleData.access[type] || [];
                             return acc;
                         }, {} as FormValues);
@@ -75,13 +79,13 @@ const EditRoles = () => {
         for (const key in checkType) {
             const typedKey = key as AccessType;
             if (initialValues[typedKey].length == permissionsMap[typedKey].length) {
-                setCheckType((prevCheckType : any) => ({
-                    ...prevCheckType, 
+                setCheckType((prevCheckType: any) => ({
+                    ...prevCheckType,
                     [typedKey]: true
                 }));
             }
         }
-        
+
 
     }, [initialValues])
 
@@ -90,9 +94,9 @@ const EditRoles = () => {
 
             Object.keys(checkType).forEach((key) => {
                 checkType[key as AccessType] = true;
-              });
+            });
 
-              setCheckType(checkType)
+            setCheckType(checkType)
             accessTypes.forEach((type) => {
                 const permissions = permissionsMap[type] || permissionsMap.default;
                 setFieldValue(type, permissions);
@@ -100,8 +104,8 @@ const EditRoles = () => {
         } else {
             Object.keys(checkType).forEach((key) => {
                 checkType[key as AccessType] = false;
-              });
-              setCheckType(checkType)
+            });
+            setCheckType(checkType)
             // Deselect all permissions
             accessTypes.forEach((type) => {
                 setFieldValue(type, []);
@@ -109,22 +113,22 @@ const EditRoles = () => {
         }
     };
 
-    const handleSelectType = (setFieldValue: any, type: AccessType, value: boolean, selectAll:boolean) => {
-      
+    const handleSelectType = (setFieldValue: any, type: AccessType, value: boolean, selectAll: boolean) => {
 
-            if (!checkType[type]) {
-                setCheckType({...checkType, [type]: true})              
-                const permissions = permissionsMap[type] || permissionsMap.default;
-                setFieldValue(type, permissions);
-             
-            } else {
-                setCheckType({...checkType, [type]: false})
-                setFieldValue(type, []);
-            }
+
+        if (!checkType[type]) {
+            setCheckType({ ...checkType, [type]: true })
+            const permissions = permissionsMap[type] || permissionsMap.default;
+            setFieldValue(type, permissions);
+
+        } else {
+            setCheckType({ ...checkType, [type]: false })
+            setFieldValue(type, []);
+        }
     };
 
     const handleSubmit = async (values: FormValues) => {
-        
+
         const access = Object.keys(values).reduce((acc, key) => {
             const permissions = values[key as AccessType];
             if (permissions.length > 0) {
@@ -141,8 +145,8 @@ const EditRoles = () => {
         };
 
         const response = await apiEditRoles(payload, id);
-        
-        
+
+
         if (response.code === 200) {
             toast.push(
                 <Notification type='success' duration={2000} closable>
@@ -158,32 +162,32 @@ const EditRoles = () => {
                 </Notification>
             );
         }
-        
+
 
     };
 
-   
+
 
     return (
         <div className='p-6'>
             <h3>Edit Role</h3>
 
-        
+
             <Formik
                 initialValues={initialValues}
                 onSubmit={handleSubmit}
                 enableReinitialize
             >
-                {({ isSubmitting,setFieldValue,values }) => {
-                     const [selectAll, setSelectAll] = useState(false);
-                     useEffect(() => {
+                {({ isSubmitting, setFieldValue, values }) => {
+                    const [selectAll, setSelectAll] = useState(false);
+                    useEffect(() => {
                         const allSelected = accessTypes.every(type => {
                             const permissions = permissionsMap[type] || permissionsMap.default;
                             return permissions.every(permission => values[type].includes(permission));
                         });
                         setSelectAll(allSelected);
                     }, [values]);
-                    return(
+                    return (
                         <div>
                             <div className="flex items-center gap-4">
                                 <FormItem label='Role' className='w-1/3 !mb-0 mt-5'>
@@ -195,10 +199,10 @@ const EditRoles = () => {
                                             setNewName(e.target.value)
                                         }}
                                     />
-                                    
+
                                 </FormItem>
                                 <div className="mt-5">
-                                <Checkbox
+                                    <Checkbox
                                         checked={selectAll}
                                         onChange={(value: boolean, e: ChangeEvent<HTMLInputElement>) => {
                                             setSelectAll(value);
@@ -207,62 +211,63 @@ const EditRoles = () => {
                                     >
                                         Select All Permissions
                                     </Checkbox>
-                                    </div>
-                                    </div>
+                                </div>
+                            </div>
 
-                    <Form>
-                        {accessTypes.map((type) => (
-                            <div
-                                key={type}
-                                className='grid md:grid-cols-4 gap-4 py-8 border-b border-gray-200 dark:border-gray-600 items-center'
-                            >
-
-                                <div className='flex items-center gap-2'>
-                                    <Checkbox
-                                        className='h-3 w-3'
-                                        checked={checkType[type]}
-                                        onChange={(value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-                                            handleSelectType(setFieldValue, type, value, selectAll)
-                                        }}
+                            <Form>
+                                {accessTypes.map((type) => (
+                                    <div
+                                        key={type}
+                                        className='grid md:grid-cols-4 gap-4 py-8 border-b border-gray-200 dark:border-gray-600 items-center'
                                     >
-                                    </Checkbox>
 
-                                    <div className="font-semibold mt-2">{type.charAt(0).toUpperCase() + type.slice(1)}</div>
-                                </div>
-                                <div className='flex gap-2'>
-                                    <Field name={type}>
-                                        {({ field, form }: any) => (
-                                            <Selector field={field} form={form} checkType={checkType} setCheckType={setCheckType}/>
-                                        )}
-                                    </Field>
-                                </div>
-                            </div>
-                        ))}
-                        <StickyFooter
-                            className="-mx-8 px-8 flex items-center justify-between py-4 mt-7"
-                            stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-                        >
-                            <div className='flex gap-3'>
-                                <Button
-                                    variant="solid"
-                                    loading={isSubmitting}
-                                    type="submit"
-                                    size='sm'
+                                        <div className='flex items-center gap-2'>
+                                            <Checkbox
+                                                className='h-3 w-3'
+                                                checked={checkType[type]}
+                                                onChange={(value: boolean, e: ChangeEvent<HTMLInputElement>) => {
+                                                    handleSelectType(setFieldValue, type, value, selectAll)
+                                                }}
+                                            >
+                                            </Checkbox>
+
+                                            <div className="font-semibold mt-2">{type.charAt(0).toUpperCase() + type.slice(1)}</div>
+                                        </div>
+                                        <div className='flex gap-2'>
+                                            <Field name={type}>
+                                                {({ field, form }: any) => (
+                                                    <Selector field={field} form={form} checkType={checkType} setCheckType={setCheckType} />
+                                                )}
+                                            </Field>
+                                        </div>
+                                    </div>
+                                ))}
+                                <StickyFooter
+                                    className="-mx-8 px-8 flex items-center justify-between py-4 mt-7"
+                                    stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                                 >
-                                    {isSubmitting ? 'Updating' : 'Update'}
-                                </Button>
-                                <Button
-                                    size='sm'
-                                    type="button"
-                                    onClick={() => navigate(`/app/crm/profile?type=roles`)}
-                                >
-                                    Back
-                                </Button>
-                            </div>
-                        </StickyFooter>
-                    </Form>
-                    </div>
-                )}}
+                                    <div className='flex gap-3'>
+                                        <Button
+                                            variant="solid"
+                                            loading={isSubmitting}
+                                            type="submit"
+                                            size='sm'
+                                        >
+                                            {isSubmitting ? 'Updating' : 'Update'}
+                                        </Button>
+                                        <Button
+                                            size='sm'
+                                            type="button"
+                                            onClick={() => navigate(`/app/crm/profile?type=roles`)}
+                                        >
+                                            Back
+                                        </Button>
+                                    </div>
+                                </StickyFooter>
+                            </Form>
+                        </div>
+                    )
+                }}
             </Formik>
         </div>
     );

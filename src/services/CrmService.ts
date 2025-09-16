@@ -49,9 +49,10 @@ const org_id = localStorage.getItem('orgId')
 export async function apiGetNotification<T>( // org done
     userId: string | null,
     page: number,
+    unreadOnly: boolean = false,
 ) {
     return ApiService.fetchData<NotificationResponse>({
-        url: `admin/get/notification?userId=${userId}&org_id=${localStorage.getItem('orgId')}&page=${page}&limit=20`,
+        url: `admin/get/notification?userId=${userId}&org_id=${localStorage.getItem('orgId')}&page=${page}&limit=20&unreadOnly=${unreadOnly}`,
         method: 'get',
     }).then((response) => {
         return response.data
@@ -562,6 +563,16 @@ export async function apiGetCrmSingleProjectEdit(formData: any) { // org done
         url: `admin/update/project`,
         method: 'put',
         data: { ...formData },
+    }).then((response) => {
+        return response.data
+    })
+}
+
+export async function apiUpdateProjectName(data: { project_id: string; org_id: string; project_name: string }) {
+    return ApiService.fetchData<any>({
+        url: 'admin/update/project/name',
+        method: 'put',
+        data,
     }).then((response) => {
         return response.data
     })

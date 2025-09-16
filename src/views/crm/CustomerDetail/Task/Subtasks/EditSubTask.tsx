@@ -8,21 +8,7 @@ import { MdOutlineAdd } from 'react-icons/md'
 import { HiOutlinePencil } from 'react-icons/hi'
 import { useLocation } from 'react-router-dom'
 import * as Yup from 'yup'
-
-type SubTask = {
-    project_id: string;
-    task_id: string;
-    sub_task_id: string;
-    sub_task_name: string;
-    sub_task_description: string;
-    estimated_sub_task_end_date: string;
-    sub_task_status: string;
-    sub_task_priority: string;
-    sub_task_createdOn: string;
-    sub_task_reporter: string;
-    sub_task_createdBy: string;
-    sub_task_assignee: string;
-};
+import type { SubTask } from '@/@types/common'
 
   type SubtaskData={
     Data:SubTask

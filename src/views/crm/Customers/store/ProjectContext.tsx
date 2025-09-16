@@ -43,9 +43,11 @@ interface ProjectContextType {
   projects: any[];
   apiData: any;
   loading:boolean;
+  updateProjectInContext: (projectId: string, updates: Partial<ProjectData>) => void;
+  refreshProjects: () => Promise<void>;
 }
 
-const ProjectContext = createContext<ProjectContextType>({ projects: [], apiData: {},loading:true });
+const ProjectContext = createContext<ProjectContextType>({ projects: [], apiData: {},loading:true, updateProjectInContext: () => {}, refreshProjects: async () => {} });
 
 export const useProjectContext = () => useContext(ProjectContext);
 const org_id = localStorage.getItem('orgId')
@@ -66,8 +68,20 @@ useEffect(() => {
 }
 , []);
 
+    const updateProjectInContext = (projectId: string, updates: Partial<ProjectData>) => {
+        setProjects(prev => prev.map(p => p.project_id === projectId ? { ...p, ...updates } : p));
+    };
+
+    const refreshProjects = async () => {
+        setLoading(true);
+        const response = await apiGetCrmProjects(org_id);
+        setProjects(response.data.projects);
+        setApiData(response.data);
+        setLoading(false);
+    };
+
     return (
-        <ProjectContext.Provider value={{ projects, apiData,loading }}>
+        <ProjectContext.Provider value={{ projects, apiData,loading, updateProjectInContext, refreshProjects }}>
             {children}
         </ProjectContext.Provider>
     );

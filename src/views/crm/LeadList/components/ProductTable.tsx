@@ -297,7 +297,7 @@ const Filtering = () => {
                             const hasPendingContract = row.original.hasPendingContract;
                             
                             return (
-                                <TableRow sx={{backgroundColor: hasPendingContract ? "#CCFBF1": "inherit" ,'&:hover': { backgroundColor: '#dfedfe' }}} key={row.id} onClick={()=>navigate(`/app/crm/lead/?id=${row.original.lead_id}&tab=Details`)} className=' cursor-pointer'>
+                                <TableRow sx={(theme) => ({backgroundColor: hasPendingContract ? "#CCFBF1": "inherit" , '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? 'rgba(55, 65, 81, 0.10)' : 'rgba(243, 244, 246, 0.10)' }})} key={row.id} onClick={()=>navigate(`/app/crm/lead/?id=${row.original.lead_id}&tab=Details`)} className=' cursor-pointer'>
                                     {row.getVisibleCells().map((cell) => {
                                         return (
                                             <TableCell key={cell.id}>

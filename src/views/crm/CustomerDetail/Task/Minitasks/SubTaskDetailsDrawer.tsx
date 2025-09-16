@@ -10,6 +10,7 @@ import TabContent from '@/components/ui/Tabs/TabContent';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SubTaskTimer from './SubTaskTimer';
 import App from '../../../CustomerDetail/components/MOM/Richtext'
+import type { SubTask, Remarks } from '@/@types/common'
 
 export type TimerResponse = {
   code: number;
@@ -27,28 +28,6 @@ type TimerData={
   total_time:string,
 }
 
-type SubTask = {
-    lead_id: string;
-    task_id: string;
-    sub_task_id:string;
-    sub_task_name: string;
-    sub_task_description: string;
-    actual_sub_task_start_date: string;
-    actual_sub_task_end_date: string;
-    estimated_sub_task_start_date: string;
-    estimated_sub_task_end_date: string;
-    sub_task_status: string;
-    sub_task_priority: string;
-    sub_task_createdOn: string;
-    sub_task_reporter: string;
-    sub_task_createdBy: string;
-    sub_task_assignee: string;
-    remark:Remarks[]
-};
-type Remarks={
-    remark:string;
-    remark_by:string;
-    remark_date:string;}
 type Data={
     data:SubTask
 }

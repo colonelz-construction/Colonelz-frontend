@@ -22,7 +22,6 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
   const selectRef = useRef<HTMLDivElement>(null);
   const colorInputRef = useRef<HTMLInputElement>(null);
 
-  // Predefined colors with better organization
   const predefinedColors = [
     "#3B82F6", "#1D4ED8", "#1E40AF", // Blues
     "#EF4444", "#DC2626", "#B91C1C", // Reds
@@ -52,42 +51,46 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (!selectRef.current) return;
-      
+
       const target = event.target as Node;
-      
+
       if (selectRef.current.contains(target)) {
         return;
       }
-      
+
       if (modalId) {
-        const modalElement = document.querySelector(`[data-modal-id="${modalId}"]`) || 
-                            document.querySelector('.dialog') || 
-                            document.querySelector('[role="dialog"]');
-        
+        const modalElement =
+          document.querySelector(`[data-modal-id="${modalId}"]`) ||
+          document.querySelector(".dialog") ||
+          document.querySelector('[role="dialog"]');
+
         if (modalElement && modalElement.contains(target)) {
           const clickedElement = target as Element;
-          
-          if (clickedElement.tagName === 'INPUT' || 
-              clickedElement.tagName === 'BUTTON' || 
-              clickedElement.tagName === 'TEXTAREA' ||
-              clickedElement.closest('input') ||
-              clickedElement.closest('button') ||
-              clickedElement.closest('.react-datepicker') ||
-              clickedElement.closest('[role="button"]')) {
+
+          if (
+            clickedElement.tagName === "INPUT" ||
+            clickedElement.tagName === "BUTTON" ||
+            clickedElement.tagName === "TEXTAREA" ||
+            clickedElement.closest("input") ||
+            clickedElement.closest("button") ||
+            clickedElement.closest(".react-datepicker") ||
+            clickedElement.closest('[role="button"]')
+          ) {
             setIsOpen(false);
             return;
           }
-          
+
           return;
         }
       }
-      
+
       setIsOpen(false);
     };
 
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [isOpen, modalId]);
 
@@ -109,7 +112,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
       >
         {selectedColor ? (
           <div className="flex items-center gap-2">
-            <span 
+            <span
               className="h-4 w-4 rounded-full border border-gray-300 shadow-sm"
               style={{ backgroundColor: selectedColor }}
             />
@@ -123,12 +126,14 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
         )}
         <FaAngleDown className="text-gray-400" />
       </button>
-      
+
       {isOpen && (
         <div className="absolute z-50 w-full bg-white border border-gray-300 mt-1 rounded-md shadow-lg max-h-80 overflow-auto">
           {/* Predefined Colors Grid */}
           <div className="p-3">
-            <div className="text-xs font-medium text-gray-600 mb-2">Predefined Colors</div>
+            <div className="text-xs font-medium text-gray-600 mb-2">
+              Predefined Colors
+            </div>
             <div className="grid grid-cols-5 gap-2">
               {predefinedColors.map((color) => (
                 <button
@@ -136,7 +141,9 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
                   type="button"
                   onClick={() => handleColorSelect(color)}
                   className={`w-8 h-8 rounded-full border-2 hover:scale-110 transition-transform ${
-                    selectedColor === color ? 'border-gray-800 shadow-md' : 'border-gray-200 hover:border-gray-400'
+                    selectedColor === color
+                      ? "border-gray-800 shadow-md"
+                      : "border-gray-200 hover:border-gray-400"
                   }`}
                   style={{ backgroundColor: color }}
                   title={color}
@@ -144,32 +151,40 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
               ))}
             </div>
           </div>
-          
+
           {/* Custom Color Picker */}
           <div className="border-t border-gray-200 p-3">
-            <div className="text-xs font-medium text-gray-600 mb-2">Custom Color</div>
+            <div className="text-xs font-medium text-gray-600 mb-2">
+              Custom Color
+            </div>
             <div className="flex items-center gap-2">
+              {/* Circular Color Picker */}
               <input
                 ref={colorInputRef}
                 type="color"
                 value={customColor}
                 onChange={handleCustomColorChange}
-                className="w-8 h-8 rounded-full border border-gray-300 cursor-pointer"
+                className="w-5 rounded-full h-5 cursor-pointer bg-grey-100"
                 title="Pick custom color"
               />
+
+              {/* Hex Input */}
               <input
                 type="text"
                 value={customColor}
                 onChange={(e) => {
                   const color = e.target.value;
-                  if (/^#[0-9A-F]{6}$/i.test(color) || /^#[0-9A-F]{3}$/i.test(color)) {
+                  if (
+                    /^#[0-9A-F]{6}$/i.test(color) ||
+                    /^#[0-9A-F]{3}$/i.test(color)
+                  ) {
                     setCustomColor(color);
                     setSelectedColor(color);
                     onChange(color);
                   }
                 }}
                 placeholder="#3B82F6"
-                className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500 w-[90%]"
               />
             </div>
           </div>

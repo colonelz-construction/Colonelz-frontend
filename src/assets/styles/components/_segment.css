@@ -52,3 +52,14 @@
     @apply cursor-not-allowed opacity-40;
   }
 }
+
+/* Themed variant to allow utility bg-* classes to show through without being overridden */
+.segment-item-default.is-themed {
+  @apply bg-transparent dark:bg-transparent;
+}
+.segment-item-default.is-themed:not(.segment-item-disabled) {
+  @apply hover:bg-transparent dark:hover:bg-transparent active:bg-transparent dark:active:bg-transparent;
+}
+.segment-item-default.is-themed.segment-item-active {
+  @apply bg-transparent dark:bg-transparent border-gray-300 dark:border-gray-700;
+}

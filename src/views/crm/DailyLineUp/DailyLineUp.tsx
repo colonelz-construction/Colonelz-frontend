@@ -547,6 +547,9 @@ const DailyLineUp: React.FC = () => {
         const data = getVisibleData()
         if (!data) return
 
+        const columnCount = data.headers.length
+        const columnWidth = `${100 / columnCount}%` // Equal width for all
+
         let htmlContent = `
             <html>
             <head>
@@ -554,32 +557,42 @@ const DailyLineUp: React.FC = () => {
                 <style>
                     body { font-family: Arial, sans-serif; margin: 20px; }
                     h1 { color: #333; text-align: center; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background-color: #f5f5f5; font-weight: bold; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; table-layout: fixed; }
+                    th, td { 
+                        border: 1px solid #ddd; 
+                        padding: 8px; 
+                        word-wrap: break-word;
+                        width: ${columnWidth};
+                    }
+                    th { 
+                        background-color: #f5f5f5; 
+                        font-weight: bold; 
+                        text-align: center;   /* Center horizontally */
+                        vertical-align: middle; /* Center vertically */
+                        white-space: normal; /* Allow wrapping */
+                    }
                     tr:nth-child(even) { background-color: #f9f9f9; }
                 </style>
             </head>
             <body>
                 <h1>Daily LineUp - ${currentSheet}</h1>
                 <table>
-                    <thead><tr>${data.headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+                    <thead>
+                        <tr>${data.headers.map(h => `<th>${h}</th>`).join('')}</tr>
+                    </thead>
                     <tbody>
-${data.rows.map(row =>
+                        ${data.rows.map(row =>
             `<tr>
-     <td>${row.time}</td>
-     ${data.headers.slice(1).map(h => {
+                                <td>${row.time}</td>
+                                ${data.headers.slice(1).map(h => {
                 let cell = row[h] || ''
-                // Preserve newlines as <br>
                 if (typeof cell === 'string') {
-                    cell = cell.replace(/\n/g, '<br>')
+                    cell = cell.replace(/\\n/g, '<br>')
                 }
                 return `<td>${cell}</td>`
             }).join('')}
-   </tr>`
+                            </tr>`
         ).join('')}
-
-
                     </tbody>
                 </table>
             </body>
@@ -594,6 +607,8 @@ ${data.rows.map(row =>
         a.click()
         window.URL.revokeObjectURL(url)
     }
+
+
 
     const handleDownload = (format: string) => {
         if (format === 'csv') downloadCSV()

@@ -50,6 +50,7 @@ const Selector = ({ field, form, setCheckType, checkType }: SelectorProps) => {
     const permissions = permissionsMap[field.name] || permissionsMap.default;
     const { bgTheme } = useThemeClass()
     const importantBgTheme = bgTheme.replace(/^bg-/, "!bg-")
+    console.log(importantBgTheme, "importantBgTheme")
     const [isDark, setIsDark] = useDarkMode()
 
     const handleChange = (permission: Permission) => {
@@ -89,7 +90,7 @@ const Selector = ({ field, form, setCheckType, checkType }: SelectorProps) => {
                 >
                     {icons[perm]}
                     <span className="ml-2">{perm}</span>
-                    {field.value.includes(perm) && <HiCheck className="ml-2 text-green-700" />}
+                    {/* {field.value.includes(perm) && <HiCheck className="ml-2 text-green-700" />} */}
                 </Segment.Item>
             ))}
         </Segment>

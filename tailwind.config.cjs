@@ -12,6 +12,11 @@ module.exports = {
     	"./src/**/*.{js,ts,jsx,tsx}", 
 		'./safelist.txt'
 	],
+	safelist: [
+		{
+		  pattern: /^!?bg-(.*)$/,
+		},
+	  ],
 	darkMode: 'class',
 		theme: {
 			fontFamily: {

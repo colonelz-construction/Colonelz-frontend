@@ -348,21 +348,28 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
 
         if (deltaDays === 0) return;
 
+        // Clamp within parent task bounds
+        const task = localExecData.find((t: any) => t.task_id === dragging.taskId);
+        const taskStart = safeParseDate(task?.start_date);
+        const taskEnd = safeParseDate(task?.end_date);
+
         if (dragging.type === 'left') {
-            const newStartDate = addDays(dragging.originalStartDate as Date, deltaDays);
-            // Ensure new start date is before end date
-            if (newStartDate < (tempDates.end || dragging.originalEndDate as Date)) {
+            let newStartDate = addDays(dragging.originalStartDate as Date, deltaDays);
+            if (taskStart && newStartDate < taskStart) newStartDate = taskStart;
+            const currentEnd = tempDates.end || (dragging.originalEndDate as Date);
+            if (newStartDate < currentEnd) {
                 setTempDates({
                     start: newStartDate,
-                    end: tempDates.end || dragging.originalEndDate
+                    end: currentEnd
                 });
             }
         } else {
-            const newEndDate = addDays(dragging.originalEndDate as Date, deltaDays);
-            // Ensure new end date is after start date
-            if (newEndDate > (tempDates.start || dragging.originalStartDate as Date)) {
+            let newEndDate = addDays(dragging.originalEndDate as Date, deltaDays);
+            if (taskEnd && newEndDate > taskEnd) newEndDate = taskEnd;
+            const currentStart = tempDates.start || (dragging.originalStartDate as Date);
+            if (newEndDate > currentStart) {
                 setTempDates({
-                    start: tempDates.start || dragging.originalStartDate,
+                    start: currentStart,
                     end: newEndDate
                 });
             }
@@ -790,8 +797,23 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
 
         if (deltaDays === 0) return;
 
-        const newStartDate = addDays(moveDragging.originalStartDate as Date, deltaDays);
-        const newEndDate = addDays(newStartDate, moveDragging.durationDays);
+        // Clamp within subtask bounds (and thus within task)
+        const task = localExecData.find((t: any) => t.task_id === moveDragging.taskId);
+        const subtask = task?.subtasks?.find((st: any) => st.sub_task_id === moveDragging.subtaskId);
+        const subtaskStart = safeParseDate(subtask?.sub_task_start_date ?? subtask?.subtask_start_date ?? subtask?.start_date ?? task?.start_date);
+        const subtaskEnd = safeParseDate(subtask?.sub_task_end_date ?? subtask?.subtask_end_date ?? subtask?.end_date ?? task?.end_date);
+
+        let newStartDate = addDays(moveDragging.originalStartDate as Date, deltaDays);
+        let newEndDate = addDays(newStartDate, moveDragging.durationDays as number);
+
+        if (subtaskStart && newStartDate < subtaskStart) {
+            newStartDate = subtaskStart;
+            newEndDate = addDays(newStartDate, moveDragging.durationDays as number);
+        }
+        if (subtaskEnd && newEndDate > subtaskEnd) {
+            newEndDate = subtaskEnd;
+            newStartDate = addDays(newEndDate, -(moveDragging.durationDays as number));
+        }
 
         setMoveTempDates({
             start: newStartDate,
@@ -971,6 +993,8 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
         const deltaDays = Math.round(deltaX / dayWidth);
         if (deltaDays === 0) return;
 
+        // Clamp tasks within global chart window (optional: use project bounds if available)
+        // For now, just ensure logical constraints: start before end and edges move both ways
         if (taskDragging.type === 'left') {
             const newStartDate = addDays(taskDragging.originalStartDate as Date, deltaDays);
             if (newStartDate < (taskTempDates.end || taskDragging.originalEndDate as Date)) {
@@ -1994,9 +2018,9 @@ const GanttChart = ({ execData, onRefreshData }: GanttChartProps) => {
                     <AddExecTask onAddSuccess={refreshExecData} />
 
                     <div className="flex items-center gap-2">
-                        <Button variant='solid' size='sm' className='rounded-lg' onClick={openShareDialog}>
+                        {/* <Button variant='solid' size='sm' className='rounded-lg' onClick={openShareDialog}>
                             Share to Client
-                        </Button>
+                        </Button> */}
                         <Dropdown renderTitle={<HiOutlineDownload className="cursor-pointer text-xl" />} placement='bottom-end'>
                             <Dropdown.Item eventKey="png" onClick={handleDownload}>
                                 <div className="text-sm">Download PNG</div>

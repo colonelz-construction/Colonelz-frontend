@@ -499,7 +499,11 @@ const DailyLineUp: React.FC = () => {
             data.headers.join(','),
             ...data.rows.map(row => [
                 `"${row.time.toString().replace(/"/g, '""')}"`,
-                ...data.headers.slice(1).map(header => `"${(row[header] || '').toString().replace(/"/g, '""')}"`)
+                ...data.headers.slice(1).map(header => {
+                    const cellValue = (row[header] || '').toString()
+                    // Preserve line breaks and formatting by escaping them properly
+                    return `"${cellValue.replace(/"/g, '""').replace(/\n/g, '\\n')}"`
+                })
             ].join(','))
         ].join('\n')
 
@@ -528,7 +532,8 @@ const DailyLineUp: React.FC = () => {
         worksheet.forEach((row, i) => {
             xlsContent += '<tr>'
             row.forEach(cell => {
-                xlsContent += i === 0 ? `<th>${cell}</th>` : `<td>${cell}</td>`
+                const cellValue = typeof cell === 'string' ? cell.replace(/\n/g, '<br>') : cell
+                xlsContent += i === 0 ? `<th>${cellValue}</th>` : `<td>${cellValue}</td>`
             })
             xlsContent += '</tr>'
         })
@@ -547,49 +552,80 @@ const DailyLineUp: React.FC = () => {
         const data = getVisibleData()
         if (!data) return
 
-        const columnCount = data.headers.length
-        const columnWidth = `${100 / columnCount}%` // Equal width for all
+        // Fixed column widths that look good regardless of number of users
+        const timeColumnWidth = '120px'  // Fixed width for time column
+        const userColumnWidth = '200px'  // Fixed width for each user column
 
         let htmlContent = `
             <html>
             <head>
                 <title>Daily LineUp - ${currentSheet}</title>
                 <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    h1 { color: #333; text-align: center; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; table-layout: fixed; }
+                    body { 
+                        font-family: Arial, sans-serif; 
+                        margin: 20px; 
+                        font-size: 12px;
+                    }
+                    h1 { 
+                        color: #333; 
+                        text-align: center; 
+                        margin-bottom: 20px;
+                    }
+                    table { 
+                        width: auto; 
+                        border-collapse: collapse; 
+                        margin: 0 auto;
+                        table-layout: fixed;
+                        min-width: 600px;
+                    }
                     th, td { 
                         border: 1px solid #ddd; 
                         padding: 8px; 
                         word-wrap: break-word;
-                        width: ${columnWidth};
+                        vertical-align: top;
+                        text-align: left;
                     }
                     th { 
                         background-color: #f5f5f5; 
                         font-weight: bold; 
-                        text-align: center;   /* Center horizontally */
-                        vertical-align: middle; /* Center vertically */
-                        white-space: normal; /* Allow wrapping */
+                        text-align: center;
+                        vertical-align: middle;
+                        white-space: normal;
+                    }
+                    .time-column {
+                        width: ${timeColumnWidth};
+                        min-width: ${timeColumnWidth};
+                        max-width: ${timeColumnWidth};
+                    }
+                    .user-column {
+                        width: ${userColumnWidth};
+                        min-width: ${userColumnWidth};
+                        max-width: ${userColumnWidth};
                     }
                     tr:nth-child(even) { background-color: #f9f9f9; }
+                    tr:nth-child(odd) { background-color: #ffffff; }
                 </style>
             </head>
             <body>
                 <h1>Daily LineUp - ${currentSheet}</h1>
                 <table>
                     <thead>
-                        <tr>${data.headers.map(h => `<th>${h}</th>`).join('')}</tr>
+                        <tr>
+                            <th class="time-column">${data.headers[0]}</th>
+                            ${data.headers.slice(1).map(h => `<th class="user-column">${h}</th>`).join('')}
+                        </tr>
                     </thead>
                     <tbody>
                         ${data.rows.map(row =>
             `<tr>
-                                <td>${row.time}</td>
+                                <td class="time-column">${row.time}</td>
                                 ${data.headers.slice(1).map(h => {
                 let cell = row[h] || ''
                 if (typeof cell === 'string') {
-                    cell = cell.replace(/\\n/g, '<br>')
+                    // Preserve line breaks and formatting for numbered lists and bullet points
+                    cell = cell.replace(/\n/g, '<br>')
                 }
-                return `<td>${cell}</td>`
+                return `<td class="user-column">${cell}</td>`
             }).join('')}
                             </tr>`
         ).join('')}
